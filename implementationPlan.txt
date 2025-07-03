@@ -1,0 +1,242 @@
+# Slab Advisor Implementation Plan
+
+## Prerequisites (Tasks for You to Complete)
+
+Before development begins, please gather the following information:
+
+### 1. Grading Service Pricing Research
+- **PSA Pricing Plans**: Research current PSA grading costs for different service levels (Economy, Regular, Express, Super Express)
+- **BGS/Beckett Pricing Plans**: Find current BGS pricing tiers and turnaround times
+- **SGC Pricing Plans**: Research SGC pricing structure and service options
+- **Additional Fees**: Note any additional fees (shipping, handling, insurance, etc.)
+
+### 2. Business Model Decisions
+- **Free Tier Limits**: Decide how many free scans per user (suggested: 3-5)
+- **Pricing Strategy**: Choose between subscription vs pay-per-scan vs credit system
+- **Card Types**: Decide which card types to support initially (all sports, specific sports, include non-sports like Pokemon/Magic)
+
+### 2a. MVP Scope (DECIDED)
+- **Collection Dashboard**: Simple list view with cards, grades, and pricing data
+- **Required Data per Card**:
+  - Card title and images
+  - Estimated grade from Ximilar
+  - Current ungraded market price
+  - Estimated graded price at predicted grade
+  - Price at grade above (if applicable)
+  - Price at grade below (if applicable)
+  - Date price was captured
+- **Collection Features**:
+  - Total ungraded portfolio value
+  - Sort by price (high to low, low to high)
+  - Sort by estimated grade (high to low, low to high)
+  - Search by card title
+- **No Advanced Analytics**: Charts and detailed analytics can wait for v2
+
+### 3. Technical Preferences
+- **LLM Service**: Choose between OpenAI GPT-4, Anthropic Claude, or other
+- **Design Direction**: Mobile-first or desktop-first approach preference
+- **Brand Colors**: Any specific color scheme or branding preferences
+
+### 3a. Image Storage Strategy (DECIDED)
+- **Storage Service**: Supabase Storage (integrated with database/auth)
+- **Bucket Structure**: `card-images/{user_id}/{card_id}/front.jpg` and `/back.jpg`
+- **Image Requirements**:
+  - Max size: 10MB per image
+  - Formats: JPG, PNG, WebP
+  - Recommended: 1200px max width for optimal quality/size balance
+  - Auto-optimization available through Supabase CDN
+- **Security**: Row Level Security policies ensure users only access their own images
+
+### 3b. Error Handling & Edge Cases (DECIDED)
+- **Failed Grading (Poor Image Quality)**:
+  - Do NOT charge user credits
+  - Show error message with image quality recommendations
+  - Display optimal photo guidelines (good lighting, clean background, no glare)
+  - Allow re-upload without penalty
+- **Successful Grading, Failed Price/Title Detection**:
+  - Save the grade estimate (user was charged for this)
+  - Allow manual entry of card title and price
+  - Provide "Request AI Price Insights" button for manual LLM search
+  - Store partial data and allow completion later
+- **Fallback Flow**: Grade → Manual Title Entry → Manual Price Entry → Optional AI Insights
+
+### 3c. User Experience Flow (DECIDED)
+- **Upload Process**: Two separate uploads (front and back) but stored together as one card
+- **Authentication Required**: Must create account and login to upload images
+- **Free Tier**: 2 free card analyses for new users
+- **Paywall Flow**:
+  - Users can upload front/back images even without credits
+  - "Analyze/Grade" button triggers paywall when credits exhausted
+  - Must purchase credits to proceed with analysis
+- **Credit System**: Pay-per-analysis model (not subscription)
+
+### 3d. Data Privacy & User Control (DECIDED)
+- **User Deletion Rights**: Users can delete any of their uploaded cards
+- **Data Retention**: Retain all data indefinitely (users paid for the service)
+- **Pricing Consideration**: Long-term storage costs may require hybrid model:
+  - Pay-per-analysis for grading
+  - Small subscription fee for collection storage/management
+- **Storage Strategy**: Need to account for growing image storage costs in pricing
+
+### 4. Backend Service Accounts to Create
+- **Supabase Account**: Create account at supabase.com
+  - Set up new project for Slab Advisor
+  - Get API keys (anon public key and service role key)
+  - Configure authentication providers
+- **Stripe Account**: Create account at stripe.com
+  - Complete business verification
+  - Get API keys (publishable key and secret key)
+  - Set up webhook endpoints (for later phases)
+- **LLM Service Account**: Choose one:
+  - **OpenAI**: Create account at platform.openai.com, get API key
+  - **Anthropic**: Create account at console.anthropic.com, get API key
+- **Vercel Account** (for deployment): Create account at vercel.com
+  - Connect to GitHub repository
+  - Set up environment variables for production
+
+### 5. API Access Preparation
+- **Ximilar API Documentation**: Have API docs ready for integration phase
+- **Ximilar API Token**: Confirm API token is working and note any usage limits
+
+### 6. Sample Data & Testing
+- **Test Cards**: Gather 5-10 sample card images (front/back) for testing
+- **Known Grades**: If possible, include cards with known grades for validation
+- **Domain Name** (optional): Purchase domain name if desired (can use Vercel subdomain initially)
+
+---
+
+## Phase 1: Foundation & Authentication (Week 1)
+
+  1. Update Next.js app metadata and branding
+    - Update layout.tsx with Slab Advisor
+  title/description
+    - Create logo and brand colors
+    - Set up Tailwind theme
+  2. Supabase Setup
+    - Install Supabase client libraries
+    - Set up Supabase project
+    - Configure authentication (email/password,
+  maybe Google)
+    - Create auth components (login, signup,
+  logout)
+    - Set up protected routes
+  3. Basic Layout Structure
+    - Navigation header with auth status
+    - Dashboard layout for authenticated users
+    - Landing page for non-authenticated users
+
+  Phase 2: Core Upload & Grading (Week 2)
+
+  1. Image Upload Interface
+    - Create card upload component
+    - Front/back image upload with preview
+    - Image validation (size, format)
+    - Progress indicators
+  2. Ximilar Integration
+    - Set up API integration
+    - Create service layer for Ximilar calls
+    - Handle response parsing
+    - Error handling and retries
+  3. Database Schema
+    - Cards table (id, user_id, front_image,
+  back_image, estimated_grade, created_at)
+    - Grading results table (card_id, service,
+  grade, confidence, details)
+    - Price history table
+
+  Phase 3: Market Price Analysis (Week 3)
+
+  1. LLM Integration
+    - Set up OpenAI/Anthropic API
+    - Create prompt templates for price searches
+    - Parse and validate price data
+  2. Price Comparison Engine
+    - Fetch ungraded card prices
+    - Calculate graded card values by grade
+    - Store price snapshots
+  3. Grading Service Cost Calculator
+    - PSA pricing tiers
+    - BGS (Beckett) pricing
+    - SGC pricing
+    - Turnaround time options
+
+  Phase 4: User Dashboard & Analytics (Week 4)
+
+  1. Card Collection View
+    - Grid/list view of uploaded cards
+    - Filter by grade, value, date
+    - Search functionality
+  2. Individual Card Details
+    - Grade breakdown
+    - Price history chart
+    - ROI calculator
+    - Grading recommendations
+  3. Portfolio Analytics
+    - Total collection value
+    - Grade distribution
+    - Best ROI opportunities
+
+  Phase 5: Monetization & Polish (Week 5)
+
+  1. Stripe Integration
+    - Subscription tiers (free/pro)
+    - Usage-based pricing
+    - Payment flow
+  2. Advanced Features
+    - Bulk upload
+    - Export reports (PDF/CSV)
+    - Price alerts
+    - Grade comparison across services
+  3. Performance & UX
+    - Image optimization
+    - Caching strategy
+    - Loading states
+    - Error boundaries
+
+## Phase 6: Additional Authentication Providers (Post-Launch)
+
+1. **Apple Sign-In** (Requires $99/year Apple Developer Account)
+   - Important for iOS users
+   - Required for iOS app if you build one later
+   - Configure in Supabase after obtaining developer account
+
+2. **Facebook Login**
+   - Large collector communities on Facebook
+   - Free to implement
+   - Good for social sharing features
+
+3. **Discord Login**
+   - Popular with TCG/gaming communities
+   - Many card collectors use Discord
+   - Free to implement
+
+4. **X/Twitter Login**
+   - Active card collector community
+   - Good for viral marketing
+   - Free to implement
+
+5. **Microsoft/Xbox Login**
+   - Broader user base
+   - Good for gaming card collectors
+   - Free to implement
+
+Note: Start with Google + Email for MVP. Add others based on user feedback and demand.
+
+  Technical Architecture
+
+  Frontend (Next.js)
+      ↓
+  API Routes
+      ↓
+  Services Layer
+      ├── Supabase (Auth & DB)
+      ├── Ximilar (Grading)
+      ├── LLM (Price Search)
+      └── Stripe (Payments)
+
+  First Steps to Start
+
+  1. Set up Supabase project and get credentials
+  2. Design the database schema
+  3. Create basic auth flow
+  4. Build simple upload interfac
