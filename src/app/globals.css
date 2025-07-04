@@ -10,6 +10,30 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom Orange Brand Color */
+  --color-orange-50: #fef7f4;
+  --color-orange-100: #feeee8;
+  --color-orange-200: #fddbcc;
+  --color-orange-300: #fbbfa0;
+  --color-orange-400: #ff6b47;
+  --color-orange-500: #f25733; /* Primary brand orange */
+  --color-orange-600: #d94d2a;
+  --color-orange-700: #b8421f;
+  --color-orange-800: #993818;
+  --color-orange-900: #7d2f15;
+  
+  /* Custom Grey Brand Colors */
+  --color-grey-50: #fafafa;
+  --color-grey-100: #f5f5f5;
+  --color-grey-200: #ededed; /* Your light grey */
+  --color-grey-300: #d0d0d0;
+  --color-grey-400: #a3a3a3;
+  --color-grey-500: #737373;
+  --color-grey-600: #525252;
+  --color-grey-700: #423d3d; /* Your dark primary */
+  --color-grey-800: #363131;
+  --color-grey-900: #2a2525;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -176,15 +176,15 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Card Photos</h3>
+      <h3 className="text-lg font-medium text-grey-900 mb-4">Upload Card Photos</h3>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Front Image Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-grey-700 mb-2">
             Front of Card
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+          <div className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors">
             {frontPreview ? (
               <div className="space-y-2">
                 <img
@@ -204,10 +204,10 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
               </div>
             ) : (
               <div>
-                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <svg className="mx-auto h-12 w-12 text-grey-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-600">Click to upload front image</p>
+                <p className="mt-2 text-sm text-grey-600">Click to upload front image</p>
               </div>
             )}
             <input
@@ -221,10 +221,10 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
 
         {/* Back Image Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-grey-700 mb-2">
             Back of Card
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+          <div className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors">
             {backPreview ? (
               <div className="space-y-2">
                 <img
@@ -244,10 +244,10 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
               </div>
             ) : (
               <div>
-                <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <svg className="mx-auto h-12 w-12 text-grey-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <p className="mt-2 text-sm text-gray-600">Click to upload back image</p>
+                <p className="mt-2 text-sm text-grey-600">Click to upload back image</p>
               </div>
             )}
             <input
@@ -270,7 +270,7 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
         <button
           onClick={handleAnalyze}
           disabled={!frontImage || !backImage || loading}
-          className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:bg-grey-300 disabled:cursor-not-allowed"
         >
           {loading ? (
             <div className="flex items-center justify-center">
@@ -286,7 +286,7 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
         </button>
       </div>
 
-      <div className="mt-4 text-sm text-gray-500">
+      <div className="mt-4 text-sm text-grey-500">
         <p>💡 <strong>Tips for best results:</strong></p>
         <ul className="mt-1 list-disc list-inside space-y-1">
           <li>Use good lighting with no shadows</li>
