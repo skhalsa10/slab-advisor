@@ -1,29 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signOut, getCurrentUser, getUserCredits } from '@/lib/auth'
-import type { User } from '@supabase/supabase-js'
+import { signOut } from '@/lib/auth'
+import { useCredits } from '@/contexts/CreditsContext'
 
 interface HeaderProps {
   onSignOut: () => void
 }
 
 export default function Header({ onSignOut }: HeaderProps) {
-  const [user, setUser] = useState<User | null>(null)
-  const [credits, setCredits] = useState(0)
-
-  useEffect(() => {
-    getCurrentUser().then(setUser).catch(console.error)
-  }, [])
-
-  useEffect(() => {
-    if (user) {
-      getUserCredits(user.id).then(setCredits).catch(console.error)
-    }
-  }, [user])
+  const { user, credits, refreshCredits } = useCredits()
 
   const handleSignOut = async () => {
     await signOut()
+    await refreshCredits() // Refresh to clear user state
     onSignOut()
   }
 

@@ -2,15 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { getCurrentUser } from '@/lib/auth'
+import { CreditsProvider } from '@/contexts/CreditsContext'
 import AuthForm from '@/components/auth/AuthForm'
 import Header from '@/components/layout/Header'
 import CardUpload from '@/components/upload/CardUpload'
+import CardCollection from '@/components/dashboard/CardCollection'
+import CardDetails from '@/components/dashboard/CardDetails'
 import type { User } from '@supabase/supabase-js'
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showUpload, setShowUpload] = useState(false)
+  const [currentView, setCurrentView] = useState<'collection' | 'upload' | 'details'>('collection')
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
 
   useEffect(() => {
     getCurrentUser()
@@ -30,16 +34,30 @@ export default function Home() {
       .catch((error) => {
         console.error('Error after auth success:', error)
       })
+    // Note: CreditsProvider will automatically refresh when the user changes
   }
 
   const handleSignOut = () => {
     setUser(null)
   }
 
-  const handleUploadComplete = (cardId: string) => {
-    // For now, just show success message
-    alert(`Card analyzed successfully! Card ID: ${cardId}`)
-    setShowUpload(false)
+  const handleUploadComplete = () => {
+    // Return to collection view after successful upload
+    setCurrentView('collection')
+  }
+
+  const handleViewCard = (cardId: string) => {
+    setSelectedCardId(cardId)
+    setCurrentView('details')
+  }
+
+  const handleUploadNew = () => {
+    setCurrentView('upload')
+  }
+
+  const handleBackToCollection = () => {
+    setCurrentView('collection')
+    setSelectedCardId(null)
   }
 
   if (loading) {
@@ -55,47 +73,28 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-grey-50">
-      <Header onSignOut={handleSignOut} />
-      
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-grey-900 sm:text-4xl">
-              Welcome to Slab Advisor
-            </h2>
-            <p className="mt-4 text-lg text-grey-600">
-              Upload your trading card photos to get AI-powered grade estimates
-            </p>
-          </div>
-
-          <div className="mt-12">
-            {showUpload ? (
+    <CreditsProvider>
+      <div className="min-h-screen bg-grey-50">
+        <Header onSignOut={handleSignOut} />
+        
+        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            {currentView === 'upload' ? (
               <CardUpload onUploadComplete={handleUploadComplete} />
+            ) : currentView === 'details' && selectedCardId ? (
+              <CardDetails 
+                cardId={selectedCardId}
+                onBack={handleBackToCollection}
+              />
             ) : (
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <h3 className="text-lg leading-6 font-medium text-grey-900">
-                    Card Analysis
-                  </h3>
-                  <div className="mt-2 max-w-xl text-sm text-grey-500">
-                    <p>Upload front and back photos of your trading card to get started.</p>
-                  </div>
-                  <div className="mt-5">
-                    <button
-                      onClick={() => setShowUpload(true)}
-                      type="button"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
-                    >
-                      Upload Card Photos
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <CardCollection 
+                onViewCard={handleViewCard}
+                onUploadNew={handleUploadNew}
+              />
             )}
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </CreditsProvider>
   )
 }

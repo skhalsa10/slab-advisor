@@ -26,8 +26,8 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         await signUp(email, password)
       }
       onSuccess()
-    } catch (err: any) {
-      setError(err.message || 'An error occurred')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setLoading(false)
     }
@@ -40,8 +40,8 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     try {
       await signInWithProvider(provider)
       // Note: For social auth, the redirect will handle the success
-    } catch (err: any) {
-      setError(err.message || 'Social login failed')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Social login failed')
       setLoading(false)
     }
   }

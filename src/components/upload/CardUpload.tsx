@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getCurrentUser, getUserCredits, deductCredit } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
+import { useCredits } from '@/contexts/CreditsContext'
 
 interface CardUploadProps {
   onUploadComplete: (cardId: string) => void
@@ -16,6 +17,19 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [uploadStep, setUploadStep] = useState<'upload' | 'analyze'>('upload')
+  
+  const frontInputRef = useRef<HTMLInputElement>(null)
+  const backInputRef = useRef<HTMLInputElement>(null)
+  
+  const { credits, refreshCredits } = useCredits()
+
+  const handleFrontClick = () => {
+    frontInputRef.current?.click()
+  }
+
+  const handleBackClick = () => {
+    backInputRef.current?.click()
+  }
 
   const handleFileSelect = (file: File, type: 'front' | 'back') => {
     // Validate file
@@ -67,7 +81,8 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
       .single()
 
     if (cardError) {
-      setError('Failed to create card record')
+      console.error('Card creation error:', cardError)
+      setError(`Failed to create card record: ${cardError.message}`)
       return null
     }
 
@@ -120,19 +135,26 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
     const user = await getCurrentUser()
     if (!user) return
 
-    // Check credits
-    const credits = await getUserCredits(user.id)
+    // Check credits using context (real-time)
     if (credits <= 0) {
       setError('No credits remaining. Please purchase more credits to analyze cards.')
       return
     }
 
     try {
+      // Get the session token
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setError('Authentication required')
+        return
+      }
+
       // Call Ximilar API
       const response = await fetch('/api/analyze-card', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({ cardId }),
       })
@@ -144,13 +166,13 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
       const result = await response.json()
       
       if (result.success) {
-        // Deduct credit only on successful analysis
-        await deductCredit(user.id)
+        // Credit deduction is now handled in the API route
+        // Realtime subscription will automatically update credits
         onUploadComplete(cardId)
       } else {
         setError(result.error || 'Failed to analyze card')
       }
-    } catch (error) {
+    } catch {
       setError('Failed to analyze card. Please try again.')
     }
   }
@@ -167,8 +189,8 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
       // Then analyze
       setUploadStep('analyze')
       await analyzeCard(cardId)
-    } catch (error: any) {
-      setError(error.message || 'Failed to process card')
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to process card')
     } finally {
       setLoading(false)
     }
@@ -184,7 +206,10 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
           <label className="block text-sm font-medium text-grey-700 mb-2">
             Front of Card
           </label>
-          <div className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors">
+          <div 
+            className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors cursor-pointer"
+            onClick={handleFrontClick}
+          >
             {frontPreview ? (
               <div className="space-y-2">
                 <img
@@ -193,7 +218,8 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
                   className="mx-auto h-32 object-contain"
                 />
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     setFrontImage(null)
                     setFrontPreview(null)
                   }}
@@ -208,13 +234,15 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <p className="mt-2 text-sm text-grey-600">Click to upload front image</p>
+                <p className="mt-1 text-xs text-grey-500">Card should fill frame, good lighting</p>
               </div>
             )}
             <input
+              ref={frontInputRef}
               type="file"
               accept="image/*"
               onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 'front')}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="hidden"
             />
           </div>
         </div>
@@ -224,7 +252,10 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
           <label className="block text-sm font-medium text-grey-700 mb-2">
             Back of Card
           </label>
-          <div className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors">
+          <div 
+            className="border-2 border-dashed border-grey-300 rounded-lg p-6 text-center hover:border-grey-400 transition-colors cursor-pointer"
+            onClick={handleBackClick}
+          >
             {backPreview ? (
               <div className="space-y-2">
                 <img
@@ -233,7 +264,8 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
                   className="mx-auto h-32 object-contain"
                 />
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     setBackImage(null)
                     setBackPreview(null)
                   }}
@@ -248,13 +280,15 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
                   <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <p className="mt-2 text-sm text-grey-600">Click to upload back image</p>
+                <p className="mt-1 text-xs text-grey-500">Card should fill frame, good lighting</p>
               </div>
             )}
             <input
+              ref={backInputRef}
               type="file"
               accept="image/*"
               onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 'back')}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="hidden"
             />
           </div>
         </div>
