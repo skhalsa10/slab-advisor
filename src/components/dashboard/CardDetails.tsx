@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import CardIdentificationModal from './CardIdentificationModal'
 
 interface Card {
   id: string
@@ -17,6 +18,21 @@ interface Card {
   estimated_grade: number | null
   confidence: number | null
   grading_details: Record<string, unknown> | null
+  // New card identification fields
+  card_set: string | null
+  rarity: string | null
+  out_of: string | null
+  card_number: string | null
+  set_series_code: string | null
+  set_code: string | null
+  series: string | null
+  year: number | null
+  subcategory: string | null
+  links: {
+    'tcgplayer.com'?: string
+    'ebay.com'?: string
+  } | null
+  analyze_details: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }
@@ -33,6 +49,7 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
   const [deleting, setDeleting] = useState(false)
   const [frontImageMode, setFrontImageMode] = useState<'original' | 'full' | 'exact'>('original')
   const [backImageMode, setBackImageMode] = useState<'original' | 'full' | 'exact'>('original')
+  const [showEditModal, setShowEditModal] = useState(false)
 
   const loadCard = useCallback(async () => {
     try {
@@ -101,6 +118,20 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
     } finally {
       setDeleting(false)
     }
+  }
+
+  const handleEditDetails = () => {
+    setShowEditModal(true)
+  }
+
+  const handleEditModalConfirm = () => {
+    setShowEditModal(false)
+    // Reload card data to get updated information
+    loadCard()
+  }
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false)
   }
 
   const formatGrade = (grade: number | null): string => {
@@ -382,6 +413,111 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
         </div>
 
         <div className="p-6">
+          {/* Card Identification Section */}
+          <div className="mb-8 bg-grey-50 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium text-grey-900">Card Information</h3>
+              <button
+                onClick={handleEditDetails}
+                className="inline-flex items-center px-3 py-1 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200 rounded-md hover:bg-orange-100"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Details
+              </button>
+            </div>
+            
+            
+            {(card.card_set || card.rarity || card.card_number || card.year || card.subcategory || card.links) ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {card.card_set && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Set:</span>
+                      <p className="text-grey-900">{card.card_set}</p>
+                    </div>
+                  )}
+                  
+                  {card.rarity && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Rarity:</span>
+                      <p className="text-grey-900">{card.rarity}</p>
+                    </div>
+                  )}
+                  
+                  {card.card_number && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Card Number:</span>
+                      <p className="text-grey-900">
+                        {card.card_number}
+                        {card.out_of && ` / ${card.out_of}`}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {card.year && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Year:</span>
+                      <p className="text-grey-900">{card.year}</p>
+                    </div>
+                  )}
+                  
+                  {card.series && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Series:</span>
+                      <p className="text-grey-900">{card.series}</p>
+                    </div>
+                  )}
+                  
+                  {card.subcategory && (
+                    <div>
+                      <span className="text-sm font-medium text-grey-700">Category:</span>
+                      <p className="text-grey-900">{card.subcategory}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Market Links */}
+                {card.links && (card.links['tcgplayer.com'] || card.links['ebay.com']) && (
+                  <div className="mt-4 pt-4 border-t border-grey-200">
+                    <span className="text-sm font-medium text-grey-700 block mb-2">Market Links:</span>
+                    <div className="flex gap-2">
+                      {card.links['tcgplayer.com'] && (
+                        <a
+                          href={card.links['tcgplayer.com']}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          TCGPlayer
+                        </a>
+                      )}
+                      {card.links['ebay.com'] && (
+                        <a
+                          href={card.links['ebay.com']}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-3 py-2 text-sm font-medium text-grey-700 bg-white border border-grey-300 rounded-md hover:bg-grey-50"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          eBay
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <p className="text-grey-500 text-sm">No card information available. Click "Edit Details" to add card details.</p>
+            )}
+          </div>
+
           {/* Images */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <CardImageDisplay
@@ -486,6 +622,32 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
           )}
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {card && (
+        <CardIdentificationModal
+          isOpen={showEditModal}
+          onClose={handleEditModalClose}
+          onConfirm={handleEditModalConfirm}
+          cardId={card.id}
+          identificationData={{
+            card_set: card.card_set,
+            rarity: card.rarity,
+            full_name: card.card_title,
+            out_of: card.out_of,
+            card_number: card.card_number,
+            set_series_code: card.set_series_code,
+            set_code: card.set_code,
+            series: card.series,
+            year: card.year,
+            subcategory: card.subcategory,
+            links: card.links
+          }}
+          analyzeSuccess={false} // Always show in edit mode
+          analyzeMessage={null}
+          estimatedGrade={card.estimated_grade}
+        />
+      )}
     </div>
   )
 }

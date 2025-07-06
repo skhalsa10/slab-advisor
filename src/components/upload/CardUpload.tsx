@@ -4,12 +4,14 @@ import { useState, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
+import CardIdentificationModal from '@/components/dashboard/CardIdentificationModal'
 
 interface CardUploadProps {
   onUploadComplete: (cardId: string) => void
+  onCancel?: () => void
 }
 
-export default function CardUpload({ onUploadComplete }: CardUploadProps) {
+export default function CardUpload({ onUploadComplete, onCancel }: CardUploadProps) {
   const [frontImage, setFrontImage] = useState<File | null>(null)
   const [backImage, setBackImage] = useState<File | null>(null)
   const [frontPreview, setFrontPreview] = useState<string | null>(null)
@@ -17,6 +19,14 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [uploadStep, setUploadStep] = useState<'upload' | 'analyze'>('upload')
+  const [showModal, setShowModal] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<{
+    cardId: string
+    estimatedGrade: number | null
+    cardIdentification: any
+    analyzeSuccess: boolean
+    analyzeMessage: string | null
+  } | null>(null)
   
   const frontInputRef = useRef<HTMLInputElement>(null)
   const backInputRef = useRef<HTMLInputElement>(null)
@@ -166,9 +176,15 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
       const result = await response.json()
       
       if (result.success) {
-        // Credit deduction is now handled in the API route
-        // Realtime subscription will automatically update credits
-        onUploadComplete(cardId)
+        // Store analysis results and show modal
+        setAnalysisResult({
+          cardId,
+          estimatedGrade: result.estimatedGrade,
+          cardIdentification: result.cardIdentification,
+          analyzeSuccess: result.analyzeSuccess,
+          analyzeMessage: result.analyzeMessage
+        })
+        setShowModal(true)
       } else {
         setError(result.error || 'Failed to analyze card')
       }
@@ -194,6 +210,17 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleModalConfirm = (cardId: string) => {
+    setShowModal(false)
+    setAnalysisResult(null)
+    onUploadComplete(cardId)
+  }
+
+  const handleModalClose = () => {
+    setShowModal(false)
+    setAnalysisResult(null)
   }
 
   return (
@@ -300,7 +327,7 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 space-y-3">
         <button
           onClick={handleAnalyze}
           disabled={!frontImage || !backImage || loading}
@@ -315,9 +342,28 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
               {uploadStep === 'upload' ? 'Uploading...' : 'Analyzing...'}
             </div>
           ) : (
-            'Analyze Card'
+            <div className="flex items-center justify-center">
+              <span>Analyze Card</span>
+              <span className="ml-2 px-2 py-0.5 bg-orange-500 rounded-full text-xs font-medium">
+                1 Credit
+              </span>
+            </div>
           )}
         </button>
+        
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            disabled={loading}
+            className="w-full bg-white text-grey-700 py-2 px-4 rounded-md border border-grey-300 hover:bg-grey-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Back to Dashboard
+          </button>
+        )}
+        
+        <p className="text-xs text-grey-500 text-center mt-2">
+          ⚠️ Analysis will use 1 credit and includes grading + card identification
+        </p>
       </div>
 
       <div className="mt-4 text-sm text-grey-500">
@@ -327,8 +373,24 @@ export default function CardUpload({ onUploadComplete }: CardUploadProps) {
           <li>Place card on a clean, contrasting background</li>
           <li>Ensure the entire card is visible</li>
           <li>Avoid glare and reflections</li>
+          <li>Use high resolution images - the larger the better</li>
+          <li>Disable phone post-processing/filters if possible</li>
         </ul>
       </div>
+
+      {/* Card Identification Modal */}
+      {analysisResult && (
+        <CardIdentificationModal
+          isOpen={showModal}
+          onClose={handleModalClose}
+          onConfirm={handleModalConfirm}
+          cardId={analysisResult.cardId}
+          identificationData={analysisResult.cardIdentification}
+          analyzeSuccess={analysisResult.analyzeSuccess}
+          analyzeMessage={analysisResult.analyzeMessage}
+          estimatedGrade={analysisResult.estimatedGrade}
+        />
+      )}
     </div>
   )
 }

@@ -80,7 +80,10 @@ export default function Home() {
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             {currentView === 'upload' ? (
-              <CardUpload onUploadComplete={handleUploadComplete} />
+              <CardUpload 
+                onUploadComplete={handleUploadComplete} 
+                onCancel={handleBackToCollection}
+              />
             ) : currentView === 'details' && selectedCardId ? (
               <CardDetails 
                 cardId={selectedCardId}
