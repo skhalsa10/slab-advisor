@@ -185,6 +185,17 @@ Before development begins, please gather the following information:
   - Benefits: Better grading accuracy with high-res, lower long-term storage costs
   - Consider: S3-compatible storage with lifecycle rules or Supabase bucket policies
 
+## TODO: Remove Realtime Credit Updates
+  - Current: Credits update in real-time using Supabase Realtime subscriptions
+  - Problem: Realtime connections have limits and incur costs at scale
+  - Investigate alternatives:
+    - Polling strategy with intervals (every 5-10 seconds when needed)
+    - Manual refresh after credit-consuming actions
+    - Optimistic UI updates with periodic sync
+    - Server-sent events (SSE) as lighter alternative
+  - Consider hybrid: Realtime for active sessions, polling for idle
+  - Cost analysis: Compare realtime costs vs polling at different user scales
+
   Phase 4: User Dashboard & Analytics (Week 4)
 
   1. Card Collection View
