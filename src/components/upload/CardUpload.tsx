@@ -23,7 +23,7 @@ export default function CardUpload({ onUploadComplete, onCancel }: CardUploadPro
   const [analysisResult, setAnalysisResult] = useState<{
     cardId: string
     estimatedGrade: number | null
-    cardIdentification: any
+    cardIdentification: Record<string, unknown> | null
     analyzeSuccess: boolean
     analyzeMessage: string | null
   } | null>(null)
@@ -31,7 +31,7 @@ export default function CardUpload({ onUploadComplete, onCancel }: CardUploadPro
   const frontInputRef = useRef<HTMLInputElement>(null)
   const backInputRef = useRef<HTMLInputElement>(null)
   
-  const { credits, refreshCredits } = useCredits()
+  const { credits } = useCredits()
 
   const handleFrontClick = () => {
     frontInputRef.current?.click()

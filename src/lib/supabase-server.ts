@@ -6,7 +6,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function createServerSupabaseClient() {
-  const cookieStore = await cookies()
+  // Note: cookies() is called to maintain Next.js compatibility but not used
+  // since we're using service role key for server operations
+  await cookies()
   
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {

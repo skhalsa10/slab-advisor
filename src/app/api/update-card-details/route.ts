@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Prepare update data
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString()
     }
 

@@ -157,8 +157,8 @@ export async function POST(request: NextRequest) {
     console.log("Raw Grade response:", gradeResponseText);
     console.log("Raw Analyze response:", analyzeResponseText);
 
-    let gradeResult: any;
-    let analyzeResult: any;
+    let gradeResult: Record<string, unknown>;
+    let analyzeResult: Record<string, unknown> | null;
 
     try {
       gradeResult = JSON.parse(gradeResponseText);
@@ -203,8 +203,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if we have grading data
-    const hasValidGrades = gradeResult.records.some(
-      (r: any) => r.grades && r.grades.final
+    const hasValidGrades = (gradeResult.records as Array<Record<string, unknown>>).some(
+      (r: Record<string, unknown>) => r.grades && (r.grades as Record<string, unknown>).final
     );
     if (!hasValidGrades) {
       console.error("No valid grades found in Grade response");
@@ -274,8 +274,8 @@ export async function POST(request: NextRequest) {
     ) {
       analyzeDetails = analyzeResult;
       const firstRecord = analyzeResult.records[0];
-      const cardObject = firstRecord._objects?.find(
-        (obj: any) => obj.name === "Card"
+      const cardObject = (firstRecord._objects as Array<Record<string, unknown>>)?.find(
+        (obj: Record<string, unknown>) => obj.name === "Card"
       );
 
       if (
@@ -301,7 +301,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Download and store overlay images
-    let overlayUrls = {
+    const overlayUrls = {
       front_full_overlay_url: null,
       front_exact_overlay_url: null,
       back_full_overlay_url: null,
@@ -417,7 +417,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Update card record with grading results, overlay URLs, and identification data
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       estimated_grade: estimatedGrade,
       confidence: confidence,
       grading_details: gradingDetails,

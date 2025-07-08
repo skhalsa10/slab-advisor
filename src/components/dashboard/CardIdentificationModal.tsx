@@ -33,7 +33,6 @@ interface CardIdentificationModalProps {
 
 export default function CardIdentificationModal({
   isOpen,
-  onClose,
   onConfirm,
   cardId,
   identificationData,
@@ -61,7 +60,7 @@ export default function CardIdentificationModal({
 
   if (!isOpen) return null
 
-  const handleInputChange = (field: keyof CardIdentificationData, value: any) => {
+  const handleInputChange = (field: keyof CardIdentificationData, value: string | number | null) => {
     setEditedData(prev => ({
       ...prev,
       [field]: value

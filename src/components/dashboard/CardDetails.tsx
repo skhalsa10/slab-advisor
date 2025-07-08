@@ -299,7 +299,7 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
     condition 
   }: { 
     title: string; 
-    grades: any; 
+    grades: Record<string, unknown> | null; 
     condition: string | null;
   }) => {
     if (!grades) {
@@ -514,7 +514,7 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
                 )}
               </>
             ) : (
-              <p className="text-grey-500 text-sm">No card information available. Click "Edit Details" to add card details.</p>
+              <p className="text-grey-500 text-sm">No card information available. Click &quot;Edit Details&quot; to add card details.</p>
             )}
           </div>
 
@@ -564,19 +564,19 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
               <h3 className="text-lg font-medium text-grey-900 mb-6">Grade Breakdown</h3>
               
               {/* Grade Calculation Info */}
-              {(card.grading_details as any)?.weighted_calculation && (
+              {(card.grading_details as Record<string, unknown>)?.weighted_calculation && (
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
                   <h4 className="text-sm font-semibold text-orange-800 mb-2">Final Grade Calculation</h4>
                   <p className="text-sm text-orange-700">
-                    {(card.grading_details as any).weighted_calculation.note || 
+                    {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.note || 
                      'Professional grading algorithm considers all aspects of card condition'}
                   </p>
-                  {(card.grading_details as any).weighted_calculation.front_grade && 
-                   (card.grading_details as any).weighted_calculation.back_grade && (
+                  {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.front_grade && 
+                   ((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.back_grade && (
                     <div className="mt-2 text-xs text-orange-600">
-                      Front Grade: {(card.grading_details as any).weighted_calculation.front_grade} | 
-                      Back Grade: {(card.grading_details as any).weighted_calculation.back_grade} → 
-                      Final: {(card.grading_details as any).weighted_calculation.ximilar_final_grade}
+                      Front Grade: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).front_grade} | 
+                      Back Grade: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).back_grade} → 
+                      Final: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).ximilar_final_grade}
                     </div>
                   )}
                 </div>
@@ -585,13 +585,17 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <GradeSummaryCard
                   title="Front"
-                  grades={(card.grading_details as any)?.ximilar_response?.records?.find((r: any) => r.side === 'front')?.grades}
-                  condition={(card.grading_details as any)?.ximilar_response?.records?.find((r: any) => r.side === 'front')?.grades?.condition}
+                  grades={((card.grading_details as Record<string, unknown>)?.ximilar_response as Record<string, unknown>)?.records ? 
+                    ((((card.grading_details as Record<string, unknown>).ximilar_response as Record<string, unknown>).records as Array<Record<string, unknown>>).find((r: Record<string, unknown>) => r.side === 'front') as Record<string, unknown>)?.grades as Record<string, unknown> || null : null}
+                  condition={((card.grading_details as Record<string, unknown>)?.ximilar_response as Record<string, unknown>)?.records ? 
+                    (((((card.grading_details as Record<string, unknown>).ximilar_response as Record<string, unknown>).records as Array<Record<string, unknown>>).find((r: Record<string, unknown>) => r.side === 'front') as Record<string, unknown>)?.grades as Record<string, unknown>)?.condition as string || null : null}
                 />
                 <GradeSummaryCard
                   title="Back"
-                  grades={(card.grading_details as any)?.ximilar_response?.records?.find((r: any) => r.side === 'back')?.grades}
-                  condition={(card.grading_details as any)?.ximilar_response?.records?.find((r: any) => r.side === 'back')?.grades?.condition}
+                  grades={((card.grading_details as Record<string, unknown>)?.ximilar_response as Record<string, unknown>)?.records ? 
+                    ((((card.grading_details as Record<string, unknown>).ximilar_response as Record<string, unknown>).records as Array<Record<string, unknown>>).find((r: Record<string, unknown>) => r.side === 'back') as Record<string, unknown>)?.grades as Record<string, unknown> || null : null}
+                  condition={((card.grading_details as Record<string, unknown>)?.ximilar_response as Record<string, unknown>)?.records ? 
+                    (((((card.grading_details as Record<string, unknown>).ximilar_response as Record<string, unknown>).records as Array<Record<string, unknown>>).find((r: Record<string, unknown>) => r.side === 'back') as Record<string, unknown>)?.grades as Record<string, unknown>)?.condition as string || null : null}
                 />
               </div>
               
@@ -600,19 +604,19 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-grey-600">
                   <div>
                     <span className="font-medium">Analysis Date:</span>{' '}
-                    {(card.grading_details as any)?.metadata?.analysis_date 
-                      ? new Date((card.grading_details as any).metadata.analysis_date).toLocaleString()
+                    {((card.grading_details as Record<string, unknown>)?.metadata as Record<string, unknown>)?.analysis_date 
+                      ? new Date(((card.grading_details as Record<string, unknown>).metadata as Record<string, unknown>).analysis_date as string).toLocaleString()
                       : 'N/A'
                     }
                   </div>
                   <div>
                     <span className="font-medium">API Version:</span>{' '}
-                    {(card.grading_details as any)?.metadata?.api_version || 'N/A'}
+                    {((card.grading_details as Record<string, unknown>)?.metadata as Record<string, unknown>)?.api_version as string || 'N/A'}
                   </div>
                   <div>
                     <span className="font-medium">Processing Time:</span>{' '}
-                    {(card.grading_details as any)?.metadata?.processing_time 
-                      ? `${(card.grading_details as any).metadata.processing_time}s`
+                    {((card.grading_details as Record<string, unknown>)?.metadata as Record<string, unknown>)?.processing_time 
+                      ? `${((card.grading_details as Record<string, unknown>).metadata as Record<string, unknown>).processing_time}s`
                       : 'N/A'
                     }
                   </div>

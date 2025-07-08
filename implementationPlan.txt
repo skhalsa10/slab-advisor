@@ -178,6 +178,13 @@ Before development begins, please gather the following information:
     - SGC pricing
     - Turnaround time options
 
+## TODO: Image Storage Optimization
+  - Investigate temporary high-resolution storage for Ximilar analysis
+  - Set up separate bucket with TTL (Time To Live) for temporary images
+  - Flow: Upload high-res → Analyze → Store compressed version → Delete high-res
+  - Benefits: Better grading accuracy with high-res, lower long-term storage costs
+  - Consider: S3-compatible storage with lifecycle rules or Supabase bucket policies
+
   Phase 4: User Dashboard & Analytics (Week 4)
 
   1. Card Collection View
