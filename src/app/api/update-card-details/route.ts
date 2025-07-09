@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, getServerSession } from '@/lib/supabase-server'
+import { getServerSession } from '@/lib/supabase-server'
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Verify user authentication
-    const { user, error: authError } = await getServerSession(request)
+    // 1. Verify user authentication and get Supabase client
+    const { user, error: authError, supabase } = await getServerSession(request)
     
-    if (authError || !user) {
+    if (authError || !user || !supabase) {
       console.error('Auth error:', authError)
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
-
-    // Create server-side Supabase client with service role
-    const supabase = await createServerSupabaseClient()
 
     // 2. Validate request body
     const { cardId, cardDetails } = await request.json()

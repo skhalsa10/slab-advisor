@@ -1,49 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  createServerSupabaseClient,
-  getServerSession,
-} from "@/lib/supabase-server";
+import { getServerSession } from "@/lib/supabase-server";
+import { checkUserCredits, deductUserCredits } from "@/utils/credits";
+import { CREDIT_COSTS, HTTP_STATUS, ERROR_MESSAGES, XIMILAR_API } from "@/constants/constants";
+import { XimilarApiResponse, CardRecord } from "@/types/ximilar";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Verify user authentication
-    const { user, error: authError } = await getServerSession(request);
+    // 1. Verify user authentication and get Supabase client
+    const { user, error: authError, supabase } = await getServerSession(request);
 
-    if (authError || !user) {
+    if (authError || !user || !supabase) {
       console.error("Auth error:", authError);
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: HTTP_STATUS.UNAUTHORIZED }
       );
     }
-
-    // Create server-side Supabase client with service role
-    const supabase = await createServerSupabaseClient();
 
     // 2. Validate request body
     const { cardId } = await request.json();
     if (!cardId || typeof cardId !== "string") {
       return NextResponse.json(
         { error: "Valid card ID is required" },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
     // 3. Check user credits before proceeding
-    const { data: creditData, error: creditError } = await supabase
-      .from("user_credits")
-      .select("credits_remaining")
-      .eq("user_id", user.id)
-      .single();
-
-    if (creditError || !creditData || creditData.credits_remaining <= 0) {
+    const creditCheck = await checkUserCredits(supabase, user.id, 1);
+    
+    if (!creditCheck.hasCredits) {
       return NextResponse.json(
         {
           error:
-            "No credits remaining. Please purchase more credits to analyze cards.",
+            creditCheck.creditsRemaining === 0
+              ? "No credits remaining. Please purchase more credits to analyze cards."
+              : creditCheck.error || "Unable to verify credits.",
           success: false,
         },
-        { status: 402 }
+        { status: HTTP_STATUS.PAYMENT_REQUIRED }
       );
     }
 
@@ -62,14 +57,9 @@ export async function POST(request: NextRequest) {
     if (!card.front_image_url || !card.back_image_url) {
       return NextResponse.json(
         { error: "Card images not found" },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
-
-    // Log URLs to verify they're accessible
-    console.log("Image URLs being sent to Ximilar:");
-    console.log("Front:", card.front_image_url);
-    console.log("Back:", card.back_image_url);
 
     // Test if URLs are publicly accessible
     try {
@@ -86,7 +76,7 @@ export async function POST(request: NextRequest) {
               "Card images are not publicly accessible. Please try uploading again.",
             success: false,
           },
-          { status: 400 }
+          { status: HTTP_STATUS.BAD_REQUEST }
         );
       }
     } catch (urlError) {
@@ -127,7 +117,7 @@ export async function POST(request: NextRequest) {
     // Call both APIs in parallel
     const [gradeResponse, analyzeResponse] = await Promise.all([
       // Grade API call
-      fetch("https://api.ximilar.com/card-grader/v2/grade", {
+      fetch(XIMILAR_API.GRADE_URL, {
         method: "POST",
         headers: {
           Authorization: `Token ${process.env.XIMILAR_API_KEY}`,
@@ -136,7 +126,7 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(gradePayload),
       }),
       // Analyze API call
-      fetch("https://api.ximilar.com/collectibles/v2/analyze", {
+      fetch(XIMILAR_API.ANALYZE_URL, {
         method: "POST",
         headers: {
           Authorization: `Token ${process.env.XIMILAR_API_KEY}`,
@@ -157,11 +147,11 @@ export async function POST(request: NextRequest) {
     console.log("Raw Grade response:", gradeResponseText);
     console.log("Raw Analyze response:", analyzeResponseText);
 
-    let gradeResult: Record<string, unknown>;
-    let analyzeResult: Record<string, unknown> | null;
+    let gradeResult: XimilarApiResponse;
+    let analyzeResult: XimilarApiResponse | null;
 
     try {
-      gradeResult = JSON.parse(gradeResponseText);
+      gradeResult = JSON.parse(gradeResponseText) as XimilarApiResponse;
       console.log(
         "Parsed Grade response:",
         JSON.stringify(gradeResult, null, 2)
@@ -170,15 +160,15 @@ export async function POST(request: NextRequest) {
       console.error("Failed to parse Grade response as JSON:", parseError);
       return NextResponse.json(
         {
-          error: "Invalid response from grading service.",
+          error: ERROR_MESSAGES.ANALYSIS_FAILED,
           success: false,
         },
-        { status: 500 }
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
       );
     }
 
     try {
-      analyzeResult = JSON.parse(analyzeResponseText);
+      analyzeResult = JSON.parse(analyzeResponseText) as XimilarApiResponse;
       console.log(
         "Parsed Analyze response:",
         JSON.stringify(analyzeResult, null, 2)
@@ -194,26 +184,25 @@ export async function POST(request: NextRequest) {
       console.error("No records in Grade response");
       return NextResponse.json(
         {
-          error:
-            "Unable to analyze card. Please ensure images are clear and well-lit.",
+          error: ERROR_MESSAGES.ANALYSIS_FAILED,
           success: false,
         },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
     // Check if we have grading data
-    const hasValidGrades = (gradeResult.records as Array<Record<string, unknown>>).some(
-      (r: Record<string, unknown>) => r.grades && (r.grades as Record<string, unknown>).final
+    const hasValidGrades = gradeResult.records.some(
+      (r) => r.grades && r.grades.final
     );
     if (!hasValidGrades) {
       console.error("No valid grades found in Grade response");
       return NextResponse.json(
         {
-          error: "Unable to grade card. Please check image quality.",
+          error: ERROR_MESSAGES.GRADING_FAILED,
           success: false,
         },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
@@ -227,10 +216,10 @@ export async function POST(request: NextRequest) {
     // Process Grade results with complete response storage
     // Extract results for analysis (using side field)
     const frontResult = gradeResult.records.find(
-      (r: { side: string }) => r.side === "front"
+      (r) => r.side === "front"
     );
     const backResult = gradeResult.records.find(
-      (r: { side: string }) => r.side === "back"
+      (r) => r.side === "back"
     );
 
     // Check for card detection errors
@@ -240,16 +229,15 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          error:
-            "Could not detect a trading card in the image. Please ensure:\n• The card is clearly visible and fills most of the frame\n• Good lighting without glare or shadows\n• Card is flat and not at an extreme angle\n• Background contrasts with the card",
+          error: ERROR_MESSAGES.CARD_DETECTION_FAILED,
           success: false,
         },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
 
     // Use Ximilar's final grade calculation (they handle sophisticated weighting/rounding)
-    const estimatedGrade = gradeResult.grades?.final || null;
+    const estimatedGrade = frontResult?.grades?.final || backResult?.grades?.final || null;
     const confidence = estimatedGrade ? 0.95 : null;
 
     // Store calculation details for transparency
@@ -274,16 +262,16 @@ export async function POST(request: NextRequest) {
     ) {
       analyzeDetails = analyzeResult;
       const firstRecord = analyzeResult.records[0];
-      const cardObject = (firstRecord._objects as Array<Record<string, unknown>>)?.find(
-        (obj: Record<string, unknown>) => obj.name === "Card"
+      const cardObject = firstRecord._objects?.find(
+        (obj) => obj.name === "Card"
       );
 
       if (
         cardObject &&
         cardObject._identification &&
-        cardObject._identification.best_match
+        (cardObject._identification as any).best_match
       ) {
-        const bestMatch = cardObject._identification.best_match;
+        const bestMatch = (cardObject._identification as any).best_match;
         cardIdentification = {
           card_set: bestMatch.set || null,
           rarity: bestMatch.rarity || null,
@@ -302,10 +290,10 @@ export async function POST(request: NextRequest) {
 
     // Download and store overlay images
     const overlayUrls = {
-      front_full_overlay_url: null,
-      front_exact_overlay_url: null,
-      back_full_overlay_url: null,
-      back_exact_overlay_url: null,
+      front_full_overlay_url: null as string | null,
+      front_exact_overlay_url: null as string | null,
+      back_full_overlay_url: null as string | null,
+      back_exact_overlay_url: null as string | null,
     };
 
     try {
@@ -457,17 +445,15 @@ export async function POST(request: NextRequest) {
       console.error("Database update error:", updateError);
       return NextResponse.json(
         { error: "Failed to save analysis results" },
-        { status: 500 }
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
       );
     }
 
     // 5. Deduct credit only after successful analysis and database update
-    const { error: deductError } = await supabase.rpc("deduct_user_credit", {
-      user_id: user.id,
-    });
-
-    if (deductError) {
-      console.error("Credit deduction error:", deductError);
+    const deductResult = await deductUserCredits(supabase, user.id, 1);
+    
+    if (!deductResult.success) {
+      console.error("Credit deduction failed:", deductResult.error);
       // Analysis was successful but credit deduction failed - log but don't fail the request
     }
 
@@ -502,7 +488,7 @@ export async function POST(request: NextRequest) {
             : "Internal server error during card analysis",
         success: false,
       },
-      { status: 500 }
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
     );
   }
 }
