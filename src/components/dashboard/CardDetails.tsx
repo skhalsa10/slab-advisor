@@ -253,17 +253,20 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
           )}
         </div>
         <div className="aspect-w-3 aspect-h-4 bg-grey-100 rounded-lg overflow-hidden">
-          {getCurrentImageUrl() ? (
-            <img
-              src={getCurrentImageUrl()}
-              alt={`Card ${side.toLowerCase()}`}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-64">
-              <span className="text-grey-400">No image</span>
-            </div>
-          )}
+          {(() => {
+            const imageUrl = getCurrentImageUrl();
+            return imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={`Card ${side.toLowerCase()}`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-64">
+                <span className="text-grey-400">No image</span>
+              </div>
+            );
+          })()}
         </div>
         {hasOverlays && imageMode !== 'original' && (
           <p className="mt-2 text-xs text-grey-500">
@@ -316,15 +319,15 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-lg font-semibold text-grey-900">{title}</h4>
           <span className="text-2xl font-bold text-orange-600">
-            {grades.final ? `${grades.final}/10` : 'N/A'}
+            {grades.final ? `${grades.final as number}/10` : 'N/A'}
           </span>
         </div>
         
         <div className="space-y-2 mb-4">
-          <GradeBar label="Corners" grade={grades.corners} />
-          <GradeBar label="Edges" grade={grades.edges} />
-          <GradeBar label="Surface" grade={grades.surface} />
-          <GradeBar label="Centering" grade={grades.centering} />
+          <GradeBar label="Corners" grade={grades.corners as number || null} />
+          <GradeBar label="Edges" grade={grades.edges as number || null} />
+          <GradeBar label="Surface" grade={grades.surface as number || null} />
+          <GradeBar label="Centering" grade={grades.centering as number || null} />
         </div>
 
         <div className="pt-3 border-t border-grey-200">
@@ -564,23 +567,24 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
               <h3 className="text-lg font-medium text-grey-900 mb-6">Grade Breakdown</h3>
               
               {/* Grade Calculation Info */}
-              {(card.grading_details as Record<string, unknown>)?.weighted_calculation && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-                  <h4 className="text-sm font-semibold text-orange-800 mb-2">Final Grade Calculation</h4>
-                  <p className="text-sm text-orange-700">
-                    {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.note || 
-                     'Professional grading algorithm considers all aspects of card condition'}
-                  </p>
-                  {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.front_grade && 
-                   ((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>)?.back_grade && (
-                    <div className="mt-2 text-xs text-orange-600">
-                      Front Grade: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).front_grade} | 
-                      Back Grade: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).back_grade} → 
-                      Final: {((card.grading_details as Record<string, unknown>).weighted_calculation as Record<string, unknown>).ximilar_final_grade}
-                    </div>
-                  )}
-                </div>
-              )}
+              {(() => {
+                const weightedCalc = (card.grading_details as Record<string, unknown>)?.weighted_calculation as Record<string, unknown>;
+                return weightedCalc && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+                    <h4 className="text-sm font-semibold text-orange-800 mb-2">Final Grade Calculation</h4>
+                    <p className="text-sm text-orange-700">
+                      {String(weightedCalc.note || 'Professional grading algorithm considers all aspects of card condition')}
+                    </p>
+                    {Boolean(weightedCalc.front_grade && weightedCalc.back_grade) && (
+                      <div className="mt-2 text-xs text-orange-600">
+                        Front Grade: {String(weightedCalc.front_grade)} | 
+                        Back Grade: {String(weightedCalc.back_grade)} → 
+                        Final: {String(weightedCalc.ximilar_final_grade)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <GradeSummaryCard

@@ -1,5 +1,4 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { User } from '@supabase/supabase-js'
 
 interface CreditCheckResult {
   hasCredits: boolean
@@ -64,13 +63,11 @@ export async function checkUserCredits(
  * Deduct credits from a user's account
  * @param supabase - The Supabase client
  * @param userId - The user's ID
- * @param creditsToDeduct - Number of credits to deduct (default: 1)
  * @returns Success boolean and error message if any
  */
 export async function deductUserCredits(
   supabase: SupabaseClient,
-  userId: string,
-  creditsToDeduct: number = 1
+  userId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { error: deductError } = await supabase.rpc('deduct_user_credit', {

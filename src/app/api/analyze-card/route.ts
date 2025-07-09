@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/supabase-server";
 import { checkUserCredits, deductUserCredits } from "@/utils/credits";
-import { CREDIT_COSTS, HTTP_STATUS, ERROR_MESSAGES, XIMILAR_API } from "@/constants/constants";
-import { XimilarApiResponse, CardRecord } from "@/types/ximilar";
+import { HTTP_STATUS, ERROR_MESSAGES, XIMILAR_API } from "@/constants/constants";
+import { XimilarApiResponse } from "@/types/ximilar";
+import { CardIdentificationData } from "@/types/card";
 
 export async function POST(request: NextRequest) {
   try {
@@ -252,7 +253,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Process analyze results for card identification
-    let cardIdentification = null;
+    let cardIdentification: CardIdentificationData | null = null;
     let analyzeDetails = null;
 
     if (
@@ -269,9 +270,9 @@ export async function POST(request: NextRequest) {
       if (
         cardObject &&
         cardObject._identification &&
-        (cardObject._identification as any).best_match
+        cardObject._identification.best_match
       ) {
-        const bestMatch = (cardObject._identification as any).best_match;
+        const bestMatch = cardObject._identification.best_match;
         cardIdentification = {
           card_set: bestMatch.set || null,
           rarity: bestMatch.rarity || null,
@@ -281,9 +282,9 @@ export async function POST(request: NextRequest) {
           set_series_code: bestMatch.set_series_code || null,
           set_code: bestMatch.set_code || null,
           series: bestMatch.series || null,
-          year: bestMatch.year || null,
+          year: bestMatch.year ? Number(bestMatch.year) : null,
           subcategory: bestMatch.subcategory || null,
-          links: bestMatch.links || null,
+          links: bestMatch.links as CardIdentificationData['links'] || null,
         };
       }
     }
@@ -450,7 +451,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Deduct credit only after successful analysis and database update
-    const deductResult = await deductUserCredits(supabase, user.id, 1);
+    const deductResult = await deductUserCredits(supabase, user.id);
     
     if (!deductResult.success) {
       console.error("Credit deduction failed:", deductResult.error);

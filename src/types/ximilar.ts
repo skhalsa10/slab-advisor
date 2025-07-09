@@ -51,6 +51,19 @@ export type ObjectItem = {
   _tags_simple?: string[];
   _identification?: {
     error?: string;
+    best_match?: {
+      set?: string;
+      rarity?: string;
+      full_name?: string;
+      out_of?: string;
+      card_number?: string;
+      set_series_code?: string;
+      set_code?: string;
+      series?: string;
+      year?: string;
+      subcategory?: string;
+      links?: string[] | Record<string, string> | null;
+    };
   };
 };
 
