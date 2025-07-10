@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import CardIdentificationModal from './CardIdentificationModal'
+import { Match } from '@/types/ximilar'
 
 interface Card {
   id: string
@@ -639,18 +640,18 @@ export default function CardDetails({ cardId, onBack }: CardDetailsProps) {
           onConfirm={handleEditModalConfirm}
           cardId={card.id}
           identificationData={{
-            card_set: card.card_set,
-            rarity: card.rarity,
-            full_name: card.card_title,
-            out_of: card.out_of,
-            card_number: card.card_number,
-            set_series_code: card.set_series_code,
-            set_code: card.set_code,
-            series: card.series,
-            year: card.year,
-            subcategory: card.subcategory,
-            links: card.links
-          }}
+            set: card.card_set || undefined,
+            rarity: card.rarity || undefined,
+            full_name: card.card_title || undefined,
+            out_of: card.out_of || undefined,
+            card_number: card.card_number || undefined,
+            set_series_code: card.set_series_code || undefined,
+            set_code: card.set_code || undefined,
+            series: card.series || undefined,
+            year: card.year?.toString() || undefined,
+            subcategory: card.subcategory || undefined,
+            links: card.links || undefined
+          } as Match}
           analyzeSuccess={false} // Always show in edit mode
           analyzeMessage={null}
           estimatedGrade={card.estimated_grade}

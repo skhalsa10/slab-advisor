@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
 import CardIdentificationModal from '@/components/dashboard/CardIdentificationModal'
+import { Match } from '@/types/ximilar'
 
 interface CardUploadProps {
   onUploadComplete: (cardId: string) => void
@@ -23,7 +24,7 @@ export default function CardUpload({ onUploadComplete, onCancel }: CardUploadPro
   const [analysisResult, setAnalysisResult] = useState<{
     cardId: string
     estimatedGrade: number | null
-    cardIdentification: Record<string, unknown> | null
+    cardIdentification: Match | null
     analyzeSuccess: boolean
     analyzeMessage: string | null
   } | null>(null)

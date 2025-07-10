@@ -30,14 +30,26 @@ export type Status = {
   proc_id?: string;
 };
 
-export type ObjectItem = {
-  name: string;
-  id: string;
-  bound_box: [number, number, number, number];
-  prob: number;
-  area?: number;
-  "Top Category"?: CategoryItem[];
-  _tags?: {
+export type Match = {
+  set?: string;
+  rarity?: string;
+  full_name?: string;
+  out_of?: string;
+  card_number?: string;
+  set_series_code?: string;
+  set_code?: string;
+  series?: string;
+  year?: string;
+  subcategory?: string;
+  links?: string[] | Record<string, string> | null;
+};
+
+export type IdentificationData = {
+  error?: string;
+  best_match?: Match;
+};
+
+export type Tags = {
     Category?: TagItem[];
     Side?: TagItem[];
     Subcategory?: TagItem[];
@@ -48,23 +60,17 @@ export type ObjectItem = {
     Damaged?: TagItem[];
     Autograph?: TagItem[];
   };
+
+export type ObjectItem = {
+  name: string;
+  id: string;
+  bound_box: [number, number, number, number];
+  prob: number;
+  area?: number;
+  "Top Category"?: CategoryItem[];
+  _tags?: Tags;
   _tags_simple?: string[];
-  _identification?: {
-    error?: string;
-    best_match?: {
-      set?: string;
-      rarity?: string;
-      full_name?: string;
-      out_of?: string;
-      card_number?: string;
-      set_series_code?: string;
-      set_code?: string;
-      series?: string;
-      year?: string;
-      subcategory?: string;
-      links?: string[] | Record<string, string> | null;
-    };
-  };
+  _identification?: IdentificationData;
 };
 
 export type CategoryItem = {

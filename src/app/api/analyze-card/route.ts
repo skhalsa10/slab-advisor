@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "@/lib/supabase-server";
 import { checkUserCredits, deductUserCredits } from "@/utils/credits";
 import { HTTP_STATUS, ERROR_MESSAGES, XIMILAR_API } from "@/constants/constants";
-import { XimilarApiResponse } from "@/types/ximilar";
-import { CardIdentificationData } from "@/types/card";
+import { XimilarApiResponse, Match } from "@/types/ximilar";
 
 export async function POST(request: NextRequest) {
   try {
@@ -253,7 +252,7 @@ export async function POST(request: NextRequest) {
     };
 
     // Process analyze results for card identification
-    let cardIdentification: CardIdentificationData | null = null;
+    let cardIdentification: Match | null = null;
     let analyzeDetails = null;
 
     if (
@@ -272,20 +271,7 @@ export async function POST(request: NextRequest) {
         cardObject._identification &&
         cardObject._identification.best_match
       ) {
-        const bestMatch = cardObject._identification.best_match;
-        cardIdentification = {
-          card_set: bestMatch.set || null,
-          rarity: bestMatch.rarity || null,
-          full_name: bestMatch.full_name || null,
-          out_of: bestMatch.out_of || null,
-          card_number: bestMatch.card_number || null,
-          set_series_code: bestMatch.set_series_code || null,
-          set_code: bestMatch.set_code || null,
-          series: bestMatch.series || null,
-          year: bestMatch.year ? Number(bestMatch.year) : null,
-          subcategory: bestMatch.subcategory || null,
-          links: bestMatch.links as CardIdentificationData['links'] || null,
-        };
+        cardIdentification = cardObject._identification.best_match;
       }
     }
 
@@ -420,14 +406,14 @@ export async function POST(request: NextRequest) {
     // Add card identification fields if available
     if (cardIdentification) {
       updateData.card_title = cardIdentification.full_name || card.card_title;
-      updateData.card_set = cardIdentification.card_set;
+      updateData.card_set = cardIdentification.set;
       updateData.rarity = cardIdentification.rarity;
       updateData.out_of = cardIdentification.out_of;
       updateData.card_number = cardIdentification.card_number;
       updateData.set_series_code = cardIdentification.set_series_code;
       updateData.set_code = cardIdentification.set_code;
       updateData.series = cardIdentification.series;
-      updateData.year = cardIdentification.year;
+      updateData.year = cardIdentification.year ? Number(cardIdentification.year) : null;
       updateData.subcategory = cardIdentification.subcategory;
       updateData.links = cardIdentification.links;
     }

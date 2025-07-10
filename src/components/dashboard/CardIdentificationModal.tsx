@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { CardIdentificationData } from '@/types/card'
+import { Match } from '@/types/ximilar'
 
 interface CardIdentificationModalProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (cardId: string) => void
   cardId: string
-  identificationData: CardIdentificationData | null
+  identificationData: Match | null
   analyzeSuccess: boolean
   analyzeMessage: string | null
   estimatedGrade: number | null
@@ -26,28 +26,28 @@ export default function CardIdentificationModal({
 }: CardIdentificationModalProps) {
   const [isEditing, setIsEditing] = useState(!analyzeSuccess)
   const [saving, setSaving] = useState(false)
-  const [editedData, setEditedData] = useState<CardIdentificationData>(
+  const [editedData, setEditedData] = useState<Match>(
     identificationData || {
-      card_set: null,
-      rarity: null,
-      full_name: null,
-      out_of: null,
-      card_number: null,
-      set_series_code: null,
-      set_code: null,
-      series: null,
-      year: null,
-      subcategory: null,
-      links: null
+      set: undefined,
+      rarity: undefined,
+      full_name: undefined,
+      out_of: undefined,
+      card_number: undefined,
+      set_series_code: undefined,
+      set_code: undefined,
+      series: undefined,
+      year: undefined,
+      subcategory: undefined,
+      links: undefined
     }
   )
 
   if (!isOpen) return null
 
-  const handleInputChange = (field: keyof CardIdentificationData, value: string | number | null) => {
+  const handleInputChange = (field: keyof Match, value: string | undefined) => {
     setEditedData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value || undefined
     }))
   }
 
@@ -55,9 +55,9 @@ export default function CardIdentificationModal({
     setEditedData(prev => ({
       ...prev,
       links: {
-        ...prev.links,
-        [platform]: value || null
-      }
+        ...(typeof prev.links === 'object' && prev.links !== null && !Array.isArray(prev.links) ? prev.links : {}),
+        [platform]: value || undefined
+      } as Record<string, string>
     }))
   }
 
@@ -166,10 +166,10 @@ export default function CardIdentificationModal({
                     <p className="text-grey-900">{editedData.full_name}</p>
                   </div>
                 )}
-                {editedData.card_set && (
+                {editedData.set && (
                   <div>
                     <span className="text-sm font-medium text-grey-700">Set:</span>
-                    <p className="text-grey-900">{editedData.card_set}</p>
+                    <p className="text-grey-900">{editedData.set}</p>
                   </div>
                 )}
                 {editedData.rarity && (
@@ -193,7 +193,7 @@ export default function CardIdentificationModal({
                     <p className="text-grey-900">{editedData.year}</p>
                   </div>
                 )}
-                {editedData.links && (
+                {editedData.links && typeof editedData.links === 'object' && !Array.isArray(editedData.links) && (
                   <div>
                     <span className="text-sm font-medium text-grey-700">Market Links:</span>
                     <div className="flex gap-2 mt-1">
@@ -243,8 +243,8 @@ export default function CardIdentificationModal({
                   </label>
                   <input
                     type="text"
-                    value={editedData.card_set || ''}
-                    onChange={(e) => handleInputChange('card_set', e.target.value)}
+                    value={editedData.set || ''}
+                    onChange={(e) => handleInputChange('set', e.target.value)}
                     className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="e.g., Base Set"
                   />
@@ -309,7 +309,7 @@ export default function CardIdentificationModal({
                   <input
                     type="number"
                     value={editedData.year || ''}
-                    onChange={(e) => handleInputChange('year', e.target.value ? parseInt(e.target.value) : null)}
+                    onChange={(e) => handleInputChange('year', e.target.value)}
                     className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="e.g., 1999"
                     min="1900"
@@ -362,7 +362,7 @@ export default function CardIdentificationModal({
                   </label>
                   <input
                     type="url"
-                    value={editedData.links?.['tcgplayer.com'] || ''}
+                    value={(typeof editedData.links === 'object' && editedData.links !== null && !Array.isArray(editedData.links) ? editedData.links['tcgplayer.com'] : '') || ''}
                     onChange={(e) => handleLinksChange('tcgplayer.com', e.target.value)}
                     className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="https://www.tcgplayer.com/product/..."
@@ -375,7 +375,7 @@ export default function CardIdentificationModal({
                   </label>
                   <input
                     type="url"
-                    value={editedData.links?.['ebay.com'] || ''}
+                    value={(typeof editedData.links === 'object' && editedData.links !== null && !Array.isArray(editedData.links) ? editedData.links['ebay.com'] : '') || ''}
                     onChange={(e) => handleLinksChange('ebay.com', e.target.value)}
                     className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="https://www.ebay.com/sch/..."
