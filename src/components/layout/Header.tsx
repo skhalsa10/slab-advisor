@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { signOut } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
 
@@ -24,7 +25,7 @@ export default function Header({ onSignOut }: HeaderProps) {
         <div className="flex justify-between items-center py-3 sm:py-4">
           {/* Logo and Title */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <img src="/logo-icon.svg" alt="Slab Advisor" className="h-8 w-8 sm:h-10 sm:w-10" />
+            <Image src="/logo-icon.svg" alt="Slab Advisor" className="h-8 w-8 sm:h-10 sm:w-10" width={40} height={40} />
             <h1 className="text-xl sm:text-2xl font-bold">
               <span className="text-grey-900">Slab</span>
               <span className="text-orange-500">Advisor</span>

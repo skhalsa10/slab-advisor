@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
@@ -240,10 +241,12 @@ export default function CardUpload({ onUploadComplete, onCancel }: CardUploadPro
           >
             {frontPreview ? (
               <div className="space-y-2">
-                <img
+                <Image
                   src={frontPreview}
                   alt="Front preview"
                   className="mx-auto h-32 object-contain"
+                  width={128}
+                  height={128}
                 />
                 <button
                   onClick={(e) => {
@@ -286,10 +289,12 @@ export default function CardUpload({ onUploadComplete, onCancel }: CardUploadPro
           >
             {backPreview ? (
               <div className="space-y-2">
-                <img
+                <Image
                   src={backPreview}
                   alt="Back preview"
                   className="mx-auto h-32 object-contain"
+                  width={128}
+                  height={128}
                 />
                 <button
                   onClick={(e) => {

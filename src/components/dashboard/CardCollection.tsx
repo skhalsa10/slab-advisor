@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -129,12 +130,15 @@ export default function CardCollection({ onViewCard, onUploadNew }: CardCollecti
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {cards.map((card) => (
           <div key={card.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-            <div className="aspect-w-3 aspect-h-4 bg-grey-200">
+            <div className="relative aspect-w-3 aspect-h-4 bg-grey-200">
               {card.front_image_url ? (
-                <img
+                <Image
                   src={card.front_image_url}
                   alt={card.card_title || 'Trading card'}
                   className="w-full h-48 object-cover"
+                  width={300}
+                  height={192}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               ) : (
                 <div className="w-full h-48 flex items-center justify-center bg-grey-100">
