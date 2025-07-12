@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { POST } from './route'
+import { POST } from '../analyze-card/route'
 import { NextRequest } from 'next/server'
 
 // Mock all dependencies
