@@ -162,23 +162,286 @@ Before development begins, please gather the following information:
   - ✅ Tested and confirmed working with API key
   - See XIMILAR_API_RESEARCH.md for full details
 
-  Phase 3: Market Price Analysis (Week 3)
+## Phase 2.5: Database Foundation & User Profiles (NEW - Priority)
 
-  1. LLM Integration
-    - Set up OpenAI/Anthropic API
-    - Create prompt templates for price searches
-    - Parse and validate price data
-  2. Price Comparison Engine
-    - Fetch ungraded card prices
-    - Calculate graded card values by grade
-    - Store price snapshots
-  3. Grading Service Cost Calculator
-    - PSA pricing tiers
-    - BGS (Beckett) pricing
-    - SGC pricing
-    - Turnaround time options
+**Duration**: 1 week
+**Prerequisites**: Complete Phase 2
+**Why Critical**: Need username/profile infrastructure before any social features
 
-## TODO: Image Storage Optimization
+### 1. Database Schema Updates
+  - Create `profiles` table:
+    ```sql
+    - user_id (FK to auth.users)
+    - username (unique, 3-30 chars, alphanumeric + underscore)
+    - display_name (optional, for showing real name)
+    - bio (text, max 500 chars)
+    - avatar_url
+    - is_public (boolean, default true)
+    - created_at, updated_at
+    ```
+  - Create `follows` table:
+    ```sql
+    - follower_id (FK to profiles)
+    - following_id (FK to profiles)
+    - created_at
+    - Composite primary key (follower_id, following_id)
+    ```
+  - Update `cards` table:
+    - Add `card_category` enum ('pokemon', 'onepiece', 'sports', 'other_tcg')
+    - Add `is_public` boolean (default false)
+    - Add indexes for category and public queries
+
+### 2. Authentication Flow Updates
+  - Modify signup to require username selection
+  - Add username availability check API
+  - Create profile automatically on signup
+  - Update TypeScript types for Database interface
+
+### 3. Profile Management
+  - Profile settings page (`/settings/profile`)
+  - Username change (with 30-day cooldown)
+  - Avatar upload to Supabase storage
+  - Bio and display name editing
+  - Privacy toggle (public/private profile)
+
+### 4. Type System Updates
+  - Fix mismatch between SQL schema and TypeScript types
+  - Add new profile and social types
+  - Update all components to use proper types
+
+## Phase 3: Core Navigation & Dashboard (Renamed from original Phase 3)
+
+**Duration**: 1 week
+**Prerequisites**: Complete Phase 2.5
+**Why Critical**: Users need proper navigation structure after login
+
+### 1. App Shell & Navigation
+  - Sidebar navigation component with:
+    - Dashboard
+    - My Collection
+    - Add Card
+    - Discover (for social features)
+    - Settings
+  - Mobile-responsive hamburger menu
+  - User profile dropdown in header
+  - Breadcrumb navigation
+
+### 2. Dashboard Page (`/dashboard`)
+  - Welcome message with username
+  - Stats widgets grid:
+    - Total Cards (with mini sparkline)
+    - Cards by Category (Pokemon, One Piece, Sports, Other TCG)
+    - Total Collection Value
+    - Followers/Following counts
+  - Recent Activity feed (last 5 actions)
+  - Quick Actions:
+    - "Add New Card" primary CTA
+    - "View Collection" secondary button
+    - "Invite Friends" (for later social features)
+
+### 3. Routing Structure
+  - `/dashboard` - Main dashboard
+  - `/collection` - Collection management
+  - `/add-card` - Add new card flow
+  - `/card/[id]` - Individual card details
+  - `/u/[username]` - Public profile (Phase 6)
+  - `/settings/*` - Settings pages
+
+### 4. Dashboard Analytics
+  - Calculate total value from graded_prices
+  - Show percentage change from last week
+  - Mini chart for collection growth over time
+
+## Phase 4: Enhanced Collection Management
+
+**Duration**: 1-2 weeks
+**Prerequisites**: Complete Phase 3
+**Why Critical**: Core feature where users spend most time
+
+### 1. Collection Page (`/collection`)
+  - Header section:
+    - Page title with total count
+    - "Add New Card" CTA button (orange, prominent)
+    - View toggle (Grid/List)
+    - Export button (CSV/JSON)
+  
+### 2. Advanced Filtering System
+  - Filter bar with:
+    - Category dropdown (All, Pokemon, One Piece, Sports, Other TCG)
+    - Grade range slider (1-10)
+    - Price range inputs (min/max)
+    - Date range picker
+    - Condition chips (Graded, Ungraded, Pending)
+  - Save filter presets
+  - Clear all filters button
+
+### 3. View Modes
+  - **Grid View**: 
+    - Card image prominent
+    - Grade badge overlay
+    - Title and value below
+    - Hover effects
+  - **List View** (Spreadsheet-like):
+    - Columns: Image thumbnail, Title, Category, Grade, Value, Date Added
+    - Sortable columns
+    - Inline actions (view, edit, delete)
+    - Bulk selection checkboxes
+
+### 4. Search & Sort
+  - Real-time search by card title
+  - Sort options:
+    - Recently added (default)
+    - Grade (high to low)
+    - Value (high to low)
+    - Alphabetical
+  - Pagination or infinite scroll
+
+### 5. Bulk Operations
+  - Select multiple cards
+  - Bulk actions menu:
+    - Delete selected
+    - Change privacy (public/private)
+    - Export selected
+    - Add to wishlist (future feature)
+
+## Phase 5: Reimagined Add Card Flow
+
+**Duration**: 1 week
+**Prerequisites**: Complete Phase 4
+**Why Critical**: Need flexible credit system for monetization
+
+### 1. Add Card Page (`/add-card`)
+  - Two-path choice screen:
+    - **Quick Add** (Manual Entry - Free)
+    - **Smart Add** (AI-Powered - Uses Credits)
+
+### 2. Manual Entry Flow (Free)
+  - Multi-step form:
+    1. Basic Info (title, category, card number)
+    2. Upload Images (front/back)
+    3. Additional Details (set, year, notes)
+  - Save as draft functionality
+  - No credit usage
+
+### 3. AI-Powered Analysis Flow
+  - Upload images first
+  - Show preview with three action buttons:
+    - **Grade Card** (1 credit) - Get AI grade estimate
+    - **Identify Card** (1 credit) - Auto-fill card details
+    - **Get Market Price** (1 credit) - Current market value
+  - **Bundle Deal**: All three for 2 credits (33% savings)
+  - Clear credit cost indicators
+  - Credit balance displayed prominently
+
+### 4. Credit Usage Strategy
+  - Show "before and after" credit balance
+  - Explain what each service provides
+  - Link to buy more credits if insufficient
+  - Success animations after each service
+
+### 5. Product Decisions TODO
+  - Determine free tier (monthly limits?)
+  - Credit package pricing
+  - Consider subscription model for heavy users
+  - API limits and rate limiting
+
+## Phase 6: Social Features & Public Profiles
+
+**Duration**: 2 weeks
+**Prerequisites**: Complete Phase 5
+**Why Critical**: Drives user engagement and viral growth
+
+### 1. Public Profile Pages (`/u/[username]`)
+  - Profile header:
+    - Avatar, username, display name
+    - Bio section
+    - Follow/Following counts (clickable)
+    - Follow/Unfollow button
+    - Share profile button
+  - Public collection display:
+    - Only shows cards marked as public
+    - Same filtering/viewing options as personal collection
+    - "Private Collection" message if none public
+
+### 2. Following System
+  - Follow/Unfollow functionality
+  - Following/Followers lists
+  - Mutual follow indicators
+  - Follow suggestions based on similar collections
+
+### 3. Social Sharing
+  - Share collection link generator
+  - Social media preview cards (Open Graph)
+  - Embed widget for blogs/forums
+  - QR code for in-person sharing
+
+### 4. Discovery Features
+  - `/discover` page with:
+    - Featured collectors
+    - Recent public cards
+    - Trending cards
+    - User search by username
+
+### 5. Activity Feed
+  - Dashboard activity from followed users
+  - New cards added
+  - Significant grades achieved
+  - Follow notifications
+
+## Phase 7: Market Price Analysis & Advanced Features (Renamed from original Phase 3)
+
+**Duration**: 2 weeks
+**Prerequisites**: Complete Phase 6
+
+### 1. LLM Integration for Pricing
+  - Integrate OpenAI/Anthropic API
+  - Create smart prompts for price searches
+  - Parse and validate price data
+  - Cache results for 24 hours
+
+### 2. Price Tracking
+  - Historical price charts
+  - Price alerts (email/in-app)
+  - Market trend indicators
+  - Comparison across platforms
+
+### 3. Grading Service Calculator
+  - PSA, BGS, SGC pricing
+  - Turnaround time estimates
+  - ROI calculator
+  - Bulk submission optimizer
+
+### 4. Collection Analytics
+  - Portfolio performance charts
+  - Category breakdowns
+  - Grade distribution
+  - Investment recommendations
+
+## Phase 8: Additional Features & Mobile Optimization
+
+**Duration**: Ongoing
+**Prerequisites**: Complete Phase 7
+
+### 1. Progressive Web App
+  - Offline support
+  - Camera optimization
+  - Install prompts
+  - Push notifications
+
+### 2. Advanced Features
+  - Wishlist management
+  - Trade tracking
+  - Insurance reports
+  - Bulk import/export
+  - API for developers
+
+### 3. Marketplace Integration
+  - Direct links to buy/sell
+  - Price comparison
+  - Listing automation
+  - Sale tracking
+
+## TODO: Technical Improvements
   - Investigate temporary high-resolution storage for Ximilar analysis
   - Set up separate bucket with TTL (Time To Live) for temporary images
   - Flow: Upload high-res → Analyze → Store compressed version → Delete high-res
@@ -196,40 +459,109 @@ Before development begins, please gather the following information:
   - Consider hybrid: Realtime for active sessions, polling for idle
   - Cost analysis: Compare realtime costs vs polling at different user scales
 
-  Phase 4: User Dashboard & Analytics (Week 4)
+## Additional Feature Suggestions for Future Phases
 
-  1. Card Collection View
-    - Grid/list view of uploaded cards
-    - Filter by grade, value, date
-    - Search functionality
-  2. Individual Card Details
-    - Grade breakdown
-    - Price history chart
-    - ROI calculator
-    - Grading recommendations
-  3. Portfolio Analytics
-    - Total collection value
-    - Grade distribution
-    - Best ROI opportunities
+### Collector Tools & Features
+1. **Export/Import Collections**
+   - CSV/JSON export with all card data
+   - Import from other platforms (TCGPlayer, COMC, etc.)
+   - Bulk editing after import
+   - Template downloads for manual entry
 
-  Phase 5: Monetization & Polish (Week 5)
+2. **Wishlist & Want Lists**
+   - Track cards you want to acquire
+   - Set target prices for wishlist items
+   - Match wishlist with other users' collections
+   - Wishlist sharing for gift ideas
 
-  1. Stripe Integration
-    - Subscription tiers (free/pro)
-    - Usage-based pricing
-    - Payment flow
-  2. Advanced Features
-    - Bulk upload
-    - Export reports (PDF/CSV)
-    - Price alerts
-    - Grade comparison across services
-  3. Performance & UX
-    - Image optimization
-    - Caching strategy
-    - Loading states
-    - Error boundaries
+3. **Trade Management System**
+   - Create trade proposals between users
+   - Trade history tracking
+   - Trade value calculator
+   - Trade reputation system
+   - Escrow-like trade confirmation
 
-## Phase 6: Additional Authentication Providers (Post-Launch)
+4. **Advanced Price Features**
+   - Price alerts when cards hit target values
+   - Portfolio performance over time
+   - Compare prices across multiple platforms
+   - Bulk pricing updates
+   - Historical price charts with events overlay
+
+5. **Collection Organization**
+   - Custom categories and tags
+   - Set completion tracking
+   - Duplicate management
+   - Location tracking (which binder/box)
+   - Condition notes per card
+
+### Business & Professional Features
+6. **Dealer/Store Features**
+   - Inventory management
+   - Customer wishlists
+   - Pricing automation
+   - Sales tracking
+   - Multi-location support
+
+7. **Insurance & Documentation**
+   - Generate insurance reports
+   - Appraisal documentation
+   - Loss reporting
+   - Photo documentation archive
+   - Certificate of authenticity tracking
+
+8. **Analytics & Insights**
+   - Market trend analysis
+   - Hot cards alerts
+   - Investment recommendations
+   - Grading population reports
+   - Category performance comparison
+
+### Platform & Integration Features
+9. **Mobile Optimization**
+   - Progressive Web App (PWA)
+   - Offline mode for shows/events
+   - Barcode/QR code scanning
+   - Quick capture mode
+   - Mobile-optimized camera settings
+
+10. **Third-Party Integrations**
+    - eBay listing automation
+    - TCGPlayer integration
+    - COMC vault integration
+    - Discord bot for collection sharing
+    - Zapier/Make automation support
+
+11. **API & Developer Tools**
+    - Public API for developers
+    - Webhook support
+    - Widget embeds
+    - Chrome extension
+    - Mobile SDK
+
+### Community & Social Features
+12. **Enhanced Social Features**
+    - Collection showcases/galleries
+    - Card of the day/week features
+    - User achievements/badges
+    - Collection milestones
+    - Community challenges
+
+13. **Content & Education**
+    - Grading guides
+    - Market analysis blog
+    - Video tutorials
+    - Card identification help
+    - Community forums
+
+14. **Events & Groups**
+    - Local collector groups
+    - Virtual card shows
+    - Group buys coordination
+    - Event calendar
+    - Meetup organization
+
+## Phase 9: Additional Authentication Providers (Post-Launch - Renamed from Phase 6)
 
 1. **Apple Sign-In** (Requires $99/year Apple Developer Account)
    - Important for iOS users
