@@ -47,13 +47,11 @@ export default function CardCollection({ onViewCard, onUploadNew }: CardCollecti
         .order('created_at', { ascending: false })
 
       if (cardsError) {
-        console.error('Error loading cards:', cardsError)
         setError('Failed to load your cards')
       } else {
         setCards(cardsData || [])
       }
-    } catch (err) {
-      console.error('Error in loadUserCards:', err)
+    } catch {
       setError('Failed to load your cards')
     } finally {
       setLoading(false)

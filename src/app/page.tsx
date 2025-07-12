@@ -8,6 +8,8 @@ import Header from '@/components/layout/Header'
 import CardUpload from '@/components/upload/CardUpload'
 import CardCollection from '@/components/dashboard/CardCollection'
 import CardDetails from '@/components/dashboard/CardDetails'
+import { ErrorBoundary } from '@/components/error/ErrorBoundary'
+import { CardErrorBoundary } from '@/components/error/CardErrorBoundary'
 import type { User } from '@supabase/supabase-js'
 
 export default function Home() {
@@ -22,8 +24,8 @@ export default function Home() {
         setUser(user)
         setLoading(false)
       })
-      .catch((error) => {
-        console.error('Error getting current user:', error)
+      .catch(() => {
+        // Handle authentication error silently - user will see login form
         setLoading(false)
       })
   }, [])
@@ -31,8 +33,8 @@ export default function Home() {
   const handleAuthSuccess = () => {
     getCurrentUser()
       .then(setUser)
-      .catch((error) => {
-        console.error('Error after auth success:', error)
+      .catch(() => {
+        // Auth success but failed to get user - let app retry on next render
       })
     // Note: CreditsProvider will automatically refresh when the user changes
   }
@@ -73,31 +75,49 @@ export default function Home() {
   }
 
   return (
-    <CreditsProvider>
-      <div className="min-h-screen bg-grey-50">
-        <Header onSignOut={handleSignOut} />
-        
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            {currentView === 'upload' ? (
-              <CardUpload 
-                onUploadComplete={handleUploadComplete} 
-                onCancel={handleBackToCollection}
-              />
-            ) : currentView === 'details' && selectedCardId ? (
-              <CardDetails 
-                cardId={selectedCardId}
-                onBack={handleBackToCollection}
-              />
-            ) : (
-              <CardCollection 
-                onViewCard={handleViewCard}
-                onUploadNew={handleUploadNew}
-              />
-            )}
-          </div>
-        </main>
-      </div>
-    </CreditsProvider>
+    <ErrorBoundary>
+      <CreditsProvider>
+        <div className="min-h-screen bg-grey-50">
+          <ErrorBoundary>
+            <Header onSignOut={handleSignOut} />
+          </ErrorBoundary>
+          
+          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div className="px-4 py-6 sm:px-0">
+              {currentView === 'upload' ? (
+                <CardErrorBoundary 
+                  title="Upload failed"
+                  message="There was an issue uploading your card. Please check your images and try again."
+                  onRetry={() => setCurrentView('upload')}
+                >
+                  <CardUpload 
+                    onUploadComplete={handleUploadComplete} 
+                    onCancel={handleBackToCollection}
+                  />
+                </CardErrorBoundary>
+              ) : currentView === 'details' && selectedCardId ? (
+                <CardErrorBoundary 
+                  title="Card details unavailable"
+                  message="There was an issue loading the card details."
+                  onRetry={() => handleViewCard(selectedCardId)}
+                >
+                  <CardDetails 
+                    cardId={selectedCardId}
+                    onBack={handleBackToCollection}
+                  />
+                </CardErrorBoundary>
+              ) : (
+                <ErrorBoundary>
+                  <CardCollection 
+                    onViewCard={handleViewCard}
+                    onUploadNew={handleUploadNew}
+                  />
+                </ErrorBoundary>
+              )}
+            </div>
+          </main>
+        </div>
+      </CreditsProvider>
+    </ErrorBoundary>
   )
 }

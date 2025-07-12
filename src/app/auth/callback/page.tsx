@@ -13,7 +13,6 @@ export default function AuthCallback() {
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
-          console.error('Auth callback error:', error)
           router.push('/?error=auth_error')
           return
         }
@@ -40,8 +39,7 @@ export default function AuthCallback() {
         } else {
           router.push('/?error=no_session')
         }
-      } catch (error) {
-        console.error('Callback handling error:', error)
+      } catch {
         router.push('/?error=callback_error')
       }
     }

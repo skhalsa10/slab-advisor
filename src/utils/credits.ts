@@ -26,7 +26,6 @@ export async function checkUserCredits(
       .single()
 
     if (creditError) {
-      console.error('Credit check error:', creditError)
       return {
         hasCredits: false,
         creditsRemaining: 0,
@@ -49,8 +48,7 @@ export async function checkUserCredits(
       creditsRemaining: creditData.credits_remaining,
       error: hasCredits ? undefined : 'Insufficient credits'
     }
-  } catch (error) {
-    console.error('Unexpected error checking credits:', error)
+  } catch {
     return {
       hasCredits: false,
       creditsRemaining: 0,
@@ -75,7 +73,6 @@ export async function deductUserCredits(
     })
 
     if (deductError) {
-      console.error('Credit deduction error:', deductError)
       return {
         success: false,
         error: 'Failed to deduct credits'
@@ -83,8 +80,7 @@ export async function deductUserCredits(
     }
 
     return { success: true }
-  } catch (error) {
-    console.error('Unexpected error deducting credits:', error)
+  } catch {
     return {
       success: false,
       error: 'Failed to deduct credits'

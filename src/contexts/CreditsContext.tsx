@@ -41,8 +41,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         setCredits(0)
         setUser(null)
       }
-    } catch (error) {
-      console.error('Error refreshing credits:', error)
+    } catch {
       setCredits(0)
     } finally {
       setLoading(false)
@@ -57,7 +56,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) return
 
-    console.log('Setting up realtime subscription for user:', user.id)
+    // Set up realtime subscription for credit changes
 
     // Create a channel for this user's credits
     const channel = supabase
@@ -71,40 +70,30 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
           filter: `user_id=eq.${user.id}`
         },
         (payload: RealtimePostgresChangesPayload<UserCreditsRow>) => {
-          console.log('Credit change detected:', payload)
-          
           if (payload.eventType === 'UPDATE' && payload.new) {
             // Update credits when database changes
             setCredits(payload.new.credits_remaining)
-            console.log('Credits updated to:', payload.new.credits_remaining)
           } else if (payload.eventType === 'INSERT' && payload.new) {
             // Handle new credit record
             setCredits(payload.new.credits_remaining)
-            console.log('New credit record created:', payload.new.credits_remaining)
           } else if (payload.eventType === 'DELETE') {
             // Handle credit record deletion (shouldn't happen normally)
             setCredits(0)
-            console.log('Credit record deleted')
           }
         }
       )
       .subscribe((status) => {
-        console.log('Subscription status:', status)
         if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to credit changes')
           setIsRealtimeConnected(true)
         } else if (status === 'CLOSED') {
-          console.log('Subscription closed')
           setIsRealtimeConnected(false)
         } else if (status === 'CHANNEL_ERROR') {
-          console.error('Subscription error')
           setIsRealtimeConnected(false)
         }
       })
 
     // Cleanup subscription on unmount or user change
     return () => {
-      console.log('Cleaning up realtime subscription')
       setIsRealtimeConnected(false)
       supabase.removeChannel(channel)
     }

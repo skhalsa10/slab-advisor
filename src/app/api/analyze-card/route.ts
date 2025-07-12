@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
     const { user, error: authError, supabase } = await getServerSession(request);
 
     if (authError || !user || !supabase) {
-      console.error("Auth error:", authError);
       return NextResponse.json(
         { error: "Authentication required" },
         { status: HTTP_STATUS.UNAUTHORIZED }
@@ -66,8 +65,7 @@ export async function POST(request: NextRequest) {
       const frontCheck = await fetch(card.front_image_url, { method: "HEAD" });
       const backCheck = await fetch(card.back_image_url, { method: "HEAD" });
 
-      console.log("Front image accessible:", frontCheck.ok, frontCheck.status);
-      console.log("Back image accessible:", backCheck.ok, backCheck.status);
+      // Check image accessibility
 
       if (!frontCheck.ok || !backCheck.ok) {
         return NextResponse.json(
@@ -79,8 +77,8 @@ export async function POST(request: NextRequest) {
           { status: HTTP_STATUS.BAD_REQUEST }
         );
       }
-    } catch (urlError) {
-      console.error("Error checking image URLs:", urlError);
+    } catch {
+      // Image URL check failed - continue with analysis
     }
 
     // Prepare payloads for both APIs
@@ -105,15 +103,6 @@ export async function POST(request: NextRequest) {
       ],
     };
 
-    console.log(
-      "Sending to Ximilar Grade API:",
-      JSON.stringify(gradePayload, null, 2)
-    );
-    console.log(
-      "Sending to Ximilar Analyze API:",
-      JSON.stringify(analyzePayload, null, 2)
-    );
-
     // Call both APIs in parallel
     const [gradeResponse, analyzeResponse] = await Promise.all([
       // Grade API call
@@ -136,28 +125,16 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    // Log response details
-    console.log("Grade API Response Status:", gradeResponse.status);
-    console.log("Analyze API Response Status:", analyzeResponse.status);
-
     // Process both responses
     const gradeResponseText = await gradeResponse.text();
     const analyzeResponseText = await analyzeResponse.text();
-
-    console.log("Raw Grade response:", gradeResponseText);
-    console.log("Raw Analyze response:", analyzeResponseText);
 
     let gradeResult: XimilarApiResponse;
     let analyzeResult: XimilarApiResponse | null;
 
     try {
       gradeResult = JSON.parse(gradeResponseText) as XimilarApiResponse;
-      console.log(
-        "Parsed Grade response:",
-        JSON.stringify(gradeResult, null, 2)
-      );
-    } catch (parseError) {
-      console.error("Failed to parse Grade response as JSON:", parseError);
+    } catch {
       return NextResponse.json(
         {
           error: ERROR_MESSAGES.ANALYSIS_FAILED,
@@ -169,19 +146,13 @@ export async function POST(request: NextRequest) {
 
     try {
       analyzeResult = JSON.parse(analyzeResponseText) as XimilarApiResponse;
-      console.log(
-        "Parsed Analyze response:",
-        JSON.stringify(analyzeResult, null, 2)
-      );
-    } catch (parseError) {
-      console.error("Failed to parse Analyze response as JSON:", parseError);
+    } catch {
       // Don't fail the entire request if analyze fails
       analyzeResult = null;
     }
 
     // Check if we have valid grading data
     if (!gradeResult.records || gradeResult.records.length === 0) {
-      console.error("No records in Grade response");
       return NextResponse.json(
         {
           error: ERROR_MESSAGES.ANALYSIS_FAILED,
@@ -196,7 +167,6 @@ export async function POST(request: NextRequest) {
       (r) => r.grades && r.grades.final
     );
     if (!hasValidGrades) {
-      console.error("No valid grades found in Grade response");
       return NextResponse.json(
         {
           error: ERROR_MESSAGES.GRADING_FAILED,
@@ -206,12 +176,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log that we're proceeding despite potential status issues
-    if (!gradeResponse.ok) {
-      console.warn(
-        `Grade API returned status ${gradeResponse.status} but has valid grading data - proceeding`
-      );
-    }
+    // Continue processing even if HTTP status isn't 200 but we have valid data
 
     // Process Grade results with complete response storage
     // Extract results for analysis (using side field)
@@ -373,9 +338,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      console.log("Overlay images processed:", overlayUrls);
-    } catch (overlayError) {
-      console.error("Error downloading overlay images:", overlayError);
+    } catch {
       // Continue without overlay images - this is not a critical error
     }
 
@@ -429,7 +392,6 @@ export async function POST(request: NextRequest) {
       .eq("id", cardId);
 
     if (updateError) {
-      console.error("Database update error:", updateError);
       return NextResponse.json(
         { error: "Failed to save analysis results" },
         { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
@@ -440,8 +402,7 @@ export async function POST(request: NextRequest) {
     const deductResult = await deductUserCredits(supabase, user.id);
     
     if (!deductResult.success) {
-      console.error("Credit deduction failed:", deductResult.error);
-      // Analysis was successful but credit deduction failed - log but don't fail the request
+      // Analysis was successful but credit deduction failed - continue anyway
     }
 
     return NextResponse.json({
@@ -458,15 +419,6 @@ export async function POST(request: NextRequest) {
           : null,
     });
   } catch (error) {
-    console.error("Analysis error:", error);
-    console.error(
-      "Error details:",
-      error instanceof Error ? error.message : "Unknown error"
-    );
-    console.error(
-      "Stack trace:",
-      error instanceof Error ? error.stack : "No stack trace"
-    );
     return NextResponse.json(
       {
         error:

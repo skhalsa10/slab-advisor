@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     const { user, error: authError, supabase } = await getServerSession(request)
     
     if (authError || !user || !supabase) {
-      console.error('Auth error:', authError)
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
@@ -54,7 +53,6 @@ export async function POST(request: NextRequest) {
       .eq('id', cardId)
 
     if (updateError) {
-      console.error('Database update error:', updateError)
       return NextResponse.json({ error: 'Failed to update card details' }, { status: 500 })
     }
 
@@ -64,7 +62,6 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Update card details error:', error)
     return NextResponse.json({ 
       error: error instanceof Error ? error.message : 'Internal server error during card update',
       success: false 
