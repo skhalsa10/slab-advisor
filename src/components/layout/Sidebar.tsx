@@ -96,7 +96,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-grey-600">Credits:</span>
-                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium font-mono">
                       {credits}
                     </span>
                   </div>
@@ -135,7 +135,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
             {/* Mobile menu button and credits */}
             <div className="flex items-center space-x-3">
               {user && (
-                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium font-mono">
                   {credits}
                 </span>
               )}
@@ -191,7 +191,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-grey-600">Credits:</span>
-                      <span className="text-sm font-medium text-grey-900">{credits}</span>
+                      <span className="text-sm font-medium font-mono text-grey-900">{credits}</span>
                     </div>
                     <button
                       onClick={handleSignOut}

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
-import CardIdentificationModal from '@/components/dashboard/CardIdentificationModal'
+import CardIdentificationModal from '@/components/cards/CardIdentificationModal'
 import { Match } from '@/types/ximilar'
 
 interface CardUploadProps {

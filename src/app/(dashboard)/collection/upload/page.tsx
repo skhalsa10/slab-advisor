@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
-import CardIdentificationModal from '@/components/dashboard/CardIdentificationModal'
+import CardIdentificationModal from '@/components/cards/CardIdentificationModal'
 import { Match } from '@/types/ximilar'
 
 export default function UploadPage() {
@@ -211,7 +211,7 @@ export default function UploadPage() {
     }
   }
 
-  const handleModalConfirm = (cardId: string) => {
+  const handleModalConfirm = () => {
     setShowModal(false)
     setAnalysisResult(null)
     router.push('/collection')

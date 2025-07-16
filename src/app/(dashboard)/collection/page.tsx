@@ -162,7 +162,7 @@ export default function CollectionPage() {
                 <h3 className="text-sm font-medium text-grey-900 truncate">
                   {card.card_title || 'Untitled Card'}
                 </h3>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono ${
                   card.estimated_grade 
                     ? 'bg-green-100 text-green-800' 
                     : 'bg-grey-100 text-grey-800'
@@ -172,7 +172,7 @@ export default function CollectionPage() {
               </div>
               
               <div className="text-xs text-grey-500 space-y-1">
-                <div>Confidence: {formatConfidence(card.confidence)}</div>
+                <div>Confidence: <span className="font-mono">{formatConfidence(card.confidence)}</span></div>
                 <div>Analyzed: {formatDate(card.created_at)}</div>
               </div>
               
