@@ -38,7 +38,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex flex-col min-h-0 bg-white border-r border-grey-200">
+        <div className="flex flex-col h-full bg-white border-r border-grey-200">
           {/* Logo */}
           <div className="flex items-center h-16 flex-shrink-0 px-4 border-b border-grey-200">
             <Image 
