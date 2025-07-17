@@ -114,7 +114,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
       </div>
 
       {/* Mobile menu button */}
-      <div className="md:hidden">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50">
         <div className="bg-white shadow-sm border-b border-grey-200">
           <div className="flex items-center justify-between h-16 px-4">
             {/* Logo */}
@@ -132,13 +132,8 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
               </h1>
             </div>
 
-            {/* Mobile menu button and credits */}
-            <div className="flex items-center space-x-3">
-              {user && (
-                <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium font-mono">
-                  {credits}
-                </span>
-              )}
+            {/* Mobile menu button */}
+            <div className="flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 rounded-md text-grey-600 hover:text-grey-900 hover:bg-grey-100"
@@ -191,7 +186,9 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-grey-600">Credits:</span>
-                      <span className="text-sm font-medium font-mono text-grey-900">{credits}</span>
+                      <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium font-mono">
+                        {credits}
+                      </span>
                     </div>
                     <button
                       onClick={handleSignOut}
