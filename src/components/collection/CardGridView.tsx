@@ -22,7 +22,7 @@ interface CardGridViewProps {
 export default function CardGridView({ cards, onViewCard }: CardGridViewProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {cards.map((card) => (
+      {cards.map((card, index) => (
         <div 
           key={card.id} 
           className="cursor-pointer group"
@@ -37,6 +37,7 @@ export default function CardGridView({ cards, onViewCard }: CardGridViewProps) {
                   alt={card.card_title || 'Trading card'}
                   className="absolute inset-0 w-full h-full object-cover"
                   fill
+                  priority={index < 10}
                   sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                 />
               ) : (

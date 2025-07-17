@@ -1,16 +1,18 @@
 'use client'
 
+import { use } from 'react'
 import { useRouter } from 'next/navigation'
 import CardDetails from '@/components/cards/CardDetails'
 
 interface CardPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function CardPage({ params }: CardPageProps) {
   const router = useRouter()
+  const { id } = use(params)
 
   const handleBack = () => {
     router.push('/collection')
@@ -18,7 +20,7 @@ export default function CardPage({ params }: CardPageProps) {
 
   return (
     <CardDetails 
-      cardId={params.id} 
+      cardId={id} 
       onBack={handleBack} 
     />
   )
