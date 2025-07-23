@@ -136,19 +136,19 @@ export default function SetDetailsPage() {
               <p className="text-xs text-grey-600">Official Count</p>
               <p className="text-lg font-semibold text-grey-900">{set.cardCount.official}</p>
             </div>
-            {set.cardCount.holo > 0 && (
+            {(set.cardCount.holo ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">Holo Cards</p>
                 <p className="text-lg font-semibold text-grey-900">{set.cardCount.holo}</p>
               </div>
             )}
-            {set.cardCount.reverse > 0 && (
+            {(set.cardCount.reverse ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">Reverse Holo</p>
                 <p className="text-lg font-semibold text-grey-900">{set.cardCount.reverse}</p>
               </div>
             )}
-            {set.cardCount.firstEd && set.cardCount.firstEd > 0 && (
+            {(set.cardCount.firstEd ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">1st Edition</p>
                 <p className="text-lg font-semibold text-grey-900">{set.cardCount.firstEd}</p>
