@@ -148,7 +148,7 @@ export default function SetDetailsPage() {
                 <p className="text-lg font-semibold text-grey-900">{set.cardCount.reverse}</p>
               </div>
             )}
-            {set.cardCount.firstEd > 0 && (
+            {set.cardCount.firstEd && set.cardCount.firstEd > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">1st Edition</p>
                 <p className="text-lg font-semibold text-grey-900">{set.cardCount.firstEd}</p>
