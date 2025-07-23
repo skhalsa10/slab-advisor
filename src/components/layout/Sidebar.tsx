@@ -25,6 +25,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: '📊' },
     { name: 'Collection', href: '/collection', icon: '🎴' },
+    { name: 'Explore', href: '/explore', icon: '🔍' },
   ]
 
   const isActiveLink = (href: string) => {

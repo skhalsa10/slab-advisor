@@ -72,6 +72,7 @@ npm run test:coverage # Run tests with coverage report
 - **Vercel Deployment**: https://vercel.com/docs
 - **Ximilar API**: https://docs.ximilar.com/
 - **Vitest**: https://vitest.dev/guide/
+- **TCGDEX**: https://tcgdex.dev/
 
 ## Development Process Requirements
 
