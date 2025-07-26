@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getCard, getSetWithCards, getCardImageUrl } from '@/lib/tcgdex'
-import type { CardFull, SetWithCards } from '@/lib/tcgdex'
+import { getCard, getSetWithCards, getCardImageUrl } from '@/lib/pokemon-db'
+import type { CardFull, SetWithCards } from '@/models/pokemon'
 
 export default function CardDetailsPage() {
   const params = useParams()
@@ -175,7 +175,7 @@ export default function CardDetailsPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-grey-50 rounded-lg p-3">
               <p className="text-sm text-grey-600">Card Number</p>
-              <p className="text-lg font-semibold">#{card.localId}</p>
+              <p className="text-lg font-semibold">#{card.local_id}</p>
             </div>
             {card.rarity && (
               <div className="bg-grey-50 rounded-lg p-3">
@@ -191,165 +191,51 @@ export default function CardDetailsPage() {
             )}
           </div>
 
-          {/* Pokemon Specific Info */}
-          {card.category === 'Pokemon' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                {card.hp && (
-                  <div className="bg-orange-50 rounded-lg p-3">
-                    <p className="text-sm text-orange-600">HP</p>
-                    <p className="text-2xl font-bold text-orange-700">{card.hp}</p>
-                  </div>
-                )}
-                {card.types && card.types.length > 0 && (
-                  <div className="bg-orange-50 rounded-lg p-3">
-                    <p className="text-sm text-orange-600">Type</p>
-                    <p className="text-lg font-semibold text-orange-700">{card.types.join(', ')}</p>
-                  </div>
-                )}
+          {/* Additional Card Info */}
+          <div className="space-y-4">
+            {/* Category */}
+            {card.category && (
+              <div className="bg-grey-50 rounded-lg p-3">
+                <p className="text-sm text-grey-600">Category</p>
+                <p className="font-semibold">{card.category}</p>
               </div>
+            )}
 
-              {card.stage && (
-                <div className="bg-grey-50 rounded-lg p-3">
-                  <p className="text-sm text-grey-600">Stage</p>
-                  <p className="font-semibold">{card.stage}</p>
-                  {card.evolveFrom && (
-                    <p className="text-sm text-grey-600 mt-1">Evolves from: {card.evolveFrom}</p>
-                  )}
-                </div>
-              )}
+            {/* Illustrator */}
+            {card.illustrator && (
+              <div className="bg-grey-50 rounded-lg p-3">
+                <p className="text-sm text-grey-600">Illustrator</p>
+                <p className="font-semibold">{card.illustrator}</p>
+              </div>
+            )}
 
-              {card.abilities && card.abilities.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-grey-900">Abilities</h3>
-                  {card.abilities.map((ability, index) => (
-                    <div key={index} className="bg-grey-50 rounded-lg p-3">
-                      <p className="font-medium">{ability.type}: {ability.name}</p>
-                      {ability.effect && (
-                        <p className="text-sm text-grey-600 mt-1">{ability.effect}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {card.attacks && card.attacks.length > 0 && (
-                <div className="space-y-3">
-                  <h3 className="font-semibold text-grey-900">Attacks</h3>
-                  {card.attacks.map((attack, index) => (
-                    <div key={index} className="bg-grey-50 rounded-lg p-3">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">{attack.name}</p>
-                        {attack.damage && (
-                          <p className="text-lg font-bold text-orange-600">{attack.damage}</p>
-                        )}
-                      </div>
-                      {attack.cost && attack.cost.length > 0 && (
-                        <p className="text-sm text-grey-600 mt-1">
-                          Cost: {attack.cost.join(', ')}
-                        </p>
-                      )}
-                      {attack.effect && (
-                        <p className="text-sm text-grey-600 mt-1">{attack.effect}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {(card.weaknesses || card.resistances || card.retreat) && (
-                <div className="grid grid-cols-3 gap-3">
-                  {card.weaknesses && card.weaknesses.length > 0 && (
-                    <div className="bg-grey-50 rounded-lg p-3">
-                      <p className="text-sm text-grey-600">Weakness</p>
-                      {card.weaknesses.map((w, i) => (
-                        <p key={i} className="font-medium">{w.type} {w.value}</p>
-                      ))}
-                    </div>
-                  )}
-                  {card.resistances && card.resistances.length > 0 && (
-                    <div className="bg-grey-50 rounded-lg p-3">
-                      <p className="text-sm text-grey-600">Resistance</p>
-                      {card.resistances.map((r, i) => (
-                        <p key={i} className="font-medium">{r.type} {r.value}</p>
-                      ))}
-                    </div>
-                  )}
-                  {card.retreat && (
-                    <div className="bg-grey-50 rounded-lg p-3">
-                      <p className="text-sm text-grey-600">Retreat Cost</p>
-                      <p className="font-medium">{card.retreat}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Trainer Card Info */}
-          {card.category === 'Trainer' && (
-            <div className="space-y-4">
-              {card.trainerType && (
-                <div className="bg-orange-50 rounded-lg p-3">
-                  <p className="text-sm text-orange-600">Trainer Type</p>
-                  <p className="text-lg font-semibold text-orange-700">{card.trainerType}</p>
-                </div>
-              )}
-              {card.effect && (
-                <div className="bg-grey-50 rounded-lg p-4">
-                  <h3 className="font-semibold text-grey-900 mb-2">Effect</h3>
-                  <p className="text-sm whitespace-pre-wrap">{card.effect}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Energy Card Info */}
-          {card.category === 'Energy' && (
-            <div className="space-y-4">
-              {card.energyType && (
-                <div className="bg-orange-50 rounded-lg p-3">
-                  <p className="text-sm text-orange-600">Energy Type</p>
-                  <p className="text-lg font-semibold text-orange-700">{card.energyType}</p>
-                </div>
-              )}
-              {card.effect && (
-                <div className="bg-grey-50 rounded-lg p-4">
-                  <h3 className="font-semibold text-grey-900 mb-2">Effect</h3>
-                  <p className="text-sm whitespace-pre-wrap">{card.effect}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Description (for Pokemon cards) */}
-          {card.description && (
-            <div className="bg-grey-50 rounded-lg p-4">
-              <h3 className="font-semibold text-grey-900 mb-2">Pokédex Entry</h3>
-              <p className="text-sm italic">{card.description}</p>
-            </div>
-          )}
-
-          {/* Variants */}
-          {card.variants && (
-            <div className="bg-grey-50 rounded-lg p-4">
-              <h3 className="font-semibold text-grey-900 mb-2">Available Variants</h3>
+            {/* Variants */}
+            <div className="bg-grey-50 rounded-lg p-3">
+              <p className="text-sm text-grey-600 mb-2">Available Variants</p>
               <div className="flex flex-wrap gap-2">
-                {card.variants.normal && (
-                  <span className="px-3 py-1 bg-white rounded-full text-sm">Normal</span>
+                {card.variant_normal && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    Normal
+                  </span>
                 )}
-                {card.variants.reverse && (
-                  <span className="px-3 py-1 bg-white rounded-full text-sm">Reverse Holo</span>
+                {card.variant_holo && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                    Holo
+                  </span>
                 )}
-                {card.variants.holo && (
-                  <span className="px-3 py-1 bg-white rounded-full text-sm">Holo</span>
+                {card.variant_reverse && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    Reverse
+                  </span>
                 )}
-                {card.variants.firstEdition && (
-                  <span className="px-3 py-1 bg-white rounded-full text-sm">1st Edition</span>
+                {card.variant_first_edition && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    1st Edition
+                  </span>
                 )}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

@@ -23,6 +23,36 @@
 
 ## Priority 1 (P1) - Immediate Next Steps
 
+### 🔄 TCGDex Database Replication for Performance
+- **Priority**: High
+- **Effort**: Medium
+- **Description**: Replicate TCGDex data to Supabase to dramatically improve browse page performance
+- **Current Issue**: Browse page makes 21+ API calls, causing 3-5 second load times
+- **Target**: Reduce to single database query with 200-500ms load times
+- **Requirements**:
+  - Create Supabase tables for pokemon_series and pokemon_sets
+  - Build data sync API route to fetch from TCGDex and upsert to Supabase
+  - Update browse pages to query Supabase instead of TCGDex API
+  - Implement full-text search using PostgreSQL
+  - Add manual sync functionality for admins
+  - Create database indexes for optimal query performance
+  - Maintain TCGDex API as fallback option
+- **Database Schema**:
+  - pokemon_series: id, name, logo, timestamps
+  - pokemon_sets: id, series_id, name, logo, symbol, card_counts, release_date, etc.
+  - Full-text search indexes on names
+  - Foreign key relationships with cascading deletes
+- **Implementation Files**:
+  - `/src/types/pokemon.ts` - Database type definitions
+  - `/src/lib/pokemon-db.ts` - Supabase query functions
+  - `/src/app/api/sync-tcgdex/route.ts` - Data synchronization endpoint
+  - Update `/src/lib/tcgdx.ts` - Add database source option
+  - Update browse pages to use new data source
+- **Future Automation**:
+  - Vercel cron job for daily data sync
+  - Incremental updates for new sets
+  - Cache warming strategies
+
 ### 🔄 Collection Integration
 - **Priority**: High
 - **Effort**: Medium
@@ -67,6 +97,30 @@
   - Display current market prices on card details
   - Price history tracking
   - Variant-specific pricing (normal vs holo vs 1st edition)
+
+### 🔄 Production Backfill Service
+- **Priority**: Medium
+- **Effort**: Medium
+- **Description**: Implement a reliable, scalable solution for data backfill operations
+- **Current Issue**: Edge Functions timeout after 150 seconds, limiting large data imports
+- **Requirements**:
+  - Evaluate options: GitHub Actions, local Node.js scripts, cloud functions, or queue-based processing
+  - Support for long-running operations (hours if needed)
+  - Progress tracking and resumability
+  - Error handling and retry logic
+  - Scheduled updates for new TCG releases
+  - Monitoring and alerting for failed jobs
+- **Options to Consider**:
+  - GitHub Actions with scheduled workflows
+  - Vercel Cron Jobs (5-minute limit on Pro plan)
+  - AWS Lambda with Step Functions
+  - Google Cloud Functions (60-minute timeout)
+  - Dedicated worker service on Railway/Render
+  - PostgreSQL functions with pg_cron
+- **Implementation**:
+  - Start with local Node.js scripts for immediate needs
+  - Move to GitHub Actions for scheduled updates
+  - Consider cloud functions for production scale
 
 ## Priority 2 (P2) - Future Enhancements
 

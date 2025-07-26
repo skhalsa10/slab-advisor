@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getAllSeriesWithSets, searchSets, getLogoUrl } from '@/lib/tcgdex'
-import type { SerieWithSets } from '@/lib/tcgdex'
+import { getAllSeriesWithSets, getLogoUrl } from '@/lib/pokemon-db'
+import type { SerieWithSets } from '@/models/pokemon'
 
 export default function PokemonBrowsePage() {
   const [series, setSeries] = useState<SerieWithSets[]>([])
@@ -46,7 +46,9 @@ export default function PokemonBrowsePage() {
     if (setSearchQuery) {
       result = result.map(serie => ({
         ...serie,
-        sets: searchSets(serie.sets, setSearchQuery)
+        sets: serie.sets.filter(set => 
+          set.name.toLowerCase().includes(setSearchQuery.toLowerCase())
+        )
       })).filter(serie => serie.sets.length > 0)
     }
 
@@ -193,7 +195,7 @@ export default function PokemonBrowsePage() {
                               {set.name}
                             </h3>
                             <p className="text-sm text-grey-600 mt-1">
-                              {set.cardCount.total} cards
+                              {set.card_count_total || 0} cards
                             </p>
                           </div>
                         </div>
@@ -203,7 +205,7 @@ export default function PokemonBrowsePage() {
                             {set.name}
                           </h3>
                           <p className="text-sm text-grey-600">
-                            {set.cardCount.total} cards
+                            {set.card_count_total || 0} cards
                           </p>
                         </div>
                       )}

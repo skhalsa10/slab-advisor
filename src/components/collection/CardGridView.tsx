@@ -1,18 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-
-interface Card {
-  id: string
-  user_id: string
-  front_image_url: string | null
-  back_image_url: string | null
-  card_title: string | null
-  estimated_grade: number | null
-  confidence: number | null
-  created_at: string
-  updated_at: string
-}
+import type { Card } from '@/lib/supabase'
 
 interface CardGridViewProps {
   cards: Card[]

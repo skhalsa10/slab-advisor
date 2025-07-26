@@ -7,7 +7,8 @@ interface CardInfoPanelProps {
 }
 
 const CardInfoPanel = memo(function CardInfoPanel({ card, onEdit }: CardInfoPanelProps) {
-  const formatDate = (dateString: string): string => {
+  const formatDate = (dateString: string | null): string => {
+    if (!dateString) return 'Unknown'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',

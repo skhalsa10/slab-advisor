@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getSetWithCards, searchCards, getCardImageUrl, getLogoUrl } from '@/lib/tcgdex'
-import type { SetWithCards, CardBrief } from '@/lib/tcgdex'
+import { getSetWithCards, getCardImageUrl, getLogoUrl } from '@/lib/pokemon-db'
+import type { SetWithCards } from '@/models/pokemon'
 import CardDetailsModal from '@/components/cards/CardDetailsModal'
 
 export default function SetDetailsPage() {
@@ -42,7 +42,10 @@ export default function SetDetailsPage() {
   const filteredCards = useMemo(() => {
     if (!set || !searchQuery) return set?.cards || []
     
-    return searchCards(set.cards as CardBrief[], searchQuery)
+    return set.cards.filter(card => 
+      card.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (card.local_id && card.local_id.toString().toLowerCase().includes(searchQuery.toLowerCase()))
+    )
   }, [set, searchQuery])
 
   const handleCardClick = (e: React.MouseEvent, cardId: string) => {
@@ -108,11 +111,11 @@ export default function SetDetailsPage() {
             <div>
               <h1 className="text-2xl font-bold text-grey-900">{set.name}</h1>
               <p className="mt-1 text-sm text-grey-600">
-                {set.serie?.name} • {set.cardCount.total} cards
+                {set.series?.name} • {set.card_count_total || 0} cards
               </p>
-              {set.releaseDate && (
+              {set.release_date && (
                 <p className="mt-1 text-sm text-grey-500">
-                  Released: {new Date(set.releaseDate).toLocaleDateString()}
+                  Released: {new Date(set.release_date).toLocaleDateString()}
                 </p>
               )}
             </div>
@@ -130,77 +133,32 @@ export default function SetDetailsPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-grey-50 rounded-lg p-3">
               <p className="text-xs text-grey-600">Total Cards</p>
-              <p className="text-lg font-semibold text-grey-900">{set.cardCount.total}</p>
+              <p className="text-lg font-semibold text-grey-900">{set.card_count_total || 0}</p>
             </div>
             <div className="bg-grey-50 rounded-lg p-3">
               <p className="text-xs text-grey-600">Official Count</p>
-              <p className="text-lg font-semibold text-grey-900">{set.cardCount.official}</p>
+              <p className="text-lg font-semibold text-grey-900">{set.card_count_official || 0}</p>
             </div>
-            {(set.cardCount.holo ?? 0) > 0 && (
+            {(set.card_count_holo ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">Holo Cards</p>
-                <p className="text-lg font-semibold text-grey-900">{set.cardCount.holo}</p>
+                <p className="text-lg font-semibold text-grey-900">{set.card_count_holo}</p>
               </div>
             )}
-            {(set.cardCount.reverse ?? 0) > 0 && (
+            {(set.card_count_reverse ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">Reverse Holo</p>
-                <p className="text-lg font-semibold text-grey-900">{set.cardCount.reverse}</p>
+                <p className="text-lg font-semibold text-grey-900">{set.card_count_reverse}</p>
               </div>
             )}
-            {(set.cardCount.firstEd ?? 0) > 0 && (
+            {(set.card_count_first_ed ?? 0) > 0 && (
               <div className="bg-grey-50 rounded-lg p-3">
                 <p className="text-xs text-grey-600">1st Edition</p>
-                <p className="text-lg font-semibold text-grey-900">{set.cardCount.firstEd}</p>
+                <p className="text-lg font-semibold text-grey-900">{set.card_count_first_ed}</p>
               </div>
             )}
           </div>
 
-          {/* Boosters */}
-          {set.boosters && set.boosters.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold text-grey-900 mb-3">Booster Packs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {set.boosters.map((booster) => (
-                  <div key={booster.id} className="bg-white border border-grey-200 rounded-lg p-4">
-                    <div className="flex items-start space-x-3">
-                      {booster.artwork_front && (
-                        <div className="flex-shrink-0">
-                          <Image
-                            src={booster.artwork_front}
-                            alt={booster.name}
-                            width={60}
-                            height={84}
-                            className="object-cover rounded"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none'
-                            }}
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-grey-900">{booster.name}</h4>
-                        {booster.logo && (
-                          <div className="mt-2">
-                            <Image
-                              src={booster.logo}
-                              alt={`${booster.name} logo`}
-                              width={80}
-                              height={40}
-                              className="object-contain"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none'
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -254,7 +212,7 @@ export default function SetDetailsPage() {
                   {card.name}
                 </h3>
                 <p className="text-xs text-grey-600">
-                  #{card.localId}
+                  #{card.local_id}
                   {card.rarity && ` • ${card.rarity}`}
                 </p>
               </div>

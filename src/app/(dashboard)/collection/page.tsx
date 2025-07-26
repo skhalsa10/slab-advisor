@@ -2,25 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabase, type Card } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import CollectionHeader from '@/components/collection/CollectionHeader'
 import CardGridView from '@/components/collection/CardGridView'
 import CardListView from '@/components/collection/CardListView'
 import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
 import { type ViewMode } from '@/components/collection/ViewToggle'
-
-interface Card {
-  id: string
-  user_id: string
-  front_image_url: string | null
-  back_image_url: string | null
-  card_title: string | null
-  estimated_grade: number | null
-  confidence: number | null
-  created_at: string
-  updated_at: string
-}
 
 export default function CollectionPage() {
   const [cards, setCards] = useState<Card[]>([])

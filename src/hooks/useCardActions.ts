@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, type Card } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { Card } from '@/types/database'
 
 export interface UseCardActionsReturn {
   card: Card | null

@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getCard, getCardImageUrl } from '@/lib/tcgdex'
-import type { CardFull } from '@/lib/tcgdex'
+import { getCard, getCardImageUrl } from '@/lib/pokemon-db'
+import type { CardFull } from '@/models/pokemon'
 
 interface CardDetailsModalProps {
   cardId: string
@@ -111,7 +111,7 @@ export default function CardDetailsModal({ cardId, setId, isOpen, onClose }: Car
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-grey-50 rounded-lg p-2">
                     <p className="text-xs text-grey-600">Number</p>
-                    <p className="font-medium">#{card.localId}</p>
+                    <p className="font-medium">#{card.local_id}</p>
                   </div>
                   {card.rarity && (
                     <div className="bg-grey-50 rounded-lg p-2">
@@ -121,52 +121,11 @@ export default function CardDetailsModal({ cardId, setId, isOpen, onClose }: Car
                   )}
                 </div>
 
-                {/* Pokemon Specific */}
-                {card.category === 'Pokemon' && (
-                  <>
-                    {card.hp && (
-                      <div className="bg-grey-50 rounded-lg p-2">
-                        <p className="text-xs text-grey-600">HP</p>
-                        <p className="font-medium">{card.hp}</p>
-                      </div>
-                    )}
-                    {card.types && card.types.length > 0 && (
-                      <div className="bg-grey-50 rounded-lg p-2">
-                        <p className="text-xs text-grey-600">Type</p>
-                        <p className="font-medium">{card.types.join(', ')}</p>
-                      </div>
-                    )}
-                    {card.stage && (
-                      <div className="bg-grey-50 rounded-lg p-2">
-                        <p className="text-xs text-grey-600">Stage</p>
-                        <p className="font-medium">{card.stage}</p>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* Trainer/Energy Specific */}
-                {card.category === 'Trainer' && card.trainerType && (
+                {/* Card Category */}
+                {card.category && (
                   <div className="bg-grey-50 rounded-lg p-2">
-                    <p className="text-xs text-grey-600">Trainer Type</p>
-                    <p className="font-medium">{card.trainerType}</p>
-                  </div>
-                )}
-
-                {card.category === 'Energy' && card.energyType && (
-                  <div className="bg-grey-50 rounded-lg p-2">
-                    <p className="text-xs text-grey-600">Energy Type</p>
-                    <p className="font-medium">{card.energyType}</p>
-                  </div>
-                )}
-
-                {/* Effect/Description */}
-                {(card.effect || card.description) && (
-                  <div className="bg-grey-50 rounded-lg p-3">
-                    <p className="text-xs text-grey-600 mb-1">
-                      {card.category === 'Pokemon' ? 'Description' : 'Effect'}
-                    </p>
-                    <p className="text-sm">{card.effect || card.description}</p>
+                    <p className="text-xs text-grey-600">Category</p>
+                    <p className="font-medium">{card.category}</p>
                   </div>
                 )}
 
@@ -177,6 +136,33 @@ export default function CardDetailsModal({ cardId, setId, isOpen, onClose }: Car
                     <p className="font-medium">{card.illustrator}</p>
                   </div>
                 )}
+
+                {/* Variants */}
+                <div className="bg-grey-50 rounded-lg p-2">
+                  <p className="text-xs text-grey-600 mb-1">Available Variants</p>
+                  <div className="flex flex-wrap gap-1">
+                    {card.variant_normal && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                        Normal
+                      </span>
+                    )}
+                    {card.variant_holo && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                        Holo
+                      </span>
+                    )}
+                    {card.variant_reverse && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        Reverse
+                      </span>
+                    )}
+                    {card.variant_first_edition && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                        1st Edition
+                      </span>
+                    )}
+                  </div>
+                </div>
 
                 {/* View Full Details Link */}
                 <Link
