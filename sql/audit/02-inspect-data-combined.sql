@@ -7,7 +7,7 @@
 -- Combine all inspection queries
 (
     -- Row counts
-    SELECT 'ROW_COUNTS' as inspection_type, 'cards' as detail1, COUNT(*)::text as detail2, '' as detail3 FROM cards
+    SELECT 'ROW_COUNTS' as inspection_type, 'collection_cards' as detail1, COUNT(*)::text as detail2, '' as detail3 FROM collection_cards
     UNION ALL
     SELECT 'ROW_COUNTS', 'user_credits', COUNT(*)::text, '' FROM user_credits
     UNION ALL
@@ -32,7 +32,7 @@ UNION ALL
         'cards_without_credits' as detail1,
         COUNT(*)::text as detail2,
         CASE WHEN COUNT(*) > 0 THEN 'WARNING: Orphaned cards found' ELSE 'OK' END as detail3
-    FROM cards c
+    FROM collection_cards c
     LEFT JOIN user_credits uc ON c.user_id = uc.user_id
     WHERE uc.user_id IS NULL
 )
@@ -47,7 +47,7 @@ UNION ALL
             WHEN COUNT(*) = 0 THEN 'No data'
             ELSE 'Has data'
         END as detail3
-    FROM cards
+    FROM collection_cards
 )
 UNION ALL
 (
@@ -55,8 +55,8 @@ UNION ALL
         'DATA_SUMMARY' as inspection_type,
         'Cards with grades' as detail1,
         COUNT(*)::text as detail2,
-        ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM cards), 0), 1)::text || '%' as detail3
-    FROM cards WHERE estimated_grade IS NOT NULL
+        ROUND(100.0 * COUNT(*) / NULLIF((SELECT COUNT(*) FROM collection_cards), 0), 1)::text || '%' as detail3
+    FROM collection_cards WHERE estimated_grade IS NOT NULL
 )
 UNION ALL
 (

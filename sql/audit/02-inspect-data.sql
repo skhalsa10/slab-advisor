@@ -5,7 +5,7 @@
 -- ============================================================================
 
 -- Count rows in all main tables
-SELECT 'ROW_COUNTS' as inspection_type, 'cards' as table_name, COUNT(*) as row_count FROM cards
+SELECT 'ROW_COUNTS' as inspection_type, 'collection_cards' as table_name, COUNT(*) as row_count FROM collection_cards
 UNION ALL
 SELECT 'ROW_COUNTS', 'user_credits', COUNT(*) FROM user_credits
 UNION ALL
@@ -23,7 +23,7 @@ SELECT
     front_image_url IS NOT NULL as has_front_image,
     back_image_url IS NOT NULL as has_back_image,
     created_at
-FROM cards 
+FROM collection_cards 
 ORDER BY created_at DESC 
 LIMIT 10;
 
@@ -69,7 +69,7 @@ SELECT
     'ORPHANED_DATA' as inspection_type,
     'cards_without_user_credits' as issue_type,
     COUNT(*) as count
-FROM cards c
+FROM collection_cards c
 LEFT JOIN user_credits uc ON c.user_id = uc.user_id
 WHERE uc.user_id IS NULL
 
@@ -88,7 +88,7 @@ SELECT
     'DATA_ANOMALIES' as inspection_type,
     'cards_with_negative_grades' as anomaly_type,
     COUNT(*) as count
-FROM cards 
+FROM collection_cards 
 WHERE estimated_grade < 0
 
 UNION ALL
@@ -106,7 +106,7 @@ SELECT
     'DATA_ANOMALIES',
     'cards_missing_images',
     COUNT(*)
-FROM cards 
+FROM collection_cards 
 WHERE front_image_url IS NULL OR back_image_url IS NULL;
 
 -- Summary

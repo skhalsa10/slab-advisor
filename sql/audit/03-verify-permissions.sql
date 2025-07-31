@@ -36,7 +36,7 @@ SELECT
     qual as using_condition,
     with_check
 FROM pg_policies 
-WHERE schemaname = 'public' AND tablename = 'cards'
+WHERE schemaname = 'public' AND tablename = 'collection_cards'
 ORDER BY policyname;
 
 -- Show specific policy details for user_credits table
@@ -103,7 +103,7 @@ SELECT
 FROM information_schema.tables t
 LEFT JOIN pg_indexes i ON t.table_name = i.tablename AND i.indexdef LIKE '%user_id%'
 WHERE t.table_schema = 'public' 
-    AND t.table_name IN ('cards', 'user_credits')
+    AND t.table_name IN ('collection_cards', 'user_credits')
 ORDER BY t.table_name;
 
 -- Summary of security setup

@@ -28,7 +28,7 @@ SELECT
     column_default
 FROM information_schema.columns 
 WHERE table_schema = 'public' 
-    AND table_name IN ('cards', 'user_credits')
+    AND table_name IN ('collection_cards', 'user_credits')
 ORDER BY table_name, ordinal_position;
 
 -- Show all RLS policies

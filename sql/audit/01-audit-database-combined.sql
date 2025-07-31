@@ -27,7 +27,7 @@ UNION ALL
         COALESCE(column_default, '') as detail3
     FROM information_schema.columns 
     WHERE table_schema = 'public' 
-        AND table_name IN ('cards', 'user_credits')
+        AND table_name IN ('collection_cards', 'user_credits')
 )
 UNION ALL
 (

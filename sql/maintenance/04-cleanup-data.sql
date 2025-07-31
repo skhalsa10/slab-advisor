@@ -9,7 +9,7 @@
 SET session_replication_role = replica;
 
 -- Show what will be deleted (run this first to see impact)
-SELECT 'BEFORE_CLEANUP' as status, 'cards' as table_name, COUNT(*) as rows_to_delete FROM cards
+SELECT 'BEFORE_CLEANUP' as status, 'collection_cards' as table_name, COUNT(*) as rows_to_delete FROM collection_cards
 UNION ALL
 SELECT 'BEFORE_CLEANUP', 'user_credits', COUNT(*) FROM user_credits
 UNION ALL
@@ -20,25 +20,25 @@ SELECT 'BEFORE_CLEANUP', 'storage.objects (card-images)', COUNT(*) FROM storage.
 DELETE FROM storage.objects WHERE bucket_id = 'card-images';
 
 -- Delete all cards (this should cascade properly due to foreign keys)
-DELETE FROM cards;
+DELETE FROM collection_cards;
 
 -- Delete all user credits
 DELETE FROM user_credits;
 
 -- Reset sequences to start from 1 again (if using serial columns)
 -- Note: Our tables use UUIDs so this might not be necessary, but included for completeness
-SELECT setval(pg_get_serial_sequence('cards', 'id'), 1, false) WHERE pg_get_serial_sequence('cards', 'id') IS NOT NULL;
+SELECT setval(pg_get_serial_sequence('collection_cards', 'id'), 1, false) WHERE pg_get_serial_sequence('collection_cards', 'id') IS NOT NULL;
 SELECT setval(pg_get_serial_sequence('user_credits', 'id'), 1, false) WHERE pg_get_serial_sequence('user_credits', 'id') IS NOT NULL;
 
 -- Re-enable triggers
 SET session_replication_role = DEFAULT;
 
 -- Vacuum tables to reclaim space
-VACUUM ANALYZE cards;
+VACUUM ANALYZE collection_cards;
 VACUUM ANALYZE user_credits;
 
 -- Verify cleanup completed
-SELECT 'AFTER_CLEANUP' as status, 'cards' as table_name, COUNT(*) as remaining_rows FROM cards
+SELECT 'AFTER_CLEANUP' as status, 'collection_cards' as table_name, COUNT(*) as remaining_rows FROM collection_cards
 UNION ALL
 SELECT 'AFTER_CLEANUP', 'user_credits', COUNT(*) FROM user_credits
 UNION ALL

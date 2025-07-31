@@ -18,7 +18,7 @@ DROP INDEX IF EXISTS idx_user_credits_lookup;
 -- ============================================================================
 
 -- Essential for cards table RLS policy performance
-CREATE INDEX idx_cards_user_id_optimized ON cards(user_id) 
+CREATE INDEX idx_cards_user_id_optimized ON collection_cards(user_id) 
 WHERE user_id IS NOT NULL;
 
 -- Essential for user_credits table RLS policy performance  
@@ -30,20 +30,20 @@ WHERE user_id IS NOT NULL;
 -- ============================================================================
 
 -- For sorting cards by creation date (most recent first)
-CREATE INDEX idx_cards_created_at ON cards(created_at DESC);
+CREATE INDEX idx_cards_created_at ON collection_cards(created_at DESC);
 
 -- Composite index for user's cards sorted by date
-CREATE INDEX idx_cards_user_created ON cards(user_id, created_at DESC);
+CREATE INDEX idx_cards_user_created ON collection_cards(user_id, created_at DESC);
 
 -- For quick credit lookups
 CREATE INDEX idx_user_credits_lookup ON user_credits(user_id, credits_remaining);
 
 -- For finding cards by grade (useful for analytics later)
-CREATE INDEX idx_cards_grade ON cards(estimated_grade) 
+CREATE INDEX idx_cards_grade ON collection_cards(estimated_grade) 
 WHERE estimated_grade IS NOT NULL;
 
 -- For finding cards with images (useful for cleanup)
-CREATE INDEX idx_cards_with_images ON cards(user_id, front_image_url, back_image_url) 
+CREATE INDEX idx_cards_with_images ON collection_cards(user_id, front_image_url, back_image_url) 
 WHERE front_image_url IS NOT NULL AND back_image_url IS NOT NULL;
 
 -- ============================================================================
@@ -51,7 +51,7 @@ WHERE front_image_url IS NOT NULL AND back_image_url IS NOT NULL;
 -- ============================================================================
 
 -- Update table statistics for better query planning
-ANALYZE cards;
+ANALYZE collection_cards;
 ANALYZE user_credits;
 
 -- Show index usage after creation
@@ -91,7 +91,7 @@ ORDER BY tablename;
 -- Test: User loading their cards (most common query)
 EXPLAIN (ANALYZE, BUFFERS) 
 SELECT id, card_title, estimated_grade, created_at 
-FROM cards 
+FROM collection_cards 
 WHERE user_id = auth.uid() 
 ORDER BY created_at DESC 
 LIMIT 10;
@@ -105,7 +105,7 @@ WHERE user_id = auth.uid();
 -- Test: Card details lookup
 EXPLAIN (ANALYZE, BUFFERS) 
 SELECT * 
-FROM cards 
+FROM collection_cards 
 WHERE id = 'some-uuid' AND user_id = auth.uid();
 
 -- ============================================================================
@@ -113,7 +113,7 @@ WHERE id = 'some-uuid' AND user_id = auth.uid();
 -- ============================================================================
 
 -- Vacuum tables to ensure optimal performance
-VACUUM ANALYZE cards;
+VACUUM ANALYZE collection_cards;
 VACUUM ANALYZE user_credits;
 
 -- Show final table sizes
