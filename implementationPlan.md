@@ -46,7 +46,6 @@
   - `/src/types/pokemon.ts` - Database type definitions
   - `/src/lib/pokemon-db.ts` - Supabase query functions
   - `/src/app/api/sync-tcgdex/route.ts` - Data synchronization endpoint
-  - Update `/src/lib/tcgdx.ts` - Add database source option
   - Update browse pages to use new data source
 - **Future Automation**:
   - Vercel cron job for daily data sync

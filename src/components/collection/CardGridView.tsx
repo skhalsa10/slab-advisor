@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import type { Card } from '@/lib/supabase'
+import type { CollectionCard } from '@/types/database'
+import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
 
 interface CardGridViewProps {
-  cards: Card[]
-  onViewCard: (cardId: string) => void
+  cards: CollectionCard[]
+  onViewCard: () => void
 }
 
 export default function CardGridView({ cards, onViewCard }: CardGridViewProps) {
@@ -15,15 +16,15 @@ export default function CardGridView({ cards, onViewCard }: CardGridViewProps) {
         <div 
           key={card.id} 
           className="cursor-pointer group"
-          onClick={() => onViewCard(card.id)}
+          onClick={() => onViewCard()}
         >
           <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-200 transform hover:scale-105">
             {/* Card aspect ratio container - 2.5:3.5 ratio typical for trading cards */}
             <div className="relative" style={{ paddingBottom: '140%' }}>
-              {card.front_image_url ? (
+              {getCardImageUrl(card) ? (
                 <Image
-                  src={card.front_image_url}
-                  alt={card.card_title || 'Trading card'}
+                  src={getCardImageUrl(card)!}
+                  alt={getCardDisplayName(card)}
                   className="absolute inset-0 w-full h-full object-cover"
                   fill
                   priority={index < 10}
@@ -49,7 +50,7 @@ export default function CardGridView({ cards, onViewCard }: CardGridViewProps) {
             
             <div className="p-2">
               <h3 className="text-xs font-medium text-grey-900 truncate">
-                {card.card_title || 'Untitled Card'}
+                {getCardDisplayName(card)}
               </h3>
             </div>
           </div>

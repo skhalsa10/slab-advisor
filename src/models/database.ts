@@ -14,98 +14,88 @@ export type Database = {
   }
   public: {
     Tables: {
-      cards: {
+      collection_cards: {
         Row: {
-          analyze_details: Json | null
-          back_exact_overlay_url: string | null
-          back_full_overlay_url: string | null
+          acquisition_date: string | null
+          acquisition_price: number | null
           back_image_url: string | null
-          card_number: string | null
-          card_set: string | null
-          card_title: string | null
-          confidence: number | null
+          card_type: string | null
+          condition: string | null
           created_at: string | null
           estimated_grade: number | null
-          front_exact_overlay_url: string | null
-          front_full_overlay_url: string | null
           front_image_url: string | null
-          graded_prices: Json | null
-          grading_details: Json | null
+          grading_data: Json | null
           id: string
-          links: Json | null
-          out_of: string | null
-          price_date: string | null
-          rarity: string | null
-          series: string | null
-          set_code: string | null
-          set_series_code: string | null
-          subcategory: string | null
-          ungraded_price: number | null
+          manual_card_name: string | null
+          manual_card_number: string | null
+          manual_rarity: string | null
+          manual_series: string | null
+          manual_set_name: string | null
+          manual_year: number | null
+          notes: string | null
+          pokemon_card_id: string | null
+          quantity: number | null
           updated_at: string | null
           user_id: string
-          year: number | null
+          variant: string
         }
         Insert: {
-          analyze_details?: Json | null
-          back_exact_overlay_url?: string | null
-          back_full_overlay_url?: string | null
+          acquisition_date?: string | null
+          acquisition_price?: number | null
           back_image_url?: string | null
-          card_number?: string | null
-          card_set?: string | null
-          card_title?: string | null
-          confidence?: number | null
+          card_type?: string | null
+          condition?: string | null
           created_at?: string | null
           estimated_grade?: number | null
-          front_exact_overlay_url?: string | null
-          front_full_overlay_url?: string | null
           front_image_url?: string | null
-          graded_prices?: Json | null
-          grading_details?: Json | null
+          grading_data?: Json | null
           id?: string
-          links?: Json | null
-          out_of?: string | null
-          price_date?: string | null
-          rarity?: string | null
-          series?: string | null
-          set_code?: string | null
-          set_series_code?: string | null
-          subcategory?: string | null
-          ungraded_price?: number | null
+          manual_card_name?: string | null
+          manual_card_number?: string | null
+          manual_rarity?: string | null
+          manual_series?: string | null
+          manual_set_name?: string | null
+          manual_year?: number | null
+          notes?: string | null
+          pokemon_card_id?: string | null
+          quantity?: number | null
           updated_at?: string | null
           user_id: string
-          year?: number | null
+          variant: string
         }
         Update: {
-          analyze_details?: Json | null
-          back_exact_overlay_url?: string | null
-          back_full_overlay_url?: string | null
+          acquisition_date?: string | null
+          acquisition_price?: number | null
           back_image_url?: string | null
-          card_number?: string | null
-          card_set?: string | null
-          card_title?: string | null
-          confidence?: number | null
+          card_type?: string | null
+          condition?: string | null
           created_at?: string | null
           estimated_grade?: number | null
-          front_exact_overlay_url?: string | null
-          front_full_overlay_url?: string | null
           front_image_url?: string | null
-          graded_prices?: Json | null
-          grading_details?: Json | null
+          grading_data?: Json | null
           id?: string
-          links?: Json | null
-          out_of?: string | null
-          price_date?: string | null
-          rarity?: string | null
-          series?: string | null
-          set_code?: string | null
-          set_series_code?: string | null
-          subcategory?: string | null
-          ungraded_price?: number | null
+          manual_card_name?: string | null
+          manual_card_number?: string | null
+          manual_rarity?: string | null
+          manual_series?: string | null
+          manual_set_name?: string | null
+          manual_year?: number | null
+          notes?: string | null
+          pokemon_card_id?: string | null
+          quantity?: number | null
           updated_at?: string | null
           user_id?: string
-          year?: number | null
+          variant?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "collection_cards_pokemon_card_id_fkey"
+            columns: ["pokemon_card_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_cards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pokemon_cards: {
         Row: {

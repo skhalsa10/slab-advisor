@@ -74,16 +74,6 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
               ))}
             </nav>
 
-            {/* Upload Button */}
-            <div className="px-2 pb-4">
-              <Link
-                href="/collection/upload"
-                className="w-full bg-orange-600 text-white flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
-              >
-                📤 Upload Card
-              </Link>
-            </div>
-
             {/* User Info */}
             {user && (
               <div className="flex-shrink-0 border-t border-grey-200 p-4">
@@ -169,14 +159,6 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     {item.name}
                   </Link>
                 ))}
-                <Link
-                  href="/collection/upload"
-                  className="flex items-center px-3 py-2 text-base font-medium text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="mr-3 text-lg">📤</span>
-                  Upload Card
-                </Link>
               </div>
               {user && (
                 <div className="border-t border-grey-200 pt-4 pb-3">

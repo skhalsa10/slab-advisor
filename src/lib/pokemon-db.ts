@@ -1,3 +1,20 @@
+/**
+ * Pokemon Database module for Slab Advisor
+ * 
+ * This module provides database operations for Pokemon TCG data stored in Supabase.
+ * It serves as a database-backed alternative to the TCGDex API, providing the same
+ * interface but with local data for better performance and reliability.
+ * 
+ * Key features:
+ * - Series, Set, and Card data management
+ * - Full-text search capabilities
+ * - Pagination support for large datasets
+ * - Image URL handling with quality options
+ * - Navigation helpers for card browsing
+ * 
+ * @module pokemon-db
+ */
+
 import { supabase } from './supabase'
 import type {
   PokemonSeries,
@@ -17,6 +34,17 @@ import type {
 /**
  * Fetch all series with their sets
  * Equivalent to getAllSeriesWithSets() from tcgdex.ts
+ * 
+ * @returns Promise containing array of series with their associated sets
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const seriesWithSets = await getAllSeriesWithSets()
+ * seriesWithSets.forEach(series => {
+ *   console.log(`${series.name} has ${series.setCount} sets`)
+ * })
+ * ```
  */
 export async function getAllSeriesWithSets(): Promise<SerieWithSets[]> {
   try {
@@ -46,6 +74,17 @@ export async function getAllSeriesWithSets(): Promise<SerieWithSets[]> {
 
 /**
  * Fetch all series without sets (lighter query)
+ * 
+ * This is a more performant alternative when set data is not needed.
+ * 
+ * @returns Promise containing array of series
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const series = await getAllSeries()
+ * console.log(`Found ${series.length} series`)
+ * ```
  */
 export async function getAllSeries(): Promise<PokemonSeries[]> {
   try {
@@ -68,6 +107,23 @@ export async function getAllSeries(): Promise<PokemonSeries[]> {
 
 /**
  * Fetch all sets with pagination
+ * 
+ * Retrieves Pokemon sets with support for pagination and text search.
+ * Sets are ordered by release date (newest first).
+ * 
+ * @param params - Search parameters including limit, offset, and query
+ * @returns Promise containing paginated results with sets
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * // Get first page of sets
+ * const result = await getAllSets({ limit: 20, offset: 0 })
+ * console.log(`Found ${result.count} total sets`)
+ * 
+ * // Search for specific sets
+ * const searchResult = await getAllSets({ query: 'Charizard', limit: 10 })
+ * ```
  */
 export async function getAllSets(params: PokemonSearchParams = {}): Promise<PaginatedResult<PokemonSet>> {
   try {
@@ -105,6 +161,19 @@ export async function getAllSets(params: PokemonSearchParams = {}): Promise<Pagi
 
 /**
  * Fetch sets by series ID
+ * 
+ * Retrieves all sets belonging to a specific series,
+ * ordered by release date (newest first).
+ * 
+ * @param seriesId - The ID of the series to fetch sets for
+ * @returns Promise containing array of sets
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const sets = await getSetsBySeries('sv')
+ * console.log(`Scarlet & Violet has ${sets.length} sets`)
+ * ```
  */
 export async function getSetsBySeries(seriesId: string): Promise<PokemonSet[]> {
   try {
@@ -129,6 +198,18 @@ export async function getSetsBySeries(seriesId: string): Promise<PokemonSet[]> {
 /**
  * Fetch a specific set with all its cards
  * Equivalent to getSetWithCards() from tcgdex.ts
+ * 
+ * Retrieves complete set information including series data and all cards.
+ * 
+ * @param setId - The ID of the set to fetch
+ * @returns Promise containing set with all cards and series information
+ * @throws Error if set not found or database query fails
+ * 
+ * @example
+ * ```typescript
+ * const setWithCards = await getSetWithCards('sv1')
+ * console.log(`${setWithCards.name} has ${setWithCards.cards.length} cards`)
+ * ```
  */
 export async function getSetWithCards(setId: string): Promise<SetWithCards> {
   try {
@@ -160,7 +241,18 @@ export async function getSetWithCards(setId: string): Promise<SetWithCards> {
 
 /**
  * Fetch a specific card
- * Equivalent to getCard() from tcgdx.ts
+ * 
+ * Retrieves complete card information including set and series data.
+ * 
+ * @param cardId - The ID of the card to fetch
+ * @returns Promise containing card with set and series information
+ * @throws Error if card not found or database query fails
+ * 
+ * @example
+ * ```typescript
+ * const card = await getCard('sv1-1')
+ * console.log(`${card.name} from ${card.set.name}`)
+ * ```
  */
 export async function getCard(cardId: string): Promise<CardFull> {
   try {
@@ -194,6 +286,20 @@ export async function getCard(cardId: string): Promise<CardFull> {
 
 /**
  * Get all cards for a specific set
+ * 
+ * Retrieves cards from a specific set with pagination support.
+ * Cards are ordered by their local_id within the set.
+ * 
+ * @param setId - The ID of the set to fetch cards from
+ * @param params - Search parameters including limit, offset, and query
+ * @returns Promise containing paginated results with cards
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const result = await getCardsBySet('sv1', { limit: 50, offset: 0 })
+ * console.log(`Found ${result.count} cards in set`)
+ * ```
  */
 export async function getCardsBySet(setId: string, params: PokemonCardSearchParams = {}): Promise<PaginatedResult<PokemonCard>> {
   try {
@@ -232,7 +338,19 @@ export async function getCardsBySet(setId: string, params: PokemonCardSearchPara
 
 /**
  * Search for sets by name
- * Equivalent to searchSets() from tcgdx.ts but using database full-text search
+ * 
+ * Performs full-text search on set names with optional filtering using the database.
+ * 
+ * @param query - Search query string
+ * @param filters - Optional filters for series, card count, etc.
+ * @returns Promise containing array of matching sets
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const sets = await searchSets('Charizard', { seriesId: 'sv' })
+ * console.log(`Found ${sets.length} sets matching 'Charizard'`)
+ * ```
  */
 export async function searchSets(query: string, filters: PokemonSetFilters = {}): Promise<PokemonSet[]> {
   try {
@@ -270,7 +388,20 @@ export async function searchSets(query: string, filters: PokemonSetFilters = {})
 
 /**
  * Search for cards by name or number
- * Equivalent to searchCards() from tcgdx.ts but using database full-text search
+ * 
+ * Performs full-text search on card names with optional filtering using the database.
+ * Returns brief card information for performance.
+ * 
+ * @param query - Search query string
+ * @param filters - Optional filters for set, category, rarity, etc.
+ * @returns Promise containing array of matching cards (brief format)
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const cards = await searchCards('Pikachu', { rarity: 'rare' })
+ * console.log(`Found ${cards.length} rare Pikachu cards`)
+ * ```
  */
 export async function searchCards(query: string, filters: PokemonCardFilters = {}): Promise<CardBrief[]> {
   try {
@@ -316,7 +447,19 @@ export async function searchCards(query: string, filters: PokemonCardFilters = {
 
 /**
  * Get image URL with specific quality
- * Compatible with existing getCardImageUrl() from tcgdx.ts
+ * 
+ * Generates card image URLs with quality options.
+ * Falls back to placeholder if no image URL provided.
+ * 
+ * @param imageUrl - Base image URL from card data
+ * @param quality - Image quality ('low' or 'high')
+ * @returns Complete image URL with quality suffix
+ * 
+ * @example
+ * ```typescript
+ * const lowRes = getCardImageUrl(card.image, 'low')
+ * const highRes = getCardImageUrl(card.image, 'high')
+ * ```
  */
 export function getCardImageUrl(imageUrl: string | undefined | null, quality: 'low' | 'high' = 'low'): string {
   if (!imageUrl) return '/card-placeholder.svg'
@@ -327,7 +470,19 @@ export function getCardImageUrl(imageUrl: string | undefined | null, quality: 'l
 
 /**
  * Get logo URL with specific format
- * Compatible with existing getLogoUrl() from tcgdx.ts
+ * 
+ * Generates set logo URLs with format options.
+ * Falls back to placeholder if no logo URL provided.
+ * 
+ * @param logoUrl - Base logo URL from set data
+ * @param format - Image format ('png' or 'webp')
+ * @returns Complete logo URL with format extension
+ * 
+ * @example
+ * ```typescript
+ * const pngLogo = getLogoUrl(set.logo, 'png')
+ * const webpLogo = getLogoUrl(set.logo, 'webp')
+ * ```
  */
 export function getLogoUrl(logoUrl: string | undefined | null, format: 'png' | 'webp' = 'png'): string {
   if (!logoUrl) return '/placeholder-logo.png'
@@ -337,6 +492,21 @@ export function getLogoUrl(logoUrl: string | undefined | null, format: 'png' | '
 
 /**
  * Get next and previous cards in a set
+ * 
+ * Finds the adjacent cards (previous and next) for navigation purposes.
+ * Cards are ordered by their local_id within the set.
+ * 
+ * @param cardId - The ID of the current card
+ * @param setId - The ID of the set containing the card
+ * @returns Promise containing previous and next cards (null if at boundaries)
+ * 
+ * @example
+ * ```typescript
+ * const { previous, next } = await getAdjacentCards('sv1-1', 'sv1')
+ * if (next) {
+ *   console.log(`Next card: ${next.name}`)
+ * }
+ * ```
  */
 export async function getAdjacentCards(cardId: string, setId: string): Promise<{
   previous: PokemonCard | null

@@ -1,9 +1,27 @@
+/**
+ * Supabase Server-side module for Slab Advisor
+ * 
+ * This module provides server-side Supabase client functionality for use in
+ * Next.js API routes and server components. It uses the service role key
+ * for elevated permissions and handles JWT token validation.
+ * 
+ * Key features:
+ * - Service role client creation for server operations
+ * - JWT token validation from Authorization headers
+ * - Session management for API routes
+ * - Type-safe session response handling
+ * 
+ * @module supabase-server
+ */
+
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { User } from '@supabase/supabase-js'
 
-// Type for the session response
+/**
+ * Response type for server session validation
+ */
 export interface SessionResponse {
   user: User | null
   error: string | null
@@ -13,7 +31,15 @@ export interface SessionResponse {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-// Private function - only used internally by getServerSession
+/**
+ * Creates a Supabase client with service role permissions
+ * 
+ * This is a private function used internally by getServerSession.
+ * Uses service role key for elevated database permissions.
+ * 
+ * @private
+ * @returns Promise containing Supabase client with service role access
+ */
 async function createServerSupabaseClient() {
   // Note: cookies() is called to maintain Next.js compatibility but not used
   // since we're using service role key for server operations
@@ -26,6 +52,30 @@ async function createServerSupabaseClient() {
   })
 }
 
+/**
+ * Validates user session from Next.js request
+ * 
+ * Extracts and validates JWT token from Authorization header,
+ * then returns user information and Supabase client for further operations.
+ * 
+ * @param request - Next.js request object containing headers
+ * @returns Promise containing session response with user, error, and client
+ * 
+ * @example
+ * ```typescript
+ * export async function GET(request: NextRequest) {
+ *   const { user, error, supabase } = await getServerSession(request)
+ *   
+ *   if (error || !user) {
+ *     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+ *   }
+ *   
+ *   // Use supabase client for database operations
+ *   const { data } = await supabase.from('user_data').select('*')
+ *   return NextResponse.json(data)
+ * }
+ * ```
+ */
 export async function getServerSession(request: NextRequest): Promise<SessionResponse> {
   const supabase = await createServerSupabaseClient()
   

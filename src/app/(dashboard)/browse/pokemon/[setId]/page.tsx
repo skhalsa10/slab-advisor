@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getSetWithCards, getCardImageUrl, getLogoUrl } from '@/lib/pokemon-db'
 import type { SetWithCards } from '@/models/pokemon'
-import CardDetailsModal from '@/components/cards/CardDetailsModal'
+import CardDetailsModal from '@/components/browse/CardDetailsModal'
 
 export default function SetDetailsPage() {
   const params = useParams()

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase, type Card } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
+import { type CollectionCard } from '@/types/database'
 import { getCurrentUser } from '@/lib/auth'
 import CollectionHeader from '@/components/collection/CollectionHeader'
 import CardGridView from '@/components/collection/CardGridView'
@@ -11,11 +11,10 @@ import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
 import { type ViewMode } from '@/components/collection/ViewToggle'
 
 export default function CollectionPage() {
-  const [cards, setCards] = useState<Card[]>([])
+  const [cards, setCards] = useState<CollectionCard[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const router = useRouter()
 
   useEffect(() => {
     loadUserCards()
@@ -31,8 +30,17 @@ export default function CollectionPage() {
       }
 
       const { data: cardsData, error: cardsError } = await supabase
-        .from('cards')
-        .select('*')
+        .from('collection_cards')
+        .select(`
+          *,
+          pokemon_card:pokemon_cards(
+            *,
+            set:pokemon_sets(
+              *,
+              series:pokemon_series(*)
+            )
+          )
+        `)
         .eq('user_id', currentUser.id)
         .order('created_at', { ascending: false })
 
@@ -48,10 +56,8 @@ export default function CollectionPage() {
     }
   }
 
-  const handleViewCard = (cardId: string) => {
-    // For now, we'll navigate to the details view
-    // In the future, this could be a modal or a separate details page
-    router.push(`/collection/${cardId}`)
+  const handleViewCard = () => {
+    // Card viewing functionality temporarily disabled
   }
 
   if (loading) {

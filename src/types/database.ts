@@ -1,77 +1,43 @@
-import { Json } from '@/lib/supabase'
+/**
+ * Application Database Types
+ * 
+ * This file provides easy-to-use type aliases for the auto-generated database types.
+ * Instead of writing `Database['public']['Tables']['collection_cards']['Row']`,
+ * you can simply use `CollectionCard`.
+ * 
+ * These types automatically stay in sync with the database schema since they
+ * reference the generated types from `/src/models/database.ts`.
+ * 
+ * To regenerate the source types, run: `npm run types:generate`
+ */
+
+import { Database } from '@/models/database'
 
 // Card category enum for future use
 export type CardCategory = 'pokemon' | 'onepiece' | 'sports' | 'other_tcg'
 
-// User Collection Cards table - cards that users upload and analyze
-export interface CollectionCard {
-  id: string
-  user_id: string
-  front_image_url: string | null
-  back_image_url: string | null
-  card_title: string | null
-  estimated_grade: number | null
-  confidence: number | null
-  grading_details: Json | null
-  ungraded_price: number | null
-  graded_prices: Json | null
-  price_date: string | null
-  
-  // Card identification fields from 11-card-identification-fields.sql
-  card_set: string | null
-  rarity: string | null
-  out_of: string | null
-  card_number: string | null
-  set_series_code: string | null
-  set_code: string | null
-  series: string | null
-  year: number | null
-  subcategory: string | null
-  links: Json | null
-  analyze_details: Json | null
-  
-  // Overlay image fields from analyze-card API
-  front_full_overlay_url: string | null
-  front_exact_overlay_url: string | null
-  back_full_overlay_url: string | null
-  back_exact_overlay_url: string | null
-  
-  created_at: string | null
-  updated_at: string | null
-}
+/**
+ * Collection Cards - User's personal card collection
+ * 
+ * References the auto-generated database type to stay in sync with schema changes.
+ * Each row represents one variant of a card in a user's collection.
+ */
+export type CollectionCard = Database['public']['Tables']['collection_cards']['Row']
 
-// User Credits table
-export interface UserCredits {
-  id: string
-  user_id: string
-  credits_remaining: number
-  total_credits_purchased: number
-  created_at: string | null
-  updated_at: string | null
-}
+/**
+ * User Credits - Credit balance tracking
+ * 
+ * References the auto-generated database type.
+ */
+export type UserCredits = Database['public']['Tables']['user_credits']['Row']
 
-// Database insert/update types
-export type CollectionCardInsert = Omit<CollectionCard, 'id' | 'created_at' | 'updated_at'> & {
-  id?: string
-  created_at?: string
-  updated_at?: string
-}
+/**
+ * Database Operation Types
+ * 
+ * These provide easy access to insert/update types for database operations.
+ */
+export type CollectionCardInsert = Database['public']['Tables']['collection_cards']['Insert']
+export type CollectionCardUpdate = Database['public']['Tables']['collection_cards']['Update']
+export type UserCreditsInsert = Database['public']['Tables']['user_credits']['Insert']
+export type UserCreditsUpdate = Database['public']['Tables']['user_credits']['Update']
 
-export type CollectionCardUpdate = Partial<Omit<CollectionCard, 'id' | 'user_id' | 'created_at'>> & {
-  updated_at?: string
-}
-
-// Legacy type aliases for backward compatibility
-export type Card = CollectionCard
-export type CardInsert = CollectionCardInsert
-export type CardUpdate = CollectionCardUpdate
-
-export type UserCreditsInsert = Omit<UserCredits, 'id' | 'created_at' | 'updated_at'> & {
-  id?: string
-  created_at?: string
-  updated_at?: string
-}
-
-export type UserCreditsUpdate = Partial<Omit<UserCredits, 'id' | 'user_id' | 'created_at'>> & {
-  updated_at?: string
-}

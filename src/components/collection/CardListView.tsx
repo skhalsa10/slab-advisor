@@ -1,11 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import type { Card } from '@/lib/supabase'
+import type { CollectionCard } from '@/types/database'
+import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
 
 interface CardListViewProps {
-  cards: Card[]
-  onViewCard: (cardId: string) => void
+  cards: CollectionCard[]
+  onViewCard: () => void
 }
 
 export default function CardListView({ cards, onViewCard }: CardListViewProps) {
@@ -14,23 +15,12 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
     return `${grade}/10`
   }
 
-  const formatConfidence = (confidence: number | null): string => {
-    if (confidence === null) return 'N/A'
-    return `${Math.round(confidence * 100)}%`
-  }
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return 'Unknown'
     return new Date(dateString).toLocaleDateString()
   }
 
-  const getGradeColor = (grade: number | null): string => {
-    if (grade === null) return 'text-grey-600'
-    if (grade >= 9) return 'text-green-700'
-    if (grade >= 7) return 'text-yellow-700'
-    if (grade >= 5) return 'text-orange-700'
-    return 'text-red-700'
-  }
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden h-full">
@@ -45,9 +35,6 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                 Grade
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
-                Confidence
-              </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                 Analyzed
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
@@ -60,15 +47,15 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
               <tr 
                 key={card.id} 
                 className="hover:bg-grey-50 cursor-pointer transition-colors"
-                onClick={() => onViewCard(card.id)}
+                onClick={() => onViewCard()}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-12 w-12">
-                      {card.front_image_url ? (
+                      {getCardImageUrl(card) ? (
                         <Image
-                          src={card.front_image_url}
-                          alt={card.card_title || 'Card'}
+                          src={getCardImageUrl(card)!}
+                          alt={getCardDisplayName(card)}
                           className="h-12 w-12 rounded-md object-cover"
                           width={48}
                           height={48}
@@ -83,7 +70,7 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-grey-900">
-                        {card.card_title || 'Untitled Card'}
+                        {getCardDisplayName(card)}
                       </div>
                       <div className="text-sm text-grey-500">
                         Added {formatDate(card.created_at)}
@@ -100,11 +87,6 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                     {formatGrade(card.estimated_grade)}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className={`text-sm font-mono ${getGradeColor(card.estimated_grade)}`}>
-                    {formatConfidence(card.confidence)}
-                  </div>
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500">
                   {formatDate(card.created_at)}
                 </td>
@@ -112,7 +94,7 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onViewCard(card.id)
+                      onViewCard()
                     }}
                     className="text-orange-600 hover:text-orange-900 transition-colors"
                   >
@@ -132,17 +114,17 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
             <div 
               key={card.id} 
               className="bg-grey-50 rounded-lg p-4 cursor-pointer hover:bg-grey-100 transition-colors"
-              onClick={() => onViewCard(card.id)}
+              onClick={() => onViewCard()}
             >
               <div className="flex items-center space-x-3">
                 <div className="flex-shrink-0">
-                  {card.front_image_url ? (
+                  {getCardImageUrl(card) ? (
                     <Image
-                      src={card.front_image_url}
-                      alt={card.card_title || 'Card'}
+                      src={getCardImageUrl(card)!}
+                      alt={getCardDisplayName(card)}
                       className="h-12 w-12 rounded-md object-cover"
                       width={48}
-                      height={48}
+                      height={45}
                     />
                   ) : (
                     <div className="h-12 w-12 rounded-md bg-grey-200 flex items-center justify-center">
@@ -154,7 +136,7 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-grey-900 truncate">
-                    {card.card_title || 'Untitled Card'}
+                    {getCardDisplayName(card)}
                   </p>
                   <div className="flex items-center space-x-4 mt-1">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono ${
@@ -163,9 +145,6 @@ export default function CardListView({ cards, onViewCard }: CardListViewProps) {
                         : 'bg-grey-100 text-grey-800'
                     }`}>
                       {formatGrade(card.estimated_grade)}
-                    </span>
-                    <span className="text-xs text-grey-500 font-mono">
-                      {formatConfidence(card.confidence)}
                     </span>
                   </div>
                 </div>
