@@ -149,6 +149,7 @@ After implementing any new feature or modifying existing code:
 - Use HTTPS for all external API calls
 - Implement rate limiting on sensitive endpoints
 - Never trust client-side data
+- We should never update database tables from client side coude we should always do it securely from the server side
 
 ## Performance Guidelines
 

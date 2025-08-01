@@ -13,7 +13,8 @@ import type { User, Provider } from '@supabase/supabase-js'
 /**
  * Signs up a new user with email and password
  * 
- * Creates a new user account and initializes their credit balance with 2 free credits.
+ * Creates a new user account. Credits are automatically initialized 
+ * by database trigger when the user is created.
  * 
  * @param email - User's email address
  * @param password - User's password
@@ -38,20 +39,8 @@ export async function signUp(email: string, password: string) {
   
   if (error) throw error
   
-  // Create user credits record
-  if (data.user) {
-    const { error: creditsError } = await supabase
-      .from('user_credits')
-      .insert({
-        user_id: data.user.id,
-        credits_remaining: 2, // Free tier: 2 credits
-        total_credits_purchased: 0
-      })
-    
-    if (creditsError) {
-      console.error('Error creating user credits:', creditsError)
-    }
-  }
+  // Credits are automatically created by database trigger on auth.users insert
+  // No client-side credit creation needed (and blocked by RLS policies)
   
   return data
 }
@@ -132,7 +121,7 @@ export async function getCurrentUser(): Promise<User | null> {
  * Gets the credit balance for a specific user
  * 
  * Retrieves the number of credits remaining for the user.
- * If no credit record exists, creates one with 2 free credits.
+ * Credits are automatically created by database trigger, so this is read-only.
  * 
  * @param userId - The user's unique identifier
  * @returns Number of credits remaining (0 if error occurs)
@@ -153,22 +142,8 @@ export async function getUserCredits(userId: string) {
     
     if (error) {
       console.error('Error fetching user credits:', error)
-      // If no credits record exists, create one
-      if (error.code === 'PGRST116') {
-        const { error: insertError } = await supabase
-          .from('user_credits')
-          .insert({
-            user_id: userId,
-            credits_remaining: 2,
-            total_credits_purchased: 0
-          })
-        
-        if (insertError) {
-          console.error('Error creating user credits:', insertError)
-          return 0
-        }
-        return 2
-      }
+      // Credits should exist (created by trigger), but return 0 if not found
+      // No client-side creation attempts - trigger handles initialization
       return 0
     }
     
