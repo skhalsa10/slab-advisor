@@ -5,14 +5,15 @@ import { signIn, signUp, signInWithProvider } from '@/lib/auth'
 
 interface AuthFormProps {
   onSuccess: () => void
+  initialError?: string
 }
 
-export default function AuthForm({ onSuccess }: AuthFormProps) {
+export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError || '')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

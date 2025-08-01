@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
+import { getErrorMessage, ERROR_CONTEXT } from '@/utils/error-utils'
 import AuthForm from '@/components/auth/AuthForm'
 import type { User } from '@supabase/supabase-js'
 
@@ -21,11 +22,28 @@ import type { User } from '@supabase/supabase-js'
  * 3. If not authenticated -> show login/signup form
  * 4. After successful auth -> redirect to dashboard
  */
-export default function Home() {
+
+function HomeContent() {
   // Authentication state management
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true) // Start with loading to check auth
+  const [error, setError] = useState<string | undefined>(undefined)
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Check for OAuth callback errors in URL parameters
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      const errorMessage = getErrorMessage(errorParam, ERROR_CONTEXT.AUTH)
+      setError(errorMessage)
+      
+      // Clear the error parameter from URL without page reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('error')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   // Check authentication status on component mount
   useEffect(() => {
@@ -72,5 +90,17 @@ export default function Home() {
 
   // Unauthenticated state: Show authentication form
   //TODO: convert this to a landing page with a signup button
-  return <AuthForm onSuccess={handleAuthSuccess} />
+  return <AuthForm onSuccess={handleAuthSuccess} initialError={error} />
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
+  )
 }

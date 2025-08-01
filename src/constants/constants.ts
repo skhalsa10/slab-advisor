@@ -30,15 +30,3 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 } as const
 
-// Error messages
-export const ERROR_MESSAGES = {
-  AUTH_REQUIRED: 'Authentication required',
-  NO_CREDITS: 'No credits remaining. Please purchase more credits to analyze cards.',
-  INVALID_CARD_ID: 'Valid card ID is required',
-  CARD_NOT_FOUND: 'Card not found',
-  CARD_IMAGES_NOT_FOUND: 'Card images not found',
-  IMAGES_NOT_ACCESSIBLE: 'Card images are not publicly accessible. Please try uploading again.',
-  ANALYSIS_FAILED: 'Unable to analyze card. Please ensure images are clear and well-lit.',
-  GRADING_FAILED: 'Unable to grade card. Please check image quality.',
-  CARD_DETECTION_FAILED: 'Could not detect a trading card in the image. Please ensure:\n" The card is clearly visible and fills most of the frame\n" Good lighting without glare or shadows\n" Card is flat and not at an extreme angle\n" Background contrasts with the card',
-} as const
