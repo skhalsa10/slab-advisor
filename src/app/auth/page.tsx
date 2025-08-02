@@ -3,40 +3,38 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
-import LandingPage from '@/components/landing/LandingPage'
+import { getErrorMessage, ERROR_CONTEXT } from '@/utils/error-utils'
+import AuthForm from '@/components/auth/AuthForm'
 import type { User } from '@supabase/supabase-js'
 
 /**
- * Home Page Component
+ * Authentication Page
  * 
- * This is the landing page for Slab Advisor.
- * Behavior:
- * - Shows landing page to unauthenticated users with CTA to signup
- * - Automatically redirects authenticated users to /dashboard
- * - Handles OAuth callback errors from URL parameters
- * - Handles loading states during authentication checks
- * 
- * Flow:
- * 1. On mount, check if user is already authenticated
- * 2. If authenticated -> redirect to dashboard
- * 3. If not authenticated -> show landing page with signup CTA
- * 4. If OAuth error present -> redirect to auth page with error
+ * Dedicated page for user authentication (login/signup).
+ * Redirects authenticated users to dashboard.
+ * Handles OAuth callback errors from URL parameters.
  */
 
-function HomeContent() {
+function AuthContent() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | undefined>(undefined)
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Check for OAuth callback errors and redirect to auth page with error
+  // Check for OAuth callback errors in URL parameters
   useEffect(() => {
     const errorParam = searchParams.get('error')
     if (errorParam) {
-      // Redirect to auth page with error parameter preserved
-      router.push(`/auth?error=${errorParam}`)
+      const errorMessage = getErrorMessage(errorParam, ERROR_CONTEXT.AUTH)
+      setError(errorMessage)
+      
+      // Clear the error parameter from URL without page reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('error')
+      window.history.replaceState({}, '', url.toString())
     }
-  }, [searchParams, router])
+  }, [searchParams])
 
   // Check authentication status on component mount
   useEffect(() => {
@@ -56,19 +54,20 @@ function HomeContent() {
   }, [router])
 
   /**
-   * Handle Get Started button clicks
-   * Redirects to the auth page for signup/login
+   * Handle successful authentication
+   * Called by AuthForm when user successfully logs in or signs up
    */
-  const handleGetStarted = () => {
-    router.push('/auth')
-  }
-
-  /**
-   * Handle Login button clicks
-   * Redirects to the auth page (same as get started but user intent is different)
-   */
-  const handleLogin = () => {
-    router.push('/auth')
+  const handleAuthSuccess = () => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user)
+        if (user) {
+          router.push('/dashboard')
+        }
+      })
+      .catch(() => {
+        // Auth success but failed to get user - let app retry on next render
+      })
   }
 
   // Show loading spinner while checking authentication OR while redirecting authenticated users
@@ -80,18 +79,18 @@ function HomeContent() {
     )
   }
 
-  // Unauthenticated state: Show landing page
-  return <LandingPage onGetStarted={handleGetStarted} onLogin={handleLogin} />
+  // Show authentication form
+  return <AuthForm onSuccess={handleAuthSuccess} initialError={error} />
 }
 
-export default function Home() {
+export default function AuthPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
       </div>
     }>
-      <HomeContent />
+      <AuthContent />
     </Suspense>
   )
 }
