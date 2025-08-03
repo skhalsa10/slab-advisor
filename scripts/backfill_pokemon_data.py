@@ -16,6 +16,8 @@ import os
 import sys
 import argparse
 import requests
+import json
+import re
 from datetime import datetime
 from typing import List, Dict, Optional, Set
 from dotenv import load_dotenv
@@ -32,6 +34,10 @@ console = Console()
 
 # TCGdex API base URL
 TCGDEX_API_BASE = "https://api.tcgdex.net/v2/en"
+
+# TCGCSV API base URL
+TCGCSV_API_BASE = "https://tcgcsv.com"
+TCGPLAYER_URL_BASE = "https://www.tcgplayer.com/categories/trading-and-collectible-card-games/pokemon"
 
 
 class PokemonBackfiller:
@@ -544,6 +550,243 @@ class PokemonBackfiller:
             console.print("[green]✓ All sets have complete card data![/green]")
         
         console.print("\n[green]Comprehensive backfill complete![/green]")
+    
+    def fetch_tcgcsv_groups(self) -> List[Dict]:
+        """Fetch all Pokemon groups from TCGCSV API"""
+        try:
+            url = f"{TCGCSV_API_BASE}/tcgplayer/3/groups"
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+            
+            # The API returns an object with 'results' array
+            if isinstance(data, dict) and 'results' in data:
+                return data['results']
+            elif isinstance(data, list):
+                return data
+            else:
+                console.print(f"[red]Unexpected API response format[/red]")
+                return []
+                
+        except Exception as e:
+            console.print(f"[red]Error fetching TCGCSV groups: {e}[/red]")
+            return []
+    
+    def extract_set_id_from_name(self, name: str) -> Optional[str]:
+        """Extract set ID from TCGCSV name (e.g., 'SV10: Destined Rivals' -> 'sv10')"""
+        # Try to match patterns like "SV10:", "SM12:", "SWSH07:", etc.
+        match = re.match(r'^([A-Z]+)(\d+(?:\.\d+)?[a-z]?):', name)
+        if match:
+            prefix = match.group(1).lower()
+            number = match.group(2)
+            
+            # Remove leading zeros from the number part
+            # e.g., "07" -> "7", "012" -> "12"
+            number = re.sub(r'^0+(\d)', r'\1', number)
+            
+            return f"{prefix}{number}"
+        return None
+    
+    def generate_tcgplayer_url(self, name: str) -> str:
+        """Generate TCGPlayer URL from set name"""
+        # Convert "SV10: Destined Rivals" -> "sv10-destined-rivals"
+        slug = name.lower()
+        slug = re.sub(r'[^a-z0-9\s-]', '', slug)  # Remove special chars except spaces and hyphens
+        slug = re.sub(r'\s+', '-', slug.strip())  # Replace spaces with hyphens
+        slug = re.sub(r'-+', '-', slug)  # Replace multiple hyphens with single
+        return f"{TCGPLAYER_URL_BASE}/{slug}"
+    
+    def check_tcgplayer_mappings(self):
+        """Check and generate TCGPlayer mappings file"""
+        console.print("\n[bold]Checking TCGPlayer mappings...[/bold]")
+        
+        # Fetch TCGCSV groups
+        groups = self.fetch_tcgcsv_groups()
+        if not groups:
+            console.print("[red]Failed to fetch TCGCSV groups[/red]")
+            return
+        
+        # Get existing sets from database
+        try:
+            result = self.supabase.table('pokemon_sets').select('id, name').execute()
+            db_sets = {row['id']: row['name'] for row in result.data}
+        except Exception as e:
+            console.print(f"[red]Error fetching sets from database: {e}[/red]")
+            return
+        
+        # Create mappings
+        mappings = {}
+        auto_mapped_count = 0
+        needs_manual_count = 0
+        
+        for group in groups:
+            group_id = str(group['groupId'])
+            group_name = group['name']
+            
+            # Try automatic mapping
+            extracted_id = self.extract_set_id_from_name(group_name)
+            auto_mapped_to = None
+            
+            if extracted_id:
+                # First try the extracted ID as-is
+                if extracted_id in db_sets:
+                    auto_mapped_to = extracted_id
+                    auto_mapped_count += 1
+                else:
+                    # Try alternative formats (e.g., if we extracted "swsh7", also try "swsh07")
+                    match = re.match(r'^([a-z]+)(\d+)(.*)$', extracted_id)
+                    if match and len(match.group(2)) == 1:
+                        # Try with leading zero
+                        alt_id = f"{match.group(1)}0{match.group(2)}{match.group(3)}"
+                        if alt_id in db_sets:
+                            auto_mapped_to = alt_id
+                            auto_mapped_count += 1
+                        else:
+                            needs_manual_count += 1
+                    else:
+                        needs_manual_count += 1
+            else:
+                needs_manual_count += 1
+            
+            mappings[group_id] = {
+                'name': group_name,
+                'auto_mapped_to': auto_mapped_to,
+                'manual_set_id': '',
+                'skip': False
+            }
+        
+        # Save mappings to file
+        mapping_file = 'manual_mappings.json'
+        with open(mapping_file, 'w') as f:
+            json.dump(mappings, f, indent=2)
+        
+        # Display summary
+        console.print(f"\n[green]✓ Generated {mapping_file}[/green]")
+        console.print(f"Total TCGCSV groups: [blue]{len(groups)}[/blue]")
+        console.print(f"Auto-mapped: [green]{auto_mapped_count}[/green]")
+        console.print(f"Needs manual mapping: [yellow]{needs_manual_count}[/yellow]")
+        
+        if needs_manual_count > 0:
+            console.print("\n[yellow]Next steps:[/yellow]")
+            console.print("1. Edit manual_mappings.json")
+            console.print("2. For unmapped sets, add the correct set ID to 'manual_set_id'")
+            console.print("3. To skip a set, leave 'manual_set_id' as empty string")
+            console.print("4. Run: python backfill_pokemon_data.py --sync-tcgplayer")
+            
+            # Show some examples of unmapped sets
+            console.print("\n[yellow]Examples of sets needing manual mapping:[/yellow]")
+            count = 0
+            for group_id, data in mappings.items():
+                if not data['auto_mapped_to'] and count < 5:
+                    console.print(f"  {data['name']} (Group ID: {group_id})")
+                    count += 1
+    
+    def sync_tcgplayer_data(self, dry_run: bool = False):
+        """Sync TCGPlayer data from manual mappings file"""
+        mapping_file = 'manual_mappings.json'
+        
+        # Check if mapping file exists
+        if not os.path.exists(mapping_file):
+            console.print(f"[red]Mapping file {mapping_file} not found. Run --check-tcgplayer first.[/red]")
+            return
+        
+        # Load mappings
+        with open(mapping_file, 'r') as f:
+            mappings = json.load(f)
+        
+        # Process mappings
+        updates = []
+        skipped = 0
+        
+        for group_id, data in mappings.items():
+            # Determine which set ID to use
+            set_id = None
+            if data['manual_set_id']:
+                set_id = data['manual_set_id']
+            elif data['auto_mapped_to']:
+                set_id = data['auto_mapped_to']
+            
+            # Skip if no mapping or explicitly skipped
+            if not set_id:
+                skipped += 1
+                continue
+            
+            # Generate TCGPlayer URL
+            tcgplayer_url = self.generate_tcgplayer_url(data['name'])
+            
+            updates.append({
+                'set_id': set_id,
+                'group_id': int(group_id),
+                'tcgplayer_url': tcgplayer_url,
+                'name': data['name']
+            })
+        
+        # Display what will be updated
+        if updates:
+            table = Table(title="TCGPlayer Data to Sync")
+            table.add_column("Set ID", style="cyan")
+            table.add_column("TCGCSV Name", style="green")
+            table.add_column("Group ID", justify="right")
+            table.add_column("URL", style="blue", no_wrap=False)
+            
+            for update in updates[:10]:
+                table.add_row(
+                    update['set_id'],
+                    update['name'],
+                    str(update['group_id']),
+                    update['tcgplayer_url']
+                )
+            
+            if len(updates) > 10:
+                table.add_row("...", f"... and {len(updates) - 10} more", "...", "...")
+            
+            console.print(table)
+        
+        console.print(f"\n[blue]Sets to update: {len(updates)}[/blue]")
+        console.print(f"[yellow]Sets skipped: {skipped}[/yellow]")
+        
+        if not updates:
+            console.print("[yellow]No sets to update![/yellow]")
+            return
+        
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes made[/yellow]")
+            return
+        
+        # Confirm before updating
+        if input("\nUpdate database with TCGPlayer data? (y/N): ").lower() != 'y':
+            console.print("[red]Sync cancelled[/red]")
+            return
+        
+        # Update database
+        success_count = 0
+        error_count = 0
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console
+        ) as progress:
+            task = progress.add_task("Updating sets...", total=len(updates))
+            
+            for update in updates:
+                try:
+                    result = self.supabase.table('pokemon_sets').update({
+                        'tcgplayer_group_id': update['group_id'],
+                        'tcgplayer_url': update['tcgplayer_url'],
+                        'updated_at': datetime.now().isoformat()
+                    }).eq('id', update['set_id']).execute()
+                    
+                    success_count += 1
+                except Exception as e:
+                    console.print(f"[red]Error updating {update['set_id']}: {e}[/red]")
+                    error_count += 1
+                
+                progress.advance(task)
+        
+        console.print(f"\n[green]✓ Successfully updated {success_count} sets[/green]")
+        if error_count > 0:
+            console.print(f"[red]Failed to update {error_count} sets[/red]")
 
 
 def main():
@@ -553,6 +796,8 @@ def main():
     parser.add_argument('--backfill-set', help='Backfill missing cards for a specific set')
     parser.add_argument('--backfill-series-sets', action='store_true', help='Backfill missing series and sets')
     parser.add_argument('--backfill-all', action='store_true', help='Comprehensive backfill: series, sets, and all cards')
+    parser.add_argument('--check-tcgplayer', action='store_true', help='Check and generate TCGPlayer mappings file')
+    parser.add_argument('--sync-tcgplayer', action='store_true', help='Sync TCGPlayer data from mappings file')
     parser.add_argument('--dry-run', action='store_true', help='Preview changes without inserting')
     
     args = parser.parse_args()
@@ -590,6 +835,12 @@ def main():
     
     elif args.backfill_all:
         backfiller.backfill_all_data(dry_run=args.dry_run)
+    
+    elif args.check_tcgplayer:
+        backfiller.check_tcgplayer_mappings()
+    
+    elif args.sync_tcgplayer:
+        backfiller.sync_tcgplayer_data(dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

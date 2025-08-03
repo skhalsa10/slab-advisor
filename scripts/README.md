@@ -58,6 +58,23 @@ python backfill_pokemon_data.py --backfill-all
 python backfill_pokemon_data.py --backfill-all --dry-run
 ```
 
+### TCGPlayer Integration
+
+```bash
+# Step 1: Generate TCGPlayer mappings file
+python backfill_pokemon_data.py --check-tcgplayer
+
+# Step 2: Edit manual_mappings.json to map unmapped sets
+# - Add set IDs to 'manual_set_id' field
+# - Leave empty string to skip sets
+
+# Step 3: Sync TCGPlayer data to database
+python backfill_pokemon_data.py --sync-tcgplayer
+
+# Preview sync without making changes
+python backfill_pokemon_data.py --sync-tcgplayer --dry-run
+```
+
 ## Features
 
 - **Safe operation**: Always shows what will be changed before making changes
@@ -84,6 +101,36 @@ The `--backfill-all` command will:
 1. First backfill any missing series
 2. Then backfill any missing sets
 3. Finally backfill all missing cards across all sets
+
+### TCGPlayer Integration
+
+The script now supports mapping Pokemon sets to TCGPlayer for shopping links:
+
+1. **--check-tcgplayer**: Generates a `manual_mappings.json` file
+   - Automatically maps sets where possible (e.g., "SV10: Destined Rivals" → "sv10")
+   - Lists unmapped sets that need manual intervention
+   
+2. **manual_mappings.json**: Edit this file to complete mappings
+   ```json
+   {
+     "24269": {
+       "name": "SV10: Destined Rivals",
+       "auto_mapped_to": "sv10",
+       "manual_set_id": "",
+       "skip": false
+     },
+     "24325": {
+       "name": "SV: Black Bolt",
+       "auto_mapped_to": null,
+       "manual_set_id": "sv10.5b",  // Add your mapping here
+       "skip": false
+     }
+   }
+   ```
+
+3. **--sync-tcgplayer**: Updates the database with:
+   - TCGPlayer group IDs
+   - Generated TCGPlayer URLs for shopping links
 
 ## Common issues
 
