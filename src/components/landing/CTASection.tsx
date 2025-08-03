@@ -1,3 +1,11 @@
+/**
+ * CTASection Component
+ * 
+ * Bottom call-to-action section of the landing page designed to convert visitors.
+ * Features a prominent headline, value proposition, and free trial incentives.
+ * Styled with an orange gradient background to draw attention.
+ */
+
 interface CTASectionProps {
   onGetStarted: () => void
 }

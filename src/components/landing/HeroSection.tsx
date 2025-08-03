@@ -1,3 +1,11 @@
+/**
+ * HeroSection Component
+ * 
+ * Primary landing page hero section with main value proposition.
+ * Features the headline, subheadline, CTA buttons, and key benefits showcase.
+ * Serves as the main entry point for user conversion.
+ */
+
 interface HeroSectionProps {
   onGetStarted: () => void
   onLogin: () => void

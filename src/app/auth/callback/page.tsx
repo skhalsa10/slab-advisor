@@ -31,17 +31,14 @@ export default function AuthCallback() {
   const router = useRouter()
 
   useEffect(() => {
-    /**
-     * Process OAuth callback and set up user account
-     */
     const handleAuthCallback = async () => {
       try {
         // Get the session data from the OAuth redirect
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
-          // OAuth failed - redirect to home with error parameter
-          router.push('/?error=auth_error')
+          // OAuth failed - redirect to auth page with error parameter
+          router.push('/auth?error=auth_error')
           return
         }
 
@@ -53,11 +50,11 @@ export default function AuthCallback() {
           router.push('/')
         } else {
           // OAuth succeeded but no session - this shouldn't happen
-          router.push('/?error=no_session')
+          router.push('/auth?error=no_session')
         }
       } catch {
         // Any unexpected error during callback processing
-        router.push('/?error=callback_error')
+        router.push('/auth?error=callback_error')
       }
     }
 

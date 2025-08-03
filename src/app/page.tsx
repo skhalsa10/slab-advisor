@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import LandingPage from '@/components/landing/LandingPage'
 import type { User } from '@supabase/supabase-js'
@@ -27,16 +27,7 @@ function HomeContent() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const searchParams = useSearchParams()
 
-  // Check for OAuth callback errors and redirect to auth page with error
-  useEffect(() => {
-    const errorParam = searchParams.get('error')
-    if (errorParam) {
-      // Redirect to auth page with error parameter preserved
-      router.push(`/auth?error=${errorParam}`)
-    }
-  }, [searchParams, router])
 
   // Check authentication status on component mount
   useEffect(() => {
@@ -56,18 +47,10 @@ function HomeContent() {
   }, [router])
 
   /**
-   * Handle Get Started button clicks
-   * Redirects to the auth page for signup/login
+   * Handle navigation to auth page
+   * Used for both Get Started and Login buttons
    */
-  const handleGetStarted = () => {
-    router.push('/auth')
-  }
-
-  /**
-   * Handle Login button clicks
-   * Redirects to the auth page (same as get started but user intent is different)
-   */
-  const handleLogin = () => {
+  const handleAuthNavigation = () => {
     router.push('/auth')
   }
 
@@ -81,7 +64,7 @@ function HomeContent() {
   }
 
   // Unauthenticated state: Show landing page
-  return <LandingPage onGetStarted={handleGetStarted} onLogin={handleLogin} />
+  return <LandingPage onGetStarted={handleAuthNavigation} onLogin={handleAuthNavigation} />
 }
 
 export default function Home() {

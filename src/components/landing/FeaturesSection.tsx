@@ -1,3 +1,11 @@
+/**
+ * FeaturesSection Component
+ * 
+ * Showcase section highlighting the six core features of Slab Advisor.
+ * Displays features in a responsive grid layout with icons and descriptions
+ * to communicate the platform's value propositions.
+ */
+
 export default function FeaturesSection() {
   const features = [
     {
