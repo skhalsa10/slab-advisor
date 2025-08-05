@@ -81,6 +81,35 @@ WHERE pc.id = 'CARD_ID';  -- Replace with actual card ID
 -- WHERE pc.id = 'base1-4'
 
 -- =====================================================
+-- 5. Get complete information for a specific set
+-- Replace 'SET_ID' with actual set id
+-- Returns: All set details including card counts and TCGPlayer data
+-- =====================================================
+SELECT 
+    ps.id as set_id,
+    ps.name as set_name,
+    ps.series_id,
+    ser.name as series_name,
+    ps.logo,
+    ps.symbol,
+    ps.release_date,
+    ps.card_count_total,
+    ps.card_count_official,
+    ps.card_count_holo,
+    ps.card_count_reverse,
+    ps.card_count_first_ed,
+    ps.tcgplayer_group_id,
+    ps.tcgplayer_url,
+    ps.created_at,
+    ps.updated_at
+FROM pokemon_sets ps
+LEFT JOIN pokemon_series ser ON ps.series_id = ser.id
+WHERE ps.id = 'SET_ID';  -- Replace with actual set ID
+
+-- Example with Scarlet & Violet base set:
+-- WHERE ps.id = 'sv1'
+
+-- =====================================================
 -- BONUS: Useful aggregate queries
 -- =====================================================
 

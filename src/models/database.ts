@@ -194,6 +194,8 @@ export type Database = {
           release_date: string | null
           series_id: string | null
           symbol: string | null
+          tcgplayer_group_id: number | null
+          tcgplayer_url: string | null
           updated_at: string | null
         }
         Insert: {
@@ -209,6 +211,8 @@ export type Database = {
           release_date?: string | null
           series_id?: string | null
           symbol?: string | null
+          tcgplayer_group_id?: number | null
+          tcgplayer_url?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -224,6 +228,8 @@ export type Database = {
           release_date?: string | null
           series_id?: string | null
           symbol?: string | null
+          tcgplayer_group_id?: number | null
+          tcgplayer_url?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -239,25 +245,40 @@ export type Database = {
       user_credits: {
         Row: {
           created_at: string | null
-          credits_remaining: number
+          credits_remaining: number | null
+          free_credits: number
+          free_credits_reset_at: string
           id: string
+          purchased_credits: number
           total_credits_purchased: number
+          total_free_credits_used: number
+          total_purchased_credits_used: number
           updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
-          credits_remaining?: number
+          credits_remaining?: number | null
+          free_credits?: number
+          free_credits_reset_at?: string
           id?: string
+          purchased_credits?: number
           total_credits_purchased?: number
+          total_free_credits_used?: number
+          total_purchased_credits_used?: number
           updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string | null
-          credits_remaining?: number
+          credits_remaining?: number | null
+          free_credits?: number
+          free_credits_reset_at?: string
           id?: string
+          purchased_credits?: number
           total_credits_purchased?: number
+          total_free_credits_used?: number
+          total_purchased_credits_used?: number
           updated_at?: string | null
           user_id?: string
         }
@@ -268,17 +289,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_user_credits: {
-        Args: { user_id: string; credits_to_add: number }
-        Returns: boolean
+      add_purchased_credits: {
+        Args: {
+          p_user_id: string
+          p_credits: number
+          p_transaction_id?: string
+        }
+        Returns: Json
       }
       deduct_user_credit: {
-        Args: { user_id: string }
-        Returns: boolean
+        Args: { p_user_id: string }
+        Returns: Json
       }
-      initialize_user_credits: {
-        Args: { user_id: string; initial_credits?: number }
-        Returns: boolean
+      get_user_credit_details: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
+      reset_monthly_free_credits: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          user_id: string
+          credits_reset: number
+        }[]
       }
     }
     Enums: {
