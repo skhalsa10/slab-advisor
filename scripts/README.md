@@ -60,6 +60,7 @@ python backfill_pokemon_data.py --backfill-all --dry-run
 
 ### TCGPlayer Integration
 
+#### Sync Set Data
 ```bash
 # Step 1: Generate TCGPlayer mappings file
 python backfill_pokemon_data.py --check-tcgplayer
@@ -74,6 +75,45 @@ python backfill_pokemon_data.py --sync-tcgplayer
 # Preview sync without making changes
 python backfill_pokemon_data.py --sync-tcgplayer --dry-run
 ```
+
+#### Sync Product Data (Cards & Sealed Products)
+```bash
+# Sync TCGPlayer products for all sets with group IDs
+python backfill_pokemon_data.py --sync-tcgplayer-products
+
+# Preview what would be synced
+python backfill_pokemon_data.py --sync-tcgplayer-products --dry-run
+
+# Sync only card data, skip sealed products
+python backfill_pokemon_data.py --sync-tcgplayer-products --skip-sealed-products
+```
+
+This will:
+- Update `pokemon_cards` with TCGPlayer product IDs and image URLs
+- Try both card ID formats (with and without leading zeros) for better matching
+- Populate `pokemon_products` with sealed products (booster boxes, ETBs, etc.)
+- Create `unmapped_cards.json` for cards that couldn't be matched
+
+Use `--skip-sealed-products` to only sync card data without adding sealed products to the `pokemon_products` table.
+
+#### Process Unmapped Cards (Legacy)
+```bash
+# Process unmapped cards by removing leading zeros from card IDs
+python backfill_pokemon_data.py --process-unmapped-cards
+
+# Preview what would be processed
+python backfill_pokemon_data.py --process-unmapped-cards --dry-run
+```
+
+**Note:** This command is now mostly obsolete since `--sync-tcgplayer-products` automatically tries both ID formats. Only use this if you have an old `unmapped_cards.json` file from before this improvement.
+
+This command:
+- Reads `unmapped_cards.json` (created by sync-tcgplayer-products)
+- Attempts to match cards by removing leading zeros (e.g., "base4-002" → "base4-2")
+- Updates matched cards in the database with TCGPlayer product IDs and image URLs
+- Saves successfully matched cards to `matched_cards.json`
+- Saves still-unmapped cards to `unmapped_cards_failed.json`
+- Moves original unmapped file to `.processed` if all cards are matched
 
 ## Features
 

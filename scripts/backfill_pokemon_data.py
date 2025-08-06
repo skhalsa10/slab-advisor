@@ -4,12 +4,17 @@ Pokemon TCG Data Backfill Script
 
 This script helps identify and backfill missing Pokemon card data from TCGdex API
 into your Supabase database. It can check for missing cards, preview changes,
-and perform selective or full backfills.
+and perform selective or full backfills. Also supports TCGPlayer integration
+for product data and card images.
 
 Usage:
     python backfill_pokemon_data.py --check-set <set_id>
     python backfill_pokemon_data.py --backfill-set <set_id>
     python backfill_pokemon_data.py --check-all
+    python backfill_pokemon_data.py --check-tcgplayer
+    python backfill_pokemon_data.py --sync-tcgplayer
+    python backfill_pokemon_data.py --sync-tcgplayer-products [--dry-run] [--skip-sealed-products]
+    python backfill_pokemon_data.py --process-unmapped-cards [--dry-run]
 """
 
 import os
@@ -787,6 +792,347 @@ class PokemonBackfiller:
         console.print(f"\n[green]✓ Successfully updated {success_count} sets[/green]")
         if error_count > 0:
             console.print(f"[red]Failed to update {error_count} sets[/red]")
+    
+    def fetch_tcgcsv_products(self, group_id: int) -> Optional[Dict]:
+        """Fetch products for a specific TCGPlayer group"""
+        try:
+            url = f"{TCGCSV_API_BASE}/tcgplayer/3/{group_id}/products"
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            console.print(f"[red]Error fetching products for group {group_id}: {e}[/red]")
+            return None
+    
+    def is_card_product(self, product: Dict) -> bool:
+        """Determine if a product is a card based on extendedData"""
+        if not product.get('extendedData'):
+            return False
+        
+        extended_names = [item['name'] for item in product['extendedData']]
+        
+        # Card-specific attributes
+        card_attributes = ['Number', 'Rarity', 'HP', 'Stage', 'Card Type']
+        
+        # If any card attribute exists, it's a card
+        return any(attr in extended_names for attr in card_attributes)
+    
+    def extract_card_number(self, product: Dict) -> Optional[str]:
+        """Extract card number from product's extendedData"""
+        if not product.get('extendedData'):
+            return None
+        
+        for item in product['extendedData']:
+            if item['name'] == 'Number':
+                return item['value']
+        
+        return None
+    
+    def construct_card_id(self, set_id: str, card_number: str) -> str:
+        """
+        Construct card ID from set ID and card number
+        Examples:
+        - set_id='sv10', number='023/182' → 'sv10-023'
+        - set_id='sv03.5', number='036/165' → 'sv03.5-036'
+        - set_id='xyp', number='XY01' → 'xyp-XY01'
+        """
+        # Extract the number before the slash (if present)
+        if '/' in card_number:
+            # "023/182" → "023", "036/165" → "036"
+            # Keep the leading zeros when there's a slash
+            number_part = card_number.split('/')[0]
+        else:
+            # "XY01" → keep as is
+            number_part = card_number
+        
+        return f"{set_id}-{number_part}"
+    
+    def sync_tcgplayer_products(self, dry_run: bool = False, skip_sealed_products: bool = False):
+        """Sync TCGPlayer products data (cards and sealed products) for all sets"""
+        console.print("\n[bold]Syncing TCGPlayer products data...[/bold]")
+        
+        # Get all sets with tcgplayer_group_id
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_group_id')\
+                .not_.is_('tcgplayer_group_id', 'null')\
+                .order('name')\
+                .execute()
+            
+            sets_with_group = result.data
+        except Exception as e:
+            console.print(f"[red]Error fetching sets: {e}[/red]")
+            return
+        
+        console.print(f"Found [blue]{len(sets_with_group)}[/blue] sets with TCGPlayer group IDs")
+        
+        total_cards_updated = 0
+        total_products_added = 0
+        unmapped_cards = []
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console
+        ) as progress:
+            task = progress.add_task("Processing sets...", total=len(sets_with_group))
+            
+            for set_data in sets_with_group:
+                set_id = set_data['id']
+                set_name = set_data['name']
+                group_id = set_data['tcgplayer_group_id']
+                
+                progress.update(task, description=f"Processing {set_name}...")
+                
+                # Fetch products from TCGCSV
+                products_data = self.fetch_tcgcsv_products(group_id)
+                if not products_data or 'results' not in products_data:
+                    progress.advance(task)
+                    continue
+                
+                products = products_data['results']
+                cards_in_set = []
+                sealed_products_in_set = []
+                
+                # Separate cards from sealed products
+                for product in products:
+                    if self.is_card_product(product):
+                        card_number = self.extract_card_number(product)
+                        if card_number:
+                            card_id = self.construct_card_id(set_id, card_number)
+                            cards_in_set.append({
+                                'id': card_id,
+                                'product': product,
+                                'card_number': card_number
+                            })
+                    else:
+                        sealed_products_in_set.append(product)
+                
+                # Update cards with TCGPlayer data
+                if cards_in_set and not dry_run:
+                    for card_data in cards_in_set:
+                        card_updated = False
+                        original_id = card_data['id']
+                        
+                        try:
+                            # First, try the original ID (with leading zeros)
+                            result = self.supabase.table('pokemon_cards')\
+                                .update({
+                                    'tcgplayer_product_id': card_data['product']['productId'],
+                                    'tcgplayer_image_url': card_data['product']['imageUrl'],
+                                    'updated_at': datetime.now().isoformat()
+                                })\
+                                .eq('id', original_id)\
+                                .execute()
+                            
+                            if result.data:
+                                total_cards_updated += 1
+                                card_updated = True
+                            else:
+                                # If original ID didn't work, try without leading zeros
+                                if '-' in original_id:
+                                    set_part, number_part = original_id.rsplit('-', 1)
+                                    if number_part.isdigit():
+                                        modified_id = f"{set_part}-{int(number_part)}"
+                                        
+                                        # Try the modified ID (without leading zeros)
+                                        result = self.supabase.table('pokemon_cards')\
+                                            .update({
+                                                'tcgplayer_product_id': card_data['product']['productId'],
+                                                'tcgplayer_image_url': card_data['product']['imageUrl'],
+                                                'updated_at': datetime.now().isoformat()
+                                            })\
+                                            .eq('id', modified_id)\
+                                            .execute()
+                                        
+                                        if result.data:
+                                            total_cards_updated += 1
+                                            card_updated = True
+                            
+                            # If neither ID worked, add to unmapped
+                            if not card_updated:
+                                unmapped_cards.append({
+                                    'set_id': set_id,
+                                    'set_name': set_name,
+                                    'card_number': card_data['card_number'],
+                                    'constructed_id': original_id,
+                                    'product_name': card_data['product']['name'],
+                                    'product_id': card_data['product']['productId'],
+                                    'tcgplayer_image_url': card_data['product'].get('imageUrl')
+                                })
+                        except Exception as e:
+                            console.print(f"[red]Error updating card {original_id}: {e}[/red]")
+                
+                # Insert sealed products (unless skipped)
+                if sealed_products_in_set and not dry_run and not skip_sealed_products:
+                    for product in sealed_products_in_set:
+                        try:
+                            product_data = {
+                                'tcgplayer_product_id': product['productId'],
+                                'name': product['name'],
+                                'tcgplayer_image_url': product.get('imageUrl'),
+                                'tcgplayer_group_id': group_id,
+                                'pokemon_set_id': set_id,
+                                'updated_at': datetime.now().isoformat()
+                            }
+                            
+                            result = self.supabase.table('pokemon_products')\
+                                .upsert(product_data, on_conflict='tcgplayer_product_id')\
+                                .execute()
+                            
+                            if result.data:
+                                total_products_added += 1
+                        except Exception as e:
+                            console.print(f"[red]Error inserting product {product['productId']}: {e}[/red]")
+                
+                progress.advance(task)
+        
+        # Display summary
+        console.print(f"\n[bold]Summary:[/bold]")
+        console.print(f"Cards updated: [green]{total_cards_updated}[/green]")
+        console.print(f"Sealed products added: [green]{total_products_added}[/green]")
+        console.print(f"Unmapped cards: [yellow]{len(unmapped_cards)}[/yellow]")
+        
+        if skip_sealed_products:
+            console.print("\n[yellow]NOTE: Sealed products were skipped (--skip-sealed-products flag)[/yellow]")
+        
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+        
+        # Save unmapped cards to file
+        if unmapped_cards:
+            filename = 'unmapped_cards.json'
+            with open(filename, 'w') as f:
+                json.dump(unmapped_cards, f, indent=2)
+            console.print(f"\n[yellow]Unmapped cards saved to {filename}[/yellow]")
+            
+            # Show first few examples
+            console.print("\n[yellow]Examples of unmapped cards:[/yellow]")
+            for card in unmapped_cards[:5]:
+                console.print(f"  {card['set_name']} - {card['product_name']} (#{card['card_number']}) → {card['constructed_id']}")
+
+    def process_unmapped_cards(self, dry_run: bool = False):
+        """Process unmapped_cards.json and try to match cards by removing leading zeros"""
+        unmapped_file = 'unmapped_cards.json'
+        
+        if not os.path.exists(unmapped_file):
+            console.print(f"[red]Error: {unmapped_file} not found[/red]")
+            console.print("Run the sync-tcgplayer-products command first to generate this file.")
+            return
+        
+        # Load unmapped cards
+        console.print(f"\n[bold]Processing {unmapped_file}...[/bold]")
+        with open(unmapped_file, 'r') as f:
+            unmapped_cards = json.load(f)
+        
+        console.print(f"Found [blue]{len(unmapped_cards)}[/blue] unmapped cards to process")
+        
+        if not unmapped_cards:
+            console.print("[yellow]No unmapped cards to process[/yellow]")
+            return
+        
+        matched_cards = []
+        still_unmapped_cards = []
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console
+        ) as progress:
+            task = progress.add_task("Processing unmapped cards...", total=len(unmapped_cards))
+            
+            for card_data in unmapped_cards:
+                original_id = card_data['constructed_id']
+                # Remove leading zeros: "base4-002" -> "base4-2"
+                if '-' in original_id:
+                    set_part, number_part = original_id.rsplit('-', 1)
+                    if number_part.isdigit():
+                        modified_id = f"{set_part}-{int(number_part)}"
+                    else:
+                        modified_id = original_id
+                else:
+                    modified_id = original_id
+                
+                progress.update(task, description=f"Checking {modified_id}...")
+                
+                # Try to find the card with the modified ID
+                try:
+                    result = self.supabase.table('pokemon_cards')\
+                        .select('id')\
+                        .eq('id', modified_id)\
+                        .execute()
+                    
+                    if result.data and len(result.data) > 0:
+                        # Card found! Add to matched list
+                        card_data['matched_id'] = modified_id
+                        card_data['original_constructed_id'] = original_id
+                        matched_cards.append(card_data)
+                        
+                        # Update the card in database if not dry run
+                        if not dry_run:
+                            update_result = self.supabase.table('pokemon_cards')\
+                                .update({
+                                    'tcgplayer_product_id': card_data['product_id'],
+                                    'tcgplayer_image_url': card_data['tcgplayer_image_url'],
+                                    'updated_at': datetime.now().isoformat()
+                                })\
+                                .eq('id', modified_id)\
+                                .execute()
+                            
+                            if not update_result.data:
+                                console.print(f"[yellow]Warning: Failed to update card {modified_id}[/yellow]")
+                    else:
+                        # Still not found, add to still unmapped
+                        card_data['attempted_id'] = modified_id
+                        still_unmapped_cards.append(card_data)
+                
+                except Exception as e:
+                    console.print(f"[red]Error processing card {original_id}: {e}[/red]")
+                    card_data['error'] = str(e)
+                    card_data['attempted_id'] = modified_id
+                    still_unmapped_cards.append(card_data)
+                
+                progress.advance(task)
+        
+        # Display results
+        console.print(f"\n[bold]Processing Results:[/bold]")
+        console.print(f"Successfully matched: [green]{len(matched_cards)}[/green]")
+        console.print(f"Still unmapped: [yellow]{len(still_unmapped_cards)}[/yellow]")
+        
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+        else:
+            console.print(f"\n[green]Updated {len(matched_cards)} cards in database[/green]")
+        
+        # Save results to files
+        if matched_cards:
+            matched_file = 'matched_cards.json'
+            with open(matched_file, 'w') as f:
+                json.dump(matched_cards, f, indent=2)
+            console.print(f"\n[green]Matched cards saved to {matched_file}[/green]")
+            
+            # Show examples of successful matches
+            console.print("\n[green]Examples of successful matches:[/green]")
+            for card in matched_cards[:5]:
+                console.print(f"  {card['set_name']} - {card['product_name']}: {card['original_constructed_id']} → {card['matched_id']}")
+        
+        if still_unmapped_cards:
+            failed_file = 'unmapped_cards_failed.json'
+            with open(failed_file, 'w') as f:
+                json.dump(still_unmapped_cards, f, indent=2)
+            console.print(f"\n[yellow]Still unmapped cards saved to {failed_file}[/yellow]")
+            
+            # Show examples of failed matches
+            console.print("\n[yellow]Examples of cards still unmapped:[/yellow]")
+            for card in still_unmapped_cards[:5]:
+                attempted = card.get('attempted_id', 'N/A')
+                console.print(f"  {card['set_name']} - {card['product_name']}: {card['constructed_id']} → {attempted}")
+        
+        # If we matched everything, clean up the original unmapped file
+        if not still_unmapped_cards and matched_cards:
+            console.print(f"\n[green]All cards successfully matched! Moving {unmapped_file} to {unmapped_file}.processed[/green]")
+            if not dry_run:
+                os.rename(unmapped_file, f"{unmapped_file}.processed")
 
 
 def main():
@@ -798,6 +1144,9 @@ def main():
     parser.add_argument('--backfill-all', action='store_true', help='Comprehensive backfill: series, sets, and all cards')
     parser.add_argument('--check-tcgplayer', action='store_true', help='Check and generate TCGPlayer mappings file')
     parser.add_argument('--sync-tcgplayer', action='store_true', help='Sync TCGPlayer data from mappings file')
+    parser.add_argument('--sync-tcgplayer-products', action='store_true', help='Sync TCGPlayer products (cards and sealed products)')
+    parser.add_argument('--process-unmapped-cards', action='store_true', help='Process unmapped cards by removing leading zeros from card IDs')
+    parser.add_argument('--skip-sealed-products', action='store_true', help='Skip adding sealed products when syncing TCGPlayer products')
     parser.add_argument('--dry-run', action='store_true', help='Preview changes without inserting')
     
     args = parser.parse_args()
@@ -841,6 +1190,12 @@ def main():
     
     elif args.sync_tcgplayer:
         backfiller.sync_tcgplayer_data(dry_run=args.dry_run)
+    
+    elif args.sync_tcgplayer_products:
+        backfiller.sync_tcgplayer_products(dry_run=args.dry_run, skip_sealed_products=args.skip_sealed_products)
+    
+    elif args.process_unmapped_cards:
+        backfiller.process_unmapped_cards(dry_run=args.dry_run)
 
 
 if __name__ == "__main__":
