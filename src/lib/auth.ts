@@ -175,7 +175,7 @@ export async function getUserCredits(userId: string) {
  */
 export async function deductCredit(userId: string) {
   const { error } = await supabase.rpc('deduct_user_credit', {
-    user_id: userId
+    p_user_id: userId
   })
   
   if (error) throw error

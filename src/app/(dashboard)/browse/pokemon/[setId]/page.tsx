@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getSetWithCards, getCardImageUrl, getLogoUrl } from '@/lib/pokemon-db'
-import type { SetWithCards } from '@/models/pokemon'
+import { getSetWithCardsAndProducts, getCardImageUrl, getLogoUrl } from '@/lib/pokemon-db'
+import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import CardDetailsModal from '@/components/browse/CardDetailsModal'
 
 export default function SetDetailsPage() {
@@ -13,18 +13,19 @@ export default function SetDetailsPage() {
   const router = useRouter()
   const setId = params.setId as string
   
-  const [set, setSet] = useState<SetWithCards | null>(null)
+  const [set, setSet] = useState<PokemonSetWithCardsAndProducts | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
 
   useEffect(() => {
     async function fetchSet() {
       try {
         setLoading(true)
-        const data = await getSetWithCards(setId)
+        const data = await getSetWithCardsAndProducts(setId)
         setSet(data)
         setError(null)
       } catch (err) {
@@ -179,64 +180,173 @@ export default function SetDetailsPage() {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Search by card name or number..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-        />
-        <svg
-          className="absolute left-3 top-2.5 w-5 h-5 text-grey-400"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+      {/* Tabs */}
+      <div className="border-b border-grey-200">
+        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('cards')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'cards'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-grey-500 hover:text-grey-700 hover:border-grey-300'
+            }`}
+          >
+            Cards
+            {set.cards.length > 0 && (
+              <span className="ml-2 py-0.5 px-2 rounded-full bg-grey-100 text-xs text-grey-600">
+                {set.cards.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('products')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+              activeTab === 'products'
+                ? 'border-orange-500 text-orange-600'
+                : 'border-transparent text-grey-500 hover:text-grey-700 hover:border-grey-300'
+            }`}
+          >
+            Products
+            {set.products.length > 0 && (
+              <span className="ml-2 py-0.5 px-2 rounded-full bg-grey-100 text-xs text-grey-600">
+                {set.products.length}
+              </span>
+            )}
+          </button>
+        </nav>
       </div>
 
-      {/* Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {filteredCards.length === 0 ? (
-          <div className="col-span-full text-center py-8">
-            <p className="text-grey-600">No cards found matching &quot;{searchQuery}&quot;</p>
-          </div>
-        ) : (
-          filteredCards.map((card) => (
-            <Link
-              key={card.id}
-              href={`/browse/pokemon/${setId}/${card.id}`}
-              onClick={(e) => handleCardClick(e, card.id)}
-              className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
-            >
-              <div className="aspect-[2.5/3.5] relative">
-                <Image
-                  src={getCardImageUrl(card.image, 'low')}
-                  alt={card.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                  onError={(e) => {
-                    e.currentTarget.src = '/card-placeholder.svg'
-                  }}
-                />
-              </div>
-              <div className="p-2">
-                <h3 className="text-xs font-medium text-grey-900 truncate">
-                  {card.name}
-                </h3>
-                <p className="text-xs text-grey-600">
-                  #{card.local_id}
-                  {card.rarity && ` • ${card.rarity}`}
-                </p>
-              </div>
-            </Link>
-          ))
-        )}
-      </div>
+      {/* Search Bar (only show for cards tab) */}
+      {activeTab === 'cards' && (
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by card name or number..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-2 pl-10 pr-4 text-sm border border-grey-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          />
+          <svg
+            className="absolute left-3 top-2.5 w-5 h-5 text-grey-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+      )}
+
+      {/* Content based on active tab */}
+      {activeTab === 'cards' ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {filteredCards.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              {searchQuery ? (
+                <p className="text-grey-600">No cards found matching &quot;{searchQuery}&quot;</p>
+              ) : set.cards.length === 0 ? (
+                <div className="space-y-3">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-grey-100 mb-2">
+                    <svg className="w-8 h-8 text-grey-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-grey-900 mb-1">Card data not yet available</h3>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-grey-600">No cards found</p>
+              )}
+            </div>
+          ) : (
+            filteredCards.map((card) => (
+              <Link
+                key={card.id}
+                href={`/browse/pokemon/${setId}/${card.id}`}
+                onClick={(e) => handleCardClick(e, card.id)}
+                className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
+              >
+                <div className="aspect-[2.5/3.5] relative">
+                  <Image
+                    src={getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)}
+                    alt={card.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                    onError={(e) => {
+                      e.currentTarget.src = '/card-placeholder.svg'
+                    }}
+                  />
+                </div>
+                <div className="p-2">
+                  <h3 className="text-xs font-medium text-grey-900 truncate">
+                    {card.name}
+                  </h3>
+                  <p className="text-xs text-grey-600">
+                    #{card.local_id}
+                    {card.rarity && ` • ${card.rarity}`}
+                  </p>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {set.products.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-grey-600">No products available for this set</p>
+            </div>
+          ) : (
+            set.products.map((product) => (
+              <a
+                key={product.id}
+                href={`https://www.tcgplayer.com/product/${product.tcgplayer_product_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200"
+              >
+                <div className="aspect-[2.5/3.5] relative bg-grey-100">
+                  {product.tcgplayer_image_url ? (
+                    <Image
+                      src={product.tcgplayer_image_url}
+                      alt={product.name}
+                      fill
+                      className="object-contain p-2"
+                      sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                        const parent = e.currentTarget.parentElement
+                        if (parent) {
+                          parent.innerHTML = '<div class="flex items-center justify-center h-full text-grey-400"><svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg></div>'
+                        }
+                      }}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-grey-400">
+                      <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="p-3">
+                  <h3 className="text-sm font-medium text-grey-900 line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-xs text-grey-600">Shop on TCGPlayer</span>
+                    <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </div>
+                </div>
+              </a>
+            ))
+          )}
+        </div>
+      )}
 
       {/* Card Details Modal */}
       {selectedCardId && (

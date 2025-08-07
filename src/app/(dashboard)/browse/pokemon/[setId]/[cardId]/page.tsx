@@ -149,7 +149,7 @@ export default function CardDetailsPage() {
         <div className="space-y-4">
           <div className="aspect-[2.5/3.5] relative rounded-lg overflow-hidden bg-grey-100">
             <Image
-              src={getCardImageUrl(card.image, 'high')}
+              src={getCardImageUrl(card.image, 'high', card.tcgplayer_image_url)}
               alt={card.name}
               fill
               className="object-contain"

@@ -80,7 +80,7 @@ export default function CardDetailsModal({
     
     switch (cardType) {
       case 'pokemon':
-        return getCardImageUrl(cardData.image, 'high')
+        return getCardImageUrl(cardData.image, 'high', cardData.tcgplayer_image_url)
       // Future: Add other card types
       default:
         return null  // For now, only handle Pokemon cards

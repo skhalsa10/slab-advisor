@@ -108,6 +108,8 @@ export type Database = {
           name: string
           rarity: string | null
           set_id: string | null
+          tcgplayer_image_url: string | null
+          tcgplayer_product_id: number | null
           updated_at: string | null
           variant_first_edition: boolean | null
           variant_holo: boolean | null
@@ -124,6 +126,8 @@ export type Database = {
           name: string
           rarity?: string | null
           set_id?: string | null
+          tcgplayer_image_url?: string | null
+          tcgplayer_product_id?: number | null
           updated_at?: string | null
           variant_first_edition?: boolean | null
           variant_holo?: boolean | null
@@ -140,6 +144,8 @@ export type Database = {
           name?: string
           rarity?: string | null
           set_id?: string | null
+          tcgplayer_image_url?: string | null
+          tcgplayer_product_id?: number | null
           updated_at?: string | null
           variant_first_edition?: boolean | null
           variant_holo?: boolean | null
@@ -150,6 +156,47 @@ export type Database = {
           {
             foreignKeyName: "pokemon_cards_set_id_fkey"
             columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pokemon_products: {
+        Row: {
+          created_at: string | null
+          id: number
+          name: string
+          pokemon_set_id: string | null
+          tcgplayer_group_id: number
+          tcgplayer_image_url: string | null
+          tcgplayer_product_id: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          name: string
+          pokemon_set_id?: string | null
+          tcgplayer_group_id: number
+          tcgplayer_image_url?: string | null
+          tcgplayer_product_id: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          name?: string
+          pokemon_set_id?: string | null
+          tcgplayer_group_id?: number
+          tcgplayer_image_url?: string | null
+          tcgplayer_product_id?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_products_pokemon_set_id_fkey"
+            columns: ["pokemon_set_id"]
             isOneToOne: false
             referencedRelation: "pokemon_sets"
             referencedColumns: ["id"]

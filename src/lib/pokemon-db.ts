@@ -20,6 +20,7 @@ import type {
   PokemonSeries,
   PokemonSet,
   PokemonCard,
+  PokemonProduct,
   PokemonSearchParams,
   PokemonCardSearchParams,
   PaginatedResult,
@@ -27,6 +28,7 @@ import type {
   PokemonCardFilters,
   SerieWithSets,
   SetWithCards,
+  PokemonSetWithCardsAndProducts,
   CardBrief,
   CardFull
 } from '@/models/pokemon'
@@ -449,23 +451,36 @@ export async function searchCards(query: string, filters: PokemonCardFilters = {
  * Get image URL with specific quality
  * 
  * Generates card image URLs with quality options.
- * Falls back to placeholder if no image URL provided.
+ * Falls back to TCGPlayer image, then placeholder if no image URL provided.
  * 
- * @param imageUrl - Base image URL from card data
- * @param quality - Image quality ('low' or 'high')
- * @returns Complete image URL with quality suffix
+ * @param imageUrl - Base image URL from card data (TCGdx)
+ * @param quality - Image quality ('low' or 'high') - only applies to TCGdx images
+ * @param tcgplayerImageUrl - Fallback TCGPlayer image URL
+ * @returns Complete image URL with quality suffix or fallback
  * 
  * @example
  * ```typescript
- * const lowRes = getCardImageUrl(card.image, 'low')
- * const highRes = getCardImageUrl(card.image, 'high')
+ * const lowRes = getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)
+ * const highRes = getCardImageUrl(card.image, 'high', card.tcgplayer_image_url)
  * ```
  */
-export function getCardImageUrl(imageUrl: string | undefined | null, quality: 'low' | 'high' = 'low'): string {
-  if (!imageUrl) return '/card-placeholder.svg'
+export function getCardImageUrl(
+  imageUrl: string | undefined | null, 
+  quality: 'low' | 'high' = 'low',
+  tcgplayerImageUrl?: string | null
+): string {
+  // First try TCGdx image with quality
+  if (imageUrl) {
+    return `${imageUrl}/${quality}.webp`
+  }
   
-  // TCGdx images support different qualities by appending to the URL
-  return `${imageUrl}/${quality}.webp`
+  // Fall back to TCGPlayer image if available
+  if (tcgplayerImageUrl) {
+    return tcgplayerImageUrl
+  }
+  
+  // Final fallback to placeholder
+  return '/card-placeholder.svg'
 }
 
 /**
@@ -545,5 +560,74 @@ export async function getAdjacentCards(cardId: string, setId: string): Promise<{
   } catch (error) {
     console.error('Error getting adjacent cards:', error)
     return { previous: null, next: null }
+  }
+}
+
+/**
+ * Fetch products for a specific set
+ * 
+ * Retrieves all sealed products (booster boxes, ETBs, etc.) for a given set.
+ * Products are ordered by name.
+ * 
+ * @param setId - The ID of the set to fetch products for
+ * @returns Promise containing array of products
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const products = await getProductsBySet('sv1')
+ * console.log(`Found ${products.length} products for this set`)
+ * ```
+ */
+export async function getProductsBySet(setId: string): Promise<PokemonProduct[]> {
+  try {
+    const { data, error } = await supabase
+      .from('pokemon_products')
+      .select('*')
+      .eq('pokemon_set_id', setId)
+      .order('name')
+
+    if (error) {
+      console.error('Error fetching products by set:', error)
+      throw error
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in getProductsBySet:', error)
+    throw new Error(`Failed to fetch products for set: ${setId}`)
+  }
+}
+
+/**
+ * Fetch a set with both cards and products
+ * 
+ * Retrieves complete set information including series data, all cards, and all products.
+ * 
+ * @param setId - The ID of the set to fetch
+ * @returns Promise containing set with cards, products, and series information
+ * @throws Error if set not found or database query fails
+ * 
+ * @example
+ * ```typescript
+ * const setData = await getSetWithCardsAndProducts('sv1')
+ * console.log(`${setData.name} has ${setData.cards.length} cards and ${setData.products.length} products`)
+ * ```
+ */
+export async function getSetWithCardsAndProducts(setId: string): Promise<PokemonSetWithCardsAndProducts> {
+  try {
+    // Fetch set with cards and series
+    const setWithCards = await getSetWithCards(setId)
+    
+    // Fetch products separately
+    const products = await getProductsBySet(setId)
+    
+    return {
+      ...setWithCards,
+      products
+    }
+  } catch (error) {
+    console.error('Error in getSetWithCardsAndProducts:', error)
+    throw new Error(`Failed to fetch set with cards and products: ${setId}`)
   }
 }

@@ -4,14 +4,17 @@ import type { Database } from './database'
 export type PokemonSeries = Database['public']['Tables']['pokemon_series']['Row']
 export type PokemonSet = Database['public']['Tables']['pokemon_sets']['Row']
 export type PokemonCard = Database['public']['Tables']['pokemon_cards']['Row']
+export type PokemonProduct = Database['public']['Tables']['pokemon_products']['Row']
 
 export type PokemonSeriesInsert = Database['public']['Tables']['pokemon_series']['Insert']
 export type PokemonSetInsert = Database['public']['Tables']['pokemon_sets']['Insert']
 export type PokemonCardInsert = Database['public']['Tables']['pokemon_cards']['Insert']
+export type PokemonProductInsert = Database['public']['Tables']['pokemon_products']['Insert']
 
 export type PokemonSeriesUpdate = Database['public']['Tables']['pokemon_series']['Update']
 export type PokemonSetUpdate = Database['public']['Tables']['pokemon_sets']['Update']
 export type PokemonCardUpdate = Database['public']['Tables']['pokemon_cards']['Update']
+export type PokemonProductUpdate = Database['public']['Tables']['pokemon_products']['Update']
 
 // Enhanced interfaces for query results with joins
 export interface PokemonSeriesWithSets extends PokemonSeries {
@@ -22,6 +25,15 @@ export interface PokemonSeriesWithSets extends PokemonSeries {
 export interface PokemonSetWithCards extends PokemonSet {
   cards: PokemonCard[]
   series?: PokemonSeries
+}
+
+export interface PokemonSetWithProducts extends PokemonSet {
+  products: PokemonProduct[]
+  series?: PokemonSeries
+}
+
+export interface PokemonSetWithCardsAndProducts extends PokemonSetWithCards {
+  products: PokemonProduct[]
 }
 
 export interface PokemonCardWithSet extends PokemonCard {

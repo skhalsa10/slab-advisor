@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { checkUserCredits, deductUserCredits } from './credits'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const createMockSupabase = () => ({
   from: vi.fn(() => ({
     select: vi.fn(() => ({
@@ -29,8 +28,7 @@ describe('credits utilities', () => {
         error: null
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -38,8 +36,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
 
       expect(result.hasCredits).toBe(true)
       expect(result.creditsRemaining).toBe(10)
@@ -54,8 +51,7 @@ describe('credits utilities', () => {
         error: null
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -63,8 +59,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
 
       expect(result.hasCredits).toBe(false)
       expect(result.creditsRemaining).toBe(3)
@@ -78,8 +73,7 @@ describe('credits utilities', () => {
         error: null
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -87,8 +81,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123')
+            const result = await checkUserCredits(mockSupabase as any, 'user-123')
 
       expect(result.hasCredits).toBe(true)
       expect(result.creditsRemaining).toBe(5)
@@ -101,8 +94,7 @@ describe('credits utilities', () => {
         error: new Error('Database error')
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -110,8 +102,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
 
       expect(result.hasCredits).toBe(false)
       expect(result.creditsRemaining).toBe(0)
@@ -125,8 +116,7 @@ describe('credits utilities', () => {
         error: null
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -134,8 +124,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
 
       expect(result.hasCredits).toBe(false)
       expect(result.creditsRemaining).toBe(0)
@@ -149,8 +138,7 @@ describe('credits utilities', () => {
         error: null
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -158,8 +146,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 5)
 
       expect(result.hasCredits).toBe(true)
       expect(result.creditsRemaining).toBe(5)
@@ -170,8 +157,7 @@ describe('credits utilities', () => {
       const mockSupabase = createMockSupabase()
       const mockSingle = vi.fn().mockRejectedValue(new Error('Network error'))
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockSupabase.from.mockReturnValue({
+            mockSupabase.from.mockReturnValue({
         select: vi.fn(() => ({
           eq: vi.fn(() => ({
             single: mockSingle
@@ -179,8 +165,7 @@ describe('credits utilities', () => {
         }))
       } as any)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
+            const result = await checkUserCredits(mockSupabase as any, 'user-123', 1)
 
       expect(result.hasCredits).toBe(false)
       expect(result.creditsRemaining).toBe(0)
@@ -193,8 +178,7 @@ describe('credits utilities', () => {
       const mockSupabase = createMockSupabase()
       mockSupabase.rpc.mockResolvedValue({ error: null })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await deductUserCredits(mockSupabase as any, 'user-123')
+            const result = await deductUserCredits(mockSupabase as any, 'user-123')
 
       expect(result.success).toBe(true)
       expect(result.error).toBeUndefined()
@@ -209,8 +193,7 @@ describe('credits utilities', () => {
         error: new Error('RPC failed') 
       })
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await deductUserCredits(mockSupabase as any, 'user-123')
+            const result = await deductUserCredits(mockSupabase as any, 'user-123')
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('Failed to deduct credits')
@@ -220,8 +203,7 @@ describe('credits utilities', () => {
       const mockSupabase = createMockSupabase()
       mockSupabase.rpc.mockRejectedValue(new Error('Network error'))
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await deductUserCredits(mockSupabase as any, 'user-123')
+            const result = await deductUserCredits(mockSupabase as any, 'user-123')
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('Failed to deduct credits')

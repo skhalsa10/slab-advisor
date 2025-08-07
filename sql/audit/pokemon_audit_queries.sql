@@ -65,13 +65,39 @@ ORDER BY
 -- Returns: All card details including set and series info
 -- =====================================================
 SELECT 
-    pc.*,
+    -- Card details
+    pc.id,
+    pc.name,
+    pc.local_id,
+    pc.category,
+    pc.rarity,
+    pc.illustrator,
+    pc.image,
+    pc.variant_normal,
+    pc.variant_holo,
+    pc.variant_reverse,
+    pc.variant_first_edition,
+    pc.tcgplayer_product_id,
+    pc.tcgplayer_image_url,
+    pc.created_at as card_created_at,
+    pc.updated_at as card_updated_at,
+    -- Set details
+    ps.id as set_id,
     ps.name as set_name,
     ps.symbol as set_symbol,
+    ps.logo as set_logo,
     ps.release_date as set_release_date,
     ps.card_count_total as set_total_cards,
+    ps.card_count_official as set_official_cards,
+    ps.card_count_holo as set_holo_cards,
+    ps.card_count_reverse as set_reverse_cards,
+    ps.card_count_first_ed as set_first_ed_cards,
+    ps.tcgplayer_group_id as set_tcgplayer_group_id,
+    ps.tcgplayer_url as set_tcgplayer_url,
+    -- Series details
     ser.id as series_id,
-    ser.name as series_name
+    ser.name as series_name,
+    ser.logo as series_logo
 FROM pokemon_cards pc
 JOIN pokemon_sets ps ON pc.set_id = ps.id
 JOIN pokemon_series ser ON ps.series_id = ser.id
@@ -108,6 +134,29 @@ WHERE ps.id = 'SET_ID';  -- Replace with actual set ID
 
 -- Example with Scarlet & Violet base set:
 -- WHERE ps.id = 'sv1'
+
+-- =====================================================
+-- 6. Get all products for a specific set
+-- Replace 'SET_ID' with actual set id
+-- Returns: All sealed products for a set
+-- =====================================================
+SELECT 
+    pp.id,
+    pp.name,
+    pp.tcgplayer_product_id,
+    pp.tcgplayer_image_url,
+    pp.tcgplayer_group_id,
+    pp.created_at,
+    pp.updated_at,
+    ps.name as set_name,
+    ps.id as set_id
+FROM pokemon_products pp
+JOIN pokemon_sets ps ON pp.pokemon_set_id = ps.id
+WHERE pp.pokemon_set_id = 'SET_ID'  -- Replace with actual set ID
+ORDER BY pp.name;
+
+-- Example with Destined Rivals:
+-- WHERE pp.pokemon_set_id = 'sv10'
 
 -- =====================================================
 -- BONUS: Useful aggregate queries
