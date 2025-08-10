@@ -188,24 +188,30 @@ export async function deductCredit(userId: string) {
  * Redirects to the provider's login page and back to the callback URL.
  * 
  * @param provider - OAuth provider (e.g., 'google', 'github', 'facebook')
+ * @param redirectTo - Optional URL to redirect to after successful authentication
  * @returns OAuth data including redirect URL
  * @throws Error if OAuth initialization fails
  * 
  * @example
  * ```typescript
  * try {
- *   const data = await signInWithProvider('google')
+ *   const data = await signInWithProvider('google', '/dashboard')
  *   // User will be redirected to Google login
  * } catch (error) {
  *   console.error('OAuth login failed:', error)
  * }
  * ```
  */
-export async function signInWithProvider(provider: Provider) {
+export async function signInWithProvider(provider: Provider, redirectTo?: string) {
+  // Build callback URL with optional redirect parameter
+  const callbackUrl = redirectTo 
+    ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`
+    : `${window.location.origin}/auth/callback`
+    
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`
+      redirectTo: callbackUrl
     }
   })
   

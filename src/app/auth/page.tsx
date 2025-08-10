@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { getCurrentUser } from '@/lib/auth'
 import { getErrorMessage, ERROR_CONTEXT } from '@/utils/error-utils'
 import AuthForm from '@/components/auth/AuthForm'
-import type { User } from '@supabase/supabase-js'
+import LoadingScreen from '@/components/ui/LoadingScreen'
+import { useAuth } from '@/hooks/useAuth'
 
 /**
  * Authentication Page
@@ -16,11 +17,17 @@ import type { User } from '@supabase/supabase-js'
  */
 
 function AuthContent() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | undefined>(undefined)
   const router = useRouter()
   const searchParams = useSearchParams()
+  
+  // Get redirect URL from search params, default to dashboard
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
+  
+  // Use custom auth hook with redirect
+  const { user, loading, setUser } = useAuth({ 
+    redirectOnAuthTo: redirectTo 
+  })
 
   // Check for OAuth callback errors in URL parameters
   useEffect(() => {
@@ -36,23 +43,6 @@ function AuthContent() {
     }
   }, [searchParams])
 
-  // Check authentication status on component mount
-  useEffect(() => {
-    getCurrentUser()
-      .then((user) => {
-        setUser(user)
-        if (user) {
-          // Redirect authenticated users to dashboard
-          router.push('/dashboard')
-        }
-        setLoading(false)
-      })
-      .catch(() => {
-        // Handle authentication error silently - user will see login form
-        setLoading(false)
-      })
-  }, [router])
-
   /**
    * Handle successful authentication
    * Called by AuthForm when user successfully logs in or signs up
@@ -62,7 +52,7 @@ function AuthContent() {
       .then((user) => {
         setUser(user)
         if (user) {
-          router.push('/dashboard')
+          router.push(redirectTo)
         }
       })
       .catch(() => {
@@ -72,11 +62,7 @@ function AuthContent() {
 
   // Show loading spinner while checking authentication OR while redirecting authenticated users
   if (loading || user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-      </div>
-    )
+    return <LoadingScreen background="white" />
   }
 
   // Show authentication form
@@ -85,11 +71,7 @@ function AuthContent() {
 
 export default function AuthPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-      </div>
-    }>
+    <Suspense fallback={<LoadingScreen background="white" />}>
       <AuthContent />
     </Suspense>
   )

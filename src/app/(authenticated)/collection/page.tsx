@@ -8,6 +8,7 @@ import CollectionHeader from '@/components/collection/CollectionHeader'
 import CardGridView from '@/components/collection/CardGridView'
 import CardListView from '@/components/collection/CardListView'
 import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 import { type ViewMode } from '@/components/collection/ViewToggle'
 
 export default function CollectionPage() {
@@ -61,11 +62,7 @@ export default function CollectionPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-      </div>
-    )
+    return <LoadingScreen fullScreen={false} background="white" />
   }
 
   if (error) {

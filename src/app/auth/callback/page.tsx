@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 
 /**
  * OAuth Authentication Callback Page
@@ -17,18 +18,20 @@ import { supabase } from '@/lib/supabase'
  * 3. User authorizes your app on Google
  * 4. Google redirects back to this page: /auth/callback
  * 5. This page processes the authentication result
- * 6. User gets redirected to home page, which handles final routing
+ * 6. User gets redirected to appropriate page based on redirect parameter
  * 
  * Key Responsibilities:
  * - Extract and validate the OAuth session from Supabase
  * - Handle authentication errors gracefully
- * - Route users to appropriate next page
+ * - Route users to appropriate next page with redirect parameter
  * 
  * Note: Credit initialization is now handled automatically by database trigger
  * when new users are created in auth.users table.
  */
-export default function AuthCallback() {
+function AuthCallbackContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -37,8 +40,11 @@ export default function AuthCallback() {
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
-          // OAuth failed - redirect to auth page with error parameter
-          router.push('/auth?error=auth_error')
+          // OAuth failed - redirect to auth page with error parameter (preserve redirect)
+          const errorUrl = redirectTo !== '/dashboard' 
+            ? `/auth?error=auth_error&redirect=${encodeURIComponent(redirectTo)}`
+            : '/auth?error=auth_error'
+          router.push(errorUrl)
           return
         }
 
@@ -46,28 +52,35 @@ export default function AuthCallback() {
           // OAuth succeeded - credits are automatically created by database trigger
           // No client-side credit creation needed (and blocked by RLS policies)
           
-          // Redirect to home page, which will handle authenticated user routing
-          router.push('/')
+          // Redirect to the intended destination
+          router.push(redirectTo)
         } else {
           // OAuth succeeded but no session - this shouldn't happen
-          router.push('/auth?error=no_session')
+          const errorUrl = redirectTo !== '/dashboard'
+            ? `/auth?error=no_session&redirect=${encodeURIComponent(redirectTo)}`
+            : '/auth?error=no_session'
+          router.push(errorUrl)
         }
       } catch {
         // Any unexpected error during callback processing
-        router.push('/auth?error=callback_error')
+        const errorUrl = redirectTo !== '/dashboard'
+          ? `/auth?error=callback_error&redirect=${encodeURIComponent(redirectTo)}`
+          : '/auth?error=callback_error'
+        router.push(errorUrl)
       }
     }
 
     handleAuthCallback()
-  }, [router])
+  }, [router, redirectTo])
 
   // Show loading state while processing OAuth callback
+  return <LoadingScreen message="Completing authentication..." />
+}
+
+export default function AuthCallback() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-grey-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600 mx-auto"></div>
-        <p className="mt-4 text-grey-600">Completing authentication...</p>
-      </div>
-    </div>
+    <Suspense fallback={<LoadingScreen message="Loading..." />}>
+      <AuthCallbackContent />
+    </Suspense>
   )
 }

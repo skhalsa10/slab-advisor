@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { signIn, signUp, signInWithProvider } from '@/lib/auth'
 
 interface AuthFormProps {
@@ -9,6 +10,8 @@ interface AuthFormProps {
 }
 
 export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/dashboard'
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -39,7 +42,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
     setError('')
 
     try {
-      await signInWithProvider(provider)
+      await signInWithProvider(provider, redirectTo)
       // Note: For social auth, the redirect will handle the success
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Social login failed')

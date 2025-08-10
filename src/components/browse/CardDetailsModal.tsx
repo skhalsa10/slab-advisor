@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { getCard, getCardImageUrl, getAdjacentCards } from '@/lib/pokemon-db'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import type { CardFull } from '@/models/pokemon'
 
 interface CardDetailsModalProps {
@@ -117,7 +118,7 @@ export default function CardDetailsModal({
         <div className="p-6">
           {loading && (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+              <LoadingSpinner />
             </div>
           )}
 
