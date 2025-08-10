@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import AppNavigation from '@/components/layout/AppNavigation'
 
 export default function ExplorePage() {
   const tcgGames = [
@@ -37,7 +38,8 @@ export default function ExplorePage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <AppNavigation>
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-grey-900">Explore Trading Cards</h1>
         <p className="mt-1 text-sm text-grey-600">
@@ -110,6 +112,7 @@ export default function ExplorePage() {
           Check back regularly for updates or let us know which games you&apos;d like to see next.
         </p>
       </div>
-    </div>
+      </div>
+    </AppNavigation>
   )
 }

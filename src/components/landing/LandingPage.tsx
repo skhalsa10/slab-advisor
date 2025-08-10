@@ -1,3 +1,4 @@
+import Navbar from '@/components/layout/Navbar'
 import HeroSection from './HeroSection'
 import FeaturesSection from './FeaturesSection'
 import CTASection from './CTASection'
@@ -28,8 +29,11 @@ interface LandingPageProps {
 export default function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
   return (
     <div className="min-h-screen">
+      {/* Top navigation bar */}
+      <Navbar onLogin={onLogin} />
+      
       {/* Main hero section with primary messaging and navigation */}
-      <HeroSection onGetStarted={onGetStarted} onLogin={onLogin} />
+      <HeroSection onGetStarted={onGetStarted} />
       
       {/* Product features showcase */}
       <FeaturesSection />

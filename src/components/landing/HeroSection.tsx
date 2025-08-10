@@ -8,10 +8,9 @@
 
 interface HeroSectionProps {
   onGetStarted: () => void
-  onLogin: () => void
 }
 
-export default function HeroSection({ onGetStarted, onLogin }: HeroSectionProps) {
+export default function HeroSection({ onGetStarted }: HeroSectionProps) {
   return (
     <section className="bg-gradient-to-br from-orange-50 to-orange-100 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
@@ -25,19 +24,12 @@ export default function HeroSection({ onGetStarted, onLogin }: HeroSectionProps)
           for your TCG and sports cards—all powered by advanced AI.
         </p>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+        <div className="flex justify-center items-center mb-12">
           <button
             onClick={onGetStarted}
             className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
           >
             Get Started Free
-          </button>
-          
-          <button
-            onClick={onLogin}
-            className="bg-white hover:bg-grey-50 text-orange-600 font-semibold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl border-2 border-orange-600"
-          >
-            Login
           </button>
         </div>
         

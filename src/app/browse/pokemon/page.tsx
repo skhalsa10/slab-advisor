@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getAllSeriesWithSets, getLogoUrl } from '@/lib/pokemon-db'
+import AppNavigation from '@/components/layout/AppNavigation'
 import type { SerieWithSets } from '@/models/pokemon'
 
 export default function PokemonBrowsePage() {
@@ -92,7 +93,8 @@ export default function PokemonBrowsePage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AppNavigation>
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-grey-900">Pokemon Trading Cards</h1>
         <p className="mt-1 text-sm text-grey-600">
@@ -217,6 +219,7 @@ export default function PokemonBrowsePage() {
           ))
         )}
       </div>
-    </div>
+      </div>
+    </AppNavigation>
   )
 }

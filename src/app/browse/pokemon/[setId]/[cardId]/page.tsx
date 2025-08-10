@@ -88,26 +88,28 @@ export default function CardDetailsPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center space-x-2 text-sm">
-        <Link href="/explore" className="text-grey-600 hover:text-grey-900">
-          Explore
-        </Link>
-        <span className="text-grey-400">/</span>
-        <Link href="/browse/pokemon" className="text-grey-600 hover:text-grey-900">
-          Pokemon
-        </Link>
-        <span className="text-grey-400">/</span>
-        <Link href={`/browse/pokemon/${setId}`} className="text-grey-600 hover:text-grey-900">
-          {set?.name || 'Set'}
-        </Link>
-        <span className="text-grey-400">/</span>
-        <span className="text-grey-900 font-medium">{card.name}</span>
-      </div>
+    <div className="min-h-screen bg-grey-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <div className="space-y-6">
+          {/* Breadcrumb */}
+          <div className="flex items-center space-x-2 text-sm">
+            <Link href="/explore" className="text-grey-600 hover:text-grey-900">
+              Explore
+            </Link>
+            <span className="text-grey-400">/</span>
+            <Link href="/browse/pokemon" className="text-grey-600 hover:text-grey-900">
+              Pokemon
+            </Link>
+            <span className="text-grey-400">/</span>
+            <Link href={`/browse/pokemon/${setId}`} className="text-grey-600 hover:text-grey-900">
+              {set?.name || 'Set'}
+            </Link>
+            <span className="text-grey-400">/</span>
+            <span className="text-grey-900 font-medium">{card.name}</span>
+          </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
         <Link
           href={`/browse/pokemon/${setId}`}
           className="text-sm text-orange-600 hover:text-orange-700"
@@ -140,11 +142,11 @@ export default function CardDetailsPage() {
               </svg>
             </Link>
           )}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      {/* Card Details */}
-      <div className="grid md:grid-cols-2 gap-8">
+          {/* Card Details */}
+          <div className="grid md:grid-cols-2 gap-8">
         {/* Card Image */}
         <div className="space-y-4">
           <div className="aspect-[2.5/3.5] relative rounded-lg overflow-hidden bg-grey-100">
@@ -236,6 +238,8 @@ export default function CardDetailsPage() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

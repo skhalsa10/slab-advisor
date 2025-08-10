@@ -92,7 +92,9 @@ export default function SetDetailsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-grey-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+        <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg border border-grey-200 p-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
@@ -360,6 +362,8 @@ export default function SetDetailsPage() {
           }}
         />
       )}
+        </div>
+      </div>
     </div>
   )
 }
