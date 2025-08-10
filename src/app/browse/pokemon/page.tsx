@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getAllSeriesWithSets, getLogoUrl } from '@/lib/pokemon-db'
 import AppNavigation from '@/components/layout/AppNavigation'
+import LoadingScreen from '@/components/ui/LoadingScreen'
 import type { SerieWithSets } from '@/models/pokemon'
 
 export default function PokemonBrowsePage() {
@@ -58,37 +59,31 @@ export default function PokemonBrowsePage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-grey-200 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-grey-200 rounded w-1/2 mb-8"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-32 bg-grey-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <AppNavigation>
+        <LoadingScreen fullScreen={false} />
+      </AppNavigation>
     )
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-4">
-          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+      <AppNavigation>
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-4">
+            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-grey-900 mb-2">Error Loading Data</h3>
+          <p className="text-sm text-grey-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
-        <h3 className="text-lg font-medium text-grey-900 mb-2">Error Loading Data</h3>
-        <p className="text-sm text-grey-600 mb-4">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
-        >
-          Try Again
-        </button>
-      </div>
+      </AppNavigation>
     )
   }
 
