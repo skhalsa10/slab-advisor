@@ -96,7 +96,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${jetBrainsMono.variable} antialiased`}
+        className={`${inter.variable} ${jetBrainsMono.variable} antialiased min-w-[320px]`}
       >
         {children}
         {/* Vercel Speed Insights for performance monitoring */}
