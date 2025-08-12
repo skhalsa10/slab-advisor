@@ -23,6 +23,60 @@
 
 ## Priority 1 (P1) - Immediate Next Steps
 
+### 🔄 Code Refactoring for Maintainability
+- **Priority**: High
+- **Effort**: Medium
+- **Description**: Refactor large components into smaller, reusable subcomponents
+- **Current Issue**: Several components exceed 200 lines, making them hard to maintain and test
+- **Target**: Components under 200 lines with single responsibilities
+- **Components to Refactor**:
+  
+  **Dashboard Page Components** ✅:
+  - ✅ `StatCard` - Reusable component for stat cards (Total Cards, Estimated Value, etc.)
+  - ✅ `QuickActions` - Component for quick actions section
+  - ✅ `RecentActivity` - Component for recent activity section
+  - ✅ `DashboardStats` - Container component for the stats grid
+  - ✅ `PageHeader` - Reusable page header component (moved to `/components/ui/`)
+  
+  **Pokemon Browse Page Components**:
+  - `SearchBar` - Reusable search input component with icon
+  - `SeriesSection` - Component for each series with its sets
+  - `SetCard` - Individual set card component
+  - `NoResultsMessage` - Component for empty states
+  
+  **Set Details Page Components** (Priority - 363 lines):
+  - `SetHeader` - Header section with logo, title, and stats
+  - `SetStatistics` - Grid of statistics cards
+  - `TabNavigation` - Reusable tab navigation component
+  - `CardsGrid` - Card grid view component
+  - `ProductsGrid` - Products grid view component
+  - `ProductCard` - Individual product card
+  
+  **Common UI Components**:
+  - `SearchInput` - Standardized search input used across pages
+  - `StatCard` - Reusable statistics card component
+  - `EmptyState` - Generic empty state component
+  - `ErrorState` - Generic error state component
+  - `TabBar` - Reusable tab navigation component
+  
+  **Component Organization**:
+  - Create `/components/ui/cards/` for card-related components
+  - Create `/components/ui/forms/` for form components
+  - Create `/components/pokemon/` for Pokemon-specific components
+  - Move page-specific components closer to their pages
+
+- **Benefits**:
+  - Improved code reusability
+  - Better testability
+  - Easier maintenance
+  - Consistent UI patterns
+  - Faster development of new features
+  
+- **Progress**:
+  - ✅ Dashboard refactored from 113 lines to 21 lines
+  - ✅ Created 5 reusable components
+  - Dashboard page now follows single responsibility principle
+
 ### 🔄 TCGDex Database Replication for Performance
 - **Priority**: High
 - **Effort**: Medium
