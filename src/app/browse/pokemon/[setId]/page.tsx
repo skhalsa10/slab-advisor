@@ -8,7 +8,7 @@ import { getSetWithCardsAndProducts, getCardImageUrl, getLogoUrl } from '@/lib/p
 import LoadingScreen from '@/components/ui/LoadingScreen'
 import AppNavigation from '@/components/layout/AppNavigation'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
-import CardDetailsModal from '@/components/browse/CardDetailsModal'
+import CardDetailsModal from '@/components/browse/cards/CardDetailsModal'
 
 export default function SetDetailsPage() {
   const params = useParams()

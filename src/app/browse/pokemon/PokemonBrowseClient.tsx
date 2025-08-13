@@ -2,30 +2,37 @@
 
 import { useState, useMemo } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
-import SearchBar from '@/components/ui/SearchBar'
-import SortDropdown from '@/components/ui/SortDropdown'
+import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
 import SetCard from '@/components/pokemon/SetCard'
 import NoResultsMessage from '@/components/pokemon/NoResultsMessage'
 import type { PokemonSetWithSeries } from '@/models/pokemon'
 
 interface PokemonBrowseClientProps {
   initialSets: PokemonSetWithSeries[]
+  seriesOptions: Array<{
+    id: string
+    name: string
+  }>
 }
 
-export default function PokemonBrowseClient({ initialSets }: PokemonBrowseClientProps) {
-  const [seriesSearchQuery, setSeriesSearchQuery] = useState('')
+export default function PokemonBrowseClient({ initialSets, seriesOptions }: PokemonBrowseClientProps) {
+  const [selectedSeriesId, setSelectedSeriesId] = useState('')
   const [setSearchQuery, setSetSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState('newest')
+
+  // Create dropdown options from server-provided series data
+  const seriesDropdownOptions = useMemo(() => [
+    { value: '', label: 'All Series' },
+    ...seriesOptions.map(series => ({ value: series.id, label: series.name }))
+  ], [seriesOptions])
 
   // Filter and sort sets using initial data
   const filteredSets = useMemo(() => {
     let result = initialSets
 
-    // Filter by series name
-    if (seriesSearchQuery) {
-      result = result.filter(set => 
-        set.series.name.toLowerCase().includes(seriesSearchQuery.toLowerCase())
-      )
+    // Filter by selected series
+    if (selectedSeriesId) {
+      result = result.filter(set => set.series.id === selectedSeriesId)
     }
 
     // Filter by set name
@@ -43,7 +50,7 @@ export default function PokemonBrowseClient({ initialSets }: PokemonBrowseClient
     })
 
     return result
-  }, [initialSets, seriesSearchQuery, setSearchQuery, sortOrder])
+  }, [initialSets, selectedSeriesId, setSearchQuery, sortOrder])
 
   return (
     <div className="space-y-6">
@@ -53,35 +60,26 @@ export default function PokemonBrowseClient({ initialSets }: PokemonBrowseClient
       />
 
       {/* Search and Sort Controls */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <SearchBar 
-            placeholder="Search by series name..."
-            value={seriesSearchQuery}
-            onChange={setSeriesSearchQuery}
-          />
-          <SearchBar 
-            placeholder="Search by set name..."
-            value={setSearchQuery}
-            onChange={setSetSearchQuery}
-          />
-        </div>
-        <SortDropdown
-          options={[
-            { value: 'newest', label: 'Newest First' },
-            { value: 'oldest', label: 'Oldest First' }
-          ]}
-          value={sortOrder}
-          onChange={setSortOrder}
-          className="sm:w-48"
-        />
-      </div>
+      <BrowseFilterAndSort
+        searchQuery={setSearchQuery}
+        onSearchChange={setSetSearchQuery}
+        searchPlaceholder="Search by set name..."
+        selectedFilterId={selectedSeriesId}
+        onFilterChange={setSelectedSeriesId}
+        filterOptions={seriesDropdownOptions}
+        sortOrder={sortOrder}
+        onSortChange={setSortOrder}
+        sortOptions={[
+          { value: 'newest', label: 'Newest First' },
+          { value: 'oldest', label: 'Oldest First' }
+        ]}
+      />
 
       {/* Sets Grid */}
       <div>
         {filteredSets.length === 0 ? (
           <NoResultsMessage 
-            seriesSearchQuery={seriesSearchQuery}
+            seriesSearchQuery={selectedSeriesId ? seriesOptions.find(s => s.id === selectedSeriesId)?.name || '' : ''}
             setSearchQuery={setSearchQuery}
           />
         ) : (
