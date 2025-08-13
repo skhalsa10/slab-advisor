@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getLogoUrl } from '@/lib/pokemon-db'
-import type { PokemonSet, PokemonSeries } from '@/models/pokemon'
+import type { PokemonSet } from '@/models/pokemon'
 
 interface SetCardProps {
   set: PokemonSet
-  series?: PokemonSeries
+  series?: {
+    id: string
+    name: string
+  }
 }
 
 export default function SetCard({ set, series }: SetCardProps) {

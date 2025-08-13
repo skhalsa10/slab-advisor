@@ -29,6 +29,7 @@ import type {
   SerieWithSets,
   SetWithCards,
   PokemonSetWithCardsAndProducts,
+  PokemonSetWithSeries,
   CardBrief,
   CardFull
 } from '@/models/pokemon'
@@ -160,6 +161,50 @@ export async function getAllSets(params: PokemonSearchParams = {}): Promise<Pagi
     throw new Error('Failed to fetch Pokemon sets')
   }
 }
+
+/**
+ * Fetch all sets with their series information (optimized)
+ * 
+ * Returns a flat array of sets with only essential series data.
+ * Perfect for browse pages where we need sets with series context.
+ * Uses minimal data transfer by only selecting id and name from series.
+ * 
+ * @returns Promise containing array of sets with series info
+ * @throws Error if database query fails
+ * 
+ * @example
+ * ```typescript
+ * const setsWithSeries = await getAllSetsWithSeries()
+ * setsWithSeries.forEach(set => {
+ *   console.log(`${set.name} belongs to ${set.series.name}`)
+ * })
+ * ```
+ */
+export async function getAllSetsWithSeries(): Promise<PokemonSetWithSeries[]> {
+  try {
+    const { data, error } = await supabase
+      .from('pokemon_sets')
+      .select(`
+        *,
+        series:pokemon_series(
+          id,
+          name
+        )
+      `)
+      .order('release_date', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching sets with series:', error)
+      throw new Error('Failed to fetch Pokemon sets')
+    }
+    
+    return (data || []) as PokemonSetWithSeries[]
+  } catch (error) {
+    console.error('Error in getAllSetsWithSeries:', error)
+    throw new Error('Failed to fetch Pokemon sets')
+  }
+}
+
 
 /**
  * Fetch sets by series ID

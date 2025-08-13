@@ -36,6 +36,13 @@ export interface PokemonSetWithCardsAndProducts extends PokemonSetWithCards {
   products: PokemonProduct[]
 }
 
+export interface PokemonSetWithSeries extends PokemonSet {
+  series: {
+    id: string
+    name: string
+  }
+}
+
 export interface PokemonCardWithSet extends PokemonCard {
   set?: PokemonSet
 }

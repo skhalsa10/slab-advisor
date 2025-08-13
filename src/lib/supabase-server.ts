@@ -38,13 +38,9 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
  * Uses service role key for elevated database permissions.
  * 
  * @private
- * @returns Promise containing Supabase client with service role access
+ * @returns Supabase client with service role access
  */
-async function createServerSupabaseClient() {
-  // Note: cookies() is called to maintain Next.js compatibility but not used
-  // since we're using service role key for server operations
-  await cookies()
-  
+function createServerSupabaseClient() {
   return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       persistSession: false
@@ -76,8 +72,32 @@ async function createServerSupabaseClient() {
  * }
  * ```
  */
+/**
+ * Creates a public Supabase client for server-side operations
+ * 
+ * This function provides access to a Supabase client with service role permissions
+ * for use in Server Components and API routes where no user authentication is needed.
+ * Perfect for public data fetching operations.
+ * 
+ * @returns Supabase client with service role access
+ * 
+ * @example
+ * ```typescript
+ * export default async function ServerComponent() {
+ *   const supabase = getServerSupabaseClient()
+ *   const { data } = await supabase.from('public_data').select('*')
+ *   return <div>{JSON.stringify(data)}</div>
+ * }
+ * ```
+ */
+export function getServerSupabaseClient() {
+  return createServerSupabaseClient()
+}
+
 export async function getServerSession(request: NextRequest): Promise<SessionResponse> {
-  const supabase = await createServerSupabaseClient()
+  // Note: This function still needs cookies for session validation
+  await cookies()
+  const supabase = createServerSupabaseClient()
   
   // Get the authorization header
   const authHeader = request.headers.get('authorization')
