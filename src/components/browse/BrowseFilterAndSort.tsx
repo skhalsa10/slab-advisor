@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import SearchBar from '@/components/ui/SearchBar'
 import SortDropdown from '@/components/ui/SortDropdown'
 
@@ -13,6 +14,8 @@ interface BrowseFilterAndSortProps {
   sortOrder: string
   onSortChange: (order: string) => void
   sortOptions: Array<{ value: string; label: string }>
+  
+  rightContent?: ReactNode
 }
 
 export default function BrowseFilterAndSort({
@@ -24,7 +27,8 @@ export default function BrowseFilterAndSort({
   filterOptions,
   sortOrder,
   onSortChange,
-  sortOptions
+  sortOptions,
+  rightContent
 }: BrowseFilterAndSortProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4">
@@ -48,6 +52,7 @@ export default function BrowseFilterAndSort({
           onChange={onSortChange}
           className="sm:w-48"
         />
+        {rightContent}
       </div>
     </div>
   )

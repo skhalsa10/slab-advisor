@@ -2,8 +2,12 @@
 
 import { useState, useMemo } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
+import ItemGrid from '@/components/ui/ItemGrid'
+import ItemList from '@/components/ui/ItemList'
+import ViewToggle, { type ViewMode } from '@/components/ui/ViewToggle'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
 import SetCard from '@/components/pokemon/SetCard'
+import SetListItem from '@/components/pokemon/SetListItem'
 import NoResultsMessage from '@/components/pokemon/NoResultsMessage'
 import type { PokemonSetWithSeries } from '@/models/pokemon'
 
@@ -19,6 +23,7 @@ export default function PokemonBrowseClient({ initialSets, seriesOptions }: Poke
   const [selectedSeriesId, setSelectedSeriesId] = useState('')
   const [setSearchQuery, setSetSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState('newest')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   // Create dropdown options from server-provided series data
   const seriesDropdownOptions = useMemo(() => [
@@ -73,27 +78,78 @@ export default function PokemonBrowseClient({ initialSets, seriesOptions }: Poke
           { value: 'newest', label: 'Newest First' },
           { value: 'oldest', label: 'Oldest First' }
         ]}
+        rightContent={
+          <ViewToggle
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        }
       />
 
-      {/* Sets Grid */}
-      <div>
-        {filteredSets.length === 0 ? (
-          <NoResultsMessage 
-            seriesSearchQuery={selectedSeriesId ? seriesOptions.find(s => s.id === selectedSeriesId)?.name || '' : ''}
-            setSearchQuery={setSearchQuery}
-          />
-        ) : (
-          <div className="grid grid-cols-1 min-[480px]:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {filteredSets.map((set) => (
-              <SetCard 
-                key={set.id} 
-                set={set} 
-                series={set.series}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Sets Display - Grid or List based on viewMode */}
+      {viewMode === 'grid' ? (
+        <ItemGrid
+          items={filteredSets}
+          renderItem={(set) => (
+            <SetCard 
+              key={set.id} 
+              set={set} 
+              series={set.series}
+            />
+          )}
+          emptyStateComponent={
+            <NoResultsMessage 
+              seriesSearchQuery={selectedSeriesId ? seriesOptions.find(s => s.id === selectedSeriesId)?.name || '' : ''}
+              setSearchQuery={setSearchQuery}
+            />
+          }
+          columns={{
+            base: 1,
+            'min-480': 2,
+            sm: 2,
+            md: 3,
+            lg: 4,
+            xl: 5
+          }}
+          gap={4}
+        />
+      ) : (
+        <ItemList
+          items={filteredSets}
+          renderHeader={() => (
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                Set
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                Series
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                Cards
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                Release Date
+              </th>
+              <th scope="col" className="relative px-6 py-3">
+                <span className="sr-only">Actions</span>
+              </th>
+            </tr>
+          )}
+          renderRow={(set) => (
+            <SetListItem
+              key={set.id}
+              set={set}
+              series={set.series}
+            />
+          )}
+          emptyStateComponent={
+            <NoResultsMessage 
+              seriesSearchQuery={selectedSeriesId ? seriesOptions.find(s => s.id === selectedSeriesId)?.name || '' : ''}
+              setSearchQuery={setSearchQuery}
+            />
+          }
+        />
+      )}
     </div>
   )
 }
