@@ -7,9 +7,9 @@ interface BrowseFilterAndSortProps {
   onSearchChange: (query: string) => void
   searchPlaceholder?: string
   
-  selectedFilterId: string
-  onFilterChange: (id: string) => void
-  filterOptions: Array<{ value: string; label: string }>
+  selectedFilterId?: string
+  onFilterChange?: (id: string) => void
+  filterOptions?: Array<{ value: string; label: string }>
   
   sortOrder: string
   onSortChange: (order: string) => void
@@ -30,6 +30,9 @@ export default function BrowseFilterAndSort({
   sortOptions,
   rightContent
 }: BrowseFilterAndSortProps) {
+  // Show filter dropdown only if filter props are provided
+  const showFilter = filterOptions && selectedFilterId !== undefined && onFilterChange
+
   return (
     <div className="flex flex-col sm:flex-row gap-4">
       <div className="flex-1">
@@ -40,12 +43,14 @@ export default function BrowseFilterAndSort({
         />
       </div>
       <div className="flex gap-4">
-        <SortDropdown
-          options={filterOptions}
-          value={selectedFilterId}
-          onChange={onFilterChange}
-          className="sm:w-48"
-        />
+        {showFilter && (
+          <SortDropdown
+            options={filterOptions}
+            value={selectedFilterId}
+            onChange={onFilterChange}
+            className="sm:w-48"
+          />
+        )}
         <SortDropdown
           options={sortOptions}
           value={sortOrder}

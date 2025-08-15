@@ -11,7 +11,7 @@
  */
 
 import { getServerSupabaseClient } from './supabase-server'
-import type { PokemonSetWithSeries, PokemonBrowseData } from '@/models/pokemon'
+import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 
 
 /**
@@ -70,5 +70,81 @@ export async function getPokemonBrowseDataServer(): Promise<PokemonBrowseData> {
   } catch (error) {
     console.error('Error in getPokemonBrowseDataServer:', error)
     throw new Error('Failed to fetch Pokemon browse data')
+  }
+}
+
+/**
+ * Fetch a set with both cards and products (server-side)
+ * 
+ * Server-side version of getSetWithCardsAndProducts for use in Server Components.
+ * Uses service role client for secure, server-only database access.
+ * Optimized to only fetch necessary fields for better performance.
+ * 
+ * @param setId - The ID of the set to fetch
+ * @returns Promise containing set with cards, products, and series information
+ * @throws Error if set not found or database query fails
+ * 
+ * @example
+ * ```typescript
+ * export default async function ServerComponent({ params }) {
+ *   const setData = await getSetWithCardsAndProductsServer(params.setId)
+ *   return <ClientComponent initialData={setData} />
+ * }
+ * ```
+ */
+export async function getSetWithCardsAndProductsServer(setId: string): Promise<PokemonSetWithCardsAndProducts> {
+  try {
+    const supabase = getServerSupabaseClient()
+    
+    // Fetch set with optimized card/series data (only fields we need)
+    const { data: setWithCards, error: setError } = await supabase
+      .from('pokemon_sets')
+      .select(`
+        *,
+        series:pokemon_series(
+          id,
+          name
+        ),
+        cards:pokemon_cards(
+          id,
+          name,
+          local_id,
+          rarity,
+          image,
+          tcgplayer_image_url,
+          tcgplayer_product_id
+        )
+      `)
+      .eq('id', setId)
+      .single()
+
+    if (setError) {
+      console.error('Error fetching set with cards (server):', setError)
+      throw new Error('Failed to fetch Pokemon set')
+    }
+
+    if (!setWithCards) {
+      throw new Error('Set not found')
+    }
+    
+    // Fetch products (we need all product fields for display)
+    const { data: products, error: productsError } = await supabase
+      .from('pokemon_products')
+      .select('*')
+      .eq('pokemon_set_id', setId)
+      .order('name')
+
+    if (productsError) {
+      console.error('Error fetching products (server):', productsError)
+      throw new Error('Failed to fetch Pokemon products')
+    }
+    
+    return {
+      ...setWithCards,
+      products: products || []
+    } as PokemonSetWithCardsAndProducts
+  } catch (error) {
+    console.error('Error in getSetWithCardsAndProductsServer:', error)
+    throw new Error(`Failed to fetch set with cards and products: ${setId}`)
   }
 }
