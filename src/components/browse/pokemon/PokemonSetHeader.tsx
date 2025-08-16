@@ -2,6 +2,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getLogoUrl } from '@/lib/pokemon-db'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
+import SetStatistics from '@/components/sets/SetStatistics'
+import SetOwnershipSummary from '@/components/sets/SetOwnershipSummary'
+import ShopTheSet from '@/components/sets/ShopTheSet'
 
 interface PokemonSetHeaderProps {
   setData: PokemonSetWithCardsAndProducts
@@ -15,8 +18,19 @@ export default function PokemonSetHeader({
   backText = "← Back to Sets"
 }: PokemonSetHeaderProps) {
   return (
-    <div className="bg-white rounded-lg border border-grey-200 p-6">
-      <div className="flex items-start justify-between flex-wrap gap-4">
+    <div className="bg-white rounded-lg border border-grey-200 p-6 space-y-6">
+      {/* Back button - mobile only, top of header */}
+      <div className="block sm:hidden">
+        <Link
+          href={backHref}
+          className="text-sm text-orange-600 hover:text-orange-700"
+        >
+          {backText}
+        </Link>
+      </div>
+      
+      {/* Main header content */}
+      <div className="flex items-start justify-between gap-4">
         <div className="flex items-center space-x-4">
           {setData.logo && (
             <Image
@@ -42,60 +56,46 @@ export default function PokemonSetHeader({
             )}
           </div>
         </div>
+        
+        {/* Back button - desktop only, right side */}
         <Link
           href={backHref}
-          className="text-sm text-orange-600 hover:text-orange-700 self-start"
+          className="hidden sm:block text-sm text-orange-600 hover:text-orange-700 flex-shrink-0"
         >
           {backText}
         </Link>
       </div>
-      
-      {/* Action Buttons */}
-      {setData.tcgplayer_url && (
-        <div className="mt-4">
-          <a
-            href={setData.tcgplayer_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
-          >
-            Shop on TCGPlayer
-            <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </a>
-        </div>
-      )}
 
-      {/* Set Statistics */}
-      <div className="mt-6 space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-grey-50 rounded-lg p-3">
-            <p className="text-xs text-grey-600">Total Cards</p>
-            <p className="text-lg font-semibold text-grey-900">{setData.card_count_total || 0}</p>
-          </div>
-          <div className="bg-grey-50 rounded-lg p-3">
-            <p className="text-xs text-grey-600">Official Count</p>
-            <p className="text-lg font-semibold text-grey-900">{setData.card_count_official || 0}</p>
-          </div>
-          {setData.card_count_holo !== null && setData.card_count_holo > 0 && (
-            <div className="bg-grey-50 rounded-lg p-3">
-              <p className="text-xs text-grey-600">Holo Cards</p>
-              <p className="text-lg font-semibold text-grey-900">{setData.card_count_holo}</p>
-            </div>
-          )}
-          {setData.card_count_reverse !== null && setData.card_count_reverse > 0 && (
-            <div className="bg-grey-50 rounded-lg p-3">
-              <p className="text-xs text-grey-600">Reverse Holo</p>
-              <p className="text-lg font-semibold text-grey-900">{setData.card_count_reverse}</p>
-            </div>
-          )}
-          {setData.card_count_first_ed !== null && setData.card_count_first_ed > 0 && (
-            <div className="bg-grey-50 rounded-lg p-3">
-              <p className="text-xs text-grey-600">1st Edition</p>
-              <p className="text-lg font-semibold text-grey-900">{setData.card_count_first_ed}</p>
-            </div>
-          )}
+      {/* Divider */}
+      <hr className="border-grey-200" />
+
+      {/* All components in one row on desktop, stacked on mobile */}
+      <div className="flex flex-col xl:flex-row gap-6">
+        {/* Set Statistics */}
+        <div className="xl:flex-[2]">
+          <SetStatistics
+            totalCards={setData.card_count_total || 0}
+            officialCount={setData.card_count_official}
+            holoCount={setData.card_count_holo}
+            reverseCount={setData.card_count_reverse}
+            firstEditionCount={setData.card_count_first_ed}
+          />
+        </div>
+
+        {/* Ownership Summary - only shows if user is logged in */}
+        <div className="xl:flex-1">
+          <SetOwnershipSummary
+            totalCards={setData.card_count_total || 0}
+            setId={setData.id}
+          />
+        </div>
+
+        {/* Shop the Set */}
+        <div className="xl:flex-1">
+          <ShopTheSet
+            tcgPlayerUrl={setData.tcgplayer_url || undefined}
+            setName={setData.name}
+          />
         </div>
       </div>
     </div>

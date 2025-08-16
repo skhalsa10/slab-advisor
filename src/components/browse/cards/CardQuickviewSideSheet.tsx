@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { getCard, getCardImageUrl, getAdjacentCards } from "@/lib/pokemon-db";
+import { getCardImageUrl } from "@/lib/pokemon-db";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import type { CardFull } from "@/models/pokemon";
 
@@ -37,22 +37,36 @@ export default function CardQuickviewSideSheet({
       setError(null);
 
       if (cardType === "pokemon") {
-        const [card, adjacent] = await Promise.all([
-          getCard(cardId),
+        // Fetch card data from API routes
+        const [cardResponse, adjacentResponse] = await Promise.all([
+          fetch(`/api/pokemon/cards/${cardId}`),
           setId
-            ? getAdjacentCards(cardId, setId)
-            : Promise.resolve({ previous: null, next: null }),
+            ? fetch(`/api/pokemon/cards/${cardId}/adjacent?setId=${setId}`)
+            : Promise.resolve(null),
         ]);
 
+        if (!cardResponse.ok) {
+          throw new Error("Failed to fetch card");
+        }
+
+        const card = await cardResponse.json();
         setCardData(card);
-        setAdjacentCards({
-          prevCard: adjacent.previous
-            ? { id: adjacent.previous.id, name: adjacent.previous.name }
-            : null,
-          nextCard: adjacent.next
-            ? { id: adjacent.next.id, name: adjacent.next.name }
-            : null,
-        });
+
+        if (adjacentResponse) {
+          if (adjacentResponse.ok) {
+            const adjacent = await adjacentResponse.json();
+            setAdjacentCards({
+              prevCard: adjacent.previous
+                ? { id: adjacent.previous.id, name: adjacent.previous.name }
+                : null,
+              nextCard: adjacent.next
+                ? { id: adjacent.next.id, name: adjacent.next.name }
+                : null,
+            });
+          }
+        } else {
+          setAdjacentCards({ prevCard: null, nextCard: null });
+        }
       }
     } catch (err) {
       setError("Failed to load card details");

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import CardQuickviewSideSheet from '@/components/browse/cards/CardQuickviewSideSheet'
 import CardQuickViewModal from '@/components/browse/cards/CardQuickViewModal'
@@ -23,20 +24,10 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
-  const [isDesktop, setIsDesktop] = useState(false)
   const [sortOrder, setSortOrder] = useState('asc')
-
-  // Check if user is on desktop (lg breakpoint = 1024px)
-  useEffect(() => {
-    const checkIsDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024)
-    }
-    
-    checkIsDesktop()
-    window.addEventListener('resize', checkIsDesktop)
-    
-    return () => window.removeEventListener('resize', checkIsDesktop)
-  }, [])
+  
+  // Use custom hook to detect desktop viewport
+  const isDesktop = useIsDesktop()
 
   // Filter and sort cards based on search query and sort order
   const filteredCards = useMemo(() => {
