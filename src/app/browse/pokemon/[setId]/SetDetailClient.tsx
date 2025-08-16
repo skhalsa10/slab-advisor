@@ -205,6 +205,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
               isOpen={isQuickViewOpen}
               onClose={handleQuickViewClose}
               onNavigateToCard={handleNavigateToCard}
+              cardList={filteredCards.map(card => ({ id: card.id, name: card.name }))}
             />
           ) : (
             <CardQuickViewModal
@@ -213,6 +214,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
               isOpen={isQuickViewOpen}
               onClose={handleQuickViewClose}
               onNavigateToCard={handleNavigateToCard}
+              cardList={filteredCards.map(card => ({ id: card.id, name: card.name }))}
             />
           )}
         </>

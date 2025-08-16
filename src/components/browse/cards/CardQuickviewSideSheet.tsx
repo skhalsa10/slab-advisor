@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { getCardImageUrl } from "@/lib/pokemon-db";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { calculateAdjacentCards, type AdjacentCards } from "@/utils/card-navigation";
 import type { CardFull } from "@/models/pokemon";
 
 interface CardQuickviewSideSheetProps {
@@ -13,6 +14,7 @@ interface CardQuickviewSideSheetProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigateToCard?: (cardId: string) => void;
+  cardList?: Array<{ id: string; name: string }>;
 }
 
 export default function CardQuickviewSideSheet({
@@ -22,14 +24,21 @@ export default function CardQuickviewSideSheet({
   isOpen,
   onClose,
   onNavigateToCard,
+  cardList,
 }: CardQuickviewSideSheetProps) {
   const [cardData, setCardData] = useState<CardFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [adjacentCards, setAdjacentCards] = useState<{
-    prevCard: { id: string; name: string } | null;
-    nextCard: { id: string; name: string } | null;
-  }>({ prevCard: null, nextCard: null });
+  const [adjacentCards, setAdjacentCards] = useState<AdjacentCards>({ 
+    prevCard: null, 
+    nextCard: null 
+  });
+
+  // Update adjacent cards when card list or card ID changes
+  const updateAdjacentCards = useCallback(() => {
+    const adjacent = calculateAdjacentCards(cardList, cardId);
+    setAdjacentCards(adjacent);
+  }, [cardList, cardId]);
 
   const loadCardData = useCallback(async () => {
     try {
@@ -37,13 +46,8 @@ export default function CardQuickviewSideSheet({
       setError(null);
 
       if (cardType === "pokemon") {
-        // Fetch card data from API routes
-        const [cardResponse, adjacentResponse] = await Promise.all([
-          fetch(`/api/pokemon/cards/${cardId}`),
-          setId
-            ? fetch(`/api/pokemon/cards/${cardId}/adjacent?setId=${setId}`)
-            : Promise.resolve(null),
-        ]);
+        // Fetch only card data from API route
+        const cardResponse = await fetch(`/api/pokemon/cards/${cardId}`);
 
         if (!cardResponse.ok) {
           throw new Error("Failed to fetch card");
@@ -52,21 +56,8 @@ export default function CardQuickviewSideSheet({
         const card = await cardResponse.json();
         setCardData(card);
 
-        if (adjacentResponse) {
-          if (adjacentResponse.ok) {
-            const adjacent = await adjacentResponse.json();
-            setAdjacentCards({
-              prevCard: adjacent.previous
-                ? { id: adjacent.previous.id, name: adjacent.previous.name }
-                : null,
-              nextCard: adjacent.next
-                ? { id: adjacent.next.id, name: adjacent.next.name }
-                : null,
-            });
-          }
-        } else {
-          setAdjacentCards({ prevCard: null, nextCard: null });
-        }
+        // Calculate adjacent cards from provided card list
+        updateAdjacentCards();
       }
     } catch (err) {
       setError("Failed to load card details");
@@ -74,13 +65,18 @@ export default function CardQuickviewSideSheet({
     } finally {
       setLoading(false);
     }
-  }, [cardId, cardType, setId]);
+  }, [cardId, cardType, updateAdjacentCards]);
 
   useEffect(() => {
     if (isOpen && cardId) {
       loadCardData();
     }
   }, [cardId, isOpen, loadCardData]);
+
+  // Recalculate adjacent cards when card list or card ID changes
+  useEffect(() => {
+    updateAdjacentCards();
+  }, [updateAdjacentCards]);
 
   // Prevent background scrolling when sidesheet is open
   useEffect(() => {
