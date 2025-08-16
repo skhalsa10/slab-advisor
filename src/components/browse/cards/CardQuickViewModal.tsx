@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { calculateAdjacentCards, type AdjacentCards } from '@/utils/card-navigation'
+import { getEbaySearchUrl } from '@/utils/external-links'
+import { useAuth } from '@/hooks/useAuth'
 import type { CardFull } from '@/models/pokemon'
 
 interface CardQuickViewModalProps {
@@ -26,6 +29,7 @@ export default function CardQuickViewModal({
   onNavigateToCard,
   cardList
 }: CardQuickViewModalProps) {
+  const { user } = useAuth()
   const [cardData, setCardData] = useState<CardFull | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -132,7 +136,7 @@ export default function CardQuickViewModal({
       {/* Modal - Bottom sheet on mobile, center modal on tablet */}
       <div className={`fixed z-50 transform transition-all duration-300 ease-out flex flex-col
         max-sm:bottom-0 max-sm:left-0 max-sm:right-0 max-sm:rounded-t-2xl max-sm:max-h-[85vh]
-        sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-lg sm:rounded-lg sm:max-h-[90vh]
+        sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-xl sm:rounded-lg sm:max-h-[90vh]
         bg-white shadow-2xl overflow-hidden ${
         isOpen 
           ? 'max-sm:translate-y-0 sm:scale-100 sm:opacity-100' 
@@ -199,11 +203,17 @@ export default function CardQuickViewModal({
                   
                   {/* Action Buttons */}
                   <div className="space-y-2">
+                    <Link
+                      href={`/browse/pokemon/${setId}/${cardId}`}
+                      className="w-full inline-flex items-center justify-center py-2.5 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
+                    >
+                      View Details
+                    </Link>
                     <button className="w-full bg-orange-600 text-white py-2.5 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors">
-                      Add to Collection
+                      {user ? 'Add to Collection' : 'Sign Up to Collect'}
                     </button>
 
-                    {/* Shop Link */}
+                    {/* Shop Links */}
                     {cardData.tcgplayer_product_id && (
                       <a
                         href={`https://www.tcgplayer.com/product/${cardData.tcgplayer_product_id}`}
@@ -217,47 +227,63 @@ export default function CardQuickViewModal({
                         </svg>
                       </a>
                     )}
+                    
+                    <a
+                      href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full inline-flex items-center justify-center px-4 py-2.5 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
+                    >
+                      Shop on eBay
+                      <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                    
+                    <p className="text-xs text-grey-500 text-center">Shopping links may contain affiliate links</p>
                   </div>
-                  
-                  {/* Navigation between cards */}
-                  {(adjacentCards.prevCard || adjacentCards.nextCard) && (
-                    <div className="flex items-center justify-between pt-4 border-t border-grey-200">
-                      <button
-                        onClick={() => adjacentCards.prevCard && onNavigateToCard?.(adjacentCards.prevCard.id)}
-                        disabled={!adjacentCards.prevCard}
-                        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                          adjacentCards.prevCard
-                            ? 'text-orange-600 hover:bg-orange-50'
-                            : 'text-grey-300 cursor-not-allowed'
-                        }`}
-                      >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span>Previous</span>
-                      </button>
-
-                      <button
-                        onClick={() => adjacentCards.nextCard && onNavigateToCard?.(adjacentCards.nextCard.id)}
-                        disabled={!adjacentCards.nextCard}
-                        className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                          adjacentCards.nextCard
-                            ? 'text-orange-600 hover:bg-orange-50'
-                            : 'text-grey-300 cursor-not-allowed'
-                        }`}
-                      >
-                        <span>Next</span>
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        {/* Sticky Navigation Footer */}
+        {(adjacentCards.prevCard || adjacentCards.nextCard) && (
+          <div className="flex-shrink-0 bg-white border-t border-grey-200 px-4 py-3">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => adjacentCards.prevCard && onNavigateToCard?.(adjacentCards.prevCard.id)}
+                disabled={!adjacentCards.prevCard}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  adjacentCards.prevCard
+                    ? 'text-orange-600 hover:bg-orange-50'
+                    : 'text-grey-300 cursor-not-allowed'
+                }`}
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Previous</span>
+              </button>
+
+              <button
+                onClick={() => adjacentCards.nextCard && onNavigateToCard?.(adjacentCards.nextCard.id)}
+                disabled={!adjacentCards.nextCard}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  adjacentCards.nextCard
+                    ? 'text-orange-600 hover:bg-orange-50'
+                    : 'text-grey-300 cursor-not-allowed'
+                }`}
+              >
+                <span>Next</span>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
