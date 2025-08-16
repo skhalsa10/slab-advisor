@@ -70,6 +70,11 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
     setSelectedCardId(null)
   }
 
+  const handleNavigateToCard = (cardId: string) => {
+    setSelectedCardId(cardId)
+    // Keep the quickview open
+  }
+
   // Prepare tabs data
   const tabs = [
     {
@@ -208,6 +213,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
               setId={setId}
               isOpen={isQuickViewOpen}
               onClose={handleQuickViewClose}
+              onNavigateToCard={handleNavigateToCard}
             />
           ) : (
             <CardQuickViewModal
@@ -215,6 +221,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
               setId={setId}
               isOpen={isQuickViewOpen}
               onClose={handleQuickViewClose}
+              onNavigateToCard={handleNavigateToCard}
             />
           )}
         </>

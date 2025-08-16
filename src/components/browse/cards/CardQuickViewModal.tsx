@@ -12,6 +12,7 @@ interface CardQuickViewModalProps {
   cardType?: 'pokemon' | 'onepiece' | 'sports' | 'other'
   isOpen: boolean
   onClose: () => void
+  onNavigateToCard?: (cardId: string) => void
 }
 
 export default function CardQuickViewModal({
@@ -19,7 +20,8 @@ export default function CardQuickViewModal({
   setId,
   cardType = 'pokemon',
   isOpen,
-  onClose
+  onClose,
+  onNavigateToCard
 }: CardQuickViewModalProps) {
   const [cardData, setCardData] = useState<CardFull | null>(null)
   const [loading, setLoading] = useState(true)
@@ -205,7 +207,7 @@ export default function CardQuickViewModal({
                   {(adjacentCards.prevCard || adjacentCards.nextCard) && (
                     <div className="flex items-center justify-between pt-4 border-t border-grey-200">
                       <button
-                        onClick={() => adjacentCards.prevCard && onClose()}
+                        onClick={() => adjacentCards.prevCard && onNavigateToCard?.(adjacentCards.prevCard.id)}
                         disabled={!adjacentCards.prevCard}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                           adjacentCards.prevCard
@@ -220,7 +222,7 @@ export default function CardQuickViewModal({
                       </button>
 
                       <button
-                        onClick={() => adjacentCards.nextCard && onClose()}
+                        onClick={() => adjacentCards.nextCard && onNavigateToCard?.(adjacentCards.nextCard.id)}
                         disabled={!adjacentCards.nextCard}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                           adjacentCards.nextCard

@@ -12,6 +12,7 @@ interface CardQuickviewSideSheetProps {
   cardType?: "pokemon" | "onepiece" | "sports" | "other";
   isOpen: boolean;
   onClose: () => void;
+  onNavigateToCard?: (cardId: string) => void;
 }
 
 export default function CardQuickviewSideSheet({
@@ -20,6 +21,7 @@ export default function CardQuickviewSideSheet({
   cardType = "pokemon",
   isOpen,
   onClose,
+  onNavigateToCard,
 }: CardQuickviewSideSheetProps) {
   const [cardData, setCardData] = useState<CardFull | null>(null);
   const [loading, setLoading] = useState(true);
@@ -225,7 +227,7 @@ export default function CardQuickviewSideSheet({
                 {(adjacentCards.prevCard || adjacentCards.nextCard) && (
                   <div className="flex items-center justify-between pt-4 border-t border-grey-200">
                     <button
-                      onClick={() => adjacentCards.prevCard && onClose()}
+                      onClick={() => adjacentCards.prevCard && onNavigateToCard?.(adjacentCards.prevCard.id)}
                       disabled={!adjacentCards.prevCard}
                       className={`flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
                         adjacentCards.prevCard
@@ -250,7 +252,7 @@ export default function CardQuickviewSideSheet({
                     </button>
 
                     <button
-                      onClick={() => adjacentCards.nextCard && onClose()}
+                      onClick={() => adjacentCards.nextCard && onNavigateToCard?.(adjacentCards.nextCard.id)}
                       disabled={!adjacentCards.nextCard}
                       className={`flex items-center space-x-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
                         adjacentCards.nextCard
