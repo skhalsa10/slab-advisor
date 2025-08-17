@@ -11,7 +11,7 @@
  */
 
 import { getServerSupabaseClient } from './supabase-server'
-import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts } from '@/models/pokemon'
+import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts, CardFull, SetWithCards } from '@/models/pokemon'
 
 
 /**
@@ -146,5 +146,70 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
   } catch (error) {
     console.error('Error in getSetWithCardsAndProductsServer:', error)
     throw new Error(`Failed to fetch set with cards and products: ${setId}`)
+  }
+}
+
+/**
+ * Fetch a single card with its set and navigation context (server-side)
+ * 
+ * Securely fetches card data with full set information for navigation.
+ * Uses service role client to prevent client-side query manipulation.
+ * 
+ * @param cardId - The ID of the card to fetch
+ * @returns Promise containing card with set data and navigation context
+ * @throws Error if card not found or database query fails
+ * 
+ * @example
+ * ```typescript
+ * export default async function ServerComponent({ params }) {
+ *   const { card, set } = await getCardWithSetServer(params.cardId)
+ *   return <ClientComponent card={card} set={set} />
+ * }
+ * ```
+ */
+export async function getCardWithSetServer(cardId: string): Promise<{ card: CardFull; set: SetWithCards }> {
+  try {
+    const supabase = getServerSupabaseClient()
+    
+    // Fetch card with set and series information
+    const { data: card, error: cardError } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        *,
+        set:pokemon_sets(
+          *,
+          series:pokemon_series(*),
+          cards:pokemon_cards(
+            id,
+            name,
+            local_id,
+            rarity,
+            image,
+            tcgplayer_image_url
+          )
+        )
+      `)
+      .eq('id', cardId)
+      .single()
+
+    if (cardError) {
+      console.error('Error fetching card with set (server):', cardError)
+      throw new Error('Failed to fetch Pokemon card')
+    }
+
+    if (!card) {
+      throw new Error('Card not found')
+    }
+
+    // Extract set data for navigation
+    const set = card.set as SetWithCards
+    
+    return {
+      card: card as CardFull,
+      set
+    }
+  } catch (error) {
+    console.error('Error in getCardWithSetServer:', error)
+    throw new Error(`Failed to fetch card with set: ${cardId}`)
   }
 }

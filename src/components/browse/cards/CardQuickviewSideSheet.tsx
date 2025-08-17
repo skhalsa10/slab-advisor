@@ -8,6 +8,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { calculateAdjacentCards, type AdjacentCards } from "@/utils/card-navigation";
 import { getEbaySearchUrl } from "@/utils/external-links";
 import { useAuth } from "@/hooks/useAuth";
+import AddToCollectionForm from "@/components/collection/AddToCollectionForm";
 import type { CardFull } from "@/models/pokemon";
 
 interface CardQuickviewSideSheetProps {
@@ -33,6 +34,9 @@ export default function CardQuickviewSideSheet({
   const [cardData, setCardData] = useState<CardFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCollectionForm, setShowCollectionForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [adjacentCards, setAdjacentCards] = useState<AdjacentCards>({ 
     prevCard: null, 
     nextCard: null 
@@ -105,6 +109,46 @@ export default function CardQuickviewSideSheet({
       default:
         return "Card Details";
     }
+  };
+
+  const getAvailableVariants = () => {
+    if (!cardData) return [];
+    
+    const variants: string[] = [];
+    if (cardData.variant_normal) variants.push("normal");
+    if (cardData.variant_holo) variants.push("holo");
+    if (cardData.variant_reverse) variants.push("reverse_holo");
+    if (cardData.variant_first_edition) variants.push("first_edition");
+    
+    return variants.length > 0 ? variants : ["normal"];
+  };
+
+  const handleCollectionSuccess = (message: string) => {
+    setSuccessMessage(message);
+    setErrorMessage(null);
+    setShowCollectionForm(false);
+    
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 3000);
+  };
+
+  const handleCollectionError = (error: string) => {
+    setErrorMessage(error);
+    setSuccessMessage(null);
+  };
+
+  const handleAddToCollectionClick = () => {
+    if (!user) {
+      // Redirect to sign up/login
+      window.location.href = '/auth/signin?redirect=' + encodeURIComponent(window.location.pathname);
+      return;
+    }
+    
+    setShowCollectionForm(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
   };
 
   const getCardImage = () => {
@@ -203,18 +247,45 @@ export default function CardQuickviewSideSheet({
                 {cardType === "pokemon" &&
                   renderPokemonDetails(cardData as CardFull)}
 
-                {/* Action Buttons */}
-                <div className="pt-2 space-y-3">
-                  <Link
-                    href={`/browse/pokemon/${setId}/${cardId}`}
-                    className="w-full inline-flex items-center justify-center py-2 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
-                  >
-                    View Details
-                  </Link>
-                  <button className="w-full bg-orange-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors">
-                    {user ? 'Add to Collection' : 'Sign Up to Collect'}
-                  </button>
-                </div>
+                {/* Success/Error Messages */}
+                {successMessage && (
+                  <div className="bg-green-50 border border-green-200 text-green-800 px-3 py-2 rounded-md text-sm">
+                    {successMessage}
+                  </div>
+                )}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-md text-sm">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Collection Form or Action Buttons */}
+                {showCollectionForm ? (
+                  <AddToCollectionForm
+                    cardId={cardId}
+                    cardName={getCardName()}
+                    availableVariants={getAvailableVariants()}
+                    onSuccess={handleCollectionSuccess}
+                    onError={handleCollectionError}
+                    onClose={() => setShowCollectionForm(false)}
+                    mode="transform"
+                  />
+                ) : (
+                  <div className="pt-2 space-y-3">
+                    <Link
+                      href={`/browse/pokemon/${setId}/${cardId}`}
+                      className="w-full inline-flex items-center justify-center py-2 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
+                    >
+                      View Details
+                    </Link>
+                    <button 
+                      onClick={handleAddToCollectionClick}
+                      className="w-full bg-orange-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
+                    >
+                      {user ? 'Add to Collection' : 'Sign Up to Collect'}
+                    </button>
+                  </div>
+                )}
 
                 {/* Shop Links */}
                 <div className="space-y-3">

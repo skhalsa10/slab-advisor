@@ -16,7 +16,9 @@ export default function SetOwnershipSummary({ totalCards, setId }: SetOwnershipS
   }
   
   // TODO: Replace with actual ownership data from database
+  // Will use setId to query user's collection for this specific set
   // For now, using mocked data
+  void setId // Will be used when implementing database query
   const ownedCards = 50
   const percentage = totalCards > 0 ? (ownedCards / totalCards) * 100 : 0
   

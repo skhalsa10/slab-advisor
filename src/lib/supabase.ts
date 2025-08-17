@@ -13,7 +13,7 @@
  * @module supabase
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/models/database'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -42,7 +42,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
  *   .insert({ user_id: userId, card_name: 'Pikachu' })
  * ```
  */
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 
 // Re-export commonly used types for backward compatibility
 export type { Database, Json } from '@/models/database'
