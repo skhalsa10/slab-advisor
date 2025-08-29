@@ -154,7 +154,7 @@ export default function CardQuickViewModal({
   const handleAddToCollectionClick = () => {
     if (!user) {
       // Redirect to sign up/login
-      window.location.href = '/auth/signin?redirect=' + encodeURIComponent(window.location.pathname)
+      window.location.href = '/auth?redirect=' + encodeURIComponent(window.location.pathname)
       return
     }
     

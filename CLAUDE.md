@@ -30,6 +30,7 @@ npm run lint       # Run ESLint
 ```
 
 ### Testing
+
 ```bash
 npm run test       # Run tests in watch mode
 npm run test:run   # Run tests once
@@ -257,3 +258,11 @@ Before considering code complete, ensure:
 - Consider future scalability
 - Use proper data types
 - Implement audit fields (created_at, updated_at)
+
+## Visual Development
+
+### Design Principles
+
+- Comprehensive design checklist in `/context/design-principles.md`
+- Brand style guide in `/context/style-guide.md` if available
+- When making visual (front-end, UI/UX) changes, always refer to these files for guidance
