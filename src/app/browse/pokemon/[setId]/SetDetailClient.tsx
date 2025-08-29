@@ -10,9 +10,12 @@ import PokemonSetHeader from '@/components/browse/pokemon/PokemonSetHeader'
 import TabNavigation from '@/components/ui/TabNavigation'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
 import ItemGrid from '@/components/ui/ItemGrid'
+import ItemList from '@/components/ui/ItemList'
+import ViewToggle, { type ViewMode } from '@/components/ui/ViewToggle'
 import SetCardsEmptyState from '@/components/ui/SetCardsEmptyState'
 import TCGCard from '@/components/cards/TCGCard'
 import TCGProduct from '@/components/cards/TCGProduct'
+import CardListItem from '@/components/pokemon/CardListItem'
 
 interface SetDetailClientProps {
   initialData: PokemonSetWithCardsAndProducts
@@ -25,6 +28,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
   const [sortOrder, setSortOrder] = useState('asc')
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   
   // Use custom hook to detect desktop viewport
   const isDesktop = useIsDesktop()
@@ -163,23 +167,60 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
           sortOrder={sortOrder}
           onSortChange={setSortOrder}
           sortOptions={sortOptions}
+          rightContent={
+            <ViewToggle
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+            />
+          }
         />
       )}
 
       {/* Content based on active tab */}
       {activeTab === 'cards' ? (
-        <ItemGrid
-          items={filteredCards}
-          renderItem={(card) => renderCard(card)}
-          emptyStateComponent={cardsEmptyState}
-          columns={{
-            base: 2,
-            sm: 3,
-            md: 4,
-            lg: 5,
-            xl: 6
-          }}
-        />
+        viewMode === 'grid' ? (
+          <ItemGrid
+            items={filteredCards}
+            renderItem={(card) => renderCard(card)}
+            emptyStateComponent={cardsEmptyState}
+            columns={{
+              base: 2,
+              sm: 3,
+              md: 4,
+              lg: 5,
+              xl: 6
+            }}
+          />
+        ) : (
+          <ItemList
+            items={filteredCards}
+            renderHeader={() => (
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Card
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Number
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Rarity
+                </th>
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            )}
+            renderRow={(card) => (
+              <CardListItem
+                key={card.id}
+                card={card}
+                setId={setId}
+                onClick={handleCardClick}
+              />
+            )}
+            emptyStateComponent={cardsEmptyState}
+          />
+        )
       ) : (
         <ItemGrid
           items={initialData.products}
