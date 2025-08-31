@@ -117,7 +117,7 @@ export default function CardQuickViewModal({
     
     switch (cardType) {
       case 'pokemon':
-        return getCardImageUrl(cardData.image, 'high', cardData.tcgplayer_image_url)
+        return getCardImageUrl(cardData.image, 'low', cardData.tcgplayer_image_url)
       default:
         return null
     }

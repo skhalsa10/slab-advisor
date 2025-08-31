@@ -126,7 +126,7 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
         <div className="space-y-4">
           <div className="aspect-[2.5/3.5] relative rounded-lg overflow-hidden bg-grey-100 max-w-md mx-auto lg:mx-0">
             <Image
-              src={getCardImageUrl(card.image, 'high', card.tcgplayer_image_url)}
+              src={getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)}
               alt={card.name}
               fill
               className="object-contain"

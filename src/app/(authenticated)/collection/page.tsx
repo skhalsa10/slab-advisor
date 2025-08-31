@@ -1,5 +1,5 @@
 import { getUserCollectionCards } from '@/lib/collection-server'
-import CollectionClient from '@/components/collection/CollectionClient'
+import CollectionClient from './CollectionClient'
 
 /**
  * Collection Page - Server Component

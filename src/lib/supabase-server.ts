@@ -15,6 +15,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { User } from '@supabase/supabase-js'
@@ -72,6 +73,8 @@ function createServerSupabaseClient() {
  * }
  * ```
  */
+
+
 /**
  * Creates a public Supabase client for server-side operations
  * 
@@ -92,6 +95,53 @@ function createServerSupabaseClient() {
  */
 export function getServerSupabaseClient() {
   return createServerSupabaseClient()
+}
+
+/**
+ * Creates an authenticated Supabase client for server-side operations
+ * 
+ * This client respects Row Level Security (RLS) policies and validates
+ * the user session from cookies. Use this for any user-specific data
+ * operations where you want to ensure users can only access their own data.
+ * 
+ * @returns Promise containing authenticated Supabase client that respects RLS
+ * 
+ * @example
+ * ```typescript
+ * export default async function ServerComponent() {
+ *   const supabase = await getAuthenticatedSupabaseClient()
+ *   const { data } = await supabase
+ *     .from('collection_cards')
+ *     .select('*')
+ *     // Will only return cards for the authenticated user due to RLS
+ *   return <div>{data?.length} cards found</div>
+ * }
+ * ```
+ */
+export async function getAuthenticatedSupabaseClient() {
+  const cookieStore = await cookies()
+  
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
+          try {
+            cookiesToSet.forEach(() => {
+              // For API routes, we can't set cookies in the response
+              // This is expected and should be handled by middleware
+            })
+          } catch {
+            // Cookie set error is expected in API routes
+          }
+        },
+      },
+    }
+  )
 }
 
 export async function getServerSession(request: NextRequest): Promise<SessionResponse> {

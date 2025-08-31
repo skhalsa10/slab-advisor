@@ -7,8 +7,7 @@
  * @module collection-server
  */
 
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { getAuthenticatedSupabaseClient } from './supabase-server'
 import { type CollectionCard } from '@/types/database'
 
 /**
@@ -36,30 +35,8 @@ import { type CollectionCard } from '@/types/database'
  */
 export async function getUserCollectionCards(): Promise<CollectionCard[]> {
   try {
-    const cookieStore = await cookies()
-    
-    // Create Supabase client for server-side operations
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
-            try {
-              cookiesToSet.forEach(() => {
-                // For API routes, we can't set cookies in the response
-                // This is expected and should be handled by middleware
-              })
-            } catch {
-              // Cookie set error is expected in API routes
-            }
-          },
-        },
-      }
-    )
+    // Create authenticated Supabase client that respects RLS policies
+    const supabase = await getAuthenticatedSupabaseClient()
     
     // Validate user authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()

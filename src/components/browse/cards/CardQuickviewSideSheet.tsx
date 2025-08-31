@@ -158,7 +158,7 @@ export default function CardQuickviewSideSheet({
       case "pokemon":
         return getCardImageUrl(
           cardData.image,
-          "high",
+          "low",
           cardData.tcgplayer_image_url
         );
       default:

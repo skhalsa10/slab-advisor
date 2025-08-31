@@ -35,7 +35,7 @@ export function getCardImageUrl(
 ): string {
   // First try TCGdx image with quality
   if (imageUrl) {
-    return `${imageUrl}/${quality}.webp`
+    return `${imageUrl}/${quality}.jpg`
   }
   
   // Fall back to TCGPlayer image if available

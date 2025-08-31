@@ -20,6 +20,7 @@ export interface CollectionCardWithPokemon extends CollectionCard {
     image: string | null
     category: string | null
     illustrator: string | null
+    tcgplayer_image_url: string | null
     set?: {
       id: string
       name: string
@@ -110,20 +111,31 @@ export function getCardNumber(card: CollectionCard): string {
 }
 
 /**
- * Gets the primary image URL for the card
+ * Gets the primary image URL for the card with complete fallback chain
+ * 
+ * Priority order:
+ * 1. User's uploaded front image (highest priority)
+ * 2. Linked Pokemon database image (fallback)
+ * 3. Placeholder image (final fallback)
  */
-export function getCardImageUrl(card: CollectionCard): string | null {
+export function getCardImageUrl(card: CollectionCard, quality: 'low' | 'high' = 'low'): string {
   // User's uploaded image takes priority
   if (card.front_image_url) {
     return card.front_image_url
   }
   
-  // Fall back to Pokemon database image
+  // Fall back to Pokemon database image with proper formatting
   if (hasJoinedPokemonData(card) && card.pokemon_card?.image) {
-    return card.pokemon_card.image
+    return `${card.pokemon_card.image}/${quality}.jpg`
   }
   
-  return null
+  // Try TCGPlayer image as additional fallback
+  if (hasJoinedPokemonData(card) && card.pokemon_card?.tcgplayer_image_url) {
+    return card.pokemon_card.tcgplayer_image_url
+  }
+  
+  // Final fallback to placeholder
+  return '/card-placeholder.svg'
 }
 
 /**
