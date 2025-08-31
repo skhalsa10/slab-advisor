@@ -58,10 +58,10 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
           columns={{
             base: 2,
             sm: 3,
-            md: 5,
-            lg: 5,
-            xl: 6,
-            '2xl': 6
+            md: 4,
+            lg: 4,
+            xl: 5,
+            '2xl': 5
           }}
         />
       ) : (
@@ -72,6 +72,15 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Card
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Variant
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Condition
+                </th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Qty
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Grade

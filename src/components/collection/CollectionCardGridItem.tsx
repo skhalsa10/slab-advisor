@@ -3,6 +3,13 @@
 import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
+import { 
+  formatVariant, 
+  formatCondition, 
+  formatQuantity, 
+  formatGrade, 
+  getBadgeBaseClasses 
+} from '@/utils/collectionMetadata'
 
 interface CollectionCardGridItemProps {
   card: CollectionCard
@@ -14,7 +21,10 @@ interface CollectionCardGridItemProps {
  * Collection Card Grid Item Component
  * 
  * Displays a single collection card in grid format with collection-specific features:
- * - Grade badge overlay
+ * - Variant badge (top-left)
+ * - Grade badge (top-right)
+ * - Quantity badge (bottom-left)
+ * - Condition badge (bottom-right)
  * - User uploaded image priority
  * - Card aspect ratio optimized for trading cards
  * - Hover effects and click interactions
@@ -24,6 +34,12 @@ export default function CollectionCardGridItem({
   onViewCard, 
   priority = false 
 }: CollectionCardGridItemProps) {
+  const variant = formatVariant(card.variant, true)
+  const condition = formatCondition(card.condition, true)
+  const quantity = formatQuantity(card.quantity)
+  const grade = formatGrade(card.estimated_grade, card.grading_data)
+  const badgeClasses = getBadgeBaseClasses()
+
   return (
     <div 
       className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
@@ -39,11 +55,38 @@ export default function CollectionCardGridItem({
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
         />
         
-        {/* Grade badge overlay on top-right corner */}
-        {card.estimated_grade !== null && (
+        {/* Top-left: Variant badge */}
+        {variant && (
+          <div className="absolute top-2 left-2">
+            <span className={`${badgeClasses} ${variant.colorClass} ${variant.textColor}`}>
+              {variant.text}
+            </span>
+          </div>
+        )}
+        
+        {/* Top-right: Grade badge */}
+        {grade && (
           <div className="absolute top-2 right-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold font-mono bg-green-600 text-white shadow-lg">
-              {card.estimated_grade}
+            <span className={`${badgeClasses} ${grade.colorClass} ${grade.textColor}`}>
+              {grade.shortText}
+            </span>
+          </div>
+        )}
+        
+        {/* Bottom-left: Quantity badge (only if > 1) */}
+        {quantity.showBadge && (
+          <div className="absolute bottom-2 left-2">
+            <span className={`${badgeClasses} bg-blue-600/70 text-white`}>
+              {quantity.displayText}
+            </span>
+          </div>
+        )}
+        
+        {/* Bottom-right: Condition badge */}
+        {condition && (
+          <div className="absolute bottom-2 right-2">
+            <span className={`${badgeClasses} ${condition.colorClass} ${condition.textColor}`}>
+              {condition.text}
             </span>
           </div>
         )}

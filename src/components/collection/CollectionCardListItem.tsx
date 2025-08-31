@@ -3,6 +3,13 @@
 import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
+import { 
+  formatVariant, 
+  formatCondition, 
+  formatQuantity, 
+  formatGrade, 
+  getListBadgeClasses 
+} from '@/utils/collectionMetadata'
 
 interface CollectionCardListItemProps {
   card: CollectionCard
@@ -14,6 +21,9 @@ interface CollectionCardListItemProps {
  * 
  * Displays a single collection card as a table row with collection-specific information:
  * - Card thumbnail and name
+ * - Variant with color coding
+ * - Condition with appropriate styling
+ * - Quantity
  * - Grade with color coding
  * - Date added to collection
  * - Action buttons
@@ -23,10 +33,11 @@ export default function CollectionCardListItem({
   onViewCard 
 }: CollectionCardListItemProps) {
   
-  const formatGrade = (grade: number | null): string => {
-    if (grade === null) return 'Not graded'
-    return `${grade}/10`
-  }
+  const variant = formatVariant(card.variant, false, true)
+  const condition = formatCondition(card.condition, false, true)
+  const quantity = formatQuantity(card.quantity)
+  const grade = formatGrade(card.estimated_grade, card.grading_data)
+  const badgeClasses = getListBadgeClasses()
 
   const formatDate = (dateString: string | null): string => {
     if (!dateString) return 'Unknown'
@@ -38,6 +49,7 @@ export default function CollectionCardListItem({
       className="hover:bg-grey-50 cursor-pointer transition-colors"
       onClick={onViewCard}
     >
+      {/* Card column */}
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-12 w-12">
@@ -59,18 +71,57 @@ export default function CollectionCardListItem({
           </div>
         </div>
       </td>
+
+      {/* Variant column */}
       <td className="px-6 py-4 whitespace-nowrap">
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono ${
-          card.estimated_grade 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-grey-100 text-grey-800'
-        }`}>
-          {formatGrade(card.estimated_grade)}
-        </span>
+        {variant ? (
+          <span className={`${badgeClasses} ${variant.colorClass} ${variant.textColor}`}>
+            {variant.text}
+          </span>
+        ) : (
+          <span className="text-sm text-grey-500">-</span>
+        )}
       </td>
+
+      {/* Condition column */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        {condition ? (
+          <span className={`${badgeClasses} ${condition.colorClass} ${condition.textColor}`}>
+            {condition.text}
+          </span>
+        ) : (
+          <span className="text-sm text-grey-500">-</span>
+        )}
+      </td>
+
+      {/* Quantity column */}
+      <td className="px-6 py-4 whitespace-nowrap text-center">
+        {quantity.text === '1' ? (
+          <span className="text-sm text-grey-500">1</span>
+        ) : (
+          <span className={`${badgeClasses} bg-blue-100 text-blue-800 font-semibold`}>
+            {quantity.text}
+          </span>
+        )}
+      </td>
+
+      {/* Grade column */}
+      <td className="px-6 py-4 whitespace-nowrap">
+        {grade ? (
+          <span className={`${badgeClasses} ${grade.isProfessional ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-green-100 border-green-300 text-green-800'} font-mono`}>
+            {grade.text}
+          </span>
+        ) : (
+          <span className="text-sm text-grey-500">Not graded</span>
+        )}
+      </td>
+
+      {/* Added column */}
       <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500">
         {formatDate(card.created_at)}
       </td>
+
+      {/* Actions column */}
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
         <button
           onClick={(e) => {
