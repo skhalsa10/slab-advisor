@@ -6,6 +6,15 @@
  */
 
 /**
+ * Professional grading data structure
+ */
+export interface ProfessionalGradingData {
+  company: string
+  grade: string | number
+  [key: string]: unknown // Allow additional properties
+}
+
+/**
  * Variant type definitions and display mappings
  */
 export const VARIANT_CONFIG = {
@@ -249,23 +258,36 @@ export function formatQuantity(quantity: number | null) {
 }
 
 /**
+ * Type guard to check if grading data is professional grading data
+ */
+function isProfessionalGradingData(data: unknown): data is ProfessionalGradingData {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'company' in data &&
+    'grade' in data &&
+    typeof (data as Record<string, unknown>).company === 'string' &&
+    (typeof (data as Record<string, unknown>).grade === 'string' || 
+     typeof (data as Record<string, unknown>).grade === 'number')
+  )
+}
+
+/**
  * Format grade for display
  * Handles both estimated grades (1-10) and professional grading data
  */
 export function formatGrade(
   estimatedGrade: number | null,
-  gradingData?: any
+  gradingData?: unknown
 ) {
   // If professional grading data exists, prioritize it
-  if (gradingData && typeof gradingData === 'object') {
-    if (gradingData.company && gradingData.grade) {
-      return {
-        text: `${gradingData.company} ${gradingData.grade}`,
-        shortText: `${gradingData.grade}`,
-        isProfessional: true,
-        colorClass: 'bg-gradient-to-r from-gold-500/70 to-yellow-600/70',
-        textColor: 'text-white'
-      }
+  if (isProfessionalGradingData(gradingData)) {
+    return {
+      text: `${gradingData.company} ${gradingData.grade}`,
+      shortText: `${gradingData.grade}`,
+      isProfessional: true,
+      colorClass: 'bg-gradient-to-r from-gold-500/70 to-yellow-600/70',
+      textColor: 'text-white'
     }
   }
   
