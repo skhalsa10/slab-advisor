@@ -1,319 +1,160 @@
-# Implementation Plan - Slab Advisor
+# Pokémon Card Pricing & Portfolio Tracking Implementation Plan
 
-## Completed Features (P0)
+## Architecture Overview
+Implementing "Progressive Hydration" strategy with 3 core components:
+1. **Daily bulk price ingestion** from free sources (tcgcsv.com)
+2. **On-demand cached API calls** for detailed/graded prices
+3. **Background portfolio calculations** with historical tracking
 
-### ✅ Pokemon TCG Browse Feature
-- **Explore Page** (`/explore`) - Landing page for all TCGs with Pokemon available
-- **Pokemon Browse Page** (`/browse/pokemon`) - Lists all Pokemon series and sets with search
-- **Set Details Page** (`/browse/pokemon/[setId]`) - Shows all cards in a set with search/filter
-- **Card Details Modal** - Quick view overlay for cards (mobile full-screen, desktop side panel)
-- **Card Details Page** (`/browse/pokemon/[setId]/[cardId]`) - Comprehensive card information
-- **TCGDex Integration** - Complete API wrapper with caching and TypeScript support
-- **Navigation** - Added "Explore" to sidebar navigation
+## Phase 1: Database Schema Setup
+**Create new tables for pricing data:**
+- `daily_raw_prices` - Store bulk raw card prices (updated daily)
+- `portfolio_snapshots` - Track user portfolio value history
+- `price_cache` - Redis-like cache table for API responses (since we don't have Redis yet)
 
-### Key Features Implemented:
-- ✅ Search functionality for series, sets, and cards
-- ✅ Responsive design with trading card proportions (2.5:3.5)
-- ✅ Image optimization (low.webp for grids, high.webp for details)
-- ✅ Error handling and loading states
-- ✅ Breadcrumb navigation
-- ✅ Previous/Next card navigation within sets
-- ✅ Comprehensive card data display (attacks, abilities, weaknesses, etc.)
-- ✅ Support for all card types (Pokemon, Trainer, Energy)
+**Update pokemon_cards table:**
+- Add `raw_price` column for current market price
+- Add `price_last_updated` timestamp column
+- These will be updated by daily cron job
 
-### ✅ Collection Integration (Completed 2025-08-17)
-- **"Add to Collection" Feature** - Complete implementation across multiple UI contexts
-- **Authentication System** - Supabase SSR with middleware for cookie-based auth
-- **Database Integration** - API routes with proper validation and constraint compliance
-- **Security Improvements** - Server-side data fetching with service role client
-- **Error Boundaries** - Loading and error states for card detail pages
-- **Variant Support** - Full support for all card variants (normal, holo, reverse, 1st edition)
-- **Duplicate Handling** - Automatic quantity updates for existing card+variant combinations
+## Phase 2: Infrastructure Components
 
-## Priority 1 (P1) - Immediate Next Steps
+### 2.1 Environment Configuration
+- Add API keys for PokemonPriceTracker API
+- Add CRON_SECRET for Vercel cron authentication
+- Configure tcgcsv.com access (if needed)
 
-### 🔄 Code Refactoring for Maintainability
-- **Priority**: High
-- **Effort**: Medium
-- **Description**: Refactor large components into smaller, reusable subcomponents
-- **Current Issue**: Several components exceed 200 lines, making them hard to maintain and test
-- **Target**: Components under 200 lines with single responsibilities
-- **Components to Refactor**:
-  
-  **Dashboard Page Components** ✅:
-  - ✅ `StatCard` - Reusable component for stat cards (Total Cards, Estimated Value, etc.)
-  - ✅ `QuickActions` - Component for quick actions section
-  - ✅ `RecentActivity` - Component for recent activity section
-  - ✅ `DashboardStats` - Container component for the stats grid
-  - ✅ `PageHeader` - Reusable page header component (moved to `/components/ui/`)
-  
-  **Pokemon Browse Page Components**:
-  - `SearchBar` - Reusable search input component with icon
-  - `SeriesSection` - Component for each series with its sets
-  - `SetCard` - Individual set card component
-  - `NoResultsMessage` - Component for empty states
-  
-  **Set Details Page Components** (Priority - 363 lines):
-  - `SetHeader` - Header section with logo, title, and stats
-  - `SetStatistics` - Grid of statistics cards
-  - `TabNavigation` - Reusable tab navigation component
-  - `CardsGrid` - Card grid view component
-  - `ProductsGrid` - Products grid view component
-  - `ProductCard` - Individual product card
-  
-  **Common UI Components**:
-  - `SearchInput` - Standardized search input used across pages
-  - `StatCard` - Reusable statistics card component
-  - `EmptyState` - Generic empty state component
-  - `ErrorState` - Generic error state component
-  - `TabBar` - Reusable tab navigation component
-  
-  **Component Organization**:
-  - Create `/components/ui/cards/` for card-related components
-  - Create `/components/ui/forms/` for form components
-  - Create `/components/pokemon/` for Pokemon-specific components
-  - Move page-specific components closer to their pages
+### 2.2 Create Pricing Service Module
+**`/src/lib/pricing-service.ts`**
+- Fetch bulk prices from tcgcsv.com
+- Cache management for API calls
+- Price lookup functions with fallbacks
 
-- **Benefits**:
-  - Improved code reusability
-  - Better testability
-  - Easier maintenance
-  - Consistent UI patterns
-  - Faster development of new features
-  
-- **Progress**:
-  - ✅ Dashboard refactored from 113 lines to 21 lines
-  - ✅ Created 5 reusable components
-  - Dashboard page now follows single responsibility principle
+### 2.3 Portfolio Calculation Service
+**`/src/lib/portfolio-service.ts`**
+- Calculate total portfolio value
+- Handle graded vs raw card pricing
+- Create daily snapshots
+- Historical data aggregation
 
-### 🔄 TCGDex Database Replication for Performance
-- **Priority**: High
-- **Effort**: Medium
-- **Description**: Replicate TCGDex data to Supabase to dramatically improve browse page performance
-- **Current Issue**: Browse page makes 21+ API calls, causing 3-5 second load times
-- **Target**: Reduce to single database query with 200-500ms load times
-- **Requirements**:
-  - Create Supabase tables for pokemon_series and pokemon_sets
-  - Build data sync API route to fetch from TCGDex and upsert to Supabase
-  - Update browse pages to query Supabase instead of TCGDex API
-  - Implement full-text search using PostgreSQL
-  - Add manual sync functionality for admins
-  - Create database indexes for optimal query performance
-  - Maintain TCGDex API as fallback option
-- **Database Schema**:
-  - pokemon_series: id, name, logo, timestamps
-  - pokemon_sets: id, series_id, name, logo, symbol, card_counts, release_date, etc.
-  - Full-text search indexes on names
-  - Foreign key relationships with cascading deletes
-- **Implementation Files**:
-  - `/src/types/pokemon.ts` - Database type definitions
-  - `/src/lib/pokemon-db.ts` - Supabase query functions
-  - `/src/app/api/sync-tcgdex/route.ts` - Data synchronization endpoint
-  - Update browse pages to use new data source
-- **Future Automation**:
-  - Vercel cron job for daily data sync
-  - Incremental updates for new sets
-  - Cache warming strategies
+## Phase 3: API Routes Implementation
 
-### ✅ Collection Integration
-- **Priority**: High
-- **Effort**: Medium
-- **Status**: COMPLETED (2025-08-17)
-- **Description**: Allow users to add TCG cards to their collection from browse pages
-- **Completed Requirements**:
-  - ✅ Add "Add to Collection" buttons on card details pages/modals
-  - ✅ Update database schema to support TCG cards vs uploaded cards
-  - ✅ Support variant selection (normal, holo, reverse_holo, first_edition)
-  - ✅ Quantity tracking with automatic updates for duplicates
-  - ✅ Check for existing cards in collection
-  - ✅ Update collection views to show both uploaded and TCG cards
-- **Implementation Details**:
-  - Created `/api/collection/cards` API route with authentication
-  - Built reusable `AddToCollectionForm` component
-  - Added collection modal to card detail page
-  - Implemented quickview transform mode for seamless UX
-  - Database constraint compliance for condition and variant values
-  - Supabase SSR authentication with middleware for secure operations
+### 3.1 Cron Job for Daily Price Updates
+**`/src/app/api/cron/update-prices/route.ts`**
+- Vercel cron endpoint (runs daily at 2 AM)
+- Fetches bulk prices from tcgcsv.com
+- Updates `daily_raw_prices` table
 
-### 🔄 Authentication & Public Access
-- **Priority**: High  
-- **Effort**: Low
-- **Status**: IN PROGRESS
-- **Description**: Make browse pages publicly accessible
-- **Requirements**:
-  - 🔄 Remove authentication requirement for browse pages
-  - ✅ Keep "Add to Collection" behind auth (COMPLETED)
-  - 🔄 Update landing page to showcase browse functionality
-  - ✅ Add signup prompts on collection actions (COMPLETED)
-- **Completed Items**:
-  - Collection functionality requires authentication
-  - Shows "Sign Up to Collect" for unauthenticated users
-  - Redirects to auth page when trying to add without login
+### 3.2 Portfolio Calculation Endpoint
+**`/src/app/api/portfolio/calculate/route.ts`**
+- Triggers portfolio recalculation
+- Creates snapshot in `portfolio_snapshots`
+- Returns current portfolio value
 
-### 🔄 Advanced Search & Filtering
-- **Priority**: Medium
-- **Effort**: Medium
-- **Description**: Enhanced filtering capabilities
-- **Requirements**:
-  - Filter by card type (Pokemon/Trainer/Energy)
-  - Filter by rarity
-  - Filter by Pokemon type
-  - HP range filtering
-  - Release date filtering
-  - Advanced search with multiple criteria
+### 3.3 Card Pricing Endpoint
+**`/src/app/api/cards/[cardId]/price/route.ts`**
+- Returns detailed pricing (raw + graded)
+- Implements caching strategy
+- Falls back to daily prices if API unavailable
 
-### 🔄 Market Pricing Integration
-- **Priority**: Medium
-- **Effort**: High
-- **Description**: Add market price data to TCG cards
-- **Requirements**:
-  - Research pricing data sources (TCGPlayer, eBay, etc.)
-  - Integrate pricing API
-  - Display current market prices on card details
-  - Price history tracking
-  - Variant-specific pricing (normal vs holo vs 1st edition)
+## Phase 4: Frontend Components
 
-### 🔄 Production Backfill Service
-- **Priority**: Medium
-- **Effort**: Medium
-- **Description**: Implement a reliable, scalable solution for data backfill operations
-- **Current Issue**: Edge Functions timeout after 150 seconds, limiting large data imports
-- **Requirements**:
-  - Evaluate options: GitHub Actions, local Node.js scripts, cloud functions, or queue-based processing
-  - Support for long-running operations (hours if needed)
-  - Progress tracking and resumability
-  - Error handling and retry logic
-  - Scheduled updates for new TCG releases
-  - Monitoring and alerting for failed jobs
-- **Options to Consider**:
-  - GitHub Actions with scheduled workflows
-  - Vercel Cron Jobs (5-minute limit on Pro plan)
-  - AWS Lambda with Step Functions
-  - Google Cloud Functions (60-minute timeout)
-  - Dedicated worker service on Railway/Render
-  - PostgreSQL functions with pg_cron
-- **Implementation**:
-  - Start with local Node.js scripts for immediate needs
-  - Move to GitHub Actions for scheduled updates
-  - Consider cloud functions for production scale
+### 4.1 Portfolio Dashboard Widget
+**`/src/components/portfolio/PortfolioValue.tsx`**
+- Display total portfolio value
+- Show last update timestamp
+- Trigger background refresh on mount
 
-## Priority 2 (P2) - Future Enhancements
+### 4.2 Historical Chart Component
+**`/src/components/portfolio/PortfolioChart.tsx`**
+- Line chart for 7d/30d/1y views
+- Uses portfolio_snapshots data
+- Responsive design with loading states
 
-### 🔄 Additional TCG Support
-- **Priority**: Medium
-- **Effort**: High
-- **Description**: Add support for other trading card games
-- **Requirements**:
-  - Yu-Gi-Oh! card database integration
-  - Magic: The Gathering support
-  - Sports cards (basketball, baseball, football)
-  - Expandable architecture for future TCGs
-  - Unified search across all TCGs
+### 4.3 Card Price Display Updates
+- Update `CardDetailClient.tsx` to show prices
+- Update collection grid/list items to display values
+- Add price badges to browse views
 
-### 🔄 User Collections Enhancements
-- **Priority**: Medium
-- **Effort**: Medium
-- **Description**: Improve collection management
-- **Requirements**:
-  - Collection statistics and analytics
-  - Want lists and tracking
-  - Collection sharing and profiles
-  - Export functionality (CSV, PDF)
-  - Collection value tracking over time
+## Phase 5: Integration Points
 
-### 🔄 Social Features
-- **Priority**: Low
-- **Effort**: High
-- **Description**: Add social elements
-- **Requirements**:
-  - User profiles with usernames
-  - Follow/following system
-  - Public collection sharing
-  - Comments and ratings on cards
-  - Trading/marketplace functionality
+### 5.1 Collection Page Updates
+- Show individual card values
+- Display portfolio total at top
+- Add "Last valued" timestamp
 
-### 🔄 Progressive Web App (PWA)
-- **Priority**: Low
-- **Effort**: Medium
-- **Description**: Make the app installable and work offline
-- **Requirements**:
-  - Service worker implementation
-  - Offline card browsing
-  - App manifest
-  - Push notifications for new sets
-  - Background sync for collection updates
+### 5.2 Browse/Set Pages
+- Display raw market prices from daily_raw_prices
+- No API calls needed (fast & free)
 
-### 🔄 Performance Optimizations
-- **Priority**: Medium
-- **Effort**: Medium
-- **Description**: Improve app performance and user experience
-- **Requirements**:
-  - Implement virtual scrolling for large card lists
-  - Image lazy loading optimizations
-  - API response caching strategies
-  - Database query optimizations
-  - Bundle size reduction
+### 5.3 Card Detail Pages
+- Show current raw price
+- Display graded prices (PSA 10, 9, etc.)
+- Historical price chart
 
-## Priority 3 (P3) - Advanced Features
+## Phase 6: Testing & Optimization
 
-### 🔄 AI-Powered Features
-- **Priority**: Low
-- **Effort**: High
-- **Description**: Leverage AI for enhanced functionality
-- **Requirements**:
-  - Deck building recommendations
-  - Card value predictions
-  - Condition assessment integration with existing Ximilar
-  - Rarity and authenticity verification
-  - Personal collection insights
+### 6.1 Create Test Suite
+- Unit tests for pricing calculations
+- Integration tests for API endpoints
+- Mock external API responses
 
-### 🔄 Analytics and Insights
-- **Priority**: Low
-- **Effort**: Medium
-- **Description**: Comprehensive analytics for users and admins
-- **Requirements**:
-  - User engagement analytics
-  - Popular cards and sets tracking
-  - Market trend analysis
-  - Collection growth insights
-  - Revenue and usage metrics
+### 6.2 Performance Optimizations
+- Implement request batching
+- Add proper error boundaries
+- Set up monitoring for API usage
 
-### 🔄 Advanced Monetization
-- **Priority**: Low
-- **Effort**: High
-- **Description**: Additional revenue streams
-- **Requirements**:
-  - Premium subscription tiers
-  - Marketplace transaction fees
-  - Sponsored content and ads
-  - Professional tools for dealers
-  - Bulk import/export features
+## Implementation Order & Dependencies
 
-## Technical Debt & Maintenance
+1. **Database migrations** (daily_raw_prices, portfolio_snapshots, price_cache)
+2. **Environment setup** (API keys, secrets)
+3. **Core services** (pricing-service.ts, portfolio-service.ts)
+4. **Cron job** for daily updates
+5. **API endpoints** for real-time data
+6. **Frontend components** (value display, charts)
+7. **Integration** into existing pages
+8. **Testing** and optimization
 
-### 🔧 Code Quality
-- Add comprehensive test coverage for TCG functionality
-- Implement proper TypeScript types for all TCGDex responses
-- Add ESLint rules for consistent code style
-- Performance monitoring and optimization
-- Security audit for public pages
+## Configuration Files Needed
 
-### 🔧 Infrastructure
-- Database migrations for TCG integration
-- CDN setup for card images
-- Monitoring and logging improvements
-- Backup and disaster recovery procedures
-- Scalability planning for high traffic
+### vercel.json (for cron jobs)
+```json
+{
+  "crons": [{
+    "path": "/api/cron/update-prices",
+    "schedule": "0 2 * * *"
+  }]
+}
+```
 
-## Notes
+## Security Considerations
+- API keys stored in environment variables only
+- Service role key for database writes
+- Row-level security for user data
+- Rate limiting on expensive endpoints
+- Input validation for all API calls
 
-- **TCGDex API**: Currently free with no rate limits, but monitor usage as app grows
-- **Image Storage**: Consider moving to CDN for better performance
-- **Database**: May need to restructure cards table to support both uploaded and TCG cards
-- **Caching**: Implement Redis for API response caching as usage increases
-- **SEO**: Add proper meta tags and structured data for card pages when public
+## Cost Management
+- 24-hour cache TTL to minimize API calls
+- Bulk operations for daily prices (free)
+- Progressive loading (show cached first, update in background)
+- Monitor API usage through logging
 
----
+## Current Focus: Phase 1 - Pokemon Cards Price Updates
 
-*Last Updated: 2025-08-17*
-*Next Review: 2025-08-31*
+### Immediate Tasks:
+1. ✅ Save implementation plan to implementationPlan.md
+2. Audit pokemon_cards table schema
+3. Add `raw_price` and `price_last_updated` columns to pokemon_cards table
+4. Create Python script for fetching bulk prices from tcgcsv.com
+5. Test script locally with subset of cards
+6. Deploy as Vercel cron job for daily updates
+
+### Database Migration for pokemon_cards:
+```sql
+ALTER TABLE pokemon_cards
+ADD COLUMN raw_price NUMERIC(10, 2),
+ADD COLUMN price_last_updated TIMESTAMPTZ;
+```
+
+This implementation provides accurate card valuations while keeping costs low through intelligent caching and a hybrid data strategy.
