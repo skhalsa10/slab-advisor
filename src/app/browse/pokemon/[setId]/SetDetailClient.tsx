@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
+import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
 import { useIsDesktop } from '@/hooks/useIsDesktop'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import CardQuickviewSideSheet from '@/components/browse/cards/CardQuickviewSideSheet'
@@ -27,7 +28,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
-  const [sortOrder, setSortOrder] = useState('asc')
+  const [sortOrder, setSortOrder] = useState('num_asc')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   
   // Use custom hook to detect desktop viewport
@@ -45,12 +46,31 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
       )
     }
     
-    // Sort by local_id
+    // Sort cards based on selected option
     return cards.sort((a, b) => {
-      const aId = Number(a.local_id) || 0
-      const bId = Number(b.local_id) || 0
-      
-      return sortOrder === 'asc' ? aId - bId : bId - aId
+      if (sortOrder.startsWith('num_')) {
+        // Sort by card number
+        const aId = Number(a.local_id) || 0
+        const bId = Number(b.local_id) || 0
+        return sortOrder === 'num_asc' ? aId - bId : bId - aId
+      } else if (sortOrder.startsWith('price_')) {
+        // Sort by price
+        const aPrices = extractMarketPrices(a.price_data)
+        const bPrices = extractMarketPrices(b.price_data)
+        
+        // Get the best (lowest) price for each card, or use Infinity if no price
+        const aPrice = getBestPrice(aPrices) ?? Infinity
+        const bPrice = getBestPrice(bPrices) ?? Infinity
+        
+        // For ascending, cards without prices go to the end
+        // For descending, cards without prices go to the end
+        if (aPrice === Infinity && bPrice === Infinity) return 0
+        if (aPrice === Infinity) return 1
+        if (bPrice === Infinity) return -1
+        
+        return sortOrder === 'price_asc' ? aPrice - bPrice : bPrice - aPrice
+      }
+      return 0
     })
   }, [initialData.cards, searchQuery, sortOrder])
 
@@ -92,8 +112,10 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
 
   // Sort options for the dropdown
   const sortOptions = [
-    { value: 'asc', label: 'Number: Low to High' },
-    { value: 'desc', label: 'Number: High to Low' }
+    { value: 'num_asc', label: 'Number: Low to High' },
+    { value: 'num_desc', label: 'Number: High to Low' },
+    { value: 'price_asc', label: 'Price: Low to High' },
+    { value: 'price_desc', label: 'Price: High to Low' }
   ]
 
   // Render function for individual cards
@@ -105,6 +127,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         name: card.name,
         image: card.image || undefined,
         fallbackImageUrl: card.tcgplayer_image_url || undefined,
+        priceData: card.price_data as Record<string, unknown> | null,
         metadata: [
           ...(card.local_id ? [{ value: `#${card.local_id}` }] : []),
           ...(card.rarity ? [{ value: card.rarity }] : [])
@@ -205,6 +228,9 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Rarity
                 </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Price
+                </th>
                 <th scope="col" className="relative px-6 py-3">
                   <span className="sr-only">Actions</span>
                 </th>
@@ -213,7 +239,10 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             renderRow={(card) => (
               <CardListItem
                 key={card.id}
-                card={card}
+                card={{
+                  ...card,
+                  price_data: card.price_data as Record<string, unknown> | null
+                }}
                 setId={setId}
                 onClick={handleCardClick}
               />

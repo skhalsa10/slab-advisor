@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCardImageUrl } from "@/lib/pokemon-db";
+import { extractMarketPrices } from "@/utils/priceUtils";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { calculateAdjacentCards, type AdjacentCards } from "@/utils/card-navigation";
 import { getEbaySearchUrl } from "@/utils/external-links";
@@ -459,6 +460,50 @@ function renderPokemonDetails(card: CardFull) {
           </div>
         )}
       </div>
+
+      {/* Market Prices Section */}
+      <div className="border-t pt-3">
+        <h4 className="text-xs font-semibold text-grey-900 mb-2">💰 Market Prices</h4>
+        {renderPriceSection(card)}
+      </div>
+    </div>
+  );
+}
+
+// Helper function to render price section
+function renderPriceSection(card: CardFull) {
+  const prices = extractMarketPrices(card.price_data);
+  
+  if (!prices) {
+    return (
+      <p className="text-xs text-grey-500 italic">Price data unavailable</p>
+    );
+  }
+
+  // Only show variants that have prices
+  const availablePrices = Object.entries(prices)
+    .filter(([, price]) => price > 0)
+    .map(([variant, price]) => ({
+      label: variant,
+      price: price as number
+    }));
+
+  if (availablePrices.length === 0) {
+    return (
+      <p className="text-xs text-grey-500 italic">Price data unavailable</p>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      {availablePrices.map(({ label, price }) => (
+        <div key={label} className="flex justify-between text-xs">
+          <span className="text-grey-600">{label}</span>
+          <span className="font-semibold text-green-600">
+            ${price.toFixed(2)}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }

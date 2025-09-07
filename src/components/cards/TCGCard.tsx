@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { extractMarketPrices, getDisplayPrice } from '@/utils/priceUtils'
 
 interface TCGCardProps {
   card: {
@@ -8,6 +9,7 @@ interface TCGCardProps {
     image?: string
     fallbackImageUrl?: string
     metadata?: Array<{ label?: string; value: string }>
+    priceData?: Record<string, unknown> | null // JSONB price data from database
   }
   href?: string
   onClick?: (e: React.MouseEvent, cardId: string) => void
@@ -35,6 +37,10 @@ export default function TCGCard({
   const imageUrl = getImageUrl 
     ? getImageUrl(card.image, imageQuality, card.fallbackImageUrl)
     : card.image || card.fallbackImageUrl || '/card-placeholder.svg'
+
+  // Extract and format price using utility functions
+  const prices = extractMarketPrices(card.priceData)
+  const displayPrice = getDisplayPrice(prices)
 
   return (
     <Link
@@ -68,6 +74,9 @@ export default function TCGCard({
             ))}
           </p>
         )}
+        <p className="text-xs font-semibold text-green-600 mt-1">
+          {displayPrice || 'Price unavailable'}
+        </p>
       </div>
     </Link>
   )

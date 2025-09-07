@@ -112,7 +112,8 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
           rarity,
           image,
           tcgplayer_image_url,
-          tcgplayer_product_id
+          tcgplayer_product_id,
+          price_data
         )
       `)
       .eq('id', setId)
@@ -185,7 +186,8 @@ export async function getCardWithSetServer(cardId: string): Promise<{ card: Card
             local_id,
             rarity,
             image,
-            tcgplayer_image_url
+            tcgplayer_image_url,
+            price_data
           )
         )
       `)

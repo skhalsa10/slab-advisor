@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -106,6 +106,8 @@ export type Database = {
           image: string | null
           local_id: string | null
           name: string
+          price_data: Json | null
+          price_last_updated: string | null
           rarity: string | null
           set_id: string | null
           tcgplayer_image_url: string | null
@@ -124,6 +126,8 @@ export type Database = {
           image?: string | null
           local_id?: string | null
           name: string
+          price_data?: Json | null
+          price_last_updated?: string | null
           rarity?: string | null
           set_id?: string | null
           tcgplayer_image_url?: string | null
@@ -142,6 +146,8 @@ export type Database = {
           image?: string | null
           local_id?: string | null
           name?: string
+          price_data?: Json | null
+          price_last_updated?: string | null
           rarity?: string | null
           set_id?: string | null
           tcgplayer_image_url?: string | null
@@ -168,6 +174,8 @@ export type Database = {
           id: number
           name: string
           pokemon_set_id: string | null
+          price_data: Json | null
+          price_last_updated: string | null
           tcgplayer_group_id: number
           tcgplayer_image_url: string | null
           tcgplayer_product_id: number
@@ -178,6 +186,8 @@ export type Database = {
           id?: number
           name: string
           pokemon_set_id?: string | null
+          price_data?: Json | null
+          price_last_updated?: string | null
           tcgplayer_group_id: number
           tcgplayer_image_url?: string | null
           tcgplayer_product_id: number
@@ -188,6 +198,8 @@ export type Database = {
           id?: number
           name?: string
           pokemon_set_id?: string | null
+          price_data?: Json | null
+          price_last_updated?: string | null
           tcgplayer_group_id?: number
           tcgplayer_image_url?: string | null
           tcgplayer_product_id?: number
@@ -338,9 +350,9 @@ export type Database = {
     Functions: {
       add_purchased_credits: {
         Args: {
-          p_user_id: string
           p_credits: number
           p_transaction_id?: string
+          p_user_id: string
         }
         Returns: Json
       }
@@ -355,8 +367,8 @@ export type Database = {
       reset_monthly_free_credits: {
         Args: Record<PropertyKey, never>
         Returns: {
-          user_id: string
           credits_reset: number
+          user_id: string
         }[]
       }
     }
