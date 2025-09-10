@@ -10,7 +10,11 @@ import { calculateAdjacentCards, type AdjacentCards } from "@/utils/card-navigat
 import { getEbaySearchUrl } from "@/utils/external-links";
 import { useAuth } from "@/hooks/useAuth";
 import AddToCollectionForm from "@/components/collection/AddToCollectionForm";
+import CollectionCardActions from "@/components/collection/CollectionCardActions";
+import DeleteCardDialog from "@/components/collection/DeleteCardDialog";
 import type { CardFull } from "@/models/pokemon";
+import type { CollectionCardWithPokemon } from "@/utils/collectionCardUtils";
+import { getCardDisplayName, getCardImageUrl as getCollectionCardImage } from "@/utils/collectionCardUtils";
 
 interface CardQuickviewSideSheetProps {
   cardId: string;
@@ -20,6 +24,11 @@ interface CardQuickviewSideSheetProps {
   onClose: () => void;
   onNavigateToCard?: (cardId: string) => void;
   cardList?: Array<{ id: string; name: string }>;
+  // Collection mode props
+  mode?: "browse" | "collection";
+  collectionCard?: CollectionCardWithPokemon;
+  onUpdateCollection?: (updatedCard: CollectionCardWithPokemon) => void;
+  onDeleteFromCollection?: () => void;
 }
 
 export default function CardQuickviewSideSheet({
@@ -30,6 +39,10 @@ export default function CardQuickviewSideSheet({
   onClose,
   onNavigateToCard,
   cardList,
+  mode = "browse",
+  collectionCard,
+  onUpdateCollection,
+  onDeleteFromCollection,
 }: CardQuickviewSideSheetProps) {
   const { user } = useAuth()
   const [cardData, setCardData] = useState<CardFull | null>(null);
@@ -42,6 +55,7 @@ export default function CardQuickviewSideSheet({
     prevCard: null, 
     nextCard: null 
   });
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Update adjacent cards when card list or card ID changes
   const updateAdjacentCards = useCallback(() => {
@@ -50,6 +64,13 @@ export default function CardQuickviewSideSheet({
   }, [cardList, cardId]);
 
   const loadCardData = useCallback(async () => {
+    // In collection mode, we already have the data
+    if (mode === "collection" && collectionCard) {
+      setLoading(false);
+      updateAdjacentCards();
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -74,7 +95,7 @@ export default function CardQuickviewSideSheet({
     } finally {
       setLoading(false);
     }
-  }, [cardId, cardType, updateAdjacentCards]);
+  }, [cardId, cardType, updateAdjacentCards, mode, collectionCard]);
 
   useEffect(() => {
     if (isOpen && cardId) {
@@ -101,7 +122,33 @@ export default function CardQuickviewSideSheet({
     }
   }, [isOpen]);
 
+  const handleDeleteCard = async () => {
+    if (!collectionCard) return;
+    
+    try {
+      const response = await fetch(`/api/collection/cards/${collectionCard.id}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete card");
+      }
+
+      setShowDeleteDialog(false);
+      onDeleteFromCollection?.();
+      onClose();
+    } catch (error) {
+      console.error("Error deleting card:", error);
+      setErrorMessage("Failed to delete card from collection");
+      setShowDeleteDialog(false);
+    }
+  };
+
   const getCardName = () => {
+    if (mode === "collection" && collectionCard) {
+      return getCardDisplayName(collectionCard);
+    }
     if (!cardData) return "Loading...";
 
     switch (cardType) {
@@ -153,6 +200,9 @@ export default function CardQuickviewSideSheet({
   };
 
   const getCardImage = () => {
+    if (mode === "collection" && collectionCard) {
+      return getCollectionCardImage(collectionCard);
+    }
     if (!cardData) return null;
 
     switch (cardType) {
@@ -225,7 +275,7 @@ export default function CardQuickviewSideSheet({
             </div>
           )}
 
-          {cardData && !loading && (
+          {(mode === "collection" ? collectionCard : cardData) && !loading && (
             <div className="p-4 space-y-4">
               {/* Card Image */}
               <div className="flex justify-center">
@@ -245,8 +295,8 @@ export default function CardQuickviewSideSheet({
 
               {/* Card Details */}
               <div className="space-y-4">
-                {cardType === "pokemon" &&
-                  renderPokemonDetails(cardData as CardFull)}
+                {mode === "browse" && cardType === "pokemon" && renderPokemonDetails(cardData as CardFull)}
+                {mode === "collection" && collectionCard?.pokemon_card && renderPokemonDetails(collectionCard.pokemon_card as CardFull)}
 
                 {/* Success/Error Messages */}
                 {successMessage && (
@@ -261,7 +311,18 @@ export default function CardQuickviewSideSheet({
                 )}
 
                 {/* Collection Form or Action Buttons */}
-                {showCollectionForm ? (
+                {mode === "collection" && collectionCard ? (
+                  <CollectionCardActions
+                    card={collectionCard}
+                    onUpdate={(updatedCard) => {
+                      onUpdateCollection?.(updatedCard);
+                      setSuccessMessage("Card updated successfully");
+                      setTimeout(() => setSuccessMessage(null), 3000);
+                    }}
+                    onDelete={() => setShowDeleteDialog(true)}
+                    onError={setErrorMessage}
+                  />
+                ) : showCollectionForm ? (
                   <AddToCollectionForm
                     cardId={cardId}
                     cardName={getCardName()}
@@ -290,9 +351,9 @@ export default function CardQuickviewSideSheet({
 
                 {/* Shop Links */}
                 <div className="space-y-3">
-                  {cardData.tcgplayer_product_id && (
+                  {cardData?.tcgplayer_product_id && (
                     <a
-                      href={`https://www.tcgplayer.com/product/${cardData.tcgplayer_product_id}`}
+                      href={`https://www.tcgplayer.com/product/${cardData?.tcgplayer_product_id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
@@ -315,7 +376,7 @@ export default function CardQuickviewSideSheet({
                   )}
                   
                   <a
-                    href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
+                    href={getEbaySearchUrl(`${cardData?.name} ${cardData?.local_id} ${cardData?.set?.name || ''}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full inline-flex items-center justify-center px-4 py-2 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
@@ -400,6 +461,16 @@ export default function CardQuickviewSideSheet({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {mode === "collection" && collectionCard && (
+        <DeleteCardDialog
+          card={collectionCard}
+          isOpen={showDeleteDialog}
+          onConfirm={handleDeleteCard}
+          onCancel={() => setShowDeleteDialog(false)}
+        />
+      )}
     </>
   );
 }

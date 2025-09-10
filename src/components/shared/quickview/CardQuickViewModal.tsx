@@ -10,7 +10,11 @@ import { calculateAdjacentCards, type AdjacentCards } from '@/utils/card-navigat
 import { getEbaySearchUrl } from '@/utils/external-links'
 import { useAuth } from '@/hooks/useAuth'
 import AddToCollectionForm from '@/components/collection/AddToCollectionForm'
+import CollectionCardActions from '@/components/collection/CollectionCardActions'
+import DeleteCardDialog from '@/components/collection/DeleteCardDialog'
 import type { CardFull } from '@/models/pokemon'
+import type { CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
+import { getCardDisplayName, getCardImageUrl as getCollectionCardImage } from '@/utils/collectionCardUtils'
 
 interface CardQuickViewModalProps {
   cardId: string
@@ -20,6 +24,11 @@ interface CardQuickViewModalProps {
   onClose: () => void
   onNavigateToCard?: (cardId: string) => void
   cardList?: Array<{ id: string; name: string }>
+  // Collection mode props
+  mode?: 'browse' | 'collection'
+  collectionCard?: CollectionCardWithPokemon
+  onUpdateCollection?: (updatedCard: CollectionCardWithPokemon) => void
+  onDeleteFromCollection?: () => void
 }
 
 export default function CardQuickViewModal({
@@ -29,7 +38,11 @@ export default function CardQuickViewModal({
   isOpen,
   onClose,
   onNavigateToCard,
-  cardList
+  cardList,
+  mode = 'browse',
+  collectionCard,
+  onUpdateCollection,
+  onDeleteFromCollection
 }: CardQuickViewModalProps) {
   const { user } = useAuth()
   const [cardData, setCardData] = useState<CardFull | null>(null)
@@ -42,6 +55,7 @@ export default function CardQuickViewModal({
     prevCard: null, 
     nextCard: null 
   })
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   // Update adjacent cards when card list or card ID changes
   const updateAdjacentCards = useCallback(() => {
@@ -50,6 +64,13 @@ export default function CardQuickViewModal({
   }, [cardList, cardId])
 
   const loadCardData = useCallback(async () => {
+    // In collection mode, we already have the data
+    if (mode === 'collection' && collectionCard) {
+      setLoading(false)
+      updateAdjacentCards()
+      return
+    }
+
     try {
       setLoading(true)
       setError(null)
@@ -75,7 +96,7 @@ export default function CardQuickViewModal({
     } finally {
       setLoading(false)
     }
-  }, [cardId, cardType, updateAdjacentCards])
+  }, [cardId, cardType, updateAdjacentCards, mode, collectionCard])
 
   useEffect(() => {
     if (isOpen && cardId) {
@@ -102,7 +123,33 @@ export default function CardQuickViewModal({
     }
   }, [isOpen])
 
+  const handleDeleteCard = async () => {
+    if (!collectionCard) return
+    
+    try {
+      const response = await fetch(`/api/collection/cards/${collectionCard.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete card')
+      }
+
+      setShowDeleteDialog(false)
+      onDeleteFromCollection?.()
+      onClose()
+    } catch (error) {
+      console.error('Error deleting card:', error)
+      setErrorMessage('Failed to delete card from collection')
+      setShowDeleteDialog(false)
+    }
+  }
+
   const getCardName = () => {
+    if (mode === 'collection' && collectionCard) {
+      return getCardDisplayName(collectionCard)
+    }
     if (!cardData) return 'Loading...'
     
     switch (cardType) {
@@ -114,6 +161,9 @@ export default function CardQuickViewModal({
   }
 
   const getCardImage = () => {
+    if (mode === 'collection' && collectionCard) {
+      return getCollectionCardImage(collectionCard)
+    }
     if (!cardData) return null
     
     switch (cardType) {
@@ -222,7 +272,7 @@ export default function CardQuickViewModal({
             </div>
           )}
 
-          {cardData && !loading && (
+          {(mode === 'collection' ? collectionCard : cardData) && !loading && (
             <div className="p-4">
               {/* Two column layout on tablet, single column on mobile */}
               <div className="flex flex-col sm:flex-row sm:gap-4">
@@ -244,7 +294,8 @@ export default function CardQuickViewModal({
 
                 {/* Card Details */}
                 <div className="flex-1 space-y-4">
-                  {cardType === 'pokemon' && renderPokemonDetails(cardData as CardFull)}
+                  {mode === 'browse' && cardType === 'pokemon' && renderPokemonDetails(cardData as CardFull)}
+                  {mode === 'collection' && collectionCard?.pokemon_card && renderPokemonDetails(collectionCard.pokemon_card as CardFull)}
                   
                   {/* Success/Error Messages */}
                   {successMessage && (
@@ -259,7 +310,18 @@ export default function CardQuickViewModal({
                   )}
 
                   {/* Collection Form or Action Buttons */}
-                  {showCollectionForm ? (
+                  {mode === 'collection' && collectionCard ? (
+                    <CollectionCardActions
+                      card={collectionCard}
+                      onUpdate={(updatedCard) => {
+                        onUpdateCollection?.(updatedCard)
+                        setSuccessMessage('Card updated successfully')
+                        setTimeout(() => setSuccessMessage(null), 3000)
+                      }}
+                      onDelete={() => setShowDeleteDialog(true)}
+                      onError={setErrorMessage}
+                    />
+                  ) : showCollectionForm ? (
                     <AddToCollectionForm
                       cardId={cardId}
                       cardName={getCardName()}
@@ -271,12 +333,14 @@ export default function CardQuickViewModal({
                     />
                   ) : (
                     <div className="space-y-2">
-                      <Link
-                        href={`/browse/pokemon/${setId}/${cardId}`}
-                        className="w-full inline-flex items-center justify-center py-2.5 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
-                      >
-                        View Details
-                      </Link>
+                      {cardData && (
+                        <Link
+                          href={`/browse/pokemon/${setId}/${cardId}`}
+                          className="w-full inline-flex items-center justify-center py-2.5 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
+                        >
+                          View Details
+                        </Link>
+                      )}
                       <button 
                         onClick={handleAddToCollectionClick}
                         className="w-full bg-orange-600 text-white py-2.5 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
@@ -285,7 +349,7 @@ export default function CardQuickViewModal({
                       </button>
 
                       {/* Shop Links */}
-                      {cardData.tcgplayer_product_id && (
+                      {cardData?.tcgplayer_product_id && (
                         <a
                           href={`https://www.tcgplayer.com/product/${cardData.tcgplayer_product_id}`}
                           target="_blank"
@@ -299,8 +363,9 @@ export default function CardQuickViewModal({
                         </a>
                       )}
                       
-                      <a
-                        href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
+                      {cardData && (
+                        <a
+                          href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full inline-flex items-center justify-center px-4 py-2.5 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
@@ -309,7 +374,8 @@ export default function CardQuickViewModal({
                         <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
-                      </a>
+                        </a>
+                      )}
                       
                       <p className="text-xs text-grey-500 text-center">Shopping links may contain affiliate links</p>
                     </div>
@@ -357,6 +423,16 @@ export default function CardQuickViewModal({
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {mode === 'collection' && collectionCard && (
+        <DeleteCardDialog
+          card={collectionCard}
+          isOpen={showDeleteDialog}
+          onConfirm={handleDeleteCard}
+          onCancel={() => setShowDeleteDialog(false)}
+        />
+      )}
     </>
   )
 }

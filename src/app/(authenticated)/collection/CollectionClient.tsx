@@ -10,6 +10,7 @@ import ItemList from '@/components/ui/ItemList'
 import CollectionCardGridItem from '@/components/collection/CollectionCardGridItem'
 import CollectionCardListItem from '@/components/collection/CollectionCardListItem'
 import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
+import CardQuickViewModal from '@/components/shared/quickview/CardQuickViewModal'
 import { type ViewMode } from '@/components/collection/ViewToggle'
 
 interface CollectionClientProps {
@@ -27,26 +28,47 @@ interface CollectionClientProps {
  */
 export default function CollectionClient({ cards }: CollectionClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [selectedCard, setSelectedCard] = useState<CollectionCardWithPokemon | null>(null)
+  const [cardList, setCardList] = useState(cards as CollectionCardWithPokemon[])
 
   // Calculate total collection value
   const totalValue = useMemo(() => {
-    // Cast cards to CollectionCardWithPokemon since they include pokemon_card data from server
-    return calculateCollectionValue(cards as CollectionCardWithPokemon[])
-  }, [cards])
+    return calculateCollectionValue(cardList)
+  }, [cardList])
 
-  const handleViewCard = () => {
-    // Card viewing functionality temporarily disabled
+  const handleViewCard = (card: CollectionCard) => {
+    setSelectedCard(card as CollectionCardWithPokemon)
+  }
+
+  const handleUpdateCard = (updatedCard: CollectionCardWithPokemon) => {
+    setCardList(prev => prev.map(card => 
+      card.id === updatedCard.id ? updatedCard : card
+    ))
+    setSelectedCard(updatedCard)
+  }
+
+  const handleDeleteCard = () => {
+    if (!selectedCard) return
+    setCardList(prev => prev.filter(card => card.id !== selectedCard.id))
+    setSelectedCard(null)
+  }
+
+  const handleNavigateToCard = (cardId: string) => {
+    const card = cardList.find(c => c.id === cardId)
+    if (card) {
+      setSelectedCard(card)
+    }
   }
 
   // Show empty state if no cards
-  if (cards.length === 0) {
+  if (cardList.length === 0) {
     return <EmptyCollectionState />
   }
 
   return (
     <div className={viewMode === 'list' ? 'h-[calc(100vh-1.5rem)] flex flex-col overflow-hidden' : ''}>
       <CollectionHeader 
-        cardCount={cards.length}
+        cardCount={cardList.length}
         totalValue={totalValue}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
@@ -54,12 +76,12 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
       
       {viewMode === 'grid' ? (
         <ItemGrid
-          items={cards}
+          items={cardList}
           renderItem={(card, index) => (
             <CollectionCardGridItem
               key={card.id}
               card={card}
-              onViewCard={handleViewCard}
+              onViewCard={() => handleViewCard(card)}
               priority={index < 8}
             />
           )}
@@ -76,7 +98,7 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
       ) : (
         <div className="flex-1 min-h-0">
           <ItemList
-            items={cards}
+            items={cardList}
             renderHeader={() => (
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
@@ -112,12 +134,30 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
               <CollectionCardListItem
                 key={card.id}
                 card={card}
-                onViewCard={handleViewCard}
+                onViewCard={() => handleViewCard(card)}
               />
             )}
             emptyStateComponent={<EmptyCollectionState />}
           />
         </div>
+      )}
+
+      {/* Quickview Modal */}
+      {selectedCard && (
+        <CardQuickViewModal
+          cardId={selectedCard.pokemon_card_id || selectedCard.id}
+          isOpen={!!selectedCard}
+          onClose={() => setSelectedCard(null)}
+          mode="collection"
+          collectionCard={selectedCard}
+          onUpdateCollection={handleUpdateCard}
+          onDeleteFromCollection={handleDeleteCard}
+          onNavigateToCard={handleNavigateToCard}
+          cardList={cardList.map(c => ({ 
+            id: c.id, 
+            name: c.pokemon_card?.name || c.manual_card_name || 'Unknown' 
+          }))}
+        />
       )}
     </div>
   )

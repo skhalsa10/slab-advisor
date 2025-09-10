@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { CONDITION_OPTIONS } from '@/constants/cards'
 
 interface AddToCollectionFormProps {
   cardId: string
@@ -21,16 +22,6 @@ interface FormData {
   acquisition_date: string
   notes: string
 }
-
-const CONDITION_OPTIONS = [
-  { value: '', label: 'Select Condition' },
-  { value: 'mint', label: 'Mint (M)' },
-  { value: 'near_mint', label: 'Near Mint (NM)' },
-  { value: 'lightly_played', label: 'Lightly Played (LP)' },
-  { value: 'moderately_played', label: 'Moderately Played (MP)' },
-  { value: 'heavily_played', label: 'Heavily Played (HP)' },
-  { value: 'damaged', label: 'Damaged (D)' }
-]
 
 export default function AddToCollectionForm({
   cardId,
