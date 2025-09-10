@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { type CollectionCard } from '@/types/database'
+import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
+import { calculateCollectionValue } from '@/utils/collectionPriceUtils'
 import CollectionHeader from '@/components/collection/CollectionHeader'
 import ItemGrid from '@/components/ui/ItemGrid'
 import ItemList from '@/components/ui/ItemList'
@@ -26,6 +28,12 @@ interface CollectionClientProps {
 export default function CollectionClient({ cards }: CollectionClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
+  // Calculate total collection value
+  const totalValue = useMemo(() => {
+    // Cast cards to CollectionCardWithPokemon since they include pokemon_card data from server
+    return calculateCollectionValue(cards as CollectionCardWithPokemon[])
+  }, [cards])
+
   const handleViewCard = () => {
     // Card viewing functionality temporarily disabled
   }
@@ -39,6 +47,7 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
     <div className={viewMode === 'list' ? 'h-[calc(100vh-1.5rem)] flex flex-col overflow-hidden' : ''}>
       <CollectionHeader 
         cardCount={cards.length}
+        totalValue={totalValue}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
@@ -84,6 +93,12 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Grade
+                </th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Price
+                </th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Total
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Added

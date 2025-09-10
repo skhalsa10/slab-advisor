@@ -1,15 +1,18 @@
 'use client'
 
 import ViewToggle, { type ViewMode } from './ViewToggle'
+import { formatPrice } from '@/utils/collectionPriceUtils'
 
 interface CollectionHeaderProps {
   cardCount: number
+  totalValue: number
   viewMode: ViewMode
   onViewModeChange: (mode: ViewMode) => void
 }
 
 export default function CollectionHeader({ 
   cardCount, 
+  totalValue,
   viewMode, 
   onViewModeChange 
 }: CollectionHeaderProps) {
@@ -20,6 +23,9 @@ export default function CollectionHeader({
         <h1 className="text-2xl font-bold text-grey-900">Your Card Collection</h1>
         <p className="mt-1 text-sm text-grey-600">
           {cardCount} {cardCount === 1 ? 'card' : 'cards'} in your collection
+          {totalValue > 0 && (
+            <span className="text-green-600 font-semibold"> • {formatPrice(totalValue)} total value</span>
+          )}
         </p>
       </div>
       

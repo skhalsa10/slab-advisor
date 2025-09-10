@@ -6,6 +6,7 @@
  */
 
 import type { CollectionCard } from '@/types/database'
+import type { Json } from '@/models/database'
 
 /**
  * Extended collection card type that includes joined Pokemon card data
@@ -21,6 +22,8 @@ export interface CollectionCardWithPokemon extends CollectionCard {
     category: string | null
     illustrator: string | null
     tcgplayer_image_url: string | null
+    price_data: Json | null
+    price_last_updated: string | null
     set?: {
       id: string
       name: string

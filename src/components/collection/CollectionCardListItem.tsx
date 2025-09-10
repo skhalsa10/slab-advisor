@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
+import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
 import { 
   formatVariant, 
@@ -10,6 +11,7 @@ import {
   formatGrade, 
   getListBadgeClasses 
 } from '@/utils/collectionMetadata'
+import { getCollectionCardPrice, formatPrice, getCardTotalValue } from '@/utils/collectionPriceUtils'
 
 interface CollectionCardListItemProps {
   card: CollectionCard
@@ -114,6 +116,20 @@ export default function CollectionCardListItem({
         ) : (
           <span className="text-sm text-grey-500">Not graded</span>
         )}
+      </td>
+
+      {/* Price column */}
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <span className="text-sm font-semibold text-green-600">
+          {formatPrice(getCollectionCardPrice(card as CollectionCardWithPokemon))}
+        </span>
+      </td>
+
+      {/* Total column */}
+      <td className="px-6 py-4 whitespace-nowrap text-right">
+        <span className="text-sm font-semibold text-green-600">
+          {formatPrice(getCardTotalValue(card as CollectionCardWithPokemon))}
+        </span>
       </td>
 
       {/* Added column */}

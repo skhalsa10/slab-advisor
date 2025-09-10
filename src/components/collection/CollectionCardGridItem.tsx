@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
+import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
 import { 
   formatVariant, 
@@ -10,6 +11,7 @@ import {
   formatGrade, 
   getBadgeBaseClasses 
 } from '@/utils/collectionMetadata'
+import { getCollectionPriceDisplay, shouldShowTotalPrice } from '@/utils/collectionPriceUtils'
 
 interface CollectionCardGridItemProps {
   card: CollectionCard
@@ -96,6 +98,9 @@ export default function CollectionCardGridItem({
         <h3 className="text-xs font-medium text-grey-900 truncate">
           {getCardDisplayName(card)}
         </h3>
+        <p className="text-xs font-semibold text-green-600 mt-1">
+          {getCollectionPriceDisplay(card as CollectionCardWithPokemon, shouldShowTotalPrice(card))}
+        </p>
       </div>
     </div>
   )
