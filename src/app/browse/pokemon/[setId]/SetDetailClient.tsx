@@ -3,10 +3,9 @@
 import { useState, useMemo } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
-import { useIsDesktop } from '@/hooks/useIsDesktop'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
-import CardQuickviewSideSheet from '@/components/shared/quickview/CardQuickviewSideSheet'
-import CardQuickViewModal from '@/components/shared/quickview/CardQuickViewModal'
+import QuickView from '@/components/ui/QuickView'
+import CardQuickViewContent from '@/components/browse/CardQuickViewContent'
 import PokemonSetHeader from '@/components/browse/pokemon/PokemonSetHeader'
 import TabNavigation from '@/components/ui/TabNavigation'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
@@ -30,9 +29,6 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
   const [sortOrder, setSortOrder] = useState('num_asc')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  
-  // Use custom hook to detect desktop viewport
-  const isDesktop = useIsDesktop()
 
   // Filter and sort cards based on search query and sort order
   const filteredCards = useMemo(() => {
@@ -265,29 +261,22 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         />
       )}
 
-      {/* Card Quickview - Responsive: Sidesheet on desktop, Modal on mobile */}
+      {/* Card Quickview - Responsive: automatically adapts to screen size */}
       {selectedCardId && (
-        <>
-          {isDesktop ? (
-            <CardQuickviewSideSheet
-              cardId={selectedCardId}
-              setId={setId}
-              isOpen={isQuickViewOpen}
-              onClose={handleQuickViewClose}
-              onNavigateToCard={handleNavigateToCard}
-              cardList={filteredCards.map(card => ({ id: card.id, name: card.name }))}
-            />
-          ) : (
-            <CardQuickViewModal
-              cardId={selectedCardId}
-              setId={setId}
-              isOpen={isQuickViewOpen}
-              onClose={handleQuickViewClose}
-              onNavigateToCard={handleNavigateToCard}
-              cardList={filteredCards.map(card => ({ id: card.id, name: card.name }))}
-            />
-          )}
-        </>
+        <QuickView
+          isOpen={isQuickViewOpen}
+          onClose={handleQuickViewClose}
+          title={filteredCards.find(c => c.id === selectedCardId)?.name || 'Card Details'}
+          onNavigateToCard={handleNavigateToCard}
+          cardList={filteredCards.map(card => ({ id: card.id, name: card.name }))}
+          currentCardId={selectedCardId}
+        >
+          <CardQuickViewContent
+            cardId={selectedCardId}
+            setId={setId}
+            onClose={handleQuickViewClose}
+          />
+        </QuickView>
       )}
     </div>
   )

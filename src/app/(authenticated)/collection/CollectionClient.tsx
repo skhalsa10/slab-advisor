@@ -10,7 +10,8 @@ import ItemList from '@/components/ui/ItemList'
 import CollectionCardGridItem from '@/components/collection/CollectionCardGridItem'
 import CollectionCardListItem from '@/components/collection/CollectionCardListItem'
 import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
-import CardQuickViewModal from '@/components/shared/quickview/CardQuickViewModal'
+import QuickView from '@/components/ui/QuickView'
+import CollectionQuickViewContent from '@/components/collection/CollectionQuickViewContent'
 import { type ViewMode } from '@/components/collection/ViewToggle'
 
 interface CollectionClientProps {
@@ -142,22 +143,26 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
         </div>
       )}
 
-      {/* Quickview Modal */}
+      {/* Quickview - Responsive: automatically adapts to screen size */}
       {selectedCard && (
-        <CardQuickViewModal
-          cardId={selectedCard.pokemon_card_id || selectedCard.id}
+        <QuickView
           isOpen={!!selectedCard}
           onClose={() => setSelectedCard(null)}
-          mode="collection"
-          collectionCard={selectedCard}
-          onUpdateCollection={handleUpdateCard}
-          onDeleteFromCollection={handleDeleteCard}
+          title={selectedCard.pokemon_card?.name || selectedCard.manual_card_name || 'Card Details'}
           onNavigateToCard={handleNavigateToCard}
           cardList={cardList.map(c => ({ 
             id: c.id, 
             name: c.pokemon_card?.name || c.manual_card_name || 'Unknown' 
           }))}
-        />
+          currentCardId={selectedCard.id}
+        >
+          <CollectionQuickViewContent
+            card={selectedCard}
+            onUpdate={handleUpdateCard}
+            onDelete={handleDeleteCard}
+            onClose={() => setSelectedCard(null)}
+          />
+        </QuickView>
       )}
     </div>
   )
