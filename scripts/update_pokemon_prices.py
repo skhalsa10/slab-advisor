@@ -144,12 +144,32 @@ class PokemonPriceUpdater:
             if result.data and len(result.data) > 0:
                 last_updated_str = result.data[0].get('price_last_updated')
                 if last_updated_str:
-                    # Parse the timestamp
-                    last_updated = datetime.fromisoformat(last_updated_str.replace('Z', '+00:00'))
-                    
-                    # Check if it's recent
-                    if last_updated > cutoff_time:
-                        return True  # Skip this update
+                    try:
+                        # Handle different timestamp formats from Supabase
+                        # Remove 'Z' if present and replace with '+00:00'
+                        timestamp_str = last_updated_str.replace('Z', '+00:00')
+
+                        # Handle microseconds with varying precision (Supabase sometimes returns 5 or 6 digits)
+                        # Split at the '+' to separate timestamp from timezone
+                        if '+' in timestamp_str:
+                            time_part, tz_part = timestamp_str.rsplit('+', 1)
+                            # If there's a decimal point, ensure microseconds have exactly 6 digits
+                            if '.' in time_part:
+                                date_part, micro_part = time_part.rsplit('.', 1)
+                                # Pad or truncate microseconds to 6 digits
+                                micro_part = micro_part.ljust(6, '0')[:6]
+                                timestamp_str = f"{date_part}.{micro_part}+{tz_part}"
+
+                        # Parse the timestamp
+                        last_updated = datetime.fromisoformat(timestamp_str)
+
+                        # Check if it's recent
+                        if last_updated > cutoff_time:
+                            return True  # Skip this update
+                    except ValueError as e:
+                        # If parsing fails, log it but continue with the update
+                        console.print(f"[yellow]Warning: Could not parse timestamp '{last_updated_str}': {e}[/yellow]")
+                        return False
             
             return False  # Need to update
             
@@ -393,11 +413,17 @@ class PokemonPriceUpdater:
     
     def save_unknown_product_ids(self):
         """Save unknown product IDs to a JSON file for investigation"""
-        filename = f'unknown_product_ids_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
-        
+        filename = 'unknown_product_ids.json'
+
+        # Add timestamp to the data itself for reference
+        data_with_timestamp = {
+            'last_updated': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'product_ids': self.unknown_product_ids
+        }
+
         with open(filename, 'w') as f:
-            json.dump(self.unknown_product_ids, f, indent=2)
-        
+            json.dump(data_with_timestamp, f, indent=2)
+
         console.print(f"\n[yellow]Unknown product IDs saved to {filename}[/yellow]")
         console.print(f"[yellow]Total unknown products: {sum(len(data['product_ids']) for data in self.unknown_product_ids.values())}[/yellow]")
         
