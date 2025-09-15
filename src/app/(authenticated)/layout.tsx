@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { CreditsProvider } from '@/contexts/CreditsContext'
+import { QuickAddProvider } from '@/contexts/QuickAddContext'
 import Sidebar from '@/components/layout/Sidebar'
 import SidebarPageContainer from '@/components/layout/SidebarPageContainer'
 import LoadingScreen from '@/components/ui/LoadingScreen'
@@ -26,12 +27,14 @@ export default function DashboardLayout({
   return (
     <ErrorBoundary>
       <CreditsProvider>
-        <div className="h-screen bg-grey-50">
-          <Sidebar onSignOut={handleSignOut} />
-          <SidebarPageContainer>
-            {children}
-          </SidebarPageContainer>
-        </div>
+        <QuickAddProvider>
+          <div className="h-screen bg-grey-50">
+            <Sidebar onSignOut={handleSignOut} />
+            <SidebarPageContainer>
+              {children}
+            </SidebarPageContainer>
+          </div>
+        </QuickAddProvider>
       </CreditsProvider>
     </ErrorBoundary>
   )

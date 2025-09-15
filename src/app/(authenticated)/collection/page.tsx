@@ -1,6 +1,9 @@
 import { getUserCollectionCards } from '@/lib/collection-server'
 import CollectionClient from './CollectionClient'
 
+// Force dynamic rendering since this page requires authentication
+export const dynamic = 'force-dynamic'
+
 /**
  * Collection Page - Server Component
  * Fetches user collection data server-side for security and performance

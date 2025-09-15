@@ -2,6 +2,7 @@
 
 import ViewToggle, { type ViewMode } from './ViewToggle'
 import { formatPrice } from '@/utils/collectionPriceUtils'
+import { useQuickAddContext } from '@/contexts/QuickAddContext'
 
 interface CollectionHeaderProps {
   cardCount: number
@@ -16,6 +17,7 @@ export default function CollectionHeader({
   viewMode, 
   onViewModeChange 
 }: CollectionHeaderProps) {
+  const { openQuickAdd } = useQuickAddContext()
   return (
     <div className="sticky top-0 z-10 bg-grey-50 pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
       {/* Header with title and count */}
@@ -36,9 +38,17 @@ export default function CollectionHeader({
           onViewModeChange={onViewModeChange} 
         />
         
-        {/* Placeholder for future filters/search */}
+        {/* Quick Add Button */}
         <div className="flex items-center space-x-3">
-          {/* Could add search, sort, filter controls here */}
+          <button
+            onClick={openQuickAdd}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+          >
+            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Quick Add
+          </button>
         </div>
       </div>
     </div>

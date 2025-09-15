@@ -6,13 +6,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
+import { useQuickAddContext } from '@/contexts/QuickAddContext'
 
 interface SidebarProps {
   onSignOut: () => void
 }
 
+interface NavigationItem {
+  name: string
+  href: string
+  icon: string
+  action?: string
+}
+
 export default function Sidebar({ onSignOut }: SidebarProps) {
   const { user, credits, refreshCredits } = useCredits()
+  const { openQuickAdd } = useQuickAddContext()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
@@ -22,10 +31,11 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
     onSignOut()
   }
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: '📊' },
     { name: 'Collection', href: '/collection', icon: '🎴' },
     { name: 'Explore', href: '/explore', icon: '🔍' },
+    { name: 'Quick Add', href: '#', icon: '➕', action: 'quickAdd' },
   ]
 
   const isActiveLink = (href: string) => {
@@ -33,6 +43,13 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
       return pathname === '/dashboard'
     }
     return pathname.startsWith(href)
+  }
+
+  const handleNavigationClick = (item: NavigationItem) => {
+    if (item.action === 'quickAdd') {
+      openQuickAdd()
+    }
+    // For regular links, the Link component handles navigation
   }
 
   return (
@@ -58,20 +75,35 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
           {/* Navigation */}
           <div className="flex-1 flex flex-col overflow-y-auto">
             <nav className="flex-1 px-2 py-4 space-y-1">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`${
-                    isActiveLink(item.href)
-                      ? 'bg-orange-50 border-orange-500 text-orange-700'
-                      : 'border-transparent text-grey-600 hover:bg-grey-50 hover:text-grey-900'
-                  } group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors`}
-                >
-                  <span className="mr-3 text-lg">{item.icon}</span>
-                  {item.name}
-                </Link>
-              ))}
+              {navigation.map((item) => {
+                if (item.action === 'quickAdd') {
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => handleNavigationClick(item)}
+                      className="w-full border-transparent text-grey-600 hover:bg-grey-50 hover:text-grey-900 group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors"
+                    >
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </button>
+                  )
+                }
+                
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`${
+                      isActiveLink(item.href)
+                        ? 'bg-orange-50 border-orange-500 text-orange-700'
+                        : 'border-transparent text-grey-600 hover:bg-grey-50 hover:text-grey-900'
+                    } group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors`}
+                  >
+                    <span className="mr-3 text-lg">{item.icon}</span>
+                    {item.name}
+                  </Link>
+                )
+              })}
             </nav>
 
             {/* User Info */}
@@ -144,21 +176,39 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
           {mobileMenuOpen && (
             <div className="border-t border-grey-200">
               <div className="px-2 pt-2 pb-3 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`${
-                      isActiveLink(item.href)
-                        ? 'bg-orange-50 text-orange-700'
-                        : 'text-grey-600 hover:bg-grey-50 hover:text-grey-900'
-                    } flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <span className="mr-3 text-lg">{item.icon}</span>
-                    {item.name}
-                  </Link>
-                ))}
+                {navigation.map((item) => {
+                  if (item.action === 'quickAdd') {
+                    return (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          handleNavigationClick(item)
+                          setMobileMenuOpen(false)
+                        }}
+                        className="w-full text-grey-600 hover:bg-grey-50 hover:text-grey-900 flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors"
+                      >
+                        <span className="mr-3 text-lg">{item.icon}</span>
+                        {item.name}
+                      </button>
+                    )
+                  }
+                  
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`${
+                        isActiveLink(item.href)
+                          ? 'bg-orange-50 text-orange-700'
+                          : 'text-grey-600 hover:bg-grey-50 hover:text-grey-900'
+                      } flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </Link>
+                  )
+                })}
               </div>
               {user && (
                 <div className="border-t border-grey-200 pt-4 pb-3">
