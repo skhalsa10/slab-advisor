@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback } from 'react'
-import QuickView from '@/components/ui/QuickView'
+import QuickAddModal from '@/components/search/QuickAddModal'
 import QuickAddContent from '@/components/search/QuickAddContent'
 
 interface QuickAddContextValue {
@@ -30,6 +30,7 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
   const [notification, setNotification] = useState<{
     type: 'success' | 'error'
     message: string
+    isExiting?: boolean
   } | null>(null)
 
   const openQuickAdd = useCallback(() => {
@@ -45,14 +46,29 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
   }, [])
 
   const handleAddSuccess = useCallback((message: string) => {
-    setNotification({ type: 'success', message })
-    // Auto-hide success notification after 3 seconds
-    setTimeout(() => setNotification(null), 3000)
+    setNotification({ type: 'success', message, isExiting: false })
+    
+    // Start exit animation after 3 seconds
+    const exitTimer = setTimeout(() => {
+      setNotification(prev => prev ? { ...prev, isExiting: true } : null)
+      
+      // Remove notification completely after animation
+      setTimeout(() => setNotification(null), 300)
+    }, 3000)
+    
+    return () => clearTimeout(exitTimer)
   }, [])
 
   const handleAddError = useCallback((message: string) => {
-    setNotification({ type: 'error', message })
-    // Keep error notifications until manually cleared or modal closed
+    setNotification({ type: 'error', message, isExiting: false })
+    
+    // Error notifications stay longer (5 seconds)
+    const exitTimer = setTimeout(() => {
+      setNotification(prev => prev ? { ...prev, isExiting: true } : null)
+      setTimeout(() => setNotification(null), 300)
+    }, 5000)
+    
+    return () => clearTimeout(exitTimer)
   }, [])
 
   const contextValue: QuickAddContextValue = {
@@ -66,56 +82,96 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
       {children}
       
       {/* Global Quick Add Modal */}
-      <QuickView
+      <QuickAddModal
         isOpen={isOpen}
         onClose={closeQuickAdd}
         title="Quick Add Card"
-        preferredLayout="auto"
-        loading={false}
-        error={null}
       >
-        <div className="relative">
-          {/* Notification Bar */}
-          {notification && (
-            <div className={`absolute top-0 left-0 right-0 z-10 mx-4 mt-4 p-3 rounded-md text-sm font-medium ${
-              notification.type === 'success'
-                ? 'bg-green-50 border border-green-200 text-green-800'
-                : 'bg-red-50 border border-red-200 text-red-800'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  {notification.type === 'success' ? (
-                    <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                  {notification.message}
-                </div>
-                <button
-                  onClick={() => setNotification(null)}
-                  className="text-current hover:opacity-70 ml-4"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
-          
+        <div className="relative h-full flex flex-col">
           {/* Main Content */}
-          <div className={notification ? 'pt-16' : ''}>
+          <div className="flex-1 relative">
+            {/* Notification Toast - Sticky to Top of Scrollable Area */}
+            {notification && (
+              <div 
+                className={`
+                  sticky top-0 z-30 mx-4 mt-4 pointer-events-auto
+                  transform transition-all duration-300 ease-out
+                  ${notification.isExiting 
+                    ? 'translate-y-[-120%] opacity-0' 
+                    : 'translate-y-0 opacity-100'}
+                `}
+                style={{
+                  animation: notification.isExiting ? 'none' : 'slideDown 0.3s ease-out'
+                }}
+              >
+              <div className={`
+                relative overflow-hidden rounded-lg shadow-lg
+                ${notification.type === 'success'
+                  ? 'bg-gradient-to-r from-green-500 to-green-600'
+                  : 'bg-gradient-to-r from-red-500 to-red-600'}
+              `}>
+                {/* Progress bar for auto-dismiss */}
+                {notification.type === 'success' && !notification.isExiting && (
+                  <div 
+                    className="absolute bottom-0 left-0 h-1 bg-white/30"
+                    style={{
+                      animation: 'shrinkWidth 3s linear forwards'
+                    }}
+                  />
+                )}
+                
+                <div className="relative px-4 py-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-white">
+                      {notification.type === 'success' ? (
+                        <div className="flex-shrink-0 mr-3">
+                          <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center animate-bounce">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex-shrink-0 mr-3">
+                          <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold text-sm">
+                          {notification.type === 'success' ? 'Success!' : 'Error'}
+                        </p>
+                        <p className="text-white/90 text-sm">{notification.message}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setNotification(prev => prev ? { ...prev, isExiting: true } : null)
+                        setTimeout(() => setNotification(null), 300)
+                      }}
+                      className="text-white/80 hover:text-white ml-4 transition-colors"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                </div>
+              </div>
+            )}
+            
             <QuickAddContent
               onAddSuccess={handleAddSuccess}
               onAddError={handleAddError}
             />
           </div>
+          
         </div>
-      </QuickView>
+      </QuickAddModal>
     </QuickAddContext.Provider>
   )
 }
