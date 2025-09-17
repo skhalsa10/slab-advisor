@@ -32,6 +32,7 @@ export default function AppNavigation({ children }: AppNavigationProps) {
   }
 
   // Authenticated user - show sidebar layout
+  // Note: QuickAddProvider is now handled at the root level
   if (user) {
     return (
       <CreditsProvider>

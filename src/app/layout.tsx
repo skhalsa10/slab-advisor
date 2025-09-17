@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
 import "./globals.css";
 
 // Font configurations for the application
@@ -98,7 +99,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetBrainsMono.variable} antialiased min-w-[320px]`}
       >
-        {children}
+        <ConditionalQuickAddProvider>
+          {children}
+        </ConditionalQuickAddProvider>
         {/* Vercel Speed Insights for performance monitoring */}
         <SpeedInsights />
       </body>
