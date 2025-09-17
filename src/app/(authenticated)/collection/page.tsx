@@ -1,5 +1,6 @@
 import { getUserCollectionCards } from '@/lib/collection-server'
 import CollectionClient from './CollectionClient'
+import CollectionRefreshProvider from './CollectionRefreshProvider'
 
 // Force dynamic rendering since this page requires authentication
 export const dynamic = 'force-dynamic'
@@ -14,7 +15,12 @@ export default async function CollectionPage() {
     const cards = await getUserCollectionCards()
     
     // Pass server-fetched data to client component for interactivity
-    return <CollectionClient cards={cards} />
+    // Wrap with refresh provider to enable QuickAdd to trigger re-renders
+    return (
+      <CollectionRefreshProvider>
+        <CollectionClient cards={cards} />
+      </CollectionRefreshProvider>
+    )
   } catch (error) {
     console.error('Error fetching collection data in server component:', error)
     

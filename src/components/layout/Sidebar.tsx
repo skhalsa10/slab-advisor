@@ -31,11 +31,12 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
     onSignOut()
   }
 
+  // Navigation items - QuickAdd only shown for authenticated users
   const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: '📊' },
     { name: 'Collection', href: '/collection', icon: '🎴' },
     { name: 'Explore', href: '/explore', icon: '🔍' },
-    { name: 'Quick Add', href: '#', icon: '➕', action: 'quickAdd' },
+    ...(user ? [{ name: 'Quick Add', href: '#', icon: '➕', action: 'quickAdd' }] : []),
   ]
 
   const isActiveLink = (href: string) => {

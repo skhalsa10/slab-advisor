@@ -3,6 +3,7 @@
 import SearchBar from './SearchBar'
 import SearchResultCard from './SearchResultCard'
 import { useQuickAdd } from '@/hooks/useQuickAdd'
+import { getCurrentUser } from '@/lib/auth'
 
 interface QuickAddContentProps {
   onAddSuccess?: (message: string) => void
@@ -33,8 +34,15 @@ export default function QuickAddContent({
     addToCollection,
     addingCardId
   } = useQuickAdd()
-
+  
   const handleAddToCollection = async (cardId: string, variant: string, quantity: number) => {
+    // Authentication guard - check directly with Supabase
+    const user = await getCurrentUser()
+    if (!user) {
+      onAddError?.('You must be logged in to add cards to your collection.')
+      return false
+    }
+    
     const success = await addToCollection(cardId, variant, quantity)
     
     if (success) {

@@ -113,8 +113,31 @@ export async function signOut() {
  * ```
  */
 export async function getCurrentUser(): Promise<User | null> {
-  const { data: { user } } = await supabase.auth.getUser()
-  return user
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    
+    // Handle common auth errors gracefully
+    if (error) {
+      if (error.message.includes('Invalid Refresh Token')) {
+        console.warn('Invalid refresh token detected, clearing session')
+        await supabase.auth.signOut()
+        return null
+      } else if (error.message.includes('Auth session missing')) {
+        // Session is already cleared, just return null
+        return null
+      } else {
+        console.error('Auth error:', error)
+        return null
+      }
+    }
+    
+    return user
+  } catch (error) {
+    console.error('Unexpected error in getCurrentUser:', error)
+    // Clear session on any unexpected auth error
+    await supabase.auth.signOut()
+    return null
+  }
 }
 
 /**

@@ -3,11 +3,14 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 import QuickAddModal from '@/components/search/QuickAddModal'
 import QuickAddContent from '@/components/search/QuickAddContent'
+import { getCurrentUser } from '@/lib/auth'
 
 interface QuickAddContextValue {
   isOpen: boolean
   openQuickAdd: () => void
   closeQuickAdd: () => void
+  onCollectionUpdate?: () => void
+  setCollectionUpdateCallback: (callback: (() => void) | undefined) => void
 }
 
 const QuickAddContext = createContext<QuickAddContextValue | undefined>(undefined)
@@ -32,11 +35,25 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
     message: string
     isExiting?: boolean
   } | null>(null)
+  const [onCollectionUpdate, setOnCollectionUpdate] = useState<(() => void) | undefined>(undefined)
 
-  const openQuickAdd = useCallback(() => {
-    setIsOpen(true)
-    // Clear any existing notifications when opening
-    setNotification(null)
+  const openQuickAdd = useCallback(async () => {
+    // Check authentication before opening QuickAdd
+    try {
+      const user = await getCurrentUser()
+      if (!user) {
+        console.warn('QuickAdd attempted without authentication')
+        return
+      }
+      
+      setIsOpen(true)
+      // Clear any existing notifications when opening
+      setNotification(null)
+    } catch (error) {
+      // Handle auth session errors gracefully (e.g., during logout)
+      console.warn('QuickAdd auth check failed:', error)
+      return
+    }
   }, [])
 
   const closeQuickAdd = useCallback(() => {
@@ -48,6 +65,11 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
   const handleAddSuccess = useCallback((message: string) => {
     setNotification({ type: 'success', message, isExiting: false })
     
+    // Trigger collection update if callback is set
+    if (onCollectionUpdate) {
+      onCollectionUpdate()
+    }
+    
     // Start exit animation after 3 seconds
     const exitTimer = setTimeout(() => {
       setNotification(prev => prev ? { ...prev, isExiting: true } : null)
@@ -57,7 +79,7 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
     }, 3000)
     
     return () => clearTimeout(exitTimer)
-  }, [])
+  }, [onCollectionUpdate])
 
   const handleAddError = useCallback((message: string) => {
     setNotification({ type: 'error', message, isExiting: false })
@@ -71,10 +93,16 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
     return () => clearTimeout(exitTimer)
   }, [])
 
+  const setCollectionUpdateCallback = useCallback((callback: (() => void) | undefined) => {
+    setOnCollectionUpdate(() => callback)
+  }, [])
+
   const contextValue: QuickAddContextValue = {
     isOpen,
     openQuickAdd,
-    closeQuickAdd
+    closeQuickAdd,
+    onCollectionUpdate,
+    setCollectionUpdateCallback
   }
 
   return (

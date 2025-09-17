@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { type CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { calculateCollectionValue } from '@/utils/collectionPriceUtils'
@@ -31,6 +31,11 @@ export default function CollectionClient({ cards }: CollectionClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [selectedCard, setSelectedCard] = useState<CollectionCardWithPokemon | null>(null)
   const [cardList, setCardList] = useState(cards as CollectionCardWithPokemon[])
+
+  // Sync cardList with props when server data changes (after router.refresh)
+  useEffect(() => {
+    setCardList(cards as CollectionCardWithPokemon[])
+  }, [cards])
 
   // Calculate total collection value
   const totalValue = useMemo(() => {
