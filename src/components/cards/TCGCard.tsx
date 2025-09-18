@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { extractMarketPrices, getDisplayPrice } from '@/utils/priceUtils'
+import PriceDisplay from '@/components/ui/PriceDisplay'
 
 interface TCGCardProps {
   card: {
@@ -38,9 +38,6 @@ export default function TCGCard({
     ? getImageUrl(card.image, imageQuality, card.fallbackImageUrl)
     : card.image || card.fallbackImageUrl || '/card-placeholder.svg'
 
-  // Extract and format price using utility functions
-  const prices = extractMarketPrices(card.priceData)
-  const displayPrice = getDisplayPrice(prices)
 
   return (
     <Link
@@ -74,9 +71,11 @@ export default function TCGCard({
             ))}
           </p>
         )}
-        <p className="text-xs font-semibold text-green-600 mt-1">
-          {displayPrice || 'Price unavailable'}
-        </p>
+        <PriceDisplay
+          priceData={card.priceData}
+          showMarketLabel={false}
+          className="mt-1"
+        />
       </div>
     </Link>
   )

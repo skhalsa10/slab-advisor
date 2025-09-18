@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import PriceDisplay from '@/components/ui/PriceDisplay'
 
 interface TCGProductProps {
   product: {
@@ -7,6 +8,7 @@ interface TCGProductProps {
     tcgplayer_product_id?: string | number
     tcgplayer_image_url?: string
     image?: string
+    price_data?: Record<string, unknown> | null
   }
   href?: string
   shopLinkText?: string
@@ -29,6 +31,7 @@ export default function TCGProduct({
     (product.tcgplayer_product_id ? `https://www.tcgplayer.com/product/${product.tcgplayer_product_id}` : '#')
 
   const imageUrl = product.tcgplayer_image_url || product.image
+
 
   return (
     <a
@@ -65,6 +68,12 @@ export default function TCGProduct({
         <h3 className="text-sm font-medium text-grey-900 line-clamp-2">
           {product.name}
         </h3>
+        <div className="mt-2">
+          <PriceDisplay
+            priceData={product.price_data}
+            showMarketLabel={false}
+          />
+        </div>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-xs text-grey-600">{shopLinkText}</span>
           <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

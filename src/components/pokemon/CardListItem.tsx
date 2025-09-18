@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { getCardImageUrl } from '@/lib/pokemon-db'
-import { extractMarketPrices, getDisplayPrice } from '@/utils/priceUtils'
+import PriceDisplay from '@/components/ui/PriceDisplay'
 
 interface CardListItemProps {
   card: {
@@ -19,9 +19,6 @@ interface CardListItemProps {
 export default function CardListItem({ card, setId, onClick }: CardListItemProps) {
   const imageUrl = getCardImageUrl(card.image, 'low', card.tcgplayer_image_url || undefined)
   
-  // Extract and format price using utility functions
-  const prices = extractMarketPrices(card.price_data)
-  const displayPrice = getDisplayPrice(prices)
   
   return (
     <tr className="hover:bg-grey-50 transition-colors">
@@ -71,9 +68,10 @@ export default function CardListItem({ card, setId, onClick }: CardListItemProps
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-semibold text-green-600">
-          {displayPrice || 'Price unavailable'}
-        </div>
+        <PriceDisplay
+          priceData={card.price_data}
+          showMarketLabel={false}
+        />
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <a

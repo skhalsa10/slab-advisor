@@ -291,7 +291,7 @@ function PokemonDetails({ card }: { card: CardFull }) {
             {availablePrices.map(({ label, price }) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-grey-600">{label}</span>
-                <span className="font-semibold text-green-600">
+                <span className="font-semibold text-gray-900">
                   ${price.toFixed(2)}
                 </span>
               </div>

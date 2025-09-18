@@ -15,6 +15,7 @@ import ViewToggle, { type ViewMode } from '@/components/ui/ViewToggle'
 import SetCardsEmptyState from '@/components/ui/SetCardsEmptyState'
 import TCGCard from '@/components/cards/TCGCard'
 import TCGProduct from '@/components/cards/TCGProduct'
+import TCGProductListItem from '@/components/cards/TCGProductListItem'
 import CardListItem from '@/components/pokemon/CardListItem'
 
 interface SetDetailClientProps {
@@ -29,6 +30,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
   const [sortOrder, setSortOrder] = useState('num_asc')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [productViewMode, setProductViewMode] = useState<ViewMode>('grid')
 
   // Filter and sort cards based on search query and sort order
   const filteredCards = useMemo(() => {
@@ -153,7 +155,8 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         id: product.id.toString(),
         name: product.name,
         tcgplayer_product_id: product.tcgplayer_product_id,
-        tcgplayer_image_url: product.tcgplayer_image_url || undefined
+        tcgplayer_image_url: product.tcgplayer_image_url || undefined,
+        price_data: product.price_data
       }}
     />
   )
@@ -177,8 +180,8 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         onTabChange={handleTabChange}
       />
 
-      {/* Search and Sort (only show for cards tab) */}
-      {activeTab === 'cards' && (
+      {/* Search and Sort */}
+      {activeTab === 'cards' ? (
         <BrowseFilterAndSort
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -193,7 +196,14 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             />
           }
         />
-      )}
+      ) : activeTab === 'products' ? (
+        <div className="flex justify-end">
+          <ViewToggle
+            viewMode={productViewMode}
+            onViewModeChange={setProductViewMode}
+          />
+        </div>
+      ) : null}
 
       {/* Content based on active tab */}
       {activeTab === 'cards' ? (
@@ -247,18 +257,50 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
           />
         )
       ) : (
-        <ItemGrid
-          items={initialData.products}
-          renderItem={(product) => renderProduct(product)}
-          emptyStateComponent={productsEmptyState}
-          columns={{
-            base: 2,
-            sm: 3,
-            md: 4,
-            lg: 5,
-            xl: 6
-          }}
-        />
+        productViewMode === 'grid' ? (
+          <ItemGrid
+            items={initialData.products}
+            renderItem={(product) => renderProduct(product)}
+            emptyStateComponent={productsEmptyState}
+            columns={{
+              base: 2,
+              sm: 3,
+              md: 4,
+              lg: 5,
+              xl: 6
+            }}
+          />
+        ) : (
+          <ItemList
+            items={initialData.products}
+            renderHeader={() => (
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Product
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                  Market Price
+                </th>
+                <th scope="col" className="relative px-6 py-3">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            )}
+            renderRow={(product) => (
+              <TCGProductListItem
+                key={product.id}
+                product={{
+                  id: product.id.toString(),
+                  name: product.name,
+                  tcgplayer_product_id: product.tcgplayer_product_id,
+                  tcgplayer_image_url: product.tcgplayer_image_url || undefined,
+                  price_data: product.price_data
+                }}
+              />
+            )}
+            emptyStateComponent={productsEmptyState}
+          />
+        )
       )}
 
       {/* Card Quickview - Responsive: automatically adapts to screen size */}
