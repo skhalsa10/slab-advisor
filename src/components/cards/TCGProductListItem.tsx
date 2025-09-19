@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import PriceDisplay from '@/components/ui/PriceDisplay'
+import type { Json } from '@/models/database'
 
 interface TCGProductListItemProps {
   product: {
@@ -8,7 +9,7 @@ interface TCGProductListItemProps {
     tcgplayer_product_id?: string | number
     tcgplayer_image_url?: string
     image?: string
-    price_data?: Record<string, unknown> | null
+    price_data?: Json | null
   }
   href?: string
   target?: '_blank' | '_self'

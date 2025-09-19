@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import PriceDisplay from '@/components/ui/PriceDisplay'
+import type { Json } from '@/models/database'
 
 interface CardListItemProps {
   card: {
@@ -10,7 +11,7 @@ interface CardListItemProps {
     tcgplayer_image_url?: string | null
     local_id?: string | number | null
     rarity?: string | null
-    price_data?: Record<string, unknown> | null // JSONB price data from database
+    price_data?: Json | null // JSONB price data from database
   }
   setId: string
   onClick: (e: React.MouseEvent, cardId: string) => void

@@ -1,7 +1,8 @@
 import { extractMarketPrices, getDisplayPrice } from '@/utils/priceUtils'
+import type { Json } from '@/models/database'
 
 interface PriceDisplayProps {
-  priceData: Record<string, unknown> | null | undefined
+  priceData: Json | null | undefined
   showMarketLabel?: boolean
   className?: string
 }

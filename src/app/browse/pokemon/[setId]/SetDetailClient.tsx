@@ -125,7 +125,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         name: card.name,
         image: card.image || undefined,
         fallbackImageUrl: card.tcgplayer_image_url || undefined,
-        priceData: card.price_data as Record<string, unknown> | null,
+        priceData: card.price_data,
         metadata: [
           ...(card.local_id ? [{ value: `#${card.local_id}` }] : []),
           ...(card.rarity ? [{ value: card.rarity }] : [])
@@ -245,10 +245,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             renderRow={(card) => (
               <CardListItem
                 key={card.id}
-                card={{
-                  ...card,
-                  price_data: card.price_data as Record<string, unknown> | null
-                }}
+                card={card}
                 setId={setId}
                 onClick={handleCardClick}
               />

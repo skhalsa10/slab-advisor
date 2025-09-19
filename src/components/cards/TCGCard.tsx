@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import PriceDisplay from '@/components/ui/PriceDisplay'
+import type { Json } from '@/models/database'
 
 interface TCGCardProps {
   card: {
@@ -9,7 +10,7 @@ interface TCGCardProps {
     image?: string
     fallbackImageUrl?: string
     metadata?: Array<{ label?: string; value: string }>
-    priceData?: Record<string, unknown> | null // JSONB price data from database
+    priceData?: Json | null // JSONB price data from database
   }
   href?: string
   onClick?: (e: React.MouseEvent, cardId: string) => void
