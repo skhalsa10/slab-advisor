@@ -158,3 +158,171 @@ ADD COLUMN price_last_updated TIMESTAMPTZ;
 ```
 
 This implementation provides accurate card valuations while keeping costs low through intelligent caching and a hybrid data strategy.
+
+---
+
+# Pokemon Card Variant Correction Implementation Plan
+
+## Problem Statement
+
+TCGDex API incorrectly reports variant data for special rarity Pokemon cards, specifically:
+- Illustration Rare cards showing `normal: true`, `reverse: true`, `holo: true`
+- Special Illustration Rare cards showing `normal: true`, `reverse: true`, `holo: true`
+
+**Reality**: These cards only exist as holofoil variants and cannot have reverse holo or normal variants.
+
+## Root Cause Analysis
+
+### Pokemon TCG Variant Rules
+- **Reverse Holo**: Only applies to cards with traditional illustration box layouts
+- **Full-Art Cards**: Already have holographic effects across entire card
+- **Illustration Rare & Special Illustration Rare**: Are full-art cards, therefore no reverse holo exists
+
+### Current Impact
+Database incorrectly stores special rarity cards with `variant_reverse: true` and `variant_normal: true`.
+
+## Solution: Future-Proof Whitelist Approach
+
+### Logic
+Instead of blacklisting specific rarities, whitelist rarities that CAN have reverse holo variants:
+
+**Rarities that CAN have reverse holo:**
+- `Common`
+- `Uncommon`
+- `Rare`
+- `Rare Holo`
+
+**All other rarities (current and future):**
+- Only `variant_holo: true`
+- `variant_reverse: false`
+- `variant_normal: false`
+
+## Implementation Changes Required
+
+### 1. Supabase Function: `backfill-pokemon-data/index.ts`
+
+**Current code (lines 236-240):**
+```typescript
+variant_normal: fullCard.variants?.normal || false,
+variant_reverse: fullCard.variants?.reverse || false,
+variant_holo: fullCard.variants?.holo || false,
+variant_first_edition: fullCard.variants?.firstEdition || false,
+```
+
+**Proposed fix:**
+```typescript
+// Add variant correction function
+function correctVariants(rarity: string, originalVariants: any) {
+  const canHaveReverseHolo = [
+    'Common',
+    'Uncommon',
+    'Rare',
+    'Rare Holo'
+  ].includes(rarity || '');
+
+  if (!canHaveReverseHolo) {
+    // Special rarities: only holo, no normal or reverse
+    return {
+      normal: false,
+      reverse: false,
+      holo: true,
+      firstEdition: originalVariants?.firstEdition || false
+    };
+  }
+
+  // Standard rarities: keep original variants
+  return {
+    normal: originalVariants?.normal || false,
+    reverse: originalVariants?.reverse || false,
+    holo: originalVariants?.holo || false,
+    firstEdition: originalVariants?.firstEdition || false
+  };
+}
+
+// Apply correction in card mapping
+const correctedVariants = correctVariants(fullCard.rarity, fullCard.variants);
+
+const mappedCard = {
+  // ... other fields
+  variant_normal: correctedVariants.normal,
+  variant_reverse: correctedVariants.reverse,
+  variant_holo: correctedVariants.holo,
+  variant_first_edition: correctedVariants.firstEdition,
+  // ... rest of mapping
+}
+```
+
+### 2. Python Script: `scripts/backfill_pokemon_data.py`
+
+**Current code (lines 313-316):**
+```python
+'variant_normal': card_details.get('variants', {}).get('normal', False),
+'variant_reverse': card_details.get('variants', {}).get('reverse', False),
+'variant_holo': card_details.get('variants', {}).get('holo', False),
+'variant_first_edition': card_details.get('variants', {}).get('firstEdition', False),
+```
+
+**Proposed fix:**
+```python
+def correct_variants(rarity, original_variants):
+    """Correct variant data based on rarity whitelist approach"""
+    can_have_reverse_holo = rarity in ['Common', 'Uncommon', 'Rare', 'Rare Holo']
+
+    if not can_have_reverse_holo:
+        # Special rarities: only holo, no normal or reverse
+        return {
+            'normal': False,
+            'reverse': False,
+            'holo': True,
+            'firstEdition': original_variants.get('firstEdition', False)
+        }
+
+    # Standard rarities: keep original variants
+    return {
+        'normal': original_variants.get('normal', False),
+        'reverse': original_variants.get('reverse', False),
+        'holo': original_variants.get('holo', False),
+        'firstEdition': original_variants.get('firstEdition', False)
+    }
+
+# Apply correction in card data preparation
+corrected_variants = correct_variants(
+    card_details.get('rarity'),
+    card_details.get('variants', {})
+)
+
+card_data = {
+    # ... other fields
+    'variant_normal': corrected_variants['normal'],
+    'variant_reverse': corrected_variants['reverse'],
+    'variant_holo': corrected_variants['holo'],
+    'variant_first_edition': corrected_variants['firstEdition'],
+    # ... rest of card data
+}
+```
+
+## Benefits of This Approach
+
+1. **Future-Proof**: Automatically handles new special rarities
+2. **Simple Maintenance**: Only need to update whitelist if Pokemon introduces new standard rarities
+3. **Safe Default**: Unknown rarities default to special treatment (holo only)
+4. **Backward Compatible**: Doesn't affect existing correct data for Common/Uncommon/Rare cards
+
+## Testing Strategy
+
+1. **Verify whitelist logic** with known card examples
+2. **Test edge cases** with unusual rarity names
+3. **Ensure no regression** on standard rarity cards
+4. **Validate database consistency** after backfill
+
+## Rollout Plan
+
+1. **Phase 1**: Fix existing database data (backfill)
+2. **Phase 2**: Update ingestion scripts with new logic
+3. **Phase 3**: Monitor new card ingestion for correctness
+
+## Monitoring
+
+- **Log variant corrections** during ingestion
+- **Track counts** of cards affected by correction logic
+- **Alert on new rarities** not in whitelist for review
