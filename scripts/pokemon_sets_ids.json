@@ -1,0 +1,967 @@
+{
+  "2011bw": {
+    "name": "Macdonald's Collection 2011",
+    "tcgplayer_group_id": 1401,
+    "ptcgio_id": "mcd11"
+  },
+  "2012bw": {
+    "name": "Macdonald's Collection 2012",
+    "tcgplayer_group_id": 1427,
+    "ptcgio_id": "mcd12"
+  },
+  "2014xy": {
+    "name": "Macdonald's Collection 2014",
+    "tcgplayer_group_id": 1692,
+    "ptcgio_id": "mcd14"
+  },
+  "2015xy": {
+    "name": "Macdonald's Collection 2015",
+    "tcgplayer_group_id": 1694,
+    "ptcgio_id": "mcd15"
+  },
+  "2016xy": {
+    "name": "Macdonald's Collection 2016",
+    "tcgplayer_group_id": 3087,
+    "ptcgio_id": "mcd16"
+  },
+  "2017sm": {
+    "name": "Macdonald's Collection 2017",
+    "tcgplayer_group_id": 2148,
+    "ptcgio_id": "mcd17"
+  },
+  "2018sm": {
+    "name": "Macdonald's Collection 2018",
+    "tcgplayer_group_id": 2364,
+    "ptcgio_id": "mcd18"
+  },
+  "2019sm": {
+    "name": "Macdonald's Collection 2019",
+    "tcgplayer_group_id": 2555,
+    "ptcgio_id": "mcd19"
+  },
+  "2021swsh": {
+    "name": "Macdonald's Collection 2021",
+    "tcgplayer_group_id": 3150,
+    "ptcgio_id": "mcd21"
+  },
+  "A1": {
+    "name": "Genetic Apex",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A1a": {
+    "name": "Mythical Island",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A2": {
+    "name": "Space-Time Smackdown",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A2a": {
+    "name": "Triumphant Light",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A2b": {
+    "name": "Shining Revelry",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A3": {
+    "name": "Celestial Guardians",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A3a": {
+    "name": "Extradimensional Crisis",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A3b": {
+    "name": "Eevee Grove",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A4": {
+    "name": "Wisdom of Sea and Sky",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "A4a": {
+    "name": "Secluded Springs",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "base1": {
+    "name": "Base Set",
+    "tcgplayer_group_id": 604,
+    "ptcgio_id": "base1"
+  },
+  "base2": {
+    "name": "Jungle",
+    "tcgplayer_group_id": 635,
+    "ptcgio_id": "base2"
+  },
+  "base3": {
+    "name": "Fossil",
+    "tcgplayer_group_id": 630,
+    "ptcgio_id": "base3"
+  },
+  "base4": {
+    "name": "Base Set 2",
+    "tcgplayer_group_id": 605,
+    "ptcgio_id": "base4"
+  },
+  "base5": {
+    "name": "Team Rocket",
+    "tcgplayer_group_id": 1373,
+    "ptcgio_id": "base5"
+  },
+  "basep": {
+    "name": "Wizards Black Star Promos",
+    "tcgplayer_group_id": 1418,
+    "ptcgio_id": "basep"
+  },
+  "bog": {
+    "name": "Best of game",
+    "tcgplayer_group_id": 1455,
+    "ptcgio_id": "bp"
+  },
+  "bw1": {
+    "name": "Black & White",
+    "tcgplayer_group_id": 1400,
+    "ptcgio_id": "bw1"
+  },
+  "bw10": {
+    "name": "Plasma Blast",
+    "tcgplayer_group_id": 1370,
+    "ptcgio_id": "bw10"
+  },
+  "bw11": {
+    "name": "Legendary Treasures",
+    "tcgplayer_group_id": 1409,
+    "ptcgio_id": "bw11"
+  },
+  "bw2": {
+    "name": "Emerging Powers",
+    "tcgplayer_group_id": 1424,
+    "ptcgio_id": "bw2"
+  },
+  "bw3": {
+    "name": "Noble Victories",
+    "tcgplayer_group_id": 1385,
+    "ptcgio_id": "bw3"
+  },
+  "bw4": {
+    "name": "Next Destinies",
+    "tcgplayer_group_id": 1412,
+    "ptcgio_id": "bw4"
+  },
+  "bw5": {
+    "name": "Dark Explorers",
+    "tcgplayer_group_id": 1386,
+    "ptcgio_id": "bw5"
+  },
+  "bw6": {
+    "name": "Dragons Exalted",
+    "tcgplayer_group_id": 1394,
+    "ptcgio_id": "bw6"
+  },
+  "bw7": {
+    "name": "Boundaries Crossed",
+    "tcgplayer_group_id": 1408,
+    "ptcgio_id": "bw7"
+  },
+  "bw8": {
+    "name": "Plasma Storm",
+    "tcgplayer_group_id": 1413,
+    "ptcgio_id": "bw8"
+  },
+  "bw9": {
+    "name": "Plasma Freeze",
+    "tcgplayer_group_id": 1382,
+    "ptcgio_id": "bw9"
+  },
+  "bwp": {
+    "name": "BW Black Star Promos",
+    "tcgplayer_group_id": 1407,
+    "ptcgio_id": "bwp"
+  },
+  "cel25": {
+    "name": "Celebrations",
+    "tcgplayer_group_id": 2867,
+    "ptcgio_id": "cel25"
+  },
+  "col1": {
+    "name": "Call of Legends",
+    "tcgplayer_group_id": 1415,
+    "ptcgio_id": "col1"
+  },
+  "dc1": {
+    "name": "Double Crisis",
+    "tcgplayer_group_id": 1525,
+    "ptcgio_id": "dc1"
+  },
+  "det1": {
+    "name": "Detective Pikachu",
+    "tcgplayer_group_id": 2409,
+    "ptcgio_id": "det1"
+  },
+  "dp1": {
+    "name": "Diamond & Pearl",
+    "tcgplayer_group_id": 1430,
+    "ptcgio_id": "dp1"
+  },
+  "dp2": {
+    "name": "Mysterious Treasures",
+    "tcgplayer_group_id": 1368,
+    "ptcgio_id": "dp2"
+  },
+  "dp3": {
+    "name": "Secret Wonders",
+    "tcgplayer_group_id": 1380,
+    "ptcgio_id": "dp3"
+  },
+  "dp4": {
+    "name": "Great Encounters",
+    "tcgplayer_group_id": 1405,
+    "ptcgio_id": "dp4"
+  },
+  "dp5": {
+    "name": "Majestic Dawn",
+    "tcgplayer_group_id": 1390,
+    "ptcgio_id": "dp5"
+  },
+  "dp6": {
+    "name": "Legends Awakened",
+    "tcgplayer_group_id": 1417,
+    "ptcgio_id": "dp6"
+  },
+  "dp7": {
+    "name": "Stormfront",
+    "tcgplayer_group_id": 1369,
+    "ptcgio_id": "dp7"
+  },
+  "dpp": {
+    "name": "DP Black Star Promos",
+    "tcgplayer_group_id": 1421,
+    "ptcgio_id": "dpp"
+  },
+  "dv1": {
+    "name": "Dragon Vault",
+    "tcgplayer_group_id": 1426,
+    "ptcgio_id": "dv1"
+  },
+  "ecard1": {
+    "name": "Expedition Base Set",
+    "tcgplayer_group_id": 1375,
+    "ptcgio_id": "ecard1"
+  },
+  "ecard2": {
+    "name": "Aquapolis",
+    "tcgplayer_group_id": 1397,
+    "ptcgio_id": "ecard2"
+  },
+  "ecard3": {
+    "name": "Skyridge",
+    "tcgplayer_group_id": 1372,
+    "ptcgio_id": "ecard3"
+  },
+  "ex1": {
+    "name": "Ruby & Sapphire",
+    "tcgplayer_group_id": 1393,
+    "ptcgio_id": "ex1"
+  },
+  "ex10": {
+    "name": "Unseen Forces",
+    "tcgplayer_group_id": 1398,
+    "ptcgio_id": "ex10"
+  },
+  "ex11": {
+    "name": "Delta Species",
+    "tcgplayer_group_id": 1429,
+    "ptcgio_id": "ex11"
+  },
+  "ex12": {
+    "name": "Legend Maker",
+    "tcgplayer_group_id": 1378,
+    "ptcgio_id": "ex12"
+  },
+  "ex13": {
+    "name": "Holon Phantoms",
+    "tcgplayer_group_id": 1379,
+    "ptcgio_id": "ex13"
+  },
+  "ex14": {
+    "name": "Crystal Guardians",
+    "tcgplayer_group_id": 1395,
+    "ptcgio_id": "ex14"
+  },
+  "ex15": {
+    "name": "Dragon Frontiers",
+    "tcgplayer_group_id": 1411,
+    "ptcgio_id": "ex15"
+  },
+  "ex16": {
+    "name": "Power Keepers",
+    "tcgplayer_group_id": 1383,
+    "ptcgio_id": "ex16"
+  },
+  "ex2": {
+    "name": "Sandstorm",
+    "tcgplayer_group_id": 1392,
+    "ptcgio_id": "ex2"
+  },
+  "ex3": {
+    "name": "Dragon",
+    "tcgplayer_group_id": 1376,
+    "ptcgio_id": "ex3"
+  },
+  "ex4": {
+    "name": "Team Magma vs Team Aqua",
+    "tcgplayer_group_id": 1377,
+    "ptcgio_id": "ex4"
+  },
+  "ex5": {
+    "name": "Hidden Legends",
+    "tcgplayer_group_id": 1416,
+    "ptcgio_id": "ex5"
+  },
+  "ex5.5": {
+    "name": "Pok\u00e9 Card Creator Pack",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "ex6": {
+    "name": "FireRed & LeafGreen",
+    "tcgplayer_group_id": 1419,
+    "ptcgio_id": "ex6"
+  },
+  "ex7": {
+    "name": "Team Rocket Returns",
+    "tcgplayer_group_id": 1428,
+    "ptcgio_id": "ex7"
+  },
+  "ex8": {
+    "name": "Deoxys",
+    "tcgplayer_group_id": 1404,
+    "ptcgio_id": "ex8"
+  },
+  "ex9": {
+    "name": "Emerald",
+    "tcgplayer_group_id": 1410,
+    "ptcgio_id": "ex9"
+  },
+  "exu": {
+    "name": "Unseen Forces Unown Collection",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "fut2020": {
+    "name": "Pok\u00e9mon Futsal 2020",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "g1": {
+    "name": "Generations",
+    "tcgplayer_group_id": 1728,
+    "ptcgio_id": "g1"
+  },
+  "gym1": {
+    "name": "Gym Heroes",
+    "tcgplayer_group_id": 1441,
+    "ptcgio_id": "gym1"
+  },
+  "gym2": {
+    "name": "Gym Challenge",
+    "tcgplayer_group_id": 1440,
+    "ptcgio_id": "gym2"
+  },
+  "hgss1": {
+    "name": "HeartGold SoulSilver",
+    "tcgplayer_group_id": 1402,
+    "ptcgio_id": "hgss1"
+  },
+  "hgss2": {
+    "name": "Unleashed",
+    "tcgplayer_group_id": 1399,
+    "ptcgio_id": "hgss2"
+  },
+  "hgss3": {
+    "name": "Undaunted",
+    "tcgplayer_group_id": 1403,
+    "ptcgio_id": "hgss3"
+  },
+  "hgss4": {
+    "name": "Triumphant",
+    "tcgplayer_group_id": 1381,
+    "ptcgio_id": "hgss4"
+  },
+  "hgssp": {
+    "name": "HGSS Black Star Promos",
+    "tcgplayer_group_id": 1453,
+    "ptcgio_id": "hsp"
+  },
+  "jumbo": {
+    "name": "Jumbo cards",
+    "tcgplayer_group_id": 1528,
+    "ptcgio_id": null
+  },
+  "lc": {
+    "name": "Legendary Collection",
+    "tcgplayer_group_id": 1374,
+    "ptcgio_id": "base6"
+  },
+  "neo1": {
+    "name": "Neo Genesis",
+    "tcgplayer_group_id": 1396,
+    "ptcgio_id": "neo1"
+  },
+  "neo2": {
+    "name": "Neo Discovery",
+    "tcgplayer_group_id": 1434,
+    "ptcgio_id": "neo2"
+  },
+  "neo3": {
+    "name": "Neo Revelation",
+    "tcgplayer_group_id": 1389,
+    "ptcgio_id": "neo3"
+  },
+  "neo4": {
+    "name": "Neo Destiny",
+    "tcgplayer_group_id": 1444,
+    "ptcgio_id": "neo4"
+  },
+  "np": {
+    "name": "Nintendo Black Star Promos",
+    "tcgplayer_group_id": 1423,
+    "ptcgio_id": "np"
+  },
+  "P-A": {
+    "name": "Promos-A",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "pl1": {
+    "name": "Platinum",
+    "tcgplayer_group_id": 1406,
+    "ptcgio_id": "pl1"
+  },
+  "pl2": {
+    "name": "Rising Rivals",
+    "tcgplayer_group_id": 1367,
+    "ptcgio_id": "pl2"
+  },
+  "pl3": {
+    "name": "Supreme Victors",
+    "tcgplayer_group_id": 1384,
+    "ptcgio_id": "pl3"
+  },
+  "pl4": {
+    "name": "Arceus",
+    "tcgplayer_group_id": 1391,
+    "ptcgio_id": "pl4"
+  },
+  "pop1": {
+    "name": "POP Series 1",
+    "tcgplayer_group_id": 1422,
+    "ptcgio_id": "pop1"
+  },
+  "pop2": {
+    "name": "POP Series 2",
+    "tcgplayer_group_id": 1447,
+    "ptcgio_id": "pop2"
+  },
+  "pop3": {
+    "name": "POP Series 3",
+    "tcgplayer_group_id": 1442,
+    "ptcgio_id": "pop3"
+  },
+  "pop4": {
+    "name": "POP Series 4",
+    "tcgplayer_group_id": 1452,
+    "ptcgio_id": "pop4"
+  },
+  "pop5": {
+    "name": "POP Series 5",
+    "tcgplayer_group_id": 1439,
+    "ptcgio_id": "pop5"
+  },
+  "pop6": {
+    "name": "POP Series 6",
+    "tcgplayer_group_id": 1432,
+    "ptcgio_id": "pop6"
+  },
+  "pop7": {
+    "name": "POP Series 7",
+    "tcgplayer_group_id": 1414,
+    "ptcgio_id": "pop7"
+  },
+  "pop8": {
+    "name": "POP Series 8",
+    "tcgplayer_group_id": 1450,
+    "ptcgio_id": "pop8"
+  },
+  "pop9": {
+    "name": "POP Series 9",
+    "tcgplayer_group_id": 1446,
+    "ptcgio_id": "pop9"
+  },
+  "rc": {
+    "name": "Radiant Collection",
+    "tcgplayer_group_id": 1465,
+    "ptcgio_id": null
+  },
+  "ru1": {
+    "name": "Pok\u00e9mon Rumble",
+    "tcgplayer_group_id": 1433,
+    "ptcgio_id": "ru1"
+  },
+  "si1": {
+    "name": "Southern Islands",
+    "tcgplayer_group_id": 648,
+    "ptcgio_id": "si1"
+  },
+  "sm1": {
+    "name": "Sun & Moon",
+    "tcgplayer_group_id": 1863,
+    "ptcgio_id": "sm1"
+  },
+  "sm10": {
+    "name": "Unbroken Bonds",
+    "tcgplayer_group_id": 2420,
+    "ptcgio_id": "sm10"
+  },
+  "sm11": {
+    "name": "Unified Minds",
+    "tcgplayer_group_id": 2464,
+    "ptcgio_id": "sm11"
+  },
+  "sm115": {
+    "name": "Hidden Fates",
+    "tcgplayer_group_id": 2480,
+    "ptcgio_id": "sm115"
+  },
+  "sm12": {
+    "name": "Cosmic Eclipse",
+    "tcgplayer_group_id": 2534,
+    "ptcgio_id": "sm12"
+  },
+  "sm2": {
+    "name": "Guardians Rising",
+    "tcgplayer_group_id": 1919,
+    "ptcgio_id": "sm2"
+  },
+  "sm3": {
+    "name": "Burning Shadows",
+    "tcgplayer_group_id": 1957,
+    "ptcgio_id": "sm3"
+  },
+  "sm3.5": {
+    "name": "Shining Legends",
+    "tcgplayer_group_id": 2054,
+    "ptcgio_id": "sm35"
+  },
+  "sm4": {
+    "name": "Crimson Invasion",
+    "tcgplayer_group_id": 2071,
+    "ptcgio_id": "sm4"
+  },
+  "sm5": {
+    "name": "Ultra Prism",
+    "tcgplayer_group_id": 2178,
+    "ptcgio_id": "sm5"
+  },
+  "sm6": {
+    "name": "Forbidden Light",
+    "tcgplayer_group_id": 2209,
+    "ptcgio_id": "sm6"
+  },
+  "sm7": {
+    "name": "Celestial Storm",
+    "tcgplayer_group_id": 2278,
+    "ptcgio_id": "sm7"
+  },
+  "sm7.5": {
+    "name": "Dragon Majesty",
+    "tcgplayer_group_id": 2295,
+    "ptcgio_id": "sm75"
+  },
+  "sm8": {
+    "name": "Lost Thunder",
+    "tcgplayer_group_id": 2328,
+    "ptcgio_id": "sm8"
+  },
+  "sm9": {
+    "name": "Team Up",
+    "tcgplayer_group_id": 2377,
+    "ptcgio_id": "sm9"
+  },
+  "sma": {
+    "name": "Yellow A Alternate",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "smp": {
+    "name": "SM Black Star Promos",
+    "tcgplayer_group_id": 1861,
+    "ptcgio_id": "smp"
+  },
+  "sp": {
+    "name": "Sample",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "sv01": {
+    "name": "Scarlet & Violet",
+    "tcgplayer_group_id": 22873,
+    "ptcgio_id": "sv1"
+  },
+  "sv02": {
+    "name": "Paldea Evolved",
+    "tcgplayer_group_id": 23120,
+    "ptcgio_id": "sv2"
+  },
+  "sv03": {
+    "name": "Obsidian Flames",
+    "tcgplayer_group_id": 23228,
+    "ptcgio_id": "sv3"
+  },
+  "sv03.5": {
+    "name": "151",
+    "tcgplayer_group_id": 23237,
+    "ptcgio_id": "sv3pt5"
+  },
+  "sv04": {
+    "name": "Paradox Rift",
+    "tcgplayer_group_id": 23286,
+    "ptcgio_id": "sv4"
+  },
+  "sv04.5": {
+    "name": "Paldean Fates",
+    "tcgplayer_group_id": 23353,
+    "ptcgio_id": "sv4pt5"
+  },
+  "sv05": {
+    "name": "Temporal Forces",
+    "tcgplayer_group_id": 23381,
+    "ptcgio_id": "sv5"
+  },
+  "sv06": {
+    "name": "Twilight Masquerade",
+    "tcgplayer_group_id": 23473,
+    "ptcgio_id": "sv6"
+  },
+  "sv06.5": {
+    "name": "Shrouded Fable",
+    "tcgplayer_group_id": 23529,
+    "ptcgio_id": "sv6pt5"
+  },
+  "sv07": {
+    "name": "Stellar Crown",
+    "tcgplayer_group_id": 23537,
+    "ptcgio_id": "sv7"
+  },
+  "sv08": {
+    "name": "Surging Sparks",
+    "tcgplayer_group_id": 23651,
+    "ptcgio_id": "sv8"
+  },
+  "sv08.5": {
+    "name": "Prismatic Evolutions",
+    "tcgplayer_group_id": 23821,
+    "ptcgio_id": "sv8pt5"
+  },
+  "sv09": {
+    "name": "Journey Together",
+    "tcgplayer_group_id": 24073,
+    "ptcgio_id": "sv9"
+  },
+  "sv10": {
+    "name": "Destined Rivals",
+    "tcgplayer_group_id": 24269,
+    "ptcgio_id": "sv10"
+  },
+  "sv10.5b": {
+    "name": "Black Bolt",
+    "tcgplayer_group_id": 24325,
+    "ptcgio_id": "zsv10pt5"
+  },
+  "sv10.5w": {
+    "name": "White Flare",
+    "tcgplayer_group_id": 24326,
+    "ptcgio_id": "rsv10pt5"
+  },
+  "svp": {
+    "name": "SVP Black Star Promos",
+    "tcgplayer_group_id": 22872,
+    "ptcgio_id": "svp"
+  },
+  "swsh1": {
+    "name": "Sword & Shield",
+    "tcgplayer_group_id": 2585,
+    "ptcgio_id": "swsh1"
+  },
+  "swsh10": {
+    "name": "Astral Radiance",
+    "tcgplayer_group_id": 3040,
+    "ptcgio_id": "swsh10"
+  },
+  "swsh10.5": {
+    "name": "Pok\u00e9mon GO",
+    "tcgplayer_group_id": 3064,
+    "ptcgio_id": "pgo"
+  },
+  "swsh11": {
+    "name": "Lost Origin",
+    "tcgplayer_group_id": 3118,
+    "ptcgio_id": "swsh11"
+  },
+  "swsh12": {
+    "name": "Silver Tempest",
+    "tcgplayer_group_id": 3170,
+    "ptcgio_id": "swsh12"
+  },
+  "swsh12.5": {
+    "name": "Crown Zenith",
+    "tcgplayer_group_id": 17688,
+    "ptcgio_id": "swsh12pt5"
+  },
+  "swsh2": {
+    "name": "Rebel Clash",
+    "tcgplayer_group_id": 2626,
+    "ptcgio_id": "swsh2"
+  },
+  "swsh3": {
+    "name": "Darkness Ablaze",
+    "tcgplayer_group_id": 2675,
+    "ptcgio_id": "swsh3"
+  },
+  "swsh3.5": {
+    "name": "Champion's Path",
+    "tcgplayer_group_id": 2685,
+    "ptcgio_id": "swsh35"
+  },
+  "swsh4": {
+    "name": "Vivid Voltage",
+    "tcgplayer_group_id": 2701,
+    "ptcgio_id": "swsh4"
+  },
+  "swsh4.5": {
+    "name": "Shining Fates",
+    "tcgplayer_group_id": 2754,
+    "ptcgio_id": "swsh45"
+  },
+  "swsh5": {
+    "name": "Battle Styles",
+    "tcgplayer_group_id": 2765,
+    "ptcgio_id": "swsh5"
+  },
+  "swsh6": {
+    "name": "Chilling Reign",
+    "tcgplayer_group_id": 2807,
+    "ptcgio_id": "swsh6"
+  },
+  "swsh7": {
+    "name": "Evolving Skies",
+    "tcgplayer_group_id": 2848,
+    "ptcgio_id": "swsh7"
+  },
+  "swsh8": {
+    "name": "Fusion Strike",
+    "tcgplayer_group_id": 2906,
+    "ptcgio_id": "swsh8"
+  },
+  "swsh9": {
+    "name": "Brilliant Stars",
+    "tcgplayer_group_id": 3020,
+    "ptcgio_id": "swsh9"
+  },
+  "swshp": {
+    "name": "SWSH Black Star Promos",
+    "tcgplayer_group_id": 2545,
+    "ptcgio_id": "swshp"
+  },
+  "tk-bw-e": {
+    "name": "BW trainer Kit (Excadrill)",
+    "tcgplayer_group_id": 1538,
+    "ptcgio_id": null
+  },
+  "tk-bw-z": {
+    "name": "BW trainer Kit (Zoroark)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-dp-l": {
+    "name": "DP trainer Kit (Lucario)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-dp-m": {
+    "name": "DP trainer Kit (Manaphy)",
+    "tcgplayer_group_id": 1541,
+    "ptcgio_id": null
+  },
+  "tk-ex-latia": {
+    "name": "EX trainer Kit (Latias)",
+    "tcgplayer_group_id": 1543,
+    "ptcgio_id": "tk1a"
+  },
+  "tk-ex-latio": {
+    "name": "EX trainer Kit (Latios)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": "tk1b"
+  },
+  "tk-ex-m": {
+    "name": "EX trainer Kit 2 (Minun)",
+    "tcgplayer_group_id": 1542,
+    "ptcgio_id": "tk2b"
+  },
+  "tk-ex-p": {
+    "name": "EX trainer Kit 2 (Plusle)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": "tk2a"
+  },
+  "tk-hs-g": {
+    "name": "HS trainer Kit (Gyarados)",
+    "tcgplayer_group_id": 1540,
+    "ptcgio_id": null
+  },
+  "tk-hs-r": {
+    "name": "HS trainer Kit (Raichu)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-sm-l": {
+    "name": "SM trainer Kit (Lycanroc)",
+    "tcgplayer_group_id": 2069,
+    "ptcgio_id": null
+  },
+  "tk-sm-r": {
+    "name": "SM trainer Kit (Alolan Raichu)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-xy-b": {
+    "name": "XY trainer Kit (Bisharp)",
+    "tcgplayer_group_id": 1533,
+    "ptcgio_id": null
+  },
+  "tk-xy-latia": {
+    "name": "XY trainer Kit (Latias)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-xy-latio": {
+    "name": "XY trainer Kit (Latios)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-xy-n": {
+    "name": "XY trainer Kit (Noivern)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-xy-p": {
+    "name": "XY trainer Kit (Pikachu Libre)",
+    "tcgplayer_group_id": 1796,
+    "ptcgio_id": null
+  },
+  "tk-xy-su": {
+    "name": "XY trainer Kit (Suicune)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "tk-xy-sy": {
+    "name": "XY trainer Kit (Sylveon)",
+    "tcgplayer_group_id": 1532,
+    "ptcgio_id": null
+  },
+  "tk-xy-w": {
+    "name": "XY trainer Kit (Wigglytuff)",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "wp": {
+    "name": "W Promotional",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "xy0": {
+    "name": "Kalos Starter Set",
+    "tcgplayer_group_id": 1522,
+    "ptcgio_id": "xy0"
+  },
+  "xy1": {
+    "name": "XY",
+    "tcgplayer_group_id": 1387,
+    "ptcgio_id": "xy1"
+  },
+  "xy10": {
+    "name": "Fates Collide",
+    "tcgplayer_group_id": 1780,
+    "ptcgio_id": "xy10"
+  },
+  "xy11": {
+    "name": "Steam Siege",
+    "tcgplayer_group_id": 1815,
+    "ptcgio_id": "xy11"
+  },
+  "xy12": {
+    "name": "Evolutions",
+    "tcgplayer_group_id": 1842,
+    "ptcgio_id": "xy12"
+  },
+  "xy2": {
+    "name": "Flashfire",
+    "tcgplayer_group_id": 1464,
+    "ptcgio_id": "xy2"
+  },
+  "xy3": {
+    "name": "Furious Fists",
+    "tcgplayer_group_id": 1481,
+    "ptcgio_id": "xy3"
+  },
+  "xy4": {
+    "name": "Phantom Forces",
+    "tcgplayer_group_id": 1494,
+    "ptcgio_id": "xy4"
+  },
+  "xy5": {
+    "name": "Primal Clash",
+    "tcgplayer_group_id": 1509,
+    "ptcgio_id": "xy5"
+  },
+  "xy6": {
+    "name": "Roaring Skies",
+    "tcgplayer_group_id": 1534,
+    "ptcgio_id": "xy6"
+  },
+  "xy7": {
+    "name": "Ancient Origins",
+    "tcgplayer_group_id": 1576,
+    "ptcgio_id": "xy7"
+  },
+  "xy8": {
+    "name": "BREAKthrough",
+    "tcgplayer_group_id": 1661,
+    "ptcgio_id": "xy8"
+  },
+  "xy9": {
+    "name": "BREAKpoint",
+    "tcgplayer_group_id": 1701,
+    "ptcgio_id": "xy9"
+  },
+  "xya": {
+    "name": "Yello A Alternate",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "xyp": {
+    "name": "XY Black Star Promos",
+    "tcgplayer_group_id": 1451,
+    "ptcgio_id": "xyp"
+  }
+}

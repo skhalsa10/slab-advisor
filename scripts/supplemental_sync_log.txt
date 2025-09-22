@@ -1,0 +1,47 @@
+[21:58:53] Supplemental Data Sync Started at 2025-09-21T21:58:53.045359
+[21:58:53] ============================================================
+[21:58:53] ✓ Connected to Supabase
+[21:58:53] ✓ PokemonTCG.io API key loaded
+[21:58:53] ✓ Loaded 193 existing set mappings
+[21:59:26] ✓ Fetched 168 sets from PokemonTCG.io
+[21:59:26] 
+--- Mapping PokemonTCG.io Sets ---
+[21:59:43]   Ambiguous matches for 'McDonald's Collection 2022':
+[21:59:43]     2012bw: Macdonald's Collection 2012 (0.94)
+[21:59:43]     2021swsh: Macdonald's Collection 2021 (0.94)
+[21:59:43]     2011bw: Macdonald's Collection 2011 (0.91)
+[21:59:44]   ✓ Mapped: Scarlet & Violet → sv01
+[21:59:45] ✓ Saved updated mappings to pokemon_sets_ids.json
+[21:59:45] ✓ Saved 10 unmapped sets to unmapped_ptcgio_sets.json
+[21:59:45] ✓ Mapped 1 new sets
+[21:59:45] Found 10 unmapped sets
+[21:59:45] 
+--- Updating Database with Supplemental Data ---
+[22:00:01] ✓ Updated 0 sets in database
+[22:00:01] ✓ Fetched 208 groups from TCGCSV
+[22:00:01] 
+--- Mapping TCGCSV Groups ---
+[22:00:06] ✓ Saved 38 unmapped TCGCSV groups to unmapped_tcgcsv_groups.json
+[22:00:06] ✓ Mapped 0 new TCGCSV groups
+[22:00:06] Skipped 170 already-mapped groups
+[22:00:06] Found 38 unmapped groups
+[22:00:06] 
+--- Updating Database with TCGPlayer Data ---
+[22:00:22] ✓ Updated 0 sets with TCGPlayer data
+[22:00:22] 
+============================================================
+[22:00:22] SUPPLEMENTAL SYNC COMPLETED
+[22:00:22] PokemonTCG.io sets mapped: 1
+[22:00:22] PokemonTCG.io sets updated: 0
+[22:00:22] PokemonTCG.io sets skipped: 157
+[22:00:22] PokemonTCG.io sets unmapped: 10
+[22:00:22] TCGCSV groups mapped: 0
+[22:00:22] TCGCSV groups updated: 0
+[22:00:22] TCGCSV groups skipped: 170
+[22:00:22] TCGCSV groups unmapped: 38
+[22:00:22] Errors: 0
+[22:00:22] Completed at 2025-09-21T22:00:22.351165
+[22:00:22] 
+Check unmapped_ptcgio_sets.json for PokemonTCG.io sets that couldn't be mapped
+[22:00:22] Check unmapped_tcgcsv_groups.json for TCGCSV groups that couldn't be mapped
+[22:00:22] Check pokemon_sets_ids.json for new mappings

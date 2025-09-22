@@ -1,0 +1,28 @@
+[17:26:44] TCGdex Auto Sync Started at 2025-09-20T17:26:44.635528
+[17:26:44] ============================================================
+[17:26:44] ✓ Connected to Supabase
+[17:26:44] 
+--- Syncing Series ---
+[17:26:44] Found 20 series in TCGdex
+[17:26:45] Found 20 series in database
+[17:26:45] No new series to add
+[17:26:45] 
+--- Syncing Sets ---
+[17:26:45] Found 193 sets in TCGdex
+[17:26:46] Found 192 sets in database
+[17:26:46] Added set: Secluded Springs (A4a)
+[17:27:19]   ✓ Added 105 cards for set A4a
+[17:27:19] ✓ Added 1 new sets
+[17:27:19] 
+--- Checking Existing Sets for Missing Cards ---
+[17:27:19] Checking 193 sets for missing cards...
+[17:28:49] No missing cards found in existing sets
+[17:28:49] 
+============================================================
+[17:28:49] SYNC COMPLETED
+[17:28:49] Series added: 0
+[17:28:49] Sets added: 1
+[17:28:49] Cards added: 105
+[17:28:49] Cards checked: 105
+[17:28:49] Errors: 0
+[17:28:49] Completed at 2025-09-20T17:28:49.547101
