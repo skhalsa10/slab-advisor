@@ -12,14 +12,16 @@ interface SetListItemProps {
 }
 
 export default function SetListItem({ set, series }: SetListItemProps) {
+  const hasLogo = set.logo || set.secondary_logo
+
   return (
     <tr className="hover:bg-grey-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <Link href={`/browse/pokemon/${set.id}`} className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
-            {set.logo ? (
+            {hasLogo ? (
               <Image
-                src={getLogoUrl(set.logo)}
+                src={getLogoUrl(set.logo, set.secondary_logo)}
                 alt={set.name}
                 width={40}
                 height={40}

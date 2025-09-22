@@ -12,17 +12,19 @@ interface SetCardProps {
 }
 
 export default function SetCard({ set, series }: SetCardProps) {
+  const hasLogo = set.logo || set.secondary_logo
+
   return (
     <Link
       href={`/browse/pokemon/${set.id}`}
       className="group bg-white border border-grey-200 rounded-lg hover:border-orange-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
       <div className="p-4 sm:p-5">
-        {set.logo ? (
+        {hasLogo ? (
           <>
             <div className="h-20 sm:h-24 flex items-center justify-center mb-3">
               <Image
-                src={getLogoUrl(set.logo)}
+                src={getLogoUrl(set.logo, set.secondary_logo)}
                 alt={set.name}
                 width={150}
                 height={100}

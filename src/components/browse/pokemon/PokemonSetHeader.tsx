@@ -32,9 +32,9 @@ export default function PokemonSetHeader({
       {/* Main header content */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center space-x-4">
-          {setData.logo && (
+          {(setData.logo || setData.secondary_logo) && (
             <Image
-              src={getLogoUrl(setData.logo)}
+              src={getLogoUrl(setData.logo, setData.secondary_logo)}
               alt={setData.name}
               width={80}
               height={80}

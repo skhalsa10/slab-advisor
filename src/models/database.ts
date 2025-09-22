@@ -250,7 +250,10 @@ export type Database = {
           id: string
           logo: string | null
           name: string
+          ptcgio_id: string | null
           release_date: string | null
+          secondary_logo: string | null
+          secondary_symbol: string | null
           series_id: string | null
           symbol: string | null
           tcgplayer_group_id: number | null
@@ -267,7 +270,10 @@ export type Database = {
           id: string
           logo?: string | null
           name: string
+          ptcgio_id?: string | null
           release_date?: string | null
+          secondary_logo?: string | null
+          secondary_symbol?: string | null
           series_id?: string | null
           symbol?: string | null
           tcgplayer_group_id?: number | null
@@ -284,7 +290,10 @@ export type Database = {
           id?: string
           logo?: string | null
           name?: string
+          ptcgio_id?: string | null
           release_date?: string | null
+          secondary_logo?: string | null
+          secondary_symbol?: string | null
           series_id?: string | null
           symbol?: string | null
           tcgplayer_group_id?: number | null

@@ -48,23 +48,53 @@ export function getCardImageUrl(
 }
 
 /**
+ * Check if URL already has an image file extension
+ *
+ * @param url - URL to check
+ * @returns true if URL ends with a common image extension
+ */
+function hasImageExtension(url: string): boolean {
+  const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.bmp', '.ico', '.tiff', '.avif']
+  const lowerUrl = url.toLowerCase()
+  return imageExtensions.some(ext => lowerUrl.endsWith(ext))
+}
+
+/**
  * Get logo URL with specific format
- * 
+ *
  * Generates set logo URLs with format options.
- * Falls back to placeholder if no logo URL provided.
- * 
+ * Checks primary logo first, then secondary logo, then falls back to placeholder.
+ *
  * @param logoUrl - Base logo URL from set data
+ * @param secondaryLogoUrl - Secondary logo URL from set data (optional fallback)
  * @param format - Image format ('png' or 'webp')
  * @returns Complete logo URL with format extension
- * 
+ *
  * @example
  * ```typescript
- * const pngLogo = getLogoUrl(set.logo, 'png')
- * const webpLogo = getLogoUrl(set.logo, 'webp')
+ * const pngLogo = getLogoUrl(set.logo, set.secondary_logo, 'png')
+ * const webpLogo = getLogoUrl(set.logo, set.secondary_logo, 'webp')
  * ```
  */
-export function getLogoUrl(logoUrl: string | undefined | null, format: 'png' | 'webp' = 'png'): string {
-  if (!logoUrl) return '/placeholder-logo.png'
-  
-  return `${logoUrl}.${format}`
+export function getLogoUrl(
+  logoUrl: string | undefined | null,
+  secondaryLogoUrl?: string | undefined | null,
+  format: 'png' | 'webp' = 'png'
+): string {
+  // Try primary logo first
+  if (logoUrl) {
+    return `${logoUrl}.${format}`
+  }
+
+  // Fall back to secondary logo if available
+  if (secondaryLogoUrl) {
+    // Check if secondary logo already has an image extension
+    if (hasImageExtension(secondaryLogoUrl)) {
+      return secondaryLogoUrl
+    }
+    return `${secondaryLogoUrl}.${format}`
+  }
+
+  // Final fallback to placeholder
+  return '/placeholder-logo.png'
 }
