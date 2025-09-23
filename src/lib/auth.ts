@@ -114,28 +114,98 @@ export async function signOut() {
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser()
-    
-    // Handle common auth errors gracefully
-    if (error) {
-      if (error.message.includes('Invalid Refresh Token')) {
-        console.warn('Invalid refresh token detected, clearing session')
-        await supabase.auth.signOut()
-        return null
-      } else if (error.message.includes('Auth session missing')) {
-        // Session is already cleared, just return null
-        return null
-      } else {
-        console.error('Auth error:', error)
-        return null
+    // First, check if we have a session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+    if (sessionError) {
+      // Only log errors in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Session error:', sessionError)
       }
     }
-    
+
+    // Check if session exists with refresh token
+    if (!session || !session.refresh_token) {
+      // This is a normal state when not logged in, no need to warn
+      return null
+    }
+
+    // Now try to get the user
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    // Handle common auth errors gracefully
+    if (error) {
+      // Cast to access code property
+      const authError = error as { message: string; name: string; code?: string; status?: number }
+
+      // Only log detailed error info in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Auth error occurred:', {
+          message: authError.message,
+          name: authError.name,
+          code: authError.code,
+          status: authError.status
+        })
+      }
+
+      // Check if it's a refresh token error
+      if (authError.message.includes('Refresh Token') ||
+          authError.message.includes('refresh_token') ||
+          authError.code === 'refresh_token_not_found' ||
+          authError.code === 'refresh_token_already_used') {
+        // Only log in development
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Refresh token issue detected, clearing session')
+        }
+
+        try {
+          // Clear the session completely
+          await supabase.auth.signOut()
+        } catch {
+          // Silent fail in production
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to sign out cleanly, clearing storage manually')
+          }
+          // Manually clear storage if signOut fails
+          if (typeof window !== 'undefined') {
+            // Clear all Supabase-related storage
+            const keysToRemove: string[] = []
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i)
+              if (key && key.includes('supabase')) {
+                keysToRemove.push(key)
+              }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key))
+
+            // Also clear session storage
+            for (let i = 0; i < sessionStorage.length; i++) {
+              const key = sessionStorage.key(i)
+              if (key && key.includes('supabase')) {
+                sessionStorage.removeItem(key)
+              }
+            }
+          }
+        }
+        return null
+      }
+
+      // For any other auth errors, just return null without clearing session
+      // This allows the app to retry
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Non-refresh token auth error, returning null')
+      }
+      return null
+    }
+
     return user
   } catch (error) {
-    console.error('Unexpected error in getCurrentUser:', error)
-    // Clear session on any unexpected auth error
-    await supabase.auth.signOut()
+    // Only log unexpected errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Unexpected error in getCurrentUser:', error)
+    }
+    // Don't automatically sign out on unexpected errors
+    // Let the app decide what to do
     return null
   }
 }
@@ -202,6 +272,51 @@ export async function deductCredit(userId: string) {
   })
   
   if (error) throw error
+}
+
+/**
+ * Sets up an auth state change listener for better session management
+ *
+ * This should be called once when your app initializes to handle
+ * auth state changes and token refreshes properly.
+ *
+ * @returns Unsubscribe function to clean up the listener
+ *
+ * @example
+ * ```typescript
+ * // In your app's initialization (e.g., _app.tsx or layout.tsx)
+ * useEffect(() => {
+ *   const { data: { subscription } } = setupAuthListener()
+ *   return () => subscription.unsubscribe()
+ * }, [])
+ * ```
+ */
+export function setupAuthListener() {
+  return supabase.auth.onAuthStateChange((event, session) => {
+    // Only log auth state changes in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Auth state changed:', event)
+
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token was refreshed successfully')
+      }
+
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out')
+      }
+
+      if (event === 'SIGNED_IN' && session) {
+        console.log('User signed in, session established')
+      }
+
+      // Log refresh token status
+      if (session?.refresh_token) {
+        console.log('Session has refresh token')
+      } else if (session) {
+        console.warn('Session exists but no refresh token found!')
+      }
+    }
+  })
 }
 
 /**
