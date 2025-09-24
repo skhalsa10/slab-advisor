@@ -1,0 +1,1680 @@
+{
+  "timestamp": "2025-09-23T19:17:25.360503",
+  "summary": {
+    "total_unmapped": 17,
+    "sets_affected": 1
+  },
+  "sets": {
+    "xyp": {
+      "products": [
+        {
+          "set_id": "xyp",
+          "card_number": "59",
+          "product_names": [
+            "Machamp (XY Evolutions Prerelease)",
+            "Machamp - 59/108 (Prerelease) [Staff]"
+          ],
+          "product_ids": [
+            126018,
+            126019
+          ],
+          "reason": "Multi-variant card not found in database",
+          "action": "create",
+          "tcg_products": [
+            {
+              "productId": 126018,
+              "name": "Machamp (XY Evolutions Prerelease)",
+              "cleanName": "Machamp XY Evolutions Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126018_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126018/pokemon-xy-promos-machamp-xy-evolutions-prerelease",
+              "modifiedOn": "2022-12-15T14:53:32.847",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "59/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Fighting"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "160"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "<b>Ability \u2014 Counterattack</b>\r\n<br>If this Pokemon is your Active Pokemon and is damaged by an opponent's attack <em>(even if this Pokemon is Knocked Out)</em>, put 3 damage counters on the Attacking Pokemon."
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[FFF] Seismic Toss (120)"
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Px2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "2"
+                }
+              ]
+            },
+            {
+              "productId": 126019,
+              "name": "Machamp - 59/108 (Prerelease) [Staff]",
+              "cleanName": "Machamp 59 108 Prerelease Staff",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126019_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126019/pokemon-xy-promos-machamp-59-108-prerelease-staff",
+              "modifiedOn": "2024-04-03T17:41:22.457",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "59/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Fighting"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "160"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "<b>Ability \u2014 Counterattack</b>\r\n<br>If this Pokemon is your Active Pokemon and is damaged by an opponent's attack <em>(even if this Pokemon is Knocked Out)</em>, put 3 damage counters on the Attacking Pokemon."
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[FFF] Seismic Toss (120)"
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Px2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "51",
+          "product_names": [
+            "Mewtwo (XY Evolutions Prerelease)",
+            "Mewtwo - 51/108 (Prerelease) [Staff]"
+          ],
+          "product_ids": [
+            126020,
+            126021
+          ],
+          "reason": "Multi-variant card not found in database",
+          "action": "create",
+          "tcg_products": [
+            {
+              "productId": 126020,
+              "name": "Mewtwo (XY Evolutions Prerelease)",
+              "cleanName": "Mewtwo XY Evolutions Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126020_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126020/pokemon-xy-promos-mewtwo-xy-evolutions-prerelease",
+              "modifiedOn": "2022-12-15T14:52:59.903",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "51/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Psychic"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "130"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Basic"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[2] Psychic (20+)\r\n<br>This attack does 20 more damage for each Energy card attached to your opponent's Active Pokemon."
+                },
+                {
+                  "name": "Attack 2",
+                  "displayName": "Attack 2",
+                  "value": "[PP] Barrier\r\n<br>During your opponent's next turn, prevents all effects of attacks, including damage, done to this Pokemon. If 1 of your Pokemon used Barrier during your last turn, this attack can't be used."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Px2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "2"
+                }
+              ]
+            },
+            {
+              "productId": 126021,
+              "name": "Mewtwo - 51/108 (Prerelease) [Staff]",
+              "cleanName": "Mewtwo 51 108 Prerelease Staff",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126021_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126021/pokemon-xy-promos-mewtwo-51-108-prerelease-staff",
+              "modifiedOn": "2024-04-03T17:41:44.583",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "51/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Psychic"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "130"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Basic"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[2] Psychic (20+)\r\n<br>This attack does 20 more damage for each Energy card attached to your opponent's Active Pokemon."
+                },
+                {
+                  "name": "Attack 2",
+                  "displayName": "Attack 2",
+                  "value": "[PP] Barrier\r\n<br>During your opponent's next turn, prevents all effects of attacks, including damage, done to this Pokemon. If 1 of your Pokemon used Barrier during your last turn, this attack can't be used."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Px2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "11",
+          "product_names": [
+            "Charizard (XY Evolutions Prerelease)",
+            "Charizard - 11/108 (Prerelease)"
+          ],
+          "product_ids": [
+            126022,
+            126023
+          ],
+          "reason": "Multi-variant card not found in database",
+          "action": "create",
+          "tcg_products": [
+            {
+              "productId": 126022,
+              "name": "Charizard (XY Evolutions Prerelease)",
+              "cleanName": "Charizard XY Evolutions Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126022_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126022/pokemon-xy-promos-charizard-xy-evolutions-prerelease",
+              "modifiedOn": "2022-12-15T14:50:53.313",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "11/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Fire"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "150"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "<b>Ability \u2014 Energy Burn</b>\r\n<br>All Energy attached to this Pokemon are Fire Energy instead of their usual type."
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[RRRR] Fire Spin (200)\r\n<br>Discard 3 Energy attached to this Pokemon."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Wx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "F-20"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            },
+            {
+              "productId": 126023,
+              "name": "Charizard - 11/108 (Prerelease)",
+              "cleanName": "Charizard 11 108 Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126023_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126023/pokemon-xy-promos-charizard-11-108-prerelease",
+              "modifiedOn": "2024-10-23T16:06:50.61",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "11/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Fire"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "150"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "<b>Ability \u2014 Energy Burn</b>\r\n<br>All Energy attached to this Pokemon are Fire Energy instead of their usual type."
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[RRRR] Fire Spin (200)\r\n<br>Discard 3 Energy attached to this Pokemon."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Wx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "F-20"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "34",
+          "product_names": [
+            "Gyarados (XY Evolutions Prerelease)",
+            "Gyarados - 34/108 (Prerelease) [Staff]"
+          ],
+          "product_ids": [
+            126024,
+            126025
+          ],
+          "reason": "Multi-variant card not found in database",
+          "action": "create",
+          "tcg_products": [
+            {
+              "productId": 126024,
+              "name": "Gyarados (XY Evolutions Prerelease)",
+              "cleanName": "Gyarados XY Evolutions Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126024_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126024/pokemon-xy-promos-gyarados-xy-evolutions-prerelease",
+              "modifiedOn": "2022-12-15T14:52:42.993",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "34/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Water"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "130"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 1"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[WWW] Bubble Beam (50)\r\n<br>Flip a coin. If heads, your opponent's Active Pokemon is now Paralyzed."
+                },
+                {
+                  "name": "Attack 2",
+                  "displayName": "Attack 2",
+                  "value": "[WWWW] Dragon Rage (180)\r\n<br>Flip 2 coins. If either of them are tails, this attack does nothing."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Lx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            },
+            {
+              "productId": 126025,
+              "name": "Gyarados - 34/108 (Prerelease) [Staff]",
+              "cleanName": "Gyarados 34 108 Prerelease Staff",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/126025_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/126025/pokemon-xy-promos-gyarados-34-108-prerelease-staff",
+              "modifiedOn": "2024-04-03T17:40:24.107",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "34/108"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Water"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "130"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 1"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[WWW] Bubble Beam (50)\r\n<br>Flip a coin. If heads, your opponent's Active Pokemon is now Paralyzed."
+                },
+                {
+                  "name": "Attack 2",
+                  "displayName": "Attack 2",
+                  "value": "[WWWW] Dragon Rage (180)\r\n<br>Flip 2 coins. If either of them are tails, this attack does nothing."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Lx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "None"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "86",
+          "product_names": [
+            "Aegislash - 86/146 (Prerelease)",
+            "Aegislash - 86/146 (Prerelease) [Staff]"
+          ],
+          "product_ids": [
+            243195,
+            243196
+          ],
+          "reason": "Multi-variant card not found in database",
+          "action": "create",
+          "tcg_products": [
+            {
+              "productId": 243195,
+              "name": "Aegislash - 86/146 (Prerelease)",
+              "cleanName": "Aegislash 86 146 Prerelease",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/243195_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/243195/pokemon-xy-promos-aegislash-86-146-prerelease",
+              "modifiedOn": "2024-04-08T15:55:39.28",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "86/146"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Metal"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "140"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "Stance Change - Once during your turn (before your attack), you may switch this Pokemon with an Aegislash in your hand.  (Any cards attached to this Pokemon, damage counters, Special Conditions, turns in play, and any other effects remain on the new Pokemon.)  (Ability)"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[2MM] King's Shield (50) \r\n<br>Prevent all damage done to this Pokemon by attacks during your opponent's next turn. This Pokemon can't use King's Shield during your next turn."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Rx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "P-20"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            },
+            {
+              "productId": 243196,
+              "name": "Aegislash - 86/146 (Prerelease) [Staff]",
+              "cleanName": "Aegislash 86 146 Prerelease Staff",
+              "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/243196_200w.jpg",
+              "categoryId": 3,
+              "groupId": 1451,
+              "url": "https://www.tcgplayer.com/product/243196/pokemon-xy-promos-aegislash-86-146-prerelease-staff",
+              "modifiedOn": "2024-04-08T15:55:45.867",
+              "imageCount": 1,
+              "presaleInfo": {
+                "isPresale": false,
+                "releasedOn": null,
+                "note": null
+              },
+              "extendedData": [
+                {
+                  "name": "Number",
+                  "displayName": "Card Number",
+                  "value": "86/146"
+                },
+                {
+                  "name": "Rarity",
+                  "displayName": "Rarity",
+                  "value": "Promo"
+                },
+                {
+                  "name": "Card Type",
+                  "displayName": "Card Type",
+                  "value": "Metal"
+                },
+                {
+                  "name": "HP",
+                  "displayName": "HP",
+                  "value": "140"
+                },
+                {
+                  "name": "Stage",
+                  "displayName": "Stage",
+                  "value": "Stage 2"
+                },
+                {
+                  "name": "CardText",
+                  "displayName": "Card Text",
+                  "value": "<strong>Ability \u2014 Stance Change</strong>\r\n<br>\r\nOnce during your turn (before your attack), you may switch this Pok\u00e9mon with an Aegislash in your hand. (Any cards attached to this Pok\u00e9mon, damage counters, Special Conditions, turns in play, and any other effects remain on the new Pok\u00e9mon.)"
+                },
+                {
+                  "name": "Attack 1",
+                  "displayName": "Attack 1",
+                  "value": "[2MM] King's Shield (50) \r\n<br>\r\nPrevent all damage done to this Pok\u00e9mon by attacks during your opponent\u2019s next turn. This Pok\u00e9mon can\u2019t use King\u2019s Shield during your next turn."
+                },
+                {
+                  "name": "Weakness",
+                  "displayName": "Weakness",
+                  "value": "Rx2"
+                },
+                {
+                  "name": "Resistance",
+                  "displayName": "Resistance",
+                  "value": "P-20"
+                },
+                {
+                  "name": "RetreatCost",
+                  "displayName": "Retreat Cost",
+                  "value": "3"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "208",
+          "product_name": "Poncho-wearing Pikachu - 208/XY-P",
+          "product_id": 252737,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 252737,
+            "name": "Poncho-wearing Pikachu - 208/XY-P",
+            "cleanName": "Poncho wearing Pikachu 208 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/252737_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/252737/pokemon-xy-promos-poncho-wearing-pikachu-208-xy-p",
+            "modifiedOn": "2021-11-02T12:37:20.507",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "208/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[2] Pika Punch (20)"
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[LLL] Crimson Dive? (90)\r\n<br>Flip a coin. If tails, this Pokemon does 30 damage to itself."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "207",
+          "product_name": "Poncho-wearing Pikachu - 207/XY-P",
+          "product_id": 252738,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 252738,
+            "name": "Poncho-wearing Pikachu - 207/XY-P",
+            "cleanName": "Poncho wearing Pikachu 207 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/252738_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/252738/pokemon-xy-promos-poncho-wearing-pikachu-207-xy-p",
+            "modifiedOn": "2021-11-02T12:37:01.123",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "207/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[2] Pika Punch (20)"
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[LLL] Wild Blaze? (90)\r\n<br>Flip a coin. If tails, discard the top 3 cards of your deck."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "203",
+          "product_name": "Poncho-wearing Pikachu - 203/XY-P",
+          "product_id": 268123,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268123,
+            "name": "Poncho-wearing Pikachu - 203/XY-P",
+            "cleanName": "Poncho wearing Pikachu 203 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268123_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268123/pokemon-xy-promos-poncho-wearing-pikachu-203-xy-p",
+            "modifiedOn": "2022-04-05T15:22:49.203",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "203/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[1] Mega Pretend\r\n<br>Flip a coin. If heads, search your deck for a Mega Evolution Pok\u00e9mon, reveal it, and put it into your hand. Shuffle your deck afterwards."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[LLL] Triple Spark (30x)\r\n<br>Flip 3 coins. This attack does 30 damage times the number of heads."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "230",
+          "product_name": "Poncho-wearing Pikachu - 230/XY-P",
+          "product_id": 268124,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268124,
+            "name": "Poncho-wearing Pikachu - 230/XY-P",
+            "cleanName": "Poncho wearing Pikachu 230 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268124_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268124/pokemon-xy-promos-poncho-wearing-pikachu-230-xy-p",
+            "modifiedOn": "2022-04-05T15:24:15.933",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "230/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[2] Pika Punch (20)"
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1LL] Fly? (50)\r\n<br>Flip a coin. If tails, this attack does nothing. If heads, prevent all effects of attacks, including damage, done to this Pok\u00e9mon during your opponent's next turn."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "2"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "231",
+          "product_name": "Poncho-wearing Pikachu - 231/XY-P",
+          "product_id": 268126,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268126,
+            "name": "Poncho-wearing Pikachu - 231/XY-P",
+            "cleanName": "Poncho wearing Pikachu 231 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268126_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268126/pokemon-xy-promos-poncho-wearing-pikachu-231-xy-p",
+            "modifiedOn": "2022-04-05T15:36:04.25",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "231/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[2] Pika Punch (20)"
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1LL] Outrage? (20x)\r\n<br>Flip a coin. If heads, this attack does 20 damage times the number of damage counters on this Pok\u00e9mon."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "2"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "274",
+          "product_name": "Poncho-wearing Pikachu - 274/XY-P",
+          "product_id": 268127,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268127,
+            "name": "Poncho-wearing Pikachu - 274/XY-P",
+            "cleanName": "Poncho wearing Pikachu 274 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268127_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268127/pokemon-xy-promos-poncho-wearing-pikachu-274-xy-p",
+            "modifiedOn": "2022-04-05T15:31:59.64",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "274/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[1] Mega Pretend\r\n<br>Flip a coin. If heads, search your deck for a Mega Evolution Pok\u00e9mon, reveal it, and put it into your hand. Shuffle your deck afterwards."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[LLL] Spark Rush (60x)\r\n<br>Flip a coin until you get tails. This attack does 60 damage times the number of heads."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "2"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "275",
+          "product_name": "Poncho-wearing Pikachu - 275/XY-P",
+          "product_id": 268258,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268258,
+            "name": "Poncho-wearing Pikachu - 275/XY-P",
+            "cleanName": "Poncho wearing Pikachu 275 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268258_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268258/pokemon-xy-promos-poncho-wearing-pikachu-275-xy-p",
+            "modifiedOn": "2022-04-06T15:22:54.6",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "275/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[1] Mega Pretend\r\n<br>Flip a coin. If heads, search your deck for a Mega Evolution Pok\u00e9mon, reveal it, and put it into your hand. Shuffle your deck afterwards."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[LLL] Triple Spark (30x)\r\n<br>Flip 3 coins. This attack does 30 damage times the number of heads."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "151",
+          "product_name": "Pretend Gyarados Pikachu - 151/XY-P",
+          "product_id": 268259,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268259,
+            "name": "Pretend Gyarados Pikachu - 151/XY-P",
+            "cleanName": "Pretend Gyarados Pikachu 151 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268259_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268259/pokemon-xy-promos-pretend-gyarados-pikachu-151-xy-p",
+            "modifiedOn": "2022-04-06T15:25:55.173",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "151/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[2] Try to Get Angry (10x)\r\n<br>Flip a coin. If heads, this attack does 10 damage times the number of damage counters on this Pok\u00e9mon."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1LL] Thunderbolt (80)\r\n<br>Discard all Energy attached to this Pokemon."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "2"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "150",
+          "product_name": "Pretend Magikarp Pikachu - 150/XY-P",
+          "product_id": 268260,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268260,
+            "name": "Pretend Magikarp Pikachu - 150/XY-P",
+            "cleanName": "Pretend Magikarp Pikachu 150 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268260_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268260/pokemon-xy-promos-pretend-magikarp-pikachu-150-xy-p",
+            "modifiedOn": "2022-04-06T15:28:15.857",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "150/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "60"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[1] Try to Splash (10)\r\n<br>Flip a coin. If heads, this attack does nothing."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1LL] Thunderbolt (80)\r\n<br>Discard all Energy attached to this Pokemon."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "98",
+          "product_name": "Mega Tokyo's Pikachu - 98/XY-P",
+          "product_id": 268261,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268261,
+            "name": "Mega Tokyo's Pikachu - 98/XY-P",
+            "cleanName": "Mega Tokyos Pikachu 98 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268261_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268261/pokemon-xy-promos-mega-tokyos-pikachu-98-xy-p",
+            "modifiedOn": "2022-04-06T15:30:25.89",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "98/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[L] Mega Open!\r\n<br>Each player reveals his or her hand."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1L] Thunder Shock (30)\r\n<br>Flip a coin. If heads, your opponent's Active Pok\u00e9mon is now Paralyzed."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "204",
+          "product_name": "Mega Tokyo's Pikachu - 204/XY-P",
+          "product_id": 268262,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 268262,
+            "name": "Mega Tokyo's Pikachu - 204/XY-P",
+            "cleanName": "Mega Tokyos Pikachu 204 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/268262_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/268262/pokemon-xy-promos-mega-tokyos-pikachu-204-xy-p",
+            "modifiedOn": "2022-04-06T15:31:06.377",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "204/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Lightning"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "[L] Mega Open!\r\n<br>Each player reveals his or her hand."
+              },
+              {
+                "name": "Attack 2",
+                "displayName": "Attack 2",
+                "value": "[1L] Thunder Shock (30)\r\n<br>Flip a coin. If heads, your opponent's Active Pok\u00e9mon is now Paralyzed."
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Fx2"
+              },
+              {
+                "name": "Resistance",
+                "displayName": "Resistance",
+                "value": "M-20"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        },
+        {
+          "set_id": "xyp",
+          "card_number": "155",
+          "product_name": "Hoopa - 155/XY-P",
+          "product_id": 489917,
+          "reason": "Card not found in database",
+          "action": "create",
+          "tcg_product": {
+            "productId": 489917,
+            "name": "Hoopa - 155/XY-P",
+            "cleanName": "Hoopa 155 XY P",
+            "imageUrl": "https://tcgplayer-cdn.tcgplayer.com/product/489917_200w.jpg",
+            "categoryId": 3,
+            "groupId": 1451,
+            "url": "https://www.tcgplayer.com/product/489917/pokemon-xy-promos-hoopa-155-xy-p",
+            "modifiedOn": "2023-03-27T13:20:55.463",
+            "imageCount": 1,
+            "presaleInfo": {
+              "isPresale": false,
+              "releasedOn": null,
+              "note": null
+            },
+            "extendedData": [
+              {
+                "name": "Number",
+                "displayName": "Card Number",
+                "value": "155/XY-P"
+              },
+              {
+                "name": "Rarity",
+                "displayName": "Rarity",
+                "value": "Promo"
+              },
+              {
+                "name": "Card Type",
+                "displayName": "Card Type",
+                "value": "Psychic"
+              },
+              {
+                "name": "HP",
+                "displayName": "HP",
+                "value": "70"
+              },
+              {
+                "name": "Stage",
+                "displayName": "Stage",
+                "value": "Basic"
+              },
+              {
+                "name": "CardText",
+                "displayName": "Card Text",
+                "value": "<span style=\"color:red\"><em>This promotional card was printed in Japanese only.</em></span>"
+              },
+              {
+                "name": "Attack 1",
+                "displayName": "Attack 1",
+                "value": "<span style=\"color:red\"><em>This promotional card was printed in Japanese only.</em></span>"
+              },
+              {
+                "name": "Weakness",
+                "displayName": "Weakness",
+                "value": "Px2"
+              },
+              {
+                "name": "RetreatCost",
+                "displayName": "Retreat Cost",
+                "value": "1"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

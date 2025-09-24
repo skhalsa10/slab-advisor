@@ -86,37 +86,77 @@ class PokemonPriceUpdater:
     def find_product_in_database(self, product_id: int, set_id: str) -> tuple[str, str]:
         """
         Try to find the product ID in the database
+        Checks both legacy single tcgplayer_product_id and new tcgplayer_products JSON array
         Returns: (table_name, record_id) or (None, None) if not found
         """
-        # First, check pokemon_products table
+        # First, check pokemon_products table (legacy single product ID only)
         try:
             result = self.supabase.table('pokemon_products')\
                 .select('id, name')\
                 .eq('tcgplayer_product_id', product_id)\
                 .eq('pokemon_set_id', set_id)\
                 .execute()
-            
+
             if result.data and len(result.data) > 0:
                 return ('pokemon_products', result.data[0]['id'])
+
         except Exception as e:
             console.print(f"[red]Error querying pokemon_products: {e}[/red]")
-        
+
         # Next, check pokemon_cards table
         try:
+            # Check legacy single product ID field
             result = self.supabase.table('pokemon_cards')\
                 .select('id, name')\
                 .eq('tcgplayer_product_id', product_id)\
                 .eq('set_id', set_id)\
                 .execute()
-            
+
             if result.data and len(result.data) > 0:
                 return ('pokemon_cards', result.data[0]['id'])
+
+            # Check new tcgplayer_products JSON array for product ID
+            result = self.supabase.table('pokemon_cards')\
+                .select('id, name, tcgplayer_products')\
+                .eq('set_id', set_id)\
+                .not_.is_('tcgplayer_products', 'null')\
+                .execute()
+
+            if result.data:
+                for record in result.data:
+                    tcgplayer_products = record.get('tcgplayer_products')
+                    if tcgplayer_products and self._product_id_in_array(product_id, tcgplayer_products):
+                        return ('pokemon_cards', record['id'])
+
         except Exception as e:
             console.print(f"[red]Error querying pokemon_cards: {e}[/red]")
-        
+
         # Not found in either table
         return (None, None)
     
+    def _product_id_in_array(self, product_id: int, tcgplayer_products) -> bool:
+        """
+        Check if product_id exists in tcgplayer_products array
+        Handles both JSON string and parsed array formats
+        """
+        try:
+            # Parse JSON string if needed
+            if isinstance(tcgplayer_products, str):
+                import json
+                products_array = json.loads(tcgplayer_products)
+            else:
+                products_array = tcgplayer_products
+
+            # Check if it's a list and contains objects with product_id
+            if isinstance(products_array, list):
+                for product in products_array:
+                    if isinstance(product, dict) and product.get('product_id') == product_id:
+                        return True
+
+            return False
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            return False
+
     def should_skip_update(self, table: str, record_id: str, hours: int = 24) -> bool:
         """
         Check if a record was recently updated (within specified hours)
@@ -214,9 +254,78 @@ class PokemonPriceUpdater:
             console.print(f"[red]Error updating {table}/{record_id}: {e}[/red]")
             return False
     
+    def extract_all_product_ids_from_card(self, card: Dict) -> List[int]:
+        """
+        Extract all product IDs from a card record
+        Handles both legacy tcgplayer_product_id and new tcgplayer_products array
+        Returns deduplicated list of product IDs
+        """
+        product_ids = set()
+
+        # Check legacy single product ID
+        if card.get('tcgplayer_product_id'):
+            product_ids.add(card['tcgplayer_product_id'])
+
+        # Check new tcgplayer_products array
+        tcgplayer_products = card.get('tcgplayer_products')
+        if tcgplayer_products:
+            try:
+                # Parse JSON string if needed
+                if isinstance(tcgplayer_products, str):
+                    import json
+                    products_array = json.loads(tcgplayer_products)
+                else:
+                    products_array = tcgplayer_products
+
+                # Extract product_id from each product in the array
+                if isinstance(products_array, list):
+                    for product in products_array:
+                        if isinstance(product, dict) and product.get('product_id'):
+                            product_ids.add(product['product_id'])
+            except (json.JSONDecodeError, TypeError, AttributeError):
+                pass
+
+        return list(product_ids)
+
+    def get_variant_pattern_for_product(self, product_id: int, tcgplayer_products) -> str:
+        """
+        Get the variant pattern (base, poke_ball, master_ball) for a specific product ID
+        from the tcgplayer_products array
+        """
+        if not tcgplayer_products:
+            return "base"  # Default to base pattern
+
+        try:
+            # Parse JSON string if needed
+            if isinstance(tcgplayer_products, str):
+                import json
+                products_array = json.loads(tcgplayer_products)
+            else:
+                products_array = tcgplayer_products
+
+            # Find the product with matching product_id
+            if isinstance(products_array, list):
+                for product in products_array:
+                    if isinstance(product, dict) and product.get('product_id') == product_id:
+                        variant_types = product.get('variant_types', [])
+
+                        # Determine pattern based on variant_types
+                        if 'poke_ball' in variant_types:
+                            return 'poke_ball'
+                        elif 'master_ball' in variant_types:
+                            return 'master_ball'
+                        else:
+                            return 'base'
+
+        except (json.JSONDecodeError, TypeError, AttributeError):
+            pass
+
+        return "base"  # Default fallback
+
     def process_set_prices(self, set_info: Dict, dry_run: bool = False, force: bool = False) -> Dict[str, int]:
         """
         Process prices for a single set
+        New approach: Process by card to prevent variant overwriting
         Returns statistics about the processing
         """
         stats = {
@@ -227,21 +336,21 @@ class PokemonPriceUpdater:
             'unknown_products': 0,
             'errors': 0
         }
-        
+
         set_id = set_info['id']
         set_name = set_info['name']
         group_id = set_info['tcgplayer_group_id']
-        
+
         console.print(f"\n[blue]Processing: {set_name}[/blue] (Set: {set_id}, Group: {group_id})")
-        
+
         # Fetch prices from TCGCSV
         price_data = self.fetch_tcgcsv_prices(group_id)
         if not price_data:
             console.print(f"[yellow]No price data found for {set_name}[/yellow]")
             return stats
-        
+
         console.print(f"Found [green]{len(price_data)}[/green] price entries")
-        
+
         # Group price data by product ID
         price_by_product = {}
         for price_entry in price_data:
@@ -250,10 +359,43 @@ class PokemonPriceUpdater:
                 if product_id not in price_by_product:
                     price_by_product[product_id] = []
                 price_by_product[product_id].append(price_entry)
-        
+
         console.print(f"Unique product IDs: [blue]{len(price_by_product)}[/blue]")
-        
-        # Process each unique product ID
+
+        # Get all cards in this set (with their product IDs)
+        try:
+            cards_result = self.supabase.table('pokemon_cards')\
+                .select('id, name, tcgplayer_product_id, tcgplayer_products')\
+                .eq('set_id', set_id)\
+                .execute()
+
+            cards = cards_result.data
+        except Exception as e:
+            console.print(f"[red]Error fetching cards for set {set_id}: {e}[/red]")
+            return stats
+
+        if not cards:
+            console.print(f"[yellow]No cards found for set {set_id}[/yellow]")
+            return stats
+
+        console.print(f"Found [blue]{len(cards)}[/blue] cards in set")
+
+        # Also handle pokemon_products (legacy approach for products)
+        try:
+            products_result = self.supabase.table('pokemon_products')\
+                .select('id, name, tcgplayer_product_id')\
+                .eq('pokemon_set_id', set_id)\
+                .not_.is_('tcgplayer_product_id', 'null')\
+                .execute()
+
+            products = products_result.data
+        except Exception as e:
+            console.print(f"[red]Error fetching products for set {set_id}: {e}[/red]")
+            products = []
+
+        total_items = len(cards) + len(products)
+
+        # Process each card and product
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -261,36 +403,96 @@ class PokemonPriceUpdater:
             TaskProgressColumn(),
             console=console
         ) as progress:
-            task = progress.add_task("Processing prices...", total=len(price_by_product))
-            
-            for product_id, price_variants in price_by_product.items():
-                progress.update(task, description=f"Processing product {product_id}...")
-                
-                # Find where this product exists in our database
-                table, record_id = self.find_product_in_database(product_id, set_id)
-                
-                if table and record_id:
-                    # Check if we should skip this update (updated recently) unless force is True
-                    if not force and self.should_skip_update(table, record_id):
-                        if not dry_run:
-                            progress.update(task, description=f"[dim]Skipping {product_id} (recently updated)[/dim]")
-                        if table == 'pokemon_cards':
-                            stats['cards_skipped'] += 1
-                        else:
-                            stats['products_skipped'] += 1
+            task = progress.add_task("Processing cards and products...", total=total_items)
+
+            # Process cards (new approach - collect all variant prices per card)
+            for card in cards:
+                progress.update(task, description=f"Processing card {card['name']}...")
+
+                # Extract all product IDs for this card
+                card_product_ids = self.extract_all_product_ids_from_card(card)
+
+                if not card_product_ids:
+                    progress.advance(task)
+                    continue
+
+                # Check if we should skip this update (unless force is True)
+                if not force and self.should_skip_update('pokemon_cards', card['id']):
+                    stats['cards_skipped'] += 1
+                    progress.advance(task)
+                    continue
+
+                # Collect all price variants for this card
+                all_card_prices = []
+                found_products = 0
+
+                for product_id in card_product_ids:
+                    if product_id in price_by_product:
+                        # Get the variant pattern for this product
+                        variant_pattern = self.get_variant_pattern_for_product(
+                            product_id, card.get('tcgplayer_products')
+                        )
+
+                        # Add variant_pattern to each price entry for this product
+                        product_prices = price_by_product[product_id]
+                        for price_entry in product_prices:
+                            price_entry_with_pattern = price_entry.copy()
+                            price_entry_with_pattern['variant_pattern'] = variant_pattern
+                            all_card_prices.append(price_entry_with_pattern)
+
+                        found_products += 1
+                        # Remove from price_by_product to free memory
+                        price_by_product.pop(product_id, None)
+
+                # Update card with all its variant prices
+                if all_card_prices:
+                    success = self.update_price_data('pokemon_cards', card['id'], all_card_prices, dry_run)
+
+                    if success:
+                        stats['cards_updated'] += 1
+                    else:
+                        stats['errors'] += 1
+                elif found_products == 0:
+                    # None of this card's products had prices
+                    for product_id in card_product_ids:
+                        stats['unknown_products'] += 1
+                        if set_id not in self.unknown_product_ids:
+                            self.unknown_product_ids[set_id] = {
+                                'set_name': set_name,
+                                'product_ids': []
+                            }
+                        self.unknown_product_ids[set_id]['product_ids'].append({
+                            'product_id': product_id,
+                            'variants': [],
+                            'card_name': card['name']
+                        })
+
+                progress.advance(task)
+
+            # Process remaining products (legacy single product approach)
+            for product in products:
+                progress.update(task, description=f"Processing product {product['name']}...")
+
+                product_id = product['tcgplayer_product_id']
+
+                if product_id in price_by_product:
+                    # Check if we should skip this update (unless force is True)
+                    if not force and self.should_skip_update('pokemon_products', product['id']):
+                        stats['products_skipped'] += 1
                     else:
                         # Update the price data
-                        success = self.update_price_data(table, record_id, price_variants, dry_run)
-                        
+                        success = self.update_price_data('pokemon_products', product['id'],
+                                                       price_by_product[product_id], dry_run)
+
                         if success:
-                            if table == 'pokemon_cards':
-                                stats['cards_updated'] += 1
-                            else:
-                                stats['products_updated'] += 1
+                            stats['products_updated'] += 1
                         else:
                             stats['errors'] += 1
+
+                    # Remove from price_by_product to free memory
+                    price_by_product.pop(product_id, None)
                 else:
-                    # Product ID not found - log it
+                    # Product ID not found in prices
                     stats['unknown_products'] += 1
                     if set_id not in self.unknown_product_ids:
                         self.unknown_product_ids[set_id] = {
@@ -299,16 +501,30 @@ class PokemonPriceUpdater:
                         }
                     self.unknown_product_ids[set_id]['product_ids'].append({
                         'product_id': product_id,
-                        'variants': price_variants
+                        'variants': [],
+                        'product_name': product['name']
                     })
-                
+
                 progress.advance(task)
-        
+
+        # Any remaining product IDs in price_by_product are truly unknown
+        for product_id, variants in price_by_product.items():
+            stats['unknown_products'] += 1
+            if set_id not in self.unknown_product_ids:
+                self.unknown_product_ids[set_id] = {
+                    'set_name': set_name,
+                    'product_ids': []
+                }
+            self.unknown_product_ids[set_id]['product_ids'].append({
+                'product_id': product_id,
+                'variants': variants
+            })
+
         # Display stats for this set
         cards_skipped = stats.get('cards_skipped', 0)
         products_skipped = stats.get('products_skipped', 0)
         console.print(f"[dim]  Cards: {stats['cards_updated']} updated, {cards_skipped} skipped | Products: {stats['products_updated']} updated, {products_skipped} skipped | Unknown: {stats['unknown_products']}, Errors: {stats['errors']}[/dim]")
-        
+
         return stats
     
     def update_set_prices(self, set_id: str, dry_run: bool = False, force: bool = False):

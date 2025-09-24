@@ -326,3 +326,202 @@ card_data = {
 - **Log variant corrections** during ingestion
 - **Track counts** of cards affected by correction logic
 - **Alert on new rarities** not in whitelist for review
+
+---
+
+# UI Variant Support Implementation Plan
+
+## Overview
+With the completion of variant data synchronization, the UI now needs updates to support variant selection and display across all user-facing components.
+
+## Phase 1: Database Schema Readiness ✅
+- `tcgplayer_products` JSON array field added to pokemon_cards table
+- `variant_poke_ball` and `variant_master_ball` columns added
+- Variant sync script completed and tested
+- Price update script enhanced for variant support
+
+## Phase 2: Add Card to Collection Flow Updates
+
+### 2.1 Variant Selection Component
+**File**: `/src/components/cards/VariantSelector.tsx`
+- Radio button or dropdown for variant selection (base, poke_ball, master_ball)
+- Preview card image based on selected variant
+- Price display per variant (if available)
+- Clear indication of which variants are available for the card
+
+### 2.2 Enhanced Add Card Modal
+**File**: `/src/components/cards/AddCardModal.tsx`
+- Integrate VariantSelector component
+- Update card search to show variant options
+- Modify form submission to include selected variant
+- Handle variant-specific pricing display
+
+### 2.3 Card Analysis Integration
+**File**: `/src/components/cards/CardAnalysis.tsx`
+- Detect variant from card image analysis (if possible)
+- Pre-select detected variant in selector
+- Allow manual variant override
+
+## Phase 3: Collection Display Enhancements
+
+### 3.1 Collection Grid View
+**File**: `/src/components/collection/CollectionGrid.tsx`
+- Add variant badges/indicators (Base, ⚪ Poke Ball, ⚫ Master Ball)
+- Show variant-specific card images
+- Filter by variant type in collection view
+- Sort by variant options
+
+### 3.2 Collection List View
+**File**: `/src/components/collection/CollectionList.tsx`
+- Variant column in table view
+- Variant-specific pricing display
+- Quick variant change dropdown per row
+- Batch variant update functionality
+
+### 3.3 Collection Statistics
+**File**: `/src/components/collection/CollectionStats.tsx`
+- Break down collection by variant types
+- Show most valuable variants
+- Variant completion tracking per set
+
+## Phase 4: Card Detail Page Updates
+
+### 4.1 Variant Tabs/Selector
+**File**: `/src/components/cards/CardDetail.tsx`
+- Tabbed interface for different variants
+- Large card image per variant
+- Variant availability indicators
+- Switch between variants seamlessly
+
+### 4.2 Pricing Display per Variant
+**File**: `/src/components/cards/PriceDisplay.tsx`
+- Price comparison table across variants
+- Market trends per variant
+- Historical pricing charts per variant
+- TCGPlayer product links per variant
+
+### 4.3 Variant-Specific Information
+**File**: `/src/components/cards/VariantInfo.tsx`
+- Explain variant differences
+- Rarity implications
+- Collectibility information
+- Visual differences between variants
+
+## Phase 5: Browse and Set Page Indicators
+
+### 5.1 Card Browse Grid
+**File**: `/src/components/browse/CardGrid.tsx`
+- Multi-variant indicator badges
+- Hover preview of available variants
+- Quick variant selection from grid
+- Variant count per card
+
+### 5.2 Set Overview
+**File**: `/src/components/sets/SetOverview.tsx`
+- Variant completion tracking
+- Missing variants highlighting
+- Set variant statistics
+- Progress bars per variant type
+
+## Phase 6: Search and Filter Enhancements
+
+### 6.1 Search Filters
+**File**: `/src/components/search/SearchFilters.tsx`
+- Filter by variant type
+- "Has variants" checkbox
+- Variant-specific price ranges
+- Exclude certain variants from results
+
+### 6.2 Search Results
+**File**: `/src/components/search/SearchResults.tsx`
+- Show all variants in results
+- Variant-specific result cards
+- Quick add to collection per variant
+
+## Phase 7: User Preferences
+
+### 7.1 Variant Preferences
+**File**: `/src/components/user/VariantPreferences.tsx`
+- Default variant selection preference
+- Hide/show certain variants
+- Preferred variant for pricing display
+- Notification preferences for variant availability
+
+## Implementation Priority
+
+### High Priority (MVP)
+1. **VariantSelector component** - Core functionality for variant selection
+2. **Collection display updates** - Show variant information in user collections
+3. **Add card flow** - Enable variant selection when adding cards
+4. **Card detail variant tabs** - Full variant information display
+
+### Medium Priority
+1. **Browse page indicators** - Show variant availability in browse views
+2. **Search and filter enhancements** - Filter by variant types
+3. **Variant-specific pricing** - Price display per variant
+
+### Low Priority (Future Enhancement)
+1. **User preferences** - Customizable variant display options
+2. **Advanced analytics** - Variant completion tracking and statistics
+3. **Variant comparison tools** - Side-by-side variant comparison
+
+## Technical Considerations
+
+### Data Fetching
+- Update all card queries to include `tcgplayer_products`, `variant_poke_ball`, `variant_master_ball`
+- Modify collection queries to handle variant filtering
+- Update price queries to extract from `tcgplayer_products` array
+
+### State Management
+- Add variant selection to card forms state
+- Collection state should track variants per card
+- User preference state for default variant selections
+
+### Performance
+- Lazy load variant-specific images
+- Cache variant data to minimize API calls
+- Optimize database queries for variant filtering
+
+### Accessibility
+- Clear variant labels and descriptions
+- Keyboard navigation for variant selectors
+- Screen reader support for variant information
+
+## Testing Strategy
+
+### Unit Tests
+- Variant selector component behavior
+- Price calculation per variant
+- Variant filter logic
+
+### Integration Tests
+- Add card flow with variant selection
+- Collection display with variants
+- Search and filter with variant options
+
+### User Testing
+- Variant selection user experience
+- Collection management with variants
+- Understanding of variant differences
+
+## Migration Plan
+
+### Phase 1: Backend Ready ✅
+- Database schema updated
+- Sync scripts operational
+- Price update scripts enhanced
+
+### Phase 2: Core Components (Week 1-2)
+- Implement VariantSelector component
+- Update AddCardModal for variant support
+- Basic collection display enhancements
+
+### Phase 3: Enhanced Features (Week 3-4)
+- Card detail variant tabs
+- Browse page variant indicators
+- Search and filter enhancements
+
+### Phase 4: Polish and Optimization (Week 5)
+- Performance optimizations
+- User preference settings
+- Analytics and reporting
