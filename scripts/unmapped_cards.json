@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-09-23T19:20:30.693167",
-  "summary": {
-    "total_unmapped": 0,
-    "sets_affected": 0,
-    "message": "All cards successfully mapped! No unmapped cards found."
-  },
-  "sets": {}
-}

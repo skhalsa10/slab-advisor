@@ -88,6 +88,9 @@ class SupplementalDataSync:
         self.mappings = self.load_mappings()
         self.log(f"✓ Loaded {len(self.mappings)} existing set mappings")
 
+        # Sync mappings with database (add any new sets)
+        self.sync_mappings_with_database()
+
     def log(self, message: str):
         """Write to log file and print to console"""
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -116,6 +119,57 @@ class SupplementalDataSync:
             self.log(f"✓ Saved updated mappings to {MAPPING_FILE}")
         except Exception as e:
             self.log(f"ERROR saving mappings: {e}")
+            self.stats['errors'] += 1
+
+    def sync_mappings_with_database(self):
+        """Sync mapping file with database - add any new sets from database"""
+        try:
+            # Fetch all sets from database
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_group_id, ptcgio_id')\
+                .execute()
+
+            if not result.data:
+                self.log("No sets found in database")
+                return
+
+            # Track if we need to save changes
+            mapping_updated = False
+            new_sets_added = 0
+
+            for db_set in result.data:
+                set_id = db_set['id']
+                set_name = db_set['name']
+                db_group_id = db_set.get('tcgplayer_group_id')
+                db_ptcgio_id = db_set.get('ptcgio_id')
+
+                if set_id not in self.mappings:
+                    # New set found in database - add to mappings with existing data or empty fields
+                    self.mappings[set_id] = {
+                        'name': set_name,
+                        'tcgplayer_group_id': db_group_id,
+                        'ptcgio_id': db_ptcgio_id
+                    }
+                    new_sets_added += 1
+                    mapping_updated = True
+                    self.log(f"  + Added new set to mappings: {set_id} ({set_name})")
+
+                else:
+                    # Existing set - preserve manual mappings but update name if changed
+                    if self.mappings[set_id].get('name') != set_name:
+                        self.mappings[set_id]['name'] = set_name
+                        mapping_updated = True
+                        self.log(f"  ~ Updated name for {set_id}: {set_name}")
+
+            # Save updated mappings if changes were made
+            if mapping_updated:
+                self.save_mappings()
+                self.log(f"✓ Added {new_sets_added} new sets to mapping file")
+            else:
+                self.log("✓ Mapping file is up to date with database")
+
+        except Exception as e:
+            self.log(f"ERROR syncing mappings with database: {e}")
             self.stats['errors'] += 1
 
     def fetch_pokemontcg_io_sets(self) -> List[Dict]:
