@@ -3,6 +3,7 @@
 Pokemon Card and Product Price Update Script
 
 This script updates Pokemon card and product prices from TCGCSV API into the Supabase database.
+Now supports multi-group sets (e.g., main set + trainer galleries) using tcgplayer_groups JSONB column.
 For each price entry, it tries to find the product ID in pokemon_products first, then pokemon_cards.
 Unknown product IDs are logged to a file for human investigation.
 
@@ -11,6 +12,7 @@ Usage:
     python update_pokemon_prices.py --set <set_id>
     python update_pokemon_prices.py --all --dry-run
     python update_pokemon_prices.py --set sv10 --dry-run
+    python update_pokemon_prices.py --set swsh11 --force  # Updates main set + trainer gallery prices
     python update_pokemon_prices.py --stats
 """
 
@@ -298,7 +300,6 @@ class PokemonPriceUpdater:
         try:
             # Parse JSON string if needed
             if isinstance(tcgplayer_products, str):
-                import json
                 products_array = json.loads(tcgplayer_products)
             else:
                 products_array = tcgplayer_products
@@ -308,6 +309,10 @@ class PokemonPriceUpdater:
                 for product in products_array:
                     if isinstance(product, dict) and product.get('product_id') == product_id:
                         variant_types = product.get('variant_types', [])
+
+                        # Ensure variant_types is not None and is iterable
+                        if variant_types is None:
+                            variant_types = []
 
                         # Determine pattern based on variant_types
                         if 'poke_ball' in variant_types:
@@ -324,7 +329,7 @@ class PokemonPriceUpdater:
 
     def process_set_prices(self, set_info: Dict, dry_run: bool = False, force: bool = False) -> Dict[str, int]:
         """
-        Process prices for a single set
+        Process prices for a single set (now supports multiple TCGPlayer groups)
         New approach: Process by card to prevent variant overwriting
         Returns statistics about the processing
         """
@@ -339,17 +344,29 @@ class PokemonPriceUpdater:
 
         set_id = set_info['id']
         set_name = set_info['name']
-        group_id = set_info['tcgplayer_group_id']
 
-        console.print(f"\n[blue]Processing: {set_name}[/blue] (Set: {set_id}, Group: {group_id})")
+        # Get group IDs (either from new multi-group support or legacy single group)
+        group_ids = set_info.get('group_ids', [])
+        if not group_ids and set_info.get('tcgplayer_group_id'):
+            group_ids = [set_info['tcgplayer_group_id']]
 
-        # Fetch prices from TCGCSV
-        price_data = self.fetch_tcgcsv_prices(group_id)
-        if not price_data:
-            console.print(f"[yellow]No price data found for {set_name}[/yellow]")
+        console.print(f"\n[blue]Processing: {set_name}[/blue] (Set: {set_id}, Groups: {group_ids})")
+
+        # Fetch prices from TCGCSV for ALL groups
+        all_price_data = []
+        for group_id in group_ids:
+            console.print(f"[dim]Fetching prices for group {group_id}...[/dim]")
+            price_data = self.fetch_tcgcsv_prices(group_id)
+            if price_data:
+                all_price_data.extend(price_data)
+                console.print(f"[green]  Found {len(price_data)} price entries from group {group_id}[/green]")
+
+        if not all_price_data:
+            console.print(f"[yellow]No price data found for {set_name} across {len(group_ids)} groups[/yellow]")
             return stats
 
-        console.print(f"Found [green]{len(price_data)}[/green] price entries")
+        console.print(f"Found [green]{len(all_price_data)}[/green] total price entries across {len(group_ids)} groups")
+        price_data = all_price_data  # Use combined price data from all groups
 
         # Group price data by product ID
         price_by_product = {}
@@ -529,19 +546,42 @@ class PokemonPriceUpdater:
     
     def update_set_prices(self, set_id: str, dry_run: bool = False, force: bool = False):
         """Update prices for a specific set"""
-        # Get set info
+        # Get set info including new tcgplayer_groups JSONB column
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_group_id')\
+                .select('id, name, tcgplayer_group_id, tcgplayer_groups')\
                 .eq('id', set_id)\
                 .execute()
-            
+
             if not result.data:
                 console.print(f"[red]Set {set_id} not found[/red]")
                 return
-            
+
             set_info = result.data[0]
-            if not set_info['tcgplayer_group_id']:
+
+            # Check for groups in new JSONB column first, fall back to legacy field
+            tcgplayer_groups = set_info.get('tcgplayer_groups')
+            if tcgplayer_groups:
+                # Extract group IDs from JSONB array
+                group_ids = []
+                if isinstance(tcgplayer_groups, list):
+                    for group in tcgplayer_groups:
+                        if isinstance(group, dict) and group.get('groupId'):
+                            group_ids.append(group['groupId'])
+
+                if not group_ids:
+                    console.print(f"[yellow]Set {set_id} has no valid TCGPlayer group IDs in tcgplayer_groups[/yellow]")
+                    return
+
+                # Add group_ids to set_info for processing
+                set_info['group_ids'] = group_ids
+                console.print(f"[green]Found {len(group_ids)} TCGPlayer groups for {set_id}: {group_ids}[/green]")
+
+            elif set_info.get('tcgplayer_group_id'):
+                # Fall back to legacy single group ID
+                set_info['group_ids'] = [set_info['tcgplayer_group_id']]
+                console.print(f"[yellow]Using legacy tcgplayer_group_id for {set_id}[/yellow]")
+            else:
                 console.print(f"[yellow]Set {set_id} has no TCGPlayer group ID[/yellow]")
                 return
                 
@@ -570,16 +610,33 @@ class PokemonPriceUpdater:
     def update_all_prices(self, dry_run: bool = False, force: bool = False):
         """Update prices for all sets with TCGPlayer group IDs"""
         console.print("\n[bold]Starting comprehensive price update...[/bold]")
-        
-        # Get all sets with TCGPlayer group IDs
+
+        # Get all sets with TCGPlayer group IDs (check both new and legacy fields)
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_group_id')\
-                .not_.is_('tcgplayer_group_id', 'null')\
+                .select('id, name, tcgplayer_group_id, tcgplayer_groups')\
                 .order('name')\
                 .execute()
-            
-            sets = result.data
+
+            # Filter sets that have either tcgplayer_groups or tcgplayer_group_id
+            sets = []
+            for set_data in result.data:
+                if set_data.get('tcgplayer_groups') or set_data.get('tcgplayer_group_id'):
+                    # Extract group IDs similar to update_set_prices
+                    tcgplayer_groups = set_data.get('tcgplayer_groups')
+                    if tcgplayer_groups:
+                        group_ids = []
+                        if isinstance(tcgplayer_groups, list):
+                            for group in tcgplayer_groups:
+                                if isinstance(group, dict) and group.get('groupId'):
+                                    group_ids.append(group['groupId'])
+                        if group_ids:
+                            set_data['group_ids'] = group_ids
+                            sets.append(set_data)
+                    elif set_data.get('tcgplayer_group_id'):
+                        set_data['group_ids'] = [set_data['tcgplayer_group_id']]
+                        sets.append(set_data)
+
         except Exception as e:
             console.print(f"[red]Error fetching sets: {e}[/red]")
             return

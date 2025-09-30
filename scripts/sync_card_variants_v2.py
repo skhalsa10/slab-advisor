@@ -5,18 +5,23 @@ Enhanced Pokemon Card Variant Sync Script v2
 This script handles complex variant mappings where multiple TCGPlayer products
 correspond to the same Pokemon card (same card number) but represent different
 patterns/treatments like Poke Ball Pattern, Master Ball Pattern, etc.
+Also handles sealed product mapping to the pokemon_products table.
 
 Key Features:
-- Detects 1:many product mappings
+- Uses new tcgplayer_groups JSONB column for multi-group support
+- Handles sets with multiple TCGPlayer groups (main set + trainer galleries)
+- Detects 1:many product mappings across all groups
 - Auto-classifies base vs special pattern variants
 - Sets base variant as primary mapping
 - Corrects existing incorrect mappings
 - Stores all variants in comprehensive tcgplayer_products structure
+- Automatically maps sealed products (booster boxes, ETBs, etc.) to pokemon_products table
 
 Usage:
     python sync_card_variants_v2.py --set sv08.5
     python sync_card_variants_v2.py --all-sets
     python sync_card_variants_v2.py --set sv08.5 --dry-run
+    python sync_card_variants_v2.py --set me01 --clear-products --dry-run
 """
 
 import os
@@ -32,6 +37,7 @@ from supabase import create_client, Client
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from difflib import SequenceMatcher
 
 # Load environment variables
 load_dotenv('../.env.local')
@@ -119,9 +125,10 @@ class VariantCard:
 
 
 class EnhancedVariantSync:
-    def __init__(self, dry_run: bool = False):
+    def __init__(self, dry_run: bool = False, clear_products: bool = False):
         """Initialize the enhanced variant sync"""
         self.dry_run = dry_run
+        self.clear_products = clear_products
 
         # Initialize Supabase
         supabase_url = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
@@ -280,6 +287,65 @@ class EnhancedVariantSync:
         """Construct card ID from set ID and card number"""
         return f"{set_id}-{card_number}"
 
+    def separate_cards_and_sealed_products(self, products: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+        """Separate products into cards and sealed products"""
+        cards = []
+        sealed_products = []
+
+        for product in products:
+            if self.is_card_product(product):
+                cards.append(product)
+            else:
+                sealed_products.append(product)
+
+        return cards, sealed_products
+
+    def sync_sealed_products(self, set_id: str, sealed_products: List[Dict], group_ids: List[int]) -> int:
+        """Insert sealed products into pokemon_products table"""
+        if not sealed_products:
+            return 0
+
+        console.print(f"[blue]Processing {len(sealed_products)} sealed products...[/blue]")
+
+        inserted_count = 0
+        updated_count = 0
+
+        for product in sealed_products:
+            if self.dry_run:
+                console.print(f"[yellow]DRY RUN: Would insert sealed product {product['productId']} - {product.get('name', 'Unknown')}[/yellow]")
+                inserted_count += 1
+                continue
+
+            # Determine which group this product belongs to (use first group by default)
+            group_id = group_ids[0] if group_ids else None
+
+            try:
+                product_data = {
+                    'tcgplayer_product_id': product['productId'],
+                    'name': product['name'],
+                    'tcgplayer_image_url': product.get('imageUrl'),
+                    'tcgplayer_group_id': group_id,
+                    'pokemon_set_id': set_id,
+                    'updated_at': datetime.now().isoformat()
+                }
+
+                # Use upsert to handle duplicates
+                result = self.supabase.table('pokemon_products')\
+                    .upsert(product_data, on_conflict='tcgplayer_product_id')\
+                    .execute()
+
+                if result.data:
+                    # Check if it was an insert or update based on returned data
+                    if len(result.data) > 0:
+                        inserted_count += 1
+                        console.print(f"[green]✓ Added sealed product: {product.get('name', 'Unknown')}[/green]")
+
+            except Exception as e:
+                console.print(f"[red]Error inserting sealed product {product['productId']}: {e}[/red]")
+                self.stats['errors'] += 1
+
+        return inserted_count
+
     def check_product_exists_in_tcg_products(self, card_id: str, product_id: int) -> bool:
         """Check if a product already exists in the card's tcgplayer_products array"""
         try:
@@ -369,6 +435,62 @@ class EnhancedVariantSync:
                 continue
 
         return None
+
+    def calculate_name_similarity(self, product_name: str, card_name: str) -> float:
+        """Calculate similarity between product name and card name using SequenceMatcher"""
+        if not product_name or not card_name:
+            return 0.0
+
+        # Clean product name by removing card number pattern (e.g., "Bulbasaur - 001/132" -> "Bulbasaur")
+        import re
+        cleaned_product_name = re.sub(r'\s*-\s*\d+/\d+\s*$', '', product_name)
+
+        # Normalize names for comparison
+        product_normalized = cleaned_product_name.lower().strip()
+        card_normalized = card_name.lower().strip()
+
+        # Calculate similarity ratio
+        return SequenceMatcher(None, product_normalized, card_normalized).ratio()
+
+    def validate_product_name_match(self, product: Dict, card_name: str, threshold: float = 0.7) -> Tuple[bool, float]:
+        """
+        Validate that a TCGPlayer product name reasonably matches the card name
+        Returns (is_valid, similarity_score)
+        """
+        product_name = product.get('name', '')
+        similarity = self.calculate_name_similarity(product_name, card_name)
+
+        # Log similarity for debugging
+        if similarity < threshold:
+            console.print(f"[yellow]Name mismatch: '{product_name}' vs '{card_name}' (similarity: {similarity:.2f})[/yellow]")
+
+        return similarity >= threshold, similarity
+
+    def clear_card_products(self, card_id: str) -> bool:
+        """Clear existing tcgplayer_products array for a card"""
+        try:
+            if not self.dry_run:
+                result = self.supabase.table('pokemon_cards')\
+                    .update({
+                        'tcgplayer_products': [],
+                        'tcgplayer_product_id': None,
+                        'updated_at': datetime.now().isoformat()
+                    })\
+                    .eq('id', card_id)\
+                    .execute()
+
+                if result.data:
+                    console.print(f"[green]✓ Cleared products for card {card_id}[/green]")
+                    return True
+                else:
+                    console.print(f"[red]Failed to clear products for card {card_id}[/red]")
+                    return False
+            else:
+                console.print(f"[dim]DRY RUN: Would clear products for card {card_id}[/dim]")
+                return True
+        except Exception as e:
+            console.print(f"[red]Error clearing products for card {card_id}: {e}[/red]")
+            return False
 
     def process_input_actions_for_set(self, set_id: str) -> int:
         """Process input actions for a specific set. Returns number of actions processed."""
@@ -631,10 +753,10 @@ class EnhancedVariantSync:
             console.print(f"[green]✓ Processed {input_actions_processed} input actions[/green]")
             self.stats['input_actions_processed'] += input_actions_processed
 
-        # Get set info including TCGPlayer group ID
+        # Get set info including TCGPlayer groups
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_group_id')\
+                .select('id, name, tcgplayer_groups')\
                 .eq('id', set_id)\
                 .execute()
 
@@ -643,10 +765,21 @@ class EnhancedVariantSync:
                 return
 
             set_info = result.data[0]
-            group_id = set_info['tcgplayer_group_id']
+            tcgplayer_groups = set_info['tcgplayer_groups']
 
-            if not group_id:
-                console.print(f"[yellow]Set {set_id} has no TCGPlayer group ID[/yellow]")
+            if not tcgplayer_groups:
+                console.print(f"[yellow]Set {set_id} has no TCGPlayer groups[/yellow]")
+                return
+
+            # Extract group IDs from the rich group objects
+            group_ids = []
+            if isinstance(tcgplayer_groups, list):
+                for group in tcgplayer_groups:
+                    if isinstance(group, dict) and group.get('groupId'):
+                        group_ids.append(group['groupId'])
+
+            if not group_ids:
+                console.print(f"[yellow]Set {set_id} has no valid TCGPlayer group IDs[/yellow]")
                 return
 
         except Exception as e:
@@ -654,14 +787,32 @@ class EnhancedVariantSync:
             self.stats['errors'] += 1
             return
 
-        # Fetch all products for this set
-        products = self.fetch_tcgcsv_products(group_id)
-        if not products:
-            console.print(f"[yellow]No products found for set {set_id}[/yellow]")
+        # Fetch all products for this set (from all groups)
+        all_products = []
+        for group_id in group_ids:
+            console.print(f"[dim]Fetching products for group {group_id}[/dim]")
+            products = self.fetch_tcgcsv_products(group_id)
+            if products:
+                all_products.extend(products)
+
+        if not all_products:
+            console.print(f"[yellow]No products found for set {set_id} across {len(group_ids)} groups[/yellow]")
             return
 
-        # Group products by card number
-        grouped_products = self.group_products_by_card_number(products)
+        console.print(f"[blue]Found {len(all_products)} total products across {len(group_ids)} groups[/blue]")
+
+        # Separate cards and sealed products
+        card_products, sealed_products = self.separate_cards_and_sealed_products(all_products)
+        console.print(f"[dim]  - {len(card_products)} card products[/dim]")
+        console.print(f"[dim]  - {len(sealed_products)} sealed products[/dim]")
+
+        # Handle sealed products first
+        if sealed_products:
+            sealed_inserted = self.sync_sealed_products(set_id, sealed_products, group_ids)
+            self.stats['products_added'] = sealed_inserted
+
+        # Group card products by card number
+        grouped_products = self.group_products_by_card_number(card_products)
         console.print(f"Found [blue]{len(grouped_products)}[/blue] unique card numbers")
 
         # Process each card number group
@@ -730,8 +881,40 @@ class EnhancedVariantSync:
             })
             return False
 
-        # Check if product already exists
-        if self.check_product_exists_in_tcg_products(card_id, product['productId']):
+        # Get card name for validation
+        try:
+            result = self.supabase.table('pokemon_cards')\
+                .select('name')\
+                .eq('id', card_id)\
+                .execute()
+
+            card_name = result.data[0]['name'] if result.data else ''
+        except Exception:
+            card_name = ''
+
+        # Validate product name matches card name (70% similarity threshold)
+        is_valid, similarity = self.validate_product_name_match(product, card_name, threshold=0.7)
+        if not is_valid:
+            console.print(f"[yellow]Skipping product {product['productId']} due to name mismatch (similarity: {similarity:.2f})[/yellow]")
+            self.stats['unmapped_cards'].append({
+                'set_id': set_id,
+                'card_number': card_number,
+                'product_name': product.get('name'),
+                'product_id': product.get('productId'),
+                'card_name': card_name,
+                'similarity': similarity,
+                'reason': 'Name validation failed',
+                'action': 'review',
+                'tcg_product': product
+            })
+            return False
+
+        # Clear existing products if requested
+        if self.clear_products:
+            self.clear_card_products(card_id)
+
+        # Check if product already exists (unless we're clearing products)
+        elif self.check_product_exists_in_tcg_products(card_id, product['productId']):
             console.print(f"[dim]Product {product['productId']} already exists for card {card_id}, skipping[/dim]")
             return True  # Consider this successful
 
@@ -746,6 +929,7 @@ class EnhancedVariantSync:
                 self.stats['errors'] += 1
                 return False
         else:
+            console.print(f"[dim]DRY RUN: Would add product {product['productId']} to card {card_id}[/dim]")
             return True  # Dry run success
 
     def sync_multi_variant_card(self, set_id: str, card_number: str, products: List[Dict]) -> bool:
@@ -793,17 +977,56 @@ class EnhancedVariantSync:
             })
             return False
 
-        # Check if any unprocessed products already exist
+        # Get card name for validation
+        try:
+            result = self.supabase.table('pokemon_cards')\
+                .select('name')\
+                .eq('id', card_id)\
+                .execute()
+
+            card_name = result.data[0]['name'] if result.data else ''
+        except Exception:
+            card_name = ''
+
+        # Validate product names against card name
+        validated_products = []
+        for product in unprocessed_products:
+            is_valid, similarity = self.validate_product_name_match(product, card_name, threshold=0.7)
+            if is_valid:
+                validated_products.append(product)
+            else:
+                console.print(f"[yellow]Skipping product {product['productId']} due to name mismatch (similarity: {similarity:.2f})[/yellow]")
+                self.stats['unmapped_cards'].append({
+                    'set_id': set_id,
+                    'card_number': card_number,
+                    'product_name': product.get('name'),
+                    'product_id': product.get('productId'),
+                    'card_name': card_name,
+                    'similarity': similarity,
+                    'reason': 'Name validation failed',
+                    'action': 'review',
+                    'tcg_product': product
+                })
+
+        if not validated_products:
+            console.print(f"[yellow]No products passed validation for card {card_id}[/yellow]")
+            return False
+
+        # Clear existing products if requested
+        if self.clear_products:
+            self.clear_card_products(card_id)
+
+        # Check if any validated products already exist (unless we're clearing products)
         existing_products = []
         new_products = []
-        for product in unprocessed_products:
-            if self.check_product_exists_in_tcg_products(card_id, product['productId']):
+        for product in validated_products:
+            if not self.clear_products and self.check_product_exists_in_tcg_products(card_id, product['productId']):
                 existing_products.append(product)
             else:
                 new_products.append(product)
 
         if not new_products:
-            console.print(f"[dim]All remaining products already exist for card {card_id}, skipping[/dim]")
+            console.print(f"[dim]All validated products already exist for card {card_id}, skipping[/dim]")
             return True  # Consider this successful
 
         # Create variant card object with only new products
@@ -837,6 +1060,7 @@ class EnhancedVariantSync:
                 self.stats['errors'] += 1
                 return False
         else:
+            console.print(f"[dim]DRY RUN: Would update card {card_id} with {len(products_array)} products[/dim]")
             return True  # Dry run success
 
     def update_card_variant_data(self, card_id: str, base_product: Dict, products_array: List[Dict], is_single_product: bool = False):
@@ -904,13 +1128,13 @@ class EnhancedVariantSync:
             self.stats['errors'] += 1
 
     def sync_all_sets(self):
-        """Sync variants for all sets with TCGPlayer group IDs"""
+        """Sync variants for all sets with TCGPlayer groups"""
         console.print("\n[bold]Syncing variants for all sets...[/bold]")
 
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_group_id')\
-                .not_.is_('tcgplayer_group_id', 'null')\
+                .select('id, name, tcgplayer_groups')\
+                .not_.is_('tcgplayer_groups', 'null')\
                 .order('name')\
                 .execute()
 
@@ -919,7 +1143,7 @@ class EnhancedVariantSync:
             console.print(f"[red]Error fetching sets: {e}[/red]")
             return
 
-        console.print(f"Found [blue]{len(sets)}[/blue] sets with TCGPlayer group IDs")
+        console.print(f"Found [blue]{len(sets)}[/blue] sets with TCGPlayer groups")
 
         for set_data in sets:
             self.sync_set_variants(set_data['id'])
@@ -982,6 +1206,7 @@ class EnhancedVariantSync:
         console.print(f"Automatic updates: [green]{self.stats['automatic_updates']}[/green]")
         console.print(f"Multi-variant cards found: [cyan]{self.stats['multi_product_cards']}[/cyan]")
         console.print(f"Variant mappings fixed: [green]{self.stats['variants_fixed']}[/green]")
+        console.print(f"Sealed products added: [green]{self.stats.get('products_added', 0)}[/green]")
         console.print(f"Unmapped cards: [yellow]{len(self.stats['unmapped_cards'])}[/yellow]")
         console.print(f"Errors: [red]{self.stats['errors']}[/red]")
 
@@ -998,6 +1223,7 @@ def main():
     parser.add_argument('--set', help='Sync variants for a specific set (e.g., sv08.5)')
     parser.add_argument('--all-sets', action='store_true', help='Sync variants for all sets')
     parser.add_argument('--dry-run', action='store_true', help='Preview changes without updating database')
+    parser.add_argument('--clear-products', action='store_true', help='Clear existing products before mapping (useful for fixing incorrect mappings)')
 
     args = parser.parse_args()
 
@@ -1005,7 +1231,7 @@ def main():
         parser.print_help()
         return
 
-    syncer = EnhancedVariantSync(dry_run=args.dry_run)
+    syncer = EnhancedVariantSync(dry_run=args.dry_run, clear_products=args.clear_products)
 
     # Rename unmapped_cards.json to unmapped_cards_input.json at start
     syncer.rename_unmapped_cards_file()
