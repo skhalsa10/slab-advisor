@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getLogoUrl } from '@/lib/pokemon-db'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
+import { validateTCGPlayerGroups } from '@/models/pokemon'
 import SetStatistics from '@/components/sets/SetStatistics'
 import SetOwnershipSummary from '@/components/sets/SetOwnershipSummary'
 import ShopTheSet from '@/components/sets/ShopTheSet'
@@ -12,11 +13,13 @@ interface PokemonSetHeaderProps {
   backText?: string
 }
 
-export default function PokemonSetHeader({ 
-  setData, 
+export default function PokemonSetHeader({
+  setData,
   backHref = "/browse/pokemon",
   backText = "← Back to Sets"
 }: PokemonSetHeaderProps) {
+  // Safely validate TCGPlayer groups data
+  const validatedTCGPlayerGroups = validateTCGPlayerGroups(setData.tcgplayer_groups)
   return (
     <div className="bg-white rounded-lg border border-grey-200 p-6 space-y-6">
       {/* Back button - mobile only, top of header */}
@@ -94,6 +97,7 @@ export default function PokemonSetHeader({
         <div className="xl:flex-1">
           <ShopTheSet
             tcgPlayerUrl={setData.tcgplayer_url || undefined}
+            tcgPlayerGroups={validatedTCGPlayerGroups}
             setName={setData.name}
           />
         </div>

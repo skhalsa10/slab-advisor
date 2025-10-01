@@ -112,10 +112,13 @@ export type Database = {
           set_id: string | null
           tcgplayer_image_url: string | null
           tcgplayer_product_id: number | null
+          tcgplayer_products: Json | null
           updated_at: string | null
           variant_first_edition: boolean | null
           variant_holo: boolean | null
+          variant_master_ball: boolean | null
           variant_normal: boolean | null
+          variant_poke_ball: boolean | null
           variant_reverse: boolean | null
         }
         Insert: {
@@ -132,10 +135,13 @@ export type Database = {
           set_id?: string | null
           tcgplayer_image_url?: string | null
           tcgplayer_product_id?: number | null
+          tcgplayer_products?: Json | null
           updated_at?: string | null
           variant_first_edition?: boolean | null
           variant_holo?: boolean | null
+          variant_master_ball?: boolean | null
           variant_normal?: boolean | null
+          variant_poke_ball?: boolean | null
           variant_reverse?: boolean | null
         }
         Update: {
@@ -152,10 +158,13 @@ export type Database = {
           set_id?: string | null
           tcgplayer_image_url?: string | null
           tcgplayer_product_id?: number | null
+          tcgplayer_products?: Json | null
           updated_at?: string | null
           variant_first_edition?: boolean | null
           variant_holo?: boolean | null
+          variant_master_ball?: boolean | null
           variant_normal?: boolean | null
+          variant_poke_ball?: boolean | null
           variant_reverse?: boolean | null
         }
         Relationships: [
@@ -257,6 +266,7 @@ export type Database = {
           series_id: string | null
           symbol: string | null
           tcgplayer_group_id: number | null
+          tcgplayer_groups: Json | null
           tcgplayer_url: string | null
           updated_at: string | null
         }
@@ -277,6 +287,7 @@ export type Database = {
           series_id?: string | null
           symbol?: string | null
           tcgplayer_group_id?: number | null
+          tcgplayer_groups?: Json | null
           tcgplayer_url?: string | null
           updated_at?: string | null
         }
@@ -297,6 +308,7 @@ export type Database = {
           series_id?: string | null
           symbol?: string | null
           tcgplayer_group_id?: number | null
+          tcgplayer_groups?: Json | null
           tcgplayer_url?: string | null
           updated_at?: string | null
         }
@@ -367,6 +379,10 @@ export type Database = {
       }
       deduct_user_credit: {
         Args: { p_user_id: string }
+        Returns: Json
+      }
+      get_set_tcgplayer_groups: {
+        Args: { set_id: string }
         Returns: Json
       }
       get_user_credit_details: {

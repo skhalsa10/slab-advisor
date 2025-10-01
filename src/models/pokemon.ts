@@ -16,6 +16,46 @@ export type PokemonSetUpdate = Database['public']['Tables']['pokemon_sets']['Upd
 export type PokemonCardUpdate = Database['public']['Tables']['pokemon_cards']['Update']
 export type PokemonProductUpdate = Database['public']['Tables']['pokemon_products']['Update']
 
+// TCGPlayer Group interface for tcgplayer_groups JSONB field
+export interface TCGPlayerGroup {
+  groupId: number
+  name: string
+  abbreviation?: string
+  isSupplemental: boolean
+  publishedOn?: string
+  categoryId?: number
+  modifiedOn?: string
+}
+
+/**
+ * Validate that unknown data matches the TCGPlayerGroup interface
+ * @param data - Unknown data from database JSON
+ * @returns Valid TCGPlayerGroup array or undefined if invalid
+ */
+export function validateTCGPlayerGroups(data: unknown): TCGPlayerGroup[] | undefined {
+  if (!Array.isArray(data)) {
+    return undefined
+  }
+
+  const validGroups = data.filter((group): group is TCGPlayerGroup => {
+    return (
+      typeof group === 'object' &&
+      group !== null &&
+      typeof group.groupId === 'number' &&
+      typeof group.name === 'string' &&
+      group.name.length > 0 &&
+      group.name.length <= 200 &&
+      typeof group.isSupplemental === 'boolean' &&
+      (group.abbreviation === undefined || typeof group.abbreviation === 'string') &&
+      (group.publishedOn === undefined || typeof group.publishedOn === 'string') &&
+      (group.categoryId === undefined || typeof group.categoryId === 'number') &&
+      (group.modifiedOn === undefined || typeof group.modifiedOn === 'string')
+    )
+  })
+
+  return validGroups.length > 0 ? validGroups : undefined
+}
+
 // Enhanced interfaces for query results with joins
 export interface PokemonSeriesWithSets extends PokemonSeries {
   sets: PokemonSet[]
