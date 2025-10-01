@@ -1,47 +1,137 @@
 {
   "2011bw": {
     "name": "Macdonald's Collection 2011",
-    "tcgplayer_group_id": 1401,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1401,
+        "name": "McDonald's Promos 2011",
+        "abbreviation": "",
+        "isSupplemental": false,
+        "publishedOn": "2011-06-17T00:00:00",
+        "modifiedOn": "2022-11-26T17:41:15.467",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd11"
   },
   "2012bw": {
     "name": "Macdonald's Collection 2012",
-    "tcgplayer_group_id": 1427,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1427,
+        "name": "McDonald's Promos 2012",
+        "abbreviation": "",
+        "isSupplemental": false,
+        "publishedOn": "2012-06-15T00:00:00",
+        "modifiedOn": "2022-11-17T21:11:14.983",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd12"
   },
   "2014xy": {
     "name": "Macdonald's Collection 2014",
-    "tcgplayer_group_id": 1692,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1692,
+        "name": "McDonald's Promos 2014",
+        "abbreviation": "MCD14",
+        "isSupplemental": false,
+        "publishedOn": "2014-05-23T00:00:00",
+        "modifiedOn": "2022-12-13T13:31:46.887",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd14"
   },
   "2015xy": {
     "name": "Macdonald's Collection 2015",
-    "tcgplayer_group_id": 1694,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1694,
+        "name": "McDonald's Promos 2015",
+        "abbreviation": "MCD15",
+        "isSupplemental": false,
+        "publishedOn": "2015-11-23T00:00:00",
+        "modifiedOn": "2022-09-22T20:48:29.85",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd15"
   },
   "2016xy": {
     "name": "Macdonald's Collection 2016",
-    "tcgplayer_group_id": 3087,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3087,
+        "name": "McDonald's Promos 2016",
+        "abbreviation": "MCD16",
+        "isSupplemental": true,
+        "publishedOn": "2016-08-05T00:00:00",
+        "modifiedOn": "2022-10-25T17:20:52.377",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd16"
   },
   "2017sm": {
     "name": "Macdonald's Collection 2017",
-    "tcgplayer_group_id": 2148,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2148,
+        "name": "McDonald's Promos 2017",
+        "abbreviation": "MCD17",
+        "isSupplemental": true,
+        "publishedOn": "2017-11-07T00:00:00",
+        "modifiedOn": "2022-09-23T15:39:06.843",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd17"
   },
   "2018sm": {
     "name": "Macdonald's Collection 2018",
-    "tcgplayer_group_id": 2364,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2364,
+        "name": "McDonald's Promos 2018",
+        "abbreviation": "MCD18",
+        "isSupplemental": true,
+        "publishedOn": "2018-11-02T00:00:00",
+        "modifiedOn": "2022-12-19T20:47:47.73",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd18"
   },
   "2019sm": {
     "name": "Macdonald's Collection 2019",
-    "tcgplayer_group_id": 2555,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2555,
+        "name": "McDonald's Promos 2019",
+        "abbreviation": "MCD19",
+        "isSupplemental": false,
+        "publishedOn": "2019-10-01T00:00:00",
+        "modifiedOn": "2024-10-01T13:31:52.48",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd19"
   },
   "2021swsh": {
     "name": "Macdonald's Collection 2021",
-    "tcgplayer_group_id": 3150,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3150,
+        "name": "McDonald's Promos 2022",
+        "abbreviation": "MCD22",
+        "isSupplemental": false,
+        "publishedOn": "2022-08-03T00:00:00",
+        "modifiedOn": "2024-05-08T11:30:55.18",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "mcd21"
   },
   "A1": {
@@ -96,237 +186,707 @@
   },
   "base1": {
     "name": "Base Set",
-    "tcgplayer_group_id": 604,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 604,
+        "name": "Base Set",
+        "abbreviation": "BS",
+        "isSupplemental": false,
+        "publishedOn": "1999-01-09T00:00:00",
+        "modifiedOn": "2025-07-30T16:51:05.15",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base1"
   },
   "base2": {
     "name": "Jungle",
-    "tcgplayer_group_id": 635,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 635,
+        "name": "Jungle",
+        "abbreviation": "JU",
+        "isSupplemental": false,
+        "publishedOn": "1999-06-16T00:00:00",
+        "modifiedOn": "2025-06-04T03:38:00.93",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base2"
   },
   "base3": {
     "name": "Fossil",
-    "tcgplayer_group_id": 630,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 630,
+        "name": "Fossil",
+        "abbreviation": "FO",
+        "isSupplemental": false,
+        "publishedOn": "1999-10-10T00:00:00",
+        "modifiedOn": "2025-05-20T05:10:54.563",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base3"
   },
   "base4": {
     "name": "Base Set 2",
-    "tcgplayer_group_id": 605,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 605,
+        "name": "Base Set 2",
+        "abbreviation": "BS2",
+        "isSupplemental": false,
+        "publishedOn": "2000-02-24T00:00:00",
+        "modifiedOn": "2025-09-03T20:31:53.167",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base4"
   },
   "base5": {
     "name": "Team Rocket",
-    "tcgplayer_group_id": 1373,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1373,
+        "name": "Team Rocket",
+        "abbreviation": "TR",
+        "isSupplemental": false,
+        "publishedOn": "2000-04-24T00:00:00",
+        "modifiedOn": "2025-05-05T16:02:21.73",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base5"
   },
   "basep": {
     "name": "Wizards Black Star Promos",
-    "tcgplayer_group_id": 1418,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1418,
+        "name": "WoTC Promo",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "1999-07-01T00:00:00",
+        "modifiedOn": "2025-05-22T04:59:06.953",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "basep"
   },
   "bog": {
     "name": "Best of game",
-    "tcgplayer_group_id": 1455,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1455,
+        "name": "Best of Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2002-12-01T00:00:00",
+        "modifiedOn": "2025-01-15T13:59:34.26",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bp"
   },
   "bw1": {
     "name": "Black & White",
-    "tcgplayer_group_id": 1400,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1400,
+        "name": "Black and White",
+        "abbreviation": "BLW",
+        "isSupplemental": false,
+        "publishedOn": "2011-04-25T00:00:00",
+        "modifiedOn": "2025-08-06T15:02:08.37",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw1"
   },
   "bw10": {
     "name": "Plasma Blast",
-    "tcgplayer_group_id": 1370,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1370,
+        "name": "Plasma Blast",
+        "abbreviation": "PLB",
+        "isSupplemental": false,
+        "publishedOn": "2013-08-14T00:00:00",
+        "modifiedOn": "2025-02-05T21:14:05.867",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw10"
   },
   "bw11": {
     "name": "Legendary Treasures",
-    "tcgplayer_group_id": 1409,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1409,
+        "name": "Legendary Treasures",
+        "abbreviation": "LTR",
+        "isSupplemental": false,
+        "publishedOn": "2013-11-06T00:00:00",
+        "modifiedOn": "2025-07-15T15:27:43.557",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw11"
   },
   "bw2": {
     "name": "Emerging Powers",
-    "tcgplayer_group_id": 1424,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1424,
+        "name": "Emerging Powers",
+        "abbreviation": "EPO",
+        "isSupplemental": false,
+        "publishedOn": "2011-08-31T00:00:00",
+        "modifiedOn": "2025-03-02T15:57:21.657",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw2"
   },
   "bw3": {
     "name": "Noble Victories",
-    "tcgplayer_group_id": 1385,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1385,
+        "name": "Noble Victories",
+        "abbreviation": "NVI",
+        "isSupplemental": false,
+        "publishedOn": "2011-11-16T00:00:00",
+        "modifiedOn": "2025-04-12T10:06:48.693",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw3"
   },
   "bw4": {
     "name": "Next Destinies",
-    "tcgplayer_group_id": 1412,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1412,
+        "name": "Next Destinies",
+        "abbreviation": "NXD",
+        "isSupplemental": false,
+        "publishedOn": "2012-02-08T00:00:00",
+        "modifiedOn": "2025-02-05T20:16:39.473",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw4"
   },
   "bw5": {
     "name": "Dark Explorers",
-    "tcgplayer_group_id": 1386,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1386,
+        "name": "Dark Explorers",
+        "abbreviation": "DEX",
+        "isSupplemental": false,
+        "publishedOn": "2012-05-09T00:00:00",
+        "modifiedOn": "2025-08-06T14:45:32.667",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw5"
   },
   "bw6": {
     "name": "Dragons Exalted",
-    "tcgplayer_group_id": 1394,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1394,
+        "name": "Dragons Exalted",
+        "abbreviation": "DRX",
+        "isSupplemental": false,
+        "publishedOn": "2012-08-15T00:00:00",
+        "modifiedOn": "2025-03-01T09:23:30.933",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw6"
   },
   "bw7": {
     "name": "Boundaries Crossed",
-    "tcgplayer_group_id": 1408,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1408,
+        "name": "Boundaries Crossed",
+        "abbreviation": "BCR",
+        "isSupplemental": false,
+        "publishedOn": "2012-11-07T00:00:00",
+        "modifiedOn": "2025-03-03T17:38:05.55",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw7"
   },
   "bw8": {
     "name": "Plasma Storm",
-    "tcgplayer_group_id": 1413,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1413,
+        "name": "Plasma Storm",
+        "abbreviation": "PLS",
+        "isSupplemental": false,
+        "publishedOn": "2013-02-06T00:00:00",
+        "modifiedOn": "2025-05-08T10:13:55.437",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw8"
   },
   "bw9": {
     "name": "Plasma Freeze",
-    "tcgplayer_group_id": 1382,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1382,
+        "name": "Plasma Freeze",
+        "abbreviation": "PLF",
+        "isSupplemental": false,
+        "publishedOn": "2013-05-08T00:00:00",
+        "modifiedOn": "2025-05-10T15:46:50.4",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bw9"
   },
   "bwp": {
     "name": "BW Black Star Promos",
-    "tcgplayer_group_id": 1407,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1407,
+        "name": "Black and White Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2011-04-25T00:00:00",
+        "modifiedOn": "2025-07-25T16:33:01.98",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "bwp"
   },
   "cel25": {
     "name": "Celebrations",
-    "tcgplayer_group_id": 2867,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2867,
+        "name": "Celebrations",
+        "abbreviation": "CLB",
+        "isSupplemental": false,
+        "publishedOn": "2021-10-08T00:00:00",
+        "modifiedOn": "2025-07-09T14:30:35.583",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "cel25"
   },
   "col1": {
     "name": "Call of Legends",
-    "tcgplayer_group_id": 1415,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1415,
+        "name": "Call of Legends",
+        "abbreviation": "CL",
+        "isSupplemental": false,
+        "publishedOn": "2011-02-09T00:00:00",
+        "modifiedOn": "2025-07-21T14:58:20.053",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "col1"
   },
   "dc1": {
     "name": "Double Crisis",
-    "tcgplayer_group_id": 1525,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1525,
+        "name": "Double Crisis",
+        "abbreviation": "DCR",
+        "isSupplemental": false,
+        "publishedOn": "2015-03-25T00:00:00",
+        "modifiedOn": "2024-12-27T08:19:04.257",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dc1"
   },
   "det1": {
     "name": "Detective Pikachu",
-    "tcgplayer_group_id": 2409,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2409,
+        "name": "Detective Pikachu",
+        "abbreviation": "DEP",
+        "isSupplemental": false,
+        "publishedOn": "2019-04-05T00:00:00",
+        "modifiedOn": "2025-05-20T19:03:06.537",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "det1"
   },
   "dp1": {
     "name": "Diamond & Pearl",
-    "tcgplayer_group_id": 1430,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1430,
+        "name": "Diamond and Pearl",
+        "abbreviation": "DP",
+        "isSupplemental": false,
+        "publishedOn": "2007-05-23T00:00:00",
+        "modifiedOn": "2025-03-27T20:37:55.447",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp1"
   },
   "dp2": {
     "name": "Mysterious Treasures",
-    "tcgplayer_group_id": 1368,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1368,
+        "name": "Mysterious Treasures",
+        "abbreviation": "MT",
+        "isSupplemental": false,
+        "publishedOn": "2007-08-22T00:00:00",
+        "modifiedOn": "2025-04-25T14:35:03.8",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp2"
   },
   "dp3": {
     "name": "Secret Wonders",
-    "tcgplayer_group_id": 1380,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1380,
+        "name": "Secret Wonders",
+        "abbreviation": "SW",
+        "isSupplemental": false,
+        "publishedOn": "2007-11-07T00:00:00",
+        "modifiedOn": "2025-05-04T05:25:30.23",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp3"
   },
   "dp4": {
     "name": "Great Encounters",
-    "tcgplayer_group_id": 1405,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1405,
+        "name": "Great Encounters",
+        "abbreviation": "GE",
+        "isSupplemental": false,
+        "publishedOn": "2008-02-13T00:00:00",
+        "modifiedOn": "2024-12-20T19:13:40.35",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp4"
   },
   "dp5": {
     "name": "Majestic Dawn",
-    "tcgplayer_group_id": 1390,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1390,
+        "name": "Majestic Dawn",
+        "abbreviation": "MD",
+        "isSupplemental": false,
+        "publishedOn": "2008-05-21T00:00:00",
+        "modifiedOn": "2025-02-15T10:48:02.58",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp5"
   },
   "dp6": {
     "name": "Legends Awakened",
-    "tcgplayer_group_id": 1417,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1417,
+        "name": "Legends Awakened",
+        "abbreviation": "LA",
+        "isSupplemental": false,
+        "publishedOn": "2008-08-20T00:00:00",
+        "modifiedOn": "2025-04-23T12:47:38.467",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp6"
   },
   "dp7": {
     "name": "Stormfront",
-    "tcgplayer_group_id": 1369,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1369,
+        "name": "Stormfront",
+        "abbreviation": "SF",
+        "isSupplemental": false,
+        "publishedOn": "2008-11-05T00:00:00",
+        "modifiedOn": "2025-07-15T15:47:39.75",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dp7"
   },
   "dpp": {
     "name": "DP Black Star Promos",
-    "tcgplayer_group_id": 1421,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1421,
+        "name": "Diamond and Pearl Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2007-05-01T00:00:00",
+        "modifiedOn": "2025-07-25T20:13:07.817",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dpp"
   },
   "dv1": {
     "name": "Dragon Vault",
-    "tcgplayer_group_id": 1426,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1426,
+        "name": "Dragon Vault",
+        "abbreviation": "DRV",
+        "isSupplemental": false,
+        "publishedOn": "2012-10-05T00:00:00",
+        "modifiedOn": "2023-08-29T12:38:19.02",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "dv1"
   },
   "ecard1": {
     "name": "Expedition Base Set",
-    "tcgplayer_group_id": 1375,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1375,
+        "name": "Expedition",
+        "abbreviation": "EX",
+        "isSupplemental": false,
+        "publishedOn": "2002-09-15T00:00:00",
+        "modifiedOn": "2025-01-25T10:54:55.107",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ecard1"
   },
   "ecard2": {
     "name": "Aquapolis",
-    "tcgplayer_group_id": 1397,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1397,
+        "name": "Aquapolis",
+        "abbreviation": "AQ",
+        "isSupplemental": false,
+        "publishedOn": "2003-01-15T00:00:00",
+        "modifiedOn": "2025-03-27T20:11:32.017",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ecard2"
   },
   "ecard3": {
     "name": "Skyridge",
-    "tcgplayer_group_id": 1372,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1372,
+        "name": "Skyridge",
+        "abbreviation": "SK",
+        "isSupplemental": false,
+        "publishedOn": "2003-05-12T00:00:00",
+        "modifiedOn": "2024-11-11T13:43:24.033",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ecard3"
   },
   "ex1": {
     "name": "Ruby & Sapphire",
-    "tcgplayer_group_id": 1393,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1393,
+        "name": "Ruby and Sapphire",
+        "abbreviation": "RS",
+        "isSupplemental": false,
+        "publishedOn": "2003-06-18T00:00:00",
+        "modifiedOn": "2025-07-30T16:28:04.42",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex1"
   },
   "ex10": {
     "name": "Unseen Forces",
-    "tcgplayer_group_id": 1398,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1398,
+        "name": "Unseen Forces",
+        "abbreviation": "UF",
+        "isSupplemental": false,
+        "publishedOn": "2005-08-22T00:00:00",
+        "modifiedOn": "2025-01-06T12:44:48.59",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex10"
   },
   "ex11": {
     "name": "Delta Species",
-    "tcgplayer_group_id": 1429,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1429,
+        "name": "Delta Species",
+        "abbreviation": "DS",
+        "isSupplemental": false,
+        "publishedOn": "2005-10-31T00:00:00",
+        "modifiedOn": "2025-01-17T02:46:57.467",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex11"
   },
   "ex12": {
     "name": "Legend Maker",
-    "tcgplayer_group_id": 1378,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1378,
+        "name": "Legend Maker",
+        "abbreviation": "LM",
+        "isSupplemental": false,
+        "publishedOn": "2006-02-13T00:00:00",
+        "modifiedOn": "2025-02-13T09:34:08.227",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex12"
   },
   "ex13": {
     "name": "Holon Phantoms",
-    "tcgplayer_group_id": 1379,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1379,
+        "name": "Holon Phantoms",
+        "abbreviation": "HP",
+        "isSupplemental": false,
+        "publishedOn": "2006-05-03T00:00:00",
+        "modifiedOn": "2024-10-18T17:42:43.277",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex13"
   },
   "ex14": {
     "name": "Crystal Guardians",
-    "tcgplayer_group_id": 1395,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1395,
+        "name": "Crystal Guardians",
+        "abbreviation": "CG",
+        "isSupplemental": false,
+        "publishedOn": "2006-08-30T00:00:00",
+        "modifiedOn": "2025-02-06T17:19:57.363",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex14"
   },
   "ex15": {
     "name": "Dragon Frontiers",
-    "tcgplayer_group_id": 1411,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1411,
+        "name": "Dragon Frontiers",
+        "abbreviation": "DF",
+        "isSupplemental": false,
+        "publishedOn": "2006-11-08T00:00:00",
+        "modifiedOn": "2025-05-06T15:28:34.103",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex15"
   },
   "ex16": {
     "name": "Power Keepers",
-    "tcgplayer_group_id": 1383,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1383,
+        "name": "Power Keepers",
+        "abbreviation": "PK",
+        "isSupplemental": false,
+        "publishedOn": "2007-02-01T00:00:00",
+        "modifiedOn": "2025-01-31T20:45:19.183",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex16"
   },
   "ex2": {
     "name": "Sandstorm",
-    "tcgplayer_group_id": 1392,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1392,
+        "name": "Sandstorm",
+        "abbreviation": "SS",
+        "isSupplemental": false,
+        "publishedOn": "2003-09-18T00:00:00",
+        "modifiedOn": "2025-02-05T21:15:37.663",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex2"
   },
   "ex3": {
     "name": "Dragon",
-    "tcgplayer_group_id": 1376,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1376,
+        "name": "Dragon",
+        "abbreviation": "DR",
+        "isSupplemental": false,
+        "publishedOn": "2003-11-24T00:00:00",
+        "modifiedOn": "2025-03-27T20:07:31.94",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex3"
   },
   "ex4": {
     "name": "Team Magma vs Team Aqua",
-    "tcgplayer_group_id": 1377,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1377,
+        "name": "Team Magma vs Team Aqua",
+        "abbreviation": "MA",
+        "isSupplemental": false,
+        "publishedOn": "2004-03-15T00:00:00",
+        "modifiedOn": "2025-05-08T18:10:12.653",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex4"
   },
   "ex5": {
     "name": "Hidden Legends",
-    "tcgplayer_group_id": 1416,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1416,
+        "name": "Hidden Legends",
+        "abbreviation": "HL",
+        "isSupplemental": false,
+        "publishedOn": "2004-06-14T00:00:00",
+        "modifiedOn": "2025-05-06T17:41:18.573",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex5"
   },
   "ex5.5": {
@@ -336,22 +896,62 @@
   },
   "ex6": {
     "name": "FireRed & LeafGreen",
-    "tcgplayer_group_id": 1419,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1419,
+        "name": "FireRed & LeafGreen",
+        "abbreviation": "RG",
+        "isSupplemental": false,
+        "publishedOn": "2004-08-30T00:00:00",
+        "modifiedOn": "2025-05-31T20:04:33.26",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex6"
   },
   "ex7": {
     "name": "Team Rocket Returns",
-    "tcgplayer_group_id": 1428,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1428,
+        "name": "Team Rocket Returns",
+        "abbreviation": "RR",
+        "isSupplemental": false,
+        "publishedOn": "2004-11-01T00:00:00",
+        "modifiedOn": "2025-02-19T18:24:43.103",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex7"
   },
   "ex8": {
     "name": "Deoxys",
-    "tcgplayer_group_id": 1404,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1404,
+        "name": "Deoxys",
+        "abbreviation": "DX",
+        "isSupplemental": false,
+        "publishedOn": "2005-02-14T00:00:00",
+        "modifiedOn": "2025-04-17T17:06:08.543",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex8"
   },
   "ex9": {
     "name": "Emerald",
-    "tcgplayer_group_id": 1410,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1410,
+        "name": "Emerald",
+        "abbreviation": "EM",
+        "isSupplemental": false,
+        "publishedOn": "2005-05-09T00:00:00",
+        "modifiedOn": "2025-07-24T20:31:18.517",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ex9"
   },
   "exu": {
@@ -366,77 +966,227 @@
   },
   "g1": {
     "name": "Generations",
-    "tcgplayer_group_id": 1728,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1728,
+        "name": "Generations",
+        "abbreviation": "GEN",
+        "isSupplemental": false,
+        "publishedOn": "2016-02-22T00:00:00",
+        "modifiedOn": "2025-07-31T12:10:11.417",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "g1"
   },
   "gym1": {
     "name": "Gym Heroes",
-    "tcgplayer_group_id": 1441,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1441,
+        "name": "Gym Heroes",
+        "abbreviation": "G1",
+        "isSupplemental": false,
+        "publishedOn": "2000-10-14T00:00:00",
+        "modifiedOn": "2025-08-14T11:45:06.833",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "gym1"
   },
   "gym2": {
     "name": "Gym Challenge",
-    "tcgplayer_group_id": 1440,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1440,
+        "name": "Gym Challenge",
+        "abbreviation": "G2",
+        "isSupplemental": false,
+        "publishedOn": "2000-10-16T00:00:00",
+        "modifiedOn": "2025-05-25T08:51:40.247",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "gym2"
   },
   "hgss1": {
     "name": "HeartGold SoulSilver",
-    "tcgplayer_group_id": 1402,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1402,
+        "name": "HeartGold SoulSilver",
+        "abbreviation": "HS",
+        "isSupplemental": false,
+        "publishedOn": "2010-02-10T00:00:00",
+        "modifiedOn": "2025-05-31T17:16:56.76",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "hgss1"
   },
   "hgss2": {
     "name": "Unleashed",
-    "tcgplayer_group_id": 1399,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1399,
+        "name": "Unleashed",
+        "abbreviation": "UL",
+        "isSupplemental": false,
+        "publishedOn": "2010-05-12T00:00:00",
+        "modifiedOn": "2025-03-12T19:40:47.753",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "hgss2"
   },
   "hgss3": {
     "name": "Undaunted",
-    "tcgplayer_group_id": 1403,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1403,
+        "name": "Undaunted",
+        "abbreviation": "UD",
+        "isSupplemental": false,
+        "publishedOn": "2010-08-18T00:00:00",
+        "modifiedOn": "2025-07-15T14:24:56.46",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "hgss3"
   },
   "hgss4": {
     "name": "Triumphant",
-    "tcgplayer_group_id": 1381,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1381,
+        "name": "Triumphant",
+        "abbreviation": "TM",
+        "isSupplemental": false,
+        "publishedOn": "2010-11-03T00:00:00",
+        "modifiedOn": "2025-02-05T21:04:53.413",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "hgss4"
   },
   "hgssp": {
     "name": "HGSS Black Star Promos",
-    "tcgplayer_group_id": 1453,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1453,
+        "name": "HGSS Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2010-02-01T00:00:00",
+        "modifiedOn": "2024-10-18T12:22:34.227",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "hsp"
   },
   "jumbo": {
     "name": "Jumbo cards",
-    "tcgplayer_group_id": 1528,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1528,
+        "name": "Jumbo Cards",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2015-04-01T00:00:00",
+        "modifiedOn": "2025-09-19T15:25:03.783",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "lc": {
     "name": "Legendary Collection",
-    "tcgplayer_group_id": 1374,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1374,
+        "name": "Legendary Collection",
+        "abbreviation": "LC",
+        "isSupplemental": false,
+        "publishedOn": "2002-05-24T00:00:00",
+        "modifiedOn": "2025-09-24T20:24:23.99",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "base6"
   },
   "neo1": {
     "name": "Neo Genesis",
-    "tcgplayer_group_id": 1396,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1396,
+        "name": "Neo Genesis",
+        "abbreviation": "N1",
+        "isSupplemental": false,
+        "publishedOn": "2000-12-16T00:00:00",
+        "modifiedOn": "2025-07-24T20:16:58.62",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "neo1"
   },
   "neo2": {
     "name": "Neo Discovery",
-    "tcgplayer_group_id": 1434,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1434,
+        "name": "Neo Discovery",
+        "abbreviation": "N2",
+        "isSupplemental": false,
+        "publishedOn": "2001-06-01T00:00:00",
+        "modifiedOn": "2025-05-21T10:41:06.32",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "neo2"
   },
   "neo3": {
     "name": "Neo Revelation",
-    "tcgplayer_group_id": 1389,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1389,
+        "name": "Neo Revelation",
+        "abbreviation": "N3",
+        "isSupplemental": false,
+        "publishedOn": "2001-09-21T00:00:00",
+        "modifiedOn": "2025-05-29T18:04:23.283",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "neo3"
   },
   "neo4": {
     "name": "Neo Destiny",
-    "tcgplayer_group_id": 1444,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1444,
+        "name": "Neo Destiny",
+        "abbreviation": "N4",
+        "isSupplemental": false,
+        "publishedOn": "2002-02-28T00:00:00",
+        "modifiedOn": "2025-02-05T21:14:41.987",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "neo4"
   },
   "np": {
     "name": "Nintendo Black Star Promos",
-    "tcgplayer_group_id": 1423,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1423,
+        "name": "Nintendo Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.0479613Z",
+        "modifiedOn": "2024-08-28T16:26:10.73",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "np"
   },
   "P-A": {
@@ -446,157 +1196,467 @@
   },
   "pl1": {
     "name": "Platinum",
-    "tcgplayer_group_id": 1406,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1406,
+        "name": "Platinum",
+        "abbreviation": "PL",
+        "isSupplemental": false,
+        "publishedOn": "2009-02-11T00:00:00",
+        "modifiedOn": "2025-04-23T15:55:05.3",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pl1"
   },
   "pl2": {
     "name": "Rising Rivals",
-    "tcgplayer_group_id": 1367,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1367,
+        "name": "Rising Rivals",
+        "abbreviation": "RR",
+        "isSupplemental": false,
+        "publishedOn": "2009-05-16T00:00:00",
+        "modifiedOn": "2025-02-05T21:07:34.073",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pl2"
   },
   "pl3": {
     "name": "Supreme Victors",
-    "tcgplayer_group_id": 1384,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1384,
+        "name": "Supreme Victors",
+        "abbreviation": "SV",
+        "isSupplemental": false,
+        "publishedOn": "2009-08-19T00:00:00",
+        "modifiedOn": "2025-07-22T15:03:44.633",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pl3"
   },
   "pl4": {
     "name": "Arceus",
-    "tcgplayer_group_id": 1391,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1391,
+        "name": "Arceus",
+        "abbreviation": "AR",
+        "isSupplemental": false,
+        "publishedOn": "2009-11-04T00:00:00",
+        "modifiedOn": "2025-07-22T15:24:59.397",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pl4"
   },
   "pop1": {
     "name": "POP Series 1",
-    "tcgplayer_group_id": 1422,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1422,
+        "name": "POP Series 1",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1417268Z",
+        "modifiedOn": "2025-03-17T17:09:52.317",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop1"
   },
   "pop2": {
     "name": "POP Series 2",
-    "tcgplayer_group_id": 1447,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1447,
+        "name": "POP Series 2",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2024-11-11T13:40:36.19",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop2"
   },
   "pop3": {
     "name": "POP Series 3",
-    "tcgplayer_group_id": 1442,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1442,
+        "name": "POP Series 3",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2022-10-25T17:28:02.897",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop3"
   },
   "pop4": {
     "name": "POP Series 4",
-    "tcgplayer_group_id": 1452,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1452,
+        "name": "POP Series 4",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2023-02-01T15:02:28.727",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop4"
   },
   "pop5": {
     "name": "POP Series 5",
-    "tcgplayer_group_id": 1439,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1439,
+        "name": "POP Series 5",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2024-03-23T21:26:09.477",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop5"
   },
   "pop6": {
     "name": "POP Series 6",
-    "tcgplayer_group_id": 1432,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1432,
+        "name": "POP Series 6",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2024-02-21T13:38:42.5",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop6"
   },
   "pop7": {
     "name": "POP Series 7",
-    "tcgplayer_group_id": 1414,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1414,
+        "name": "POP Series 7",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2025-01-08T07:03:26.94",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop7"
   },
   "pop8": {
     "name": "POP Series 8",
-    "tcgplayer_group_id": 1450,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1450,
+        "name": "POP Series 8",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2025-02-25T12:13:14.7",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop8"
   },
   "pop9": {
     "name": "POP Series 9",
-    "tcgplayer_group_id": 1446,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1446,
+        "name": "POP Series 9",
+        "abbreviation": "POP",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.1573419Z",
+        "modifiedOn": "2023-02-01T18:34:12.12",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pop9"
   },
   "rc": {
     "name": "Radiant Collection",
-    "tcgplayer_group_id": 1465,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1465,
+        "name": "Legendary Treasures: Radiant Collection",
+        "abbreviation": "LTR",
+        "isSupplemental": false,
+        "publishedOn": "2013-11-06T00:00:00",
+        "modifiedOn": "2025-09-26T20:07:02.867",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "ru1": {
     "name": "Pok\u00e9mon Rumble",
-    "tcgplayer_group_id": 1433,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1433,
+        "name": "Rumble",
+        "abbreviation": "RUM",
+        "isSupplemental": false,
+        "publishedOn": "2009-11-16T00:00:00",
+        "modifiedOn": "2022-11-17T21:25:24.627",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "ru1"
   },
   "si1": {
     "name": "Southern Islands",
-    "tcgplayer_group_id": 648,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 648,
+        "name": "Southern Islands",
+        "abbreviation": "SI",
+        "isSupplemental": false,
+        "publishedOn": "2001-07-31T00:00:00",
+        "modifiedOn": "2025-01-13T18:34:58.453",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "si1"
   },
   "sm1": {
     "name": "Sun & Moon",
-    "tcgplayer_group_id": 1863,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1863,
+        "name": "SM Base Set",
+        "abbreviation": "SM01",
+        "isSupplemental": false,
+        "publishedOn": "2017-02-03T00:00:00",
+        "modifiedOn": "2025-06-08T13:29:04.033",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm1"
   },
   "sm10": {
     "name": "Unbroken Bonds",
-    "tcgplayer_group_id": 2420,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2420,
+        "name": "SM - Unbroken Bonds",
+        "abbreviation": "SM10",
+        "isSupplemental": false,
+        "publishedOn": "2019-05-03T00:00:00",
+        "modifiedOn": "2025-04-30T15:49:36.997",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm10"
   },
   "sm11": {
     "name": "Unified Minds",
-    "tcgplayer_group_id": 2464,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2464,
+        "name": "SM - Unified Minds",
+        "abbreviation": "SM11",
+        "isSupplemental": false,
+        "publishedOn": "2019-08-02T00:00:00",
+        "modifiedOn": "2025-05-20T20:12:44.117",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm11"
   },
   "sm115": {
     "name": "Hidden Fates",
-    "tcgplayer_group_id": 2480,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2480,
+        "name": "Hidden Fates",
+        "abbreviation": "HIF",
+        "isSupplemental": false,
+        "publishedOn": "2019-08-23T00:00:00",
+        "modifiedOn": "2025-08-12T13:26:03.803",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm115"
   },
   "sm12": {
     "name": "Cosmic Eclipse",
-    "tcgplayer_group_id": 2534,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2534,
+        "name": "SM - Cosmic Eclipse",
+        "abbreviation": "SM12",
+        "isSupplemental": false,
+        "publishedOn": "2019-11-01T00:00:00",
+        "modifiedOn": "2025-06-03T19:35:56.223",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm12"
   },
   "sm2": {
     "name": "Guardians Rising",
-    "tcgplayer_group_id": 1919,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1919,
+        "name": "SM - Guardians Rising",
+        "abbreviation": "SM02",
+        "isSupplemental": false,
+        "publishedOn": "2017-05-05T00:00:00",
+        "modifiedOn": "2025-09-16T19:26:10.583",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm2"
   },
   "sm3": {
     "name": "Burning Shadows",
-    "tcgplayer_group_id": 1957,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1957,
+        "name": "SM - Burning Shadows",
+        "abbreviation": "SM03",
+        "isSupplemental": false,
+        "publishedOn": "2017-08-04T00:00:00",
+        "modifiedOn": "2025-05-16T09:36:22.35",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm3"
   },
   "sm3.5": {
     "name": "Shining Legends",
-    "tcgplayer_group_id": 2054,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2054,
+        "name": "Shining Legends",
+        "abbreviation": "SHL",
+        "isSupplemental": false,
+        "publishedOn": "2017-10-06T00:00:00",
+        "modifiedOn": "2025-06-08T13:28:48.583",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm35"
   },
   "sm4": {
     "name": "Crimson Invasion",
-    "tcgplayer_group_id": 2071,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2071,
+        "name": "SM - Crimson Invasion",
+        "abbreviation": "SM04",
+        "isSupplemental": false,
+        "publishedOn": "2017-11-03T00:00:00",
+        "modifiedOn": "2025-06-05T09:43:44.703",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm4"
   },
   "sm5": {
     "name": "Ultra Prism",
-    "tcgplayer_group_id": 2178,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2178,
+        "name": "SM - Ultra Prism",
+        "abbreviation": "SM05",
+        "isSupplemental": false,
+        "publishedOn": "2018-02-02T00:00:00",
+        "modifiedOn": "2025-06-02T09:38:00.453",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm5"
   },
   "sm6": {
     "name": "Forbidden Light",
-    "tcgplayer_group_id": 2209,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2209,
+        "name": "SM - Forbidden Light",
+        "abbreviation": "SM06",
+        "isSupplemental": false,
+        "publishedOn": "2018-05-04T00:00:00",
+        "modifiedOn": "2025-07-01T16:35:09.217",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm6"
   },
   "sm7": {
     "name": "Celestial Storm",
-    "tcgplayer_group_id": 2278,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2278,
+        "name": "SM - Celestial Storm",
+        "abbreviation": "CES",
+        "isSupplemental": false,
+        "publishedOn": "2018-08-03T00:00:00",
+        "modifiedOn": "2025-08-28T14:10:19.287",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm7"
   },
   "sm7.5": {
     "name": "Dragon Majesty",
-    "tcgplayer_group_id": 2295,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2295,
+        "name": "Dragon Majesty",
+        "abbreviation": "DRM",
+        "isSupplemental": false,
+        "publishedOn": "2018-09-07T00:00:00",
+        "modifiedOn": "2025-05-10T05:40:08.657",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm75"
   },
   "sm8": {
     "name": "Lost Thunder",
-    "tcgplayer_group_id": 2328,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2328,
+        "name": "SM - Lost Thunder",
+        "abbreviation": "SM8",
+        "isSupplemental": false,
+        "publishedOn": "2018-11-02T00:00:00",
+        "modifiedOn": "2025-03-27T20:20:30.063",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm8"
   },
   "sm9": {
     "name": "Team Up",
-    "tcgplayer_group_id": 2377,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2377,
+        "name": "SM - Team Up",
+        "abbreviation": "SM9",
+        "isSupplemental": false,
+        "publishedOn": "2019-02-01T00:00:00",
+        "modifiedOn": "2025-07-28T13:26:57.95",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sm9"
   },
   "sma": {
@@ -606,7 +1666,17 @@
   },
   "smp": {
     "name": "SM Black Star Promos",
-    "tcgplayer_group_id": 1861,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1861,
+        "name": "SM Promos",
+        "abbreviation": "SMP",
+        "isSupplemental": false,
+        "publishedOn": "2016-12-14T00:00:00",
+        "modifiedOn": "2025-07-25T20:07:07.65",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "smp"
   },
   "sp": {
@@ -616,177 +1686,563 @@
   },
   "sv01": {
     "name": "Scarlet & Violet",
-    "tcgplayer_group_id": 22873,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 22873,
+        "name": "SV01: Scarlet & Violet Base Set",
+        "abbreviation": "SVI",
+        "isSupplemental": false,
+        "publishedOn": "2023-03-31T00:00:00",
+        "modifiedOn": "2025-09-05T21:37:12.133",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv1"
   },
   "sv02": {
     "name": "Paldea Evolved",
-    "tcgplayer_group_id": 23120,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23120,
+        "name": "SV02: Paldea Evolved",
+        "abbreviation": "PAL",
+        "isSupplemental": false,
+        "publishedOn": "2023-06-09T00:00:00",
+        "modifiedOn": "2025-09-03T20:22:49.503",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv2"
   },
   "sv03": {
     "name": "Obsidian Flames",
-    "tcgplayer_group_id": 23228,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23228,
+        "name": "SV03: Obsidian Flames",
+        "abbreviation": "OBF",
+        "isSupplemental": false,
+        "publishedOn": "2023-08-11T00:00:00",
+        "modifiedOn": "2025-09-03T00:34:24.627",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv3"
   },
   "sv03.5": {
     "name": "151",
-    "tcgplayer_group_id": 23237,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23237,
+        "name": "SV: Scarlet & Violet 151",
+        "abbreviation": "MEW",
+        "isSupplemental": false,
+        "publishedOn": "2023-09-22T00:00:00",
+        "modifiedOn": "2025-09-26T15:47:58.42",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv3pt5"
   },
   "sv04": {
     "name": "Paradox Rift",
-    "tcgplayer_group_id": 23286,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23286,
+        "name": "SV04: Paradox Rift",
+        "abbreviation": "PAR",
+        "isSupplemental": false,
+        "publishedOn": "2023-11-03T00:00:00",
+        "modifiedOn": "2025-09-19T14:10:30.333",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv4"
   },
   "sv04.5": {
     "name": "Paldean Fates",
-    "tcgplayer_group_id": 23353,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23353,
+        "name": "SV: Paldean Fates",
+        "abbreviation": "PAF",
+        "isSupplemental": false,
+        "publishedOn": "2024-01-26T00:00:00",
+        "modifiedOn": "2025-09-18T19:00:59.703",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv4pt5"
   },
   "sv05": {
     "name": "Temporal Forces",
-    "tcgplayer_group_id": 23381,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23381,
+        "name": "SV05: Temporal Forces",
+        "abbreviation": "TEF",
+        "isSupplemental": false,
+        "publishedOn": "2024-03-22T00:00:00",
+        "modifiedOn": "2025-09-26T20:44:37.817",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv5"
   },
   "sv06": {
     "name": "Twilight Masquerade",
-    "tcgplayer_group_id": 23473,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23473,
+        "name": "SV06: Twilight Masquerade",
+        "abbreviation": "TWM",
+        "isSupplemental": false,
+        "publishedOn": "2024-05-24T00:00:00",
+        "modifiedOn": "2025-08-28T14:11:02.937",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv6"
   },
   "sv06.5": {
     "name": "Shrouded Fable",
-    "tcgplayer_group_id": 23529,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23529,
+        "name": "SV: Shrouded Fable",
+        "abbreviation": "SFA",
+        "isSupplemental": false,
+        "publishedOn": "2024-08-02T00:00:00",
+        "modifiedOn": "2025-06-04T12:10:20.46",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv6pt5"
   },
   "sv07": {
     "name": "Stellar Crown",
-    "tcgplayer_group_id": 23537,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23537,
+        "name": "SV07: Stellar Crown",
+        "abbreviation": "SCR",
+        "isSupplemental": false,
+        "publishedOn": "2024-09-13T00:00:00",
+        "modifiedOn": "2025-09-05T15:24:39.123",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv7"
   },
   "sv08": {
     "name": "Surging Sparks",
-    "tcgplayer_group_id": 23651,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23651,
+        "name": "SV08: Surging Sparks",
+        "abbreviation": "SSP",
+        "isSupplemental": false,
+        "publishedOn": "2024-11-08T00:00:00",
+        "modifiedOn": "2025-08-07T12:23:51.543",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv8"
   },
   "sv08.5": {
     "name": "Prismatic Evolutions",
-    "tcgplayer_group_id": 23821,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 23821,
+        "name": "SV: Prismatic Evolutions",
+        "abbreviation": "PRE",
+        "isSupplemental": false,
+        "publishedOn": "2025-01-17T00:00:00",
+        "modifiedOn": "2025-09-18T14:30:20.433",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv8pt5"
   },
   "sv09": {
     "name": "Journey Together",
-    "tcgplayer_group_id": 24073,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24073,
+        "name": "SV09: Journey Together",
+        "abbreviation": "JTG",
+        "isSupplemental": false,
+        "publishedOn": "2025-03-28T00:00:00",
+        "modifiedOn": "2025-09-26T20:47:11.47",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv9"
   },
   "sv10": {
     "name": "Destined Rivals",
-    "tcgplayer_group_id": 24269,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24269,
+        "name": "SV10: Destined Rivals",
+        "abbreviation": "DRI",
+        "isSupplemental": false,
+        "publishedOn": "2025-05-30T00:00:00",
+        "modifiedOn": "2025-09-17T11:27:10.503",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "sv10"
   },
   "sv10.5b": {
     "name": "Black Bolt",
-    "tcgplayer_group_id": 24325,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24325,
+        "name": "SV: Black Bolt",
+        "abbreviation": "BLK",
+        "isSupplemental": false,
+        "publishedOn": "2025-07-18T00:00:00",
+        "modifiedOn": "2025-09-26T13:13:34.09",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "zsv10pt5"
   },
   "sv10.5w": {
     "name": "White Flare",
-    "tcgplayer_group_id": 24326,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24326,
+        "name": "SV: White Flare",
+        "abbreviation": "WHT",
+        "isSupplemental": false,
+        "publishedOn": "2025-07-18T00:00:00",
+        "modifiedOn": "2025-09-26T12:44:10.587",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "rsv10pt5"
   },
   "svp": {
     "name": "SVP Black Star Promos",
-    "tcgplayer_group_id": 22872,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 22872,
+        "name": "SV: Scarlet & Violet Promo Cards",
+        "abbreviation": "SVP",
+        "isSupplemental": false,
+        "publishedOn": "2023-03-31T00:00:00",
+        "modifiedOn": "2025-09-24T22:01:37.02",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "svp"
   },
   "swsh1": {
     "name": "Sword & Shield",
-    "tcgplayer_group_id": 2585,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2585,
+        "name": "SWSH01: Sword & Shield Base Set",
+        "abbreviation": "SWSH01",
+        "isSupplemental": false,
+        "publishedOn": "2020-02-07T00:00:00",
+        "modifiedOn": "2025-06-09T02:50:07.917",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh1"
   },
   "swsh10": {
     "name": "Astral Radiance",
-    "tcgplayer_group_id": 3040,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3040,
+        "name": "SWSH10: Astral Radiance",
+        "abbreviation": "SWSH10",
+        "isSupplemental": false,
+        "publishedOn": "2022-05-27T00:00:00",
+        "modifiedOn": "2025-09-08T14:38:32.64",
+        "categoryId": 3
+      },
+      {
+        "groupId": 3068,
+        "name": "SWSH10: Astral Radiance Trainer Gallery",
+        "abbreviation": "SWSH10:TG",
+        "isSupplemental": false,
+        "publishedOn": "2022-05-27T00:00:00",
+        "modifiedOn": "2025-04-30T18:00:24.323",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh10"
   },
   "swsh10.5": {
     "name": "Pok\u00e9mon GO",
-    "tcgplayer_group_id": 3064,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3064,
+        "name": "Pokemon GO",
+        "abbreviation": "PGO",
+        "isSupplemental": false,
+        "publishedOn": "2022-07-01T00:00:00",
+        "modifiedOn": "2025-09-18T13:55:41.28",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "pgo"
   },
   "swsh11": {
     "name": "Lost Origin",
-    "tcgplayer_group_id": 3118,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3118,
+        "name": "SWSH11: Lost Origin",
+        "abbreviation": "SWSH11",
+        "isSupplemental": false,
+        "publishedOn": "2022-09-09T00:00:00",
+        "modifiedOn": "2025-09-08T19:42:05.41",
+        "categoryId": 3
+      },
+      {
+        "groupId": 3172,
+        "name": "SWSH11: Lost Origin Trainer Gallery",
+        "abbreviation": "SWSH11: TG",
+        "isSupplemental": false,
+        "publishedOn": "2022-09-09T00:00:00",
+        "modifiedOn": "2025-09-26T20:12:59.457",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh11"
   },
   "swsh12": {
     "name": "Silver Tempest",
-    "tcgplayer_group_id": 3170,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3170,
+        "name": "SWSH12: Silver Tempest",
+        "abbreviation": "SWSH12",
+        "isSupplemental": false,
+        "publishedOn": "2022-11-11T00:00:00",
+        "modifiedOn": "2025-08-29T17:05:43.08",
+        "categoryId": 3
+      },
+      {
+        "groupId": 17674,
+        "name": "SWSH12: Silver Tempest Trainer Gallery",
+        "abbreviation": "SWSH12: TG",
+        "isSupplemental": false,
+        "publishedOn": "2022-11-11T00:00:00",
+        "modifiedOn": "2025-04-17T09:07:01.777",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh12"
   },
   "swsh12.5": {
     "name": "Crown Zenith",
-    "tcgplayer_group_id": 17688,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 17688,
+        "name": "Crown Zenith",
+        "abbreviation": "CRZ",
+        "isSupplemental": false,
+        "publishedOn": "2023-01-20T00:00:00",
+        "modifiedOn": "2025-09-24T20:41:12.423",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh12pt5"
   },
   "swsh2": {
     "name": "Rebel Clash",
-    "tcgplayer_group_id": 2626,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2626,
+        "name": "SWSH02: Rebel Clash",
+        "abbreviation": "SWSH02",
+        "isSupplemental": false,
+        "publishedOn": "2020-05-01T00:00:00",
+        "modifiedOn": "2025-05-21T19:44:02.48",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh2"
   },
   "swsh3": {
     "name": "Darkness Ablaze",
-    "tcgplayer_group_id": 2675,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2675,
+        "name": "SWSH03: Darkness Ablaze",
+        "abbreviation": "SWSH03",
+        "isSupplemental": false,
+        "publishedOn": "2020-08-14T00:00:00",
+        "modifiedOn": "2025-09-09T18:07:54.76",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh3"
   },
   "swsh3.5": {
     "name": "Champion's Path",
-    "tcgplayer_group_id": 2685,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2685,
+        "name": "Champion's Path",
+        "abbreviation": "CHP",
+        "isSupplemental": false,
+        "publishedOn": "2020-09-25T00:00:00",
+        "modifiedOn": "2025-06-06T08:38:27.983",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh35"
   },
   "swsh4": {
     "name": "Vivid Voltage",
-    "tcgplayer_group_id": 2701,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2701,
+        "name": "SWSH04: Vivid Voltage",
+        "abbreviation": "SWSH04",
+        "isSupplemental": false,
+        "publishedOn": "2020-11-13T00:00:00",
+        "modifiedOn": "2025-09-16T15:12:16.44",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh4"
   },
   "swsh4.5": {
     "name": "Shining Fates",
-    "tcgplayer_group_id": 2754,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2754,
+        "name": "Shining Fates",
+        "abbreviation": "SHF",
+        "isSupplemental": false,
+        "publishedOn": "2021-02-19T00:00:00",
+        "modifiedOn": "2025-05-19T19:05:06.61",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh45"
   },
   "swsh5": {
     "name": "Battle Styles",
-    "tcgplayer_group_id": 2765,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2765,
+        "name": "SWSH05: Battle Styles",
+        "abbreviation": "SWSH05",
+        "isSupplemental": false,
+        "publishedOn": "2021-03-19T00:00:00",
+        "modifiedOn": "2025-06-06T10:14:41.023",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh5"
   },
   "swsh6": {
     "name": "Chilling Reign",
-    "tcgplayer_group_id": 2807,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2807,
+        "name": "SWSH06: Chilling Reign",
+        "abbreviation": "SWSH06",
+        "isSupplemental": false,
+        "publishedOn": "2021-06-18T00:00:00",
+        "modifiedOn": "2025-06-05T06:28:09.447",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh6"
   },
   "swsh7": {
     "name": "Evolving Skies",
-    "tcgplayer_group_id": 2848,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2848,
+        "name": "SWSH07: Evolving Skies",
+        "abbreviation": "SWSH07",
+        "isSupplemental": false,
+        "publishedOn": "2021-08-27T00:00:00",
+        "modifiedOn": "2025-08-26T13:38:56.87",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh7"
   },
   "swsh8": {
     "name": "Fusion Strike",
-    "tcgplayer_group_id": 2906,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2906,
+        "name": "SWSH08: Fusion Strike",
+        "abbreviation": "SWSH08",
+        "isSupplemental": false,
+        "publishedOn": "2021-11-12T00:00:00",
+        "modifiedOn": "2025-08-12T12:49:45.947",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh8"
   },
   "swsh9": {
     "name": "Brilliant Stars",
-    "tcgplayer_group_id": 3020,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 3020,
+        "name": "SWSH09: Brilliant Stars Trainer Gallery",
+        "abbreviation": "SWSH09:TG",
+        "isSupplemental": false,
+        "publishedOn": "2022-02-25T00:00:00",
+        "modifiedOn": "2025-06-24T19:58:40.013",
+        "categoryId": 3
+      },
+      {
+        "groupId": 2948,
+        "name": "SWSH09: Brilliant Stars",
+        "abbreviation": "SWSH09",
+        "isSupplemental": false,
+        "publishedOn": "2022-02-25T00:00:00",
+        "modifiedOn": "2025-09-05T16:02:02.46",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swsh9"
   },
   "swshp": {
     "name": "SWSH Black Star Promos",
-    "tcgplayer_group_id": 2545,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2545,
+        "name": "SWSH: Sword & Shield Promo Cards",
+        "abbreviation": "SWSD",
+        "isSupplemental": false,
+        "publishedOn": "2019-11-15T00:00:00",
+        "modifiedOn": "2025-09-22T15:53:55.29",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "swshp"
   },
   "tk-bw-e": {
     "name": "BW trainer Kit (Excadrill)",
-    "tcgplayer_group_id": 1538,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1538,
+        "name": "BW Trainer Kit: Excadrill & Zoroark",
+        "abbreviation": "BLW",
+        "isSupplemental": false,
+        "publishedOn": "2011-09-05T00:00:00",
+        "modifiedOn": "2024-11-13T20:34:29.653",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-bw-z": {
@@ -801,12 +2257,32 @@
   },
   "tk-dp-m": {
     "name": "DP trainer Kit (Manaphy)",
-    "tcgplayer_group_id": 1541,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1541,
+        "name": "DP Trainer Kit: Manaphy & Lucario",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2007-09-03T00:00:00",
+        "modifiedOn": "2024-10-14T11:32:25.06",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-ex-latia": {
     "name": "EX trainer Kit (Latias)",
-    "tcgplayer_group_id": 1543,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1543,
+        "name": "EX Trainer Kit 1: Latias & Latios",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.0479613Z",
+        "modifiedOn": "2025-08-21T16:20:14.833",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "tk1a"
   },
   "tk-ex-latio": {
@@ -816,7 +2292,17 @@
   },
   "tk-ex-m": {
     "name": "EX trainer Kit 2 (Minun)",
-    "tcgplayer_group_id": 1542,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1542,
+        "name": "EX Trainer Kit 2: Plusle & Minun",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-28T20:00:08.0479613Z",
+        "modifiedOn": "2024-05-03T19:42:49.017",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "tk2b"
   },
   "tk-ex-p": {
@@ -826,7 +2312,17 @@
   },
   "tk-hs-g": {
     "name": "HS trainer Kit (Gyarados)",
-    "tcgplayer_group_id": 1540,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1540,
+        "name": "HGSS Trainer Kit: Gyarados & Raichu",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2010-05-12T00:00:00",
+        "modifiedOn": "2023-12-20T19:38:47.463",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-hs-r": {
@@ -836,7 +2332,17 @@
   },
   "tk-sm-l": {
     "name": "SM trainer Kit (Lycanroc)",
-    "tcgplayer_group_id": 2069,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 2069,
+        "name": "SM Trainer Kit: Lycanroc & Alolan Raichu",
+        "abbreviation": "SMK1",
+        "isSupplemental": false,
+        "publishedOn": "2017-04-21T00:00:00",
+        "modifiedOn": "2025-08-04T16:53:57.113",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-sm-r": {
@@ -846,7 +2352,17 @@
   },
   "tk-xy-b": {
     "name": "XY trainer Kit (Bisharp)",
-    "tcgplayer_group_id": 1533,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1533,
+        "name": "XY Trainer Kit: Bisharp & Wigglytuff",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2014-11-14T00:00:00",
+        "modifiedOn": "2023-03-31T16:31:12.98",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-xy-latia": {
@@ -866,7 +2382,17 @@
   },
   "tk-xy-p": {
     "name": "XY trainer Kit (Pikachu Libre)",
-    "tcgplayer_group_id": 1796,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1796,
+        "name": "XY Trainer Kit: Pikachu Libre & Suicune",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2016-04-27T00:00:00",
+        "modifiedOn": "2024-08-20T18:24:14.493",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-xy-su": {
@@ -876,7 +2402,17 @@
   },
   "tk-xy-sy": {
     "name": "XY trainer Kit (Sylveon)",
-    "tcgplayer_group_id": 1532,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1532,
+        "name": "XY Trainer Kit: Sylveon & Noivern",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2014-03-12T00:00:00",
+        "modifiedOn": "2024-08-20T18:24:52.08",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": null
   },
   "tk-xy-w": {
@@ -891,67 +2427,197 @@
   },
   "xy0": {
     "name": "Kalos Starter Set",
-    "tcgplayer_group_id": 1522,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1522,
+        "name": "Kalos Starter Set",
+        "abbreviation": "KSS",
+        "isSupplemental": false,
+        "publishedOn": "2013-11-08T00:00:00",
+        "modifiedOn": "2022-12-14T16:18:51.623",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy0"
   },
   "xy1": {
     "name": "XY",
-    "tcgplayer_group_id": 1387,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1387,
+        "name": "XY Base Set",
+        "abbreviation": "XY",
+        "isSupplemental": false,
+        "publishedOn": "2014-02-05T00:00:00",
+        "modifiedOn": "2025-07-22T15:13:07.077",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy1"
   },
   "xy10": {
     "name": "Fates Collide",
-    "tcgplayer_group_id": 1780,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1780,
+        "name": "XY - Fates Collide",
+        "abbreviation": "FCO",
+        "isSupplemental": false,
+        "publishedOn": "2016-05-02T00:00:00",
+        "modifiedOn": "2025-07-28T14:43:33.007",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy10"
   },
   "xy11": {
     "name": "Steam Siege",
-    "tcgplayer_group_id": 1815,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1815,
+        "name": "XY - Steam Siege",
+        "abbreviation": "STS",
+        "isSupplemental": false,
+        "publishedOn": "2016-08-03T00:00:00",
+        "modifiedOn": "2025-05-01T08:10:36.757",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy11"
   },
   "xy12": {
     "name": "Evolutions",
-    "tcgplayer_group_id": 1842,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1842,
+        "name": "XY - Evolutions",
+        "abbreviation": "EVO",
+        "isSupplemental": false,
+        "publishedOn": "2016-11-02T00:00:00",
+        "modifiedOn": "2025-09-24T13:21:10.26",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy12"
   },
   "xy2": {
     "name": "Flashfire",
-    "tcgplayer_group_id": 1464,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1464,
+        "name": "XY - Flashfire",
+        "abbreviation": "FLF",
+        "isSupplemental": false,
+        "publishedOn": "2014-05-07T00:00:00",
+        "modifiedOn": "2025-05-30T14:49:00.103",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy2"
   },
   "xy3": {
     "name": "Furious Fists",
-    "tcgplayer_group_id": 1481,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1481,
+        "name": "XY - Furious Fists",
+        "abbreviation": "FFI",
+        "isSupplemental": false,
+        "publishedOn": "2014-08-13T00:00:00",
+        "modifiedOn": "2025-04-12T03:31:41.91",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy3"
   },
   "xy4": {
     "name": "Phantom Forces",
-    "tcgplayer_group_id": 1494,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1494,
+        "name": "XY - Phantom Forces",
+        "abbreviation": "PHF",
+        "isSupplemental": false,
+        "publishedOn": "2014-11-05T00:00:00",
+        "modifiedOn": "2025-04-17T17:05:35.47",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy4"
   },
   "xy5": {
     "name": "Primal Clash",
-    "tcgplayer_group_id": 1509,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1509,
+        "name": "XY - Primal Clash",
+        "abbreviation": "PRC",
+        "isSupplemental": false,
+        "publishedOn": "2015-02-04T00:00:00",
+        "modifiedOn": "2025-04-28T13:20:35.797",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy5"
   },
   "xy6": {
     "name": "Roaring Skies",
-    "tcgplayer_group_id": 1534,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1534,
+        "name": "XY - Roaring Skies",
+        "abbreviation": "ROS",
+        "isSupplemental": false,
+        "publishedOn": "2015-05-06T00:00:00",
+        "modifiedOn": "2025-03-16T09:39:10.503",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy6"
   },
   "xy7": {
     "name": "Ancient Origins",
-    "tcgplayer_group_id": 1576,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1576,
+        "name": "XY - Ancient Origins",
+        "abbreviation": "AOR",
+        "isSupplemental": false,
+        "publishedOn": "2015-08-12T00:00:00",
+        "modifiedOn": "2025-09-18T13:57:33.93",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy7"
   },
   "xy8": {
     "name": "BREAKthrough",
-    "tcgplayer_group_id": 1661,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1661,
+        "name": "XY - BREAKthrough",
+        "abbreviation": "BKT",
+        "isSupplemental": false,
+        "publishedOn": "2015-11-04T00:00:00",
+        "modifiedOn": "2025-06-08T11:48:44.297",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy8"
   },
   "xy9": {
     "name": "BREAKpoint",
-    "tcgplayer_group_id": 1701,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1701,
+        "name": "XY - BREAKpoint",
+        "abbreviation": "BKP",
+        "isSupplemental": false,
+        "publishedOn": "2016-02-03T00:00:00",
+        "modifiedOn": "2025-05-06T14:41:01.617",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xy9"
   },
   "xya": {
@@ -961,7 +2627,32 @@
   },
   "xyp": {
     "name": "XY Black Star Promos",
-    "tcgplayer_group_id": 1451,
+    "tcgplayer_group_id": [
+      {
+        "groupId": 1451,
+        "name": "XY Promos",
+        "abbreviation": "PR",
+        "isSupplemental": false,
+        "publishedOn": "2013-12-16T00:00:00",
+        "modifiedOn": "2025-07-25T20:06:46.27",
+        "categoryId": 3
+      }
+    ],
     "ptcgio_id": "xyp"
+  },
+  "me01": {
+    "name": "Mega Evolution",
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24380,
+        "name": "ME01: Mega Evolution",
+        "abbreviation": "MEG",
+        "isSupplemental": false,
+        "publishedOn": "2025-09-26T00:00:00",
+        "modifiedOn": "2025-09-26T18:44:52.18",
+        "categoryId": 3
+      }
+    ],
+    "ptcgio_id": "me1"
   }
 }

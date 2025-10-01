@@ -35,6 +35,37 @@ POKEMONTCG_IO_API_BASE = "https://api.pokemontcg.io/v2"
 TCGCSV_API_BASE = "https://tcgcsv.com"
 TCGPLAYER_URL_BASE = "https://www.tcgplayer.com/product/organizedplay/pokemon/{group_id}"
 
+# Helper functions for rich group object handling
+def get_group_ids_from_mapping(mapping_groups):
+    """Extract group IDs from rich group objects or legacy format"""
+    if mapping_groups is None or mapping_groups == 'null':
+        return []
+    if isinstance(mapping_groups, list):
+        # New format: array of group objects with groupId field
+        return [group.get('groupId') for group in mapping_groups if group and group.get('groupId')]
+    # Legacy format: single group ID
+    return [mapping_groups] if mapping_groups else []
+
+def get_first_group_id(mapping_groups):
+    """Get the first group ID for backward compatibility"""
+    group_ids = get_group_ids_from_mapping(mapping_groups)
+    return group_ids[0] if group_ids else None
+
+def build_group_object(group_id, tcgcsv_group_data=None):
+    """Build a rich group object from group ID and optional TCGCSV data"""
+    group_obj = {'groupId': group_id}
+    if tcgcsv_group_data:
+        # Add rich metadata from TCGCSV API
+        group_obj.update({
+            'name': tcgcsv_group_data.get('name'),
+            'abbreviation': tcgcsv_group_data.get('abbreviation'),
+            'isSupplemental': tcgcsv_group_data.get('isSupplemental', False),
+            'publishedOn': tcgcsv_group_data.get('publishedOn'),
+            'modifiedOn': tcgcsv_group_data.get('modifiedOn'),
+            'categoryId': tcgcsv_group_data.get('categoryId')
+        })
+    return group_obj
+
 # File paths
 MAPPING_FILE = "pokemon_sets_ids.json"
 UNMAPPED_PTCGIO_FILE = "unmapped_ptcgio_sets.json"
@@ -42,14 +73,17 @@ UNMAPPED_TCGCSV_FILE = "unmapped_tcgcsv_groups.json"
 LOG_FILE = "supplemental_sync_log.txt"
 
 class SupplementalDataSync:
-    def __init__(self, force_update: bool = False):
+    def __init__(self, force_update: bool = False, dry_run: bool = False):
         """Initialize the sync with Supabase client and API key"""
         self.force_update = force_update
+        self.dry_run = dry_run
         # Set up logging
         self.log_file = open(LOG_FILE, 'w')
         self.log(f"Supplemental Data Sync Started at {datetime.now().isoformat()}")
         if self.force_update:
             self.log("🔄 FORCE UPDATE MODE - Will update all records regardless of existing data")
+        if self.dry_run:
+            self.log("🔍 DRY RUN MODE - Will show what would be updated without making changes")
         self.log("=" * 60)
 
         # Initialize Supabase
@@ -483,7 +517,7 @@ class SupplementalDataSync:
             similarity = self.calculate_tcgcsv_similarity(group_name, our_name)
 
             # Consider it a match if similarity is high enough
-            if similarity >= 0.75:  # 75% similarity threshold
+            if similarity >= 0.80:  # 80% similarity threshold (increased from 75%)
                 matches.append((set_id, similarity, our_name))
 
         # Sort by similarity (highest first)
@@ -526,20 +560,36 @@ class SupplementalDataSync:
 
     def check_if_tcgcsv_already_mapped(self, group_id: int) -> bool:
         """Check if this TCGPlayer group ID is already mapped"""
-        # Check in local mappings
+        # Check in local mappings (new rich object format)
         for mapping in self.mappings.values():
-            if mapping.get('tcgplayer_group_id') == group_id:
+            mapping_groups = mapping.get('tcgplayer_group_id')
+            if group_id in get_group_ids_from_mapping(mapping_groups):
                 return True
 
-        # Check in database
+        # Check in database (both old and new columns)
         try:
+            # Check legacy single column
             result = self.supabase.table('pokemon_sets')\
                 .select('id')\
                 .eq('tcgplayer_group_id', group_id)\
                 .execute()
-
             if result.data:
                 return True
+
+            # Check new JSONB column for group objects containing this groupId
+            # Fetch all sets with non-null tcgplayer_groups and check in Python
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, tcgplayer_groups')\
+                .not_.is_('tcgplayer_groups', 'null')\
+                .execute()
+
+            if result.data:
+                for row in result.data:
+                    groups = row.get('tcgplayer_groups', [])
+                    if isinstance(groups, list):
+                        for group in groups:
+                            if isinstance(group, dict) and group.get('groupId') == group_id:
+                                return True
         except Exception as e:
             self.log(f"ERROR checking database for group_id {group_id}: {e}")
 
@@ -568,17 +618,30 @@ class SupplementalDataSync:
             matching_set_id = self.find_matching_set_tcgcsv(group)
 
             if matching_set_id:
-                # Check if this set already has a tcgplayer_group_id that's not null
-                existing_group_id = self.mappings[matching_set_id].get('tcgplayer_group_id')
+                # Check if this set already has group mappings
+                existing_groups = self.mappings[matching_set_id].get('tcgplayer_group_id')
+                existing_group_ids = get_group_ids_from_mapping(existing_groups)
 
-                if existing_group_id is None:
-                    # Found a match and no existing mapping
-                    self.mappings[matching_set_id]['tcgplayer_group_id'] = group_id
+                if not existing_group_ids:
+                    # No existing mappings - create new rich group object
+                    group_object = build_group_object(group_id, group)
+                    self.mappings[matching_set_id]['tcgplayer_group_id'] = [group_object]
                     self.stats['tcgcsv_groups_mapped'] += 1
                     mapping_updated = True
                     self.log(f"  ✓ Mapped: {group_name} → {matching_set_id} (Group ID: {group_id})")
+                elif group_id not in existing_group_ids:
+                    # Has existing groups but this one isn't mapped yet - add to array
+                    if not isinstance(existing_groups, list):
+                        # Convert legacy single ID to array format
+                        existing_groups = [build_group_object(existing_groups)]
+                    group_object = build_group_object(group_id, group)
+                    existing_groups.append(group_object)
+                    self.mappings[matching_set_id]['tcgplayer_group_id'] = existing_groups
+                    self.stats['tcgcsv_groups_mapped'] += 1
+                    mapping_updated = True
+                    self.log(f"  ✓ Added additional mapping: {group_name} → {matching_set_id} (Group ID: {group_id})")
                 else:
-                    # Already has a group ID, skip
+                    # Already mapped to this group ID, skip
                     self.stats['tcgcsv_groups_skipped'] += 1
             else:
                 # No match found - add to unmapped list
@@ -620,44 +683,85 @@ class SupplementalDataSync:
             self.stats['errors'] += 1
 
     def update_database_with_tcgplayer_data(self):
-        """Update database with TCGPlayer group IDs and URLs"""
+        """Update database with TCGPlayer group data (both legacy and rich objects)"""
         self.log("\n--- Updating Database with TCGPlayer Data ---")
 
         for set_id, mapping in self.mappings.items():
-            group_id = mapping.get('tcgplayer_group_id')
+            mapping_groups = mapping.get('tcgplayer_group_id')
 
             # Skip if no mapping or null
-            if not group_id or group_id == 'null':
+            if not mapping_groups or mapping_groups == 'null':
                 continue
 
-            # Check if database already has this group_id
+            group_ids = get_group_ids_from_mapping(mapping_groups)
+            if not group_ids:
+                continue
+
+            # Get first group ID for backward compatibility
+            first_group_id = group_ids[0]
+
             try:
+                # Check current database state
                 result = self.supabase.table('pokemon_sets')\
-                    .select('tcgplayer_group_id')\
+                    .select('tcgplayer_group_id, tcgplayer_groups')\
                     .eq('id', set_id)\
                     .execute()
 
-                if result.data and result.data[0].get('tcgplayer_group_id') == group_id:
-                    # Already up to date
-                    continue
+                current_data = result.data[0] if result.data else {}
+                current_single_id = current_data.get('tcgplayer_group_id')
+                current_groups = current_data.get('tcgplayer_groups')
 
-                # Update database
+                # Prepare update data
                 update_data = {
-                    'tcgplayer_group_id': group_id,
-                    'tcgplayer_url': TCGPLAYER_URL_BASE.format(group_id=group_id),
                     'updated_at': datetime.now().isoformat()
                 }
 
-                result = self.supabase.table('pokemon_sets')\
-                    .update(update_data)\
-                    .eq('id', set_id)\
-                    .execute()
+                # Update legacy single field for backward compatibility
+                if current_single_id != first_group_id:
+                    update_data['tcgplayer_group_id'] = first_group_id
+                    update_data['tcgplayer_url'] = TCGPLAYER_URL_BASE.format(group_id=first_group_id)
 
-                if result.data:
-                    self.stats['tcgcsv_groups_updated'] += 1
-                    self.log(f"  ✓ Updated {set_id} with TCGPlayer group ID: {group_id}")
+                # Update rich groups field
+                if isinstance(mapping_groups, list):
+                    # Rich group objects format
+                    update_data['tcgplayer_groups'] = mapping_groups
                 else:
-                    self.log(f"  Warning: No rows updated for {set_id}")
+                    # Legacy single ID - convert to rich object
+                    rich_objects = [build_group_object(mapping_groups)]
+                    update_data['tcgplayer_groups'] = rich_objects
+
+                # Only update if there are changes
+                needs_update = (
+                    current_single_id != first_group_id or
+                    current_groups != update_data.get('tcgplayer_groups')
+                )
+
+                if needs_update:
+                    if self.dry_run:
+                        # Dry run - just log what would be updated
+                        self.stats['tcgcsv_groups_updated'] += 1
+                        group_count = len(group_ids)
+                        if group_count == 1:
+                            self.log(f"  [DRY RUN] Would update {set_id} with TCGPlayer group ID: {first_group_id}")
+                        else:
+                            self.log(f"  [DRY RUN] Would update {set_id} with {group_count} TCGPlayer groups: {group_ids}")
+                        self.log(f"    Update data: {update_data}")
+                    else:
+                        # Actually update the database
+                        result = self.supabase.table('pokemon_sets')\
+                            .update(update_data)\
+                            .eq('id', set_id)\
+                            .execute()
+
+                        if result.data:
+                            self.stats['tcgcsv_groups_updated'] += 1
+                            group_count = len(group_ids)
+                            if group_count == 1:
+                                self.log(f"  ✓ Updated {set_id} with TCGPlayer group ID: {first_group_id}")
+                            else:
+                                self.log(f"  ✓ Updated {set_id} with {group_count} TCGPlayer groups: {group_ids}")
+                        else:
+                            self.log(f"  Warning: No rows updated for {set_id}")
 
             except Exception as e:
                 self.log(f"  ERROR updating {set_id}: {e}")
@@ -729,10 +833,12 @@ def main():
     parser = argparse.ArgumentParser(description='Sync supplemental Pokemon sets data')
     parser.add_argument('--force', action='store_true',
                        help='Force update all records even if data already exists')
+    parser.add_argument('--dry-run', action='store_true',
+                       help='Show what would be updated without making changes')
 
     args = parser.parse_args()
 
-    syncer = SupplementalDataSync(force_update=args.force)
+    syncer = SupplementalDataSync(force_update=args.force, dry_run=args.dry_run)
     syncer.run()
 
 
