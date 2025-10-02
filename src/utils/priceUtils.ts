@@ -54,10 +54,16 @@ export function extractMarketPrices(priceData: unknown): PriceVariants | null {
     
     // Convert to key-value object
     const prices: PriceVariants = {}
-    
+
     for (const variant of priceArray) {
       if (variant.subTypeName && typeof variant.marketPrice === 'number') {
-        prices[variant.subTypeName] = variant.marketPrice
+        // Create unique key that includes variant pattern if available
+        const variantPattern = (variant as any).variant_pattern || 'base'
+        const uniqueKey = variantPattern === 'base'
+          ? variant.subTypeName
+          : `${variant.subTypeName} (${variantPattern})`
+
+        prices[uniqueKey] = variant.marketPrice
       }
     }
     
@@ -76,19 +82,45 @@ export function extractMarketPrices(priceData: unknown): PriceVariants | null {
  */
 export function getDisplayPrice(prices: PriceVariants | null): string | null {
   if (!prices) return null
-  
-  // Prefer Normal variant
-  if (prices['Normal'] && prices['Normal'] > 0) {
-    return `$${prices['Normal'].toFixed(2)}`
-  }
-  
-  // Fallback to first available variant
-  const firstPrice = Object.values(prices)[0]
-  if (firstPrice && firstPrice > 0) {
+
+  // Fallback to first available variant with positive price
+  const validPrices = Object.entries(prices).filter(([, price]) => price > 0)
+  if (validPrices.length > 0) {
+    const [, firstPrice] = validPrices[0]
     return `$${firstPrice.toFixed(2)}`
   }
-  
+
   return null
+}
+
+/**
+ * Gets smart display price that shows "From $X.XX" for multiple variants
+ * @param priceData - The raw JSONB price data from the database
+ * @returns Formatted price string with "From" prefix for multiple variants
+ */
+export function getSmartDisplayPrice(priceData: unknown): {
+  price: string | null
+  hasMultipleVariants: boolean
+  variantCount: number
+} {
+  const prices = extractMarketPrices(priceData)
+  if (!prices) return { price: null, hasMultipleVariants: false, variantCount: 0 }
+
+  const validPrices = Object.entries(prices).filter(([, price]) => price > 0)
+  if (validPrices.length === 0) return { price: null, hasMultipleVariants: false, variantCount: 0 }
+
+  const hasMultipleVariants = validPrices.length > 1
+  const lowestPrice = Math.min(...validPrices.map(([, price]) => price))
+
+  const priceString = hasMultipleVariants
+    ? `From $${lowestPrice.toFixed(2)}`
+    : `$${lowestPrice.toFixed(2)}`
+
+  return {
+    price: priceString,
+    hasMultipleVariants,
+    variantCount: validPrices.length
+  }
 }
 
 /**

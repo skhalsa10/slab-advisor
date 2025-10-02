@@ -1,4 +1,4 @@
-import { extractMarketPrices, getDisplayPrice } from '@/utils/priceUtils'
+import { getSmartDisplayPrice } from '@/utils/priceUtils'
 import type { Json } from '@/models/database'
 
 interface PriceDisplayProps {
@@ -12,9 +12,8 @@ export default function PriceDisplay({
   showMarketLabel = true,
   className = ''
 }: PriceDisplayProps) {
-  // Extract and format price using utility functions
-  const prices = extractMarketPrices(priceData)
-  const displayPrice = getDisplayPrice(prices)
+  // Use smart display logic to show "From $X.XX" for multiple variants
+  const { price, hasMultipleVariants, variantCount } = getSmartDisplayPrice(priceData)
 
   return (
     <div className={className}>
@@ -22,8 +21,13 @@ export default function PriceDisplay({
         <p className="text-xs text-gray-500">Market price</p>
       )}
       <p className="text-base font-semibold text-gray-900">
-        {displayPrice || 'Not available'}
+        {price || 'Not available'}
       </p>
+      {hasMultipleVariants && (
+        <p className="text-xs text-gray-500 mt-0.5">
+          {variantCount} variants
+        </p>
+      )}
     </div>
   )
 }
