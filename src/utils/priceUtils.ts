@@ -13,6 +13,7 @@ interface TCGCSVPriceVariant {
   marketPrice: number
   directLowPrice: number
   subTypeName: string
+  variant_pattern?: string // Optional variant pattern (poke_ball, master_ball, etc.)
 }
 
 /**
@@ -58,7 +59,7 @@ export function extractMarketPrices(priceData: unknown): PriceVariants | null {
     for (const variant of priceArray) {
       if (variant.subTypeName && typeof variant.marketPrice === 'number') {
         // Create unique key that includes variant pattern if available
-        const variantPattern = (variant as any).variant_pattern || 'base'
+        const variantPattern = variant.variant_pattern || 'base'
         const uniqueKey = variantPattern === 'base'
           ? variant.subTypeName
           : `${variant.subTypeName} (${variantPattern})`
