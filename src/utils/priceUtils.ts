@@ -24,10 +24,63 @@ export interface PriceVariants {
 }
 
 /**
+ * Converts technical variant pattern names to user-friendly display names
+ * @param variantPattern - The technical pattern name from the database
+ * @returns User-friendly display name (sanitized to prevent XSS)
+ */
+function getFriendlyVariantName(variantPattern: string): string {
+  // Sanitize input to prevent XSS attacks
+  const sanitizedPattern = variantPattern
+    .replace(/[<>\"'&]/g, '') // Remove potentially dangerous characters
+    .slice(0, 50) // Limit length to prevent DoS
+    .trim()
+
+  const friendlyNames: Record<string, string> = {
+    'base': '',
+    'poke_ball': '(Poké Ball)',
+    'master_ball': '(Master Ball)',
+    'great_ball': '(Great Ball)',
+    'ultra_ball': '(Ultra Ball)',
+    'premier_ball': '(Premier Ball)',
+    'reverse': '(Reverse)',
+    'first_edition': '(1st Edition)',
+    'unlimited': '(Unlimited)',
+    'shadowless': '(Shadowless)',
+    'error': '(Error)',
+    'misprint': '(Misprint)'
+  }
+
+  return friendlyNames[sanitizedPattern] || `(${sanitizedPattern})`
+}
+
+/**
+ * Type guard to validate price variant data structure
+ * @param variant - The variant object to validate
+ * @returns True if the variant is valid and safe to process
+ */
+function isValidPriceVariant(variant: unknown): variant is TCGCSVPriceVariant {
+  if (variant === null || typeof variant !== 'object') {
+    return false
+  }
+
+  const obj = variant as Record<string, unknown>
+
+  return (
+    'subTypeName' in obj &&
+    'marketPrice' in obj &&
+    typeof obj.subTypeName === 'string' &&
+    typeof obj.marketPrice === 'number' &&
+    obj.marketPrice >= 0 &&
+    obj.subTypeName.length > 0 &&
+    obj.subTypeName.length <= 100 // Prevent excessively long names
+  )
+}
+
+/**
  * Extracts market prices from TCGCSV price data and returns a simple key-value object
  * @param priceData - The raw JSONB price data from the database
  * @returns Object with variant names as keys and market prices as values, or null if no valid data
- * 
+ *
  * @example
  * Input: [
  *   { "subTypeName": "Normal", "marketPrice": 0.07, ... },
@@ -37,14 +90,32 @@ export interface PriceVariants {
  */
 export function extractMarketPrices(priceData: unknown): PriceVariants | null {
   if (!priceData) return null
-  
+
   try {
     // Handle both array format and potential string format from database
-    let priceArray: TCGCSVPriceVariant[] = []
-    
+    let priceArray: unknown[] = []
+
     if (typeof priceData === 'string') {
-      // Parse if it's a JSON string
-      priceArray = JSON.parse(priceData)
+      // Validate JSON string size to prevent DoS
+      if (priceData.length > 10000) {
+        console.debug('Price data string too large, rejecting')
+        return null
+      }
+
+      // Parse with security against prototype pollution
+      const parsed = JSON.parse(priceData, (key, value) => {
+        // Prevent prototype pollution attacks
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          return undefined
+        }
+        return value
+      })
+
+      if (!Array.isArray(parsed)) {
+        console.debug('Parsed price data is not an array')
+        return null
+      }
+      priceArray = parsed
     } else if (Array.isArray(priceData)) {
       // Use directly if already an array
       priceArray = priceData
@@ -52,26 +123,41 @@ export function extractMarketPrices(priceData: unknown): PriceVariants | null {
       // Unknown format
       return null
     }
-    
-    // Convert to key-value object
+
+    // Limit array size to prevent DoS
+    if (priceArray.length > 100) {
+      console.debug('Price array too large, truncating')
+      priceArray = priceArray.slice(0, 100)
+    }
+
+    // Convert to key-value object with validation
     const prices: PriceVariants = {}
 
     for (const variant of priceArray) {
-      if (variant.subTypeName && typeof variant.marketPrice === 'number') {
-        // Create unique key that includes variant pattern if available
-        const variantPattern = variant.variant_pattern || 'base'
-        const uniqueKey = variantPattern === 'base'
-          ? variant.subTypeName
-          : `${variant.subTypeName} (${variantPattern})`
-
-        prices[uniqueKey] = variant.marketPrice
+      if (!isValidPriceVariant(variant)) {
+        console.debug('Invalid price variant detected, skipping')
+        continue
       }
+
+      // Create unique key that includes variant pattern if available
+      const variantPattern = variant.variant_pattern || 'base'
+      const friendlyPattern = getFriendlyVariantName(variantPattern)
+      const uniqueKey = variantPattern === 'base'
+        ? variant.subTypeName
+        : `${variant.subTypeName} ${friendlyPattern}`
+
+      prices[uniqueKey] = variant.marketPrice
     }
-    
+
     // Return null if no valid prices found
     return Object.keys(prices).length > 0 ? prices : null
   } catch (error) {
-    console.debug('Error parsing TCGCSV price data:', error)
+    // Log detailed error server-side only, minimal info client-side
+    if (typeof window === 'undefined') {
+      console.error('Price data parsing error:', error)
+    } else {
+      console.debug('Price data parsing failed')
+    }
     return null
   }
 }
