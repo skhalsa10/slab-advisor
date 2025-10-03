@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Pokemon TCG Data Pipeline daily at 2 AM
+Requires=tcg-pipeline.service
+
+[Timer]
+OnCalendar=daily
+OnCalendar=02:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

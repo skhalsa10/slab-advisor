@@ -22,6 +22,9 @@ xset s noblank 2>/dev/null
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Activate virtual environment
+source venv/bin/activate
+
 # Initialize overall tracking
 total_errors=0
 step_count=0

@@ -1,0 +1,16 @@
+[Unit]
+Description=Pokemon TCG Data Pipeline
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=siri
+Group=siri
+WorkingDirectory=/home/siri/slab-advidor/slab-advisor/scripts
+ExecStart=/bin/bash /home/siri/slab-advidor/slab-advisor/scripts/run_auto_sync.sh
+StandardOutput=append:/home/siri/tcg_pipeline.log
+StandardError=append:/home/siri/tcg_pipeline.log
+
+[Install]
+WantedBy=multi-user.target

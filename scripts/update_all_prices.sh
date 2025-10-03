@@ -24,7 +24,8 @@ xset -dpms 2>/dev/null
 xset s noblank 2>/dev/null
 
 # Run the price update
-cd /home/pi/projects/slab-advisor/scripts
+cd /home/siri/slab-advidor/slab-advisor/scripts
+source venv/bin/activate
 python3 update_pokemon_prices.py --all $force_flag
 
 # Record end time
