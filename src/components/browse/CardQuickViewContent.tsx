@@ -38,6 +38,11 @@ export default function CardQuickViewContent({
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  // Reset form state when navigating to a different card
+  useEffect(() => {
+    setShowCollectionForm(false)
+  }, [cardId])
+
   const loadCardData = useCallback(async () => {
     try {
       setLoading(true)

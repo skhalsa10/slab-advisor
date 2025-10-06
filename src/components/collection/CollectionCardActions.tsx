@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import EditCollectionForm from './EditCollectionForm'
 import type { CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 
@@ -19,6 +19,11 @@ export default function CollectionCardActions({
 }: CollectionCardActionsProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Reset edit state when navigating to a different card
+  useEffect(() => {
+    setIsEditing(false)
+  }, [card.id])
 
   const handleSave = async (updates: Partial<CollectionCardWithPokemon>) => {
     setIsSubmitting(true)
