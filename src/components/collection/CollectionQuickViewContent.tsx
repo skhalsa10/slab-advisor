@@ -42,7 +42,10 @@ export default function CollectionQuickViewContent({
       })
 
       if (!response.ok) {
-        throw new Error('Failed to delete card')
+        const errorData = await response.json().catch(() => ({}))
+        const errorMessage = errorData.error || `Failed to delete card (${response.status})`
+        console.error('Delete card error:', errorMessage, errorData)
+        throw new Error(errorMessage)
       }
 
       setShowDeleteDialog(false)
@@ -50,7 +53,7 @@ export default function CollectionQuickViewContent({
       onClose?.()
     } catch (error) {
       console.error('Error deleting card:', error)
-      setErrorMessage('Failed to delete card from collection')
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete card from collection')
       setShowDeleteDialog(false)
     }
   }
