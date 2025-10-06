@@ -525,3 +525,149 @@ With the completion of variant data synchronization, the UI now needs updates to
 - Performance optimizations
 - User preference settings
 - Analytics and reporting
+
+---
+
+## Future Enhancement: Edit Collection Form Variant Support
+
+### Context
+The EditCollectionForm currently does not support changing the variant of a card in the collection. This is intentionally left out of the initial pattern variant implementation due to complexity.
+
+### Challenge
+When a user wants to change a card's variant, we need to handle the following scenarios:
+1. **Simple case**: No other collection entry exists with the target variant
+   - Can safely update the variant and variant_pattern fields
+2. **Merge case**: Another entry exists with the same card + target variant
+   - Need to warn the user they're about to merge quantities
+   - Ask if they want to combine the quantities or keep them separate
+   - Update quantities and delete the original entry if merging
+
+### Implementation Requirements
+
+#### 1. Fetch Available Variants
+- EditCollectionForm needs pokemon_card data to determine available variants
+- Type signature would change from `CollectionCard` to `CollectionCardWithPokemon`
+- Use `buildAvailableVariants()` to get variant options
+
+#### 2. Add Variant Selector
+```tsx
+{/* Variant Selection */}
+<div>
+  <label htmlFor="variant" className="block text-sm font-medium text-grey-700 mb-1">
+    Variant
+  </label>
+  <select
+    id="variant"
+    value={formData.variant}
+    onChange={(e) => handleVariantChange(e.target.value)}
+    className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+    disabled={isSubmitting}
+  >
+    {availableVariants.map((variant) => (
+      <option key={variant} value={variant}>
+        {getVariantLabel(variant)}
+      </option>
+    ))}
+  </select>
+</div>
+```
+
+#### 3. Check for Existing Entry
+```tsx
+const handleVariantChange = async (newVariant: string) => {
+  const { variant, variant_pattern } = parseVariantSelection(newVariant)
+
+  // Check if another collection entry exists with this variant
+  const response = await fetch(`/api/collection/check-duplicate?` + new URLSearchParams({
+    pokemon_card_id: card.pokemon_card_id,
+    variant,
+    variant_pattern: variant_pattern || ''
+  }))
+
+  const { exists, existingCard } = await response.json()
+
+  if (exists) {
+    // Show warning modal
+    setShowMergeWarning({
+      existingCard,
+      newVariant: variant,
+      newPattern: variant_pattern
+    })
+  } else {
+    // Safe to update
+    setFormData(prev => ({ ...prev, variant: newVariant }))
+  }
+}
+```
+
+#### 4. Create API Endpoint for Duplicate Check
+**New File**: `/src/app/api/collection/check-duplicate/route.ts`
+```typescript
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const pokemon_card_id = searchParams.get('pokemon_card_id')
+  const variant = searchParams.get('variant')
+  const variant_pattern = searchParams.get('variant_pattern')
+
+  // Query collection_cards for existing entry
+  // Return exists: boolean and existingCard data if found
+}
+```
+
+#### 5. Merge Warning Modal
+```tsx
+if (showMergeWarning) {
+  return (
+    <MergeWarningModal
+      currentCard={card}
+      existingCard={showMergeWarning.existingCard}
+      newVariant={showMergeWarning.newVariant}
+      onConfirmMerge={handleConfirmMerge}
+      onCancel={() => setShowMergeWarning(null)}
+    />
+  )
+}
+```
+
+#### 6. Handle Merge Logic
+```tsx
+const handleConfirmMerge = async () => {
+  const { variant, variant_pattern } = parseVariantSelection(showMergeWarning.newVariant)
+
+  // Add quantities from current card to existing card
+  await fetch(`/api/collection/cards/${showMergeWarning.existingCard.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      quantity: showMergeWarning.existingCard.quantity + card.quantity
+    })
+  })
+
+  // Delete current card
+  await fetch(`/api/collection/cards/${card.id}`, {
+    method: 'DELETE'
+  })
+
+  onUpdate(showMergeWarning.existingCard)
+  setShowMergeWarning(null)
+}
+```
+
+### Testing Considerations
+1. Test variant change when no duplicate exists (simple path)
+2. Test variant change when duplicate exists (merge warning)
+3. Test merge confirmation (quantities add correctly)
+4. Test merge cancellation (no changes made)
+5. Test changing back to original variant (should work)
+6. Test pattern variant changes (poke_ball ↔ master_ball ↔ base)
+
+### Priority
+**Low Priority** - This is a nice-to-have feature. Users can work around it by:
+1. Deleting the incorrect variant card
+2. Re-adding the card with the correct variant
+
+### Estimated Effort
+- 4-6 hours of development
+- 2 hours of testing
+- API endpoint creation
+- Modal component creation
+- State management complexity

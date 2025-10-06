@@ -38,6 +38,7 @@ export type Database = {
           updated_at: string | null
           user_id: string
           variant: string
+          variant_pattern: string | null
         }
         Insert: {
           acquisition_date?: string | null
@@ -62,6 +63,7 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           variant: string
+          variant_pattern?: string | null
         }
         Update: {
           acquisition_date?: string | null
@@ -86,6 +88,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           variant?: string
+          variant_pattern?: string | null
         }
         Relationships: [
           {

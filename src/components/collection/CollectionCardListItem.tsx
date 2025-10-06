@@ -35,7 +35,7 @@ export default function CollectionCardListItem({
   onViewCard 
 }: CollectionCardListItemProps) {
   
-  const variant = formatVariant(card.variant, false, true)
+  const variant = formatVariant(card.variant, false, true, card.variant_pattern)
   const condition = formatCondition(card.condition, false, true)
   const quantity = formatQuantity(card.quantity)
   const grade = formatGrade(card.estimated_grade, card.grading_data)

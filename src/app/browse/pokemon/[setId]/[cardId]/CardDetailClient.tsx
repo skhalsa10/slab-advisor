@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import AddToCollectionModal from '@/components/collection/AddToCollectionModal'
+import { buildAvailableVariants, getVariantLabel } from '@/utils/variantUtils'
 import type { CardFull, SetWithCards } from '@/models/pokemon'
 
 interface CardDetailClientProps {
@@ -26,15 +27,8 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
   const previousCard = currentCardIndex > 0 ? set.cards[currentCardIndex - 1] : null
   const nextCard = currentCardIndex < set.cards.length - 1 ? set.cards[currentCardIndex + 1] : null
 
-  // Build variants array from boolean fields (using database constraint values)
-  const variants: string[] = []
-  if (card.variant_normal) variants.push("normal")
-  if (card.variant_holo) variants.push("holo")
-  if (card.variant_reverse) variants.push("reverse_holo")
-  if (card.variant_first_edition) variants.push("first_edition")
-  
-  // Ensure at least one variant is available
-  const availableVariants = variants.length > 0 ? variants : ["normal"]
+  // Build variants array from boolean fields (including pattern variants)
+  const availableVariants = buildAvailableVariants(card)
 
   const handleCollectionSuccess = (message: string) => {
     setSuccessMessage(message)
@@ -234,23 +228,26 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
             )}
 
             {/* Variants */}
-            {variants.length > 0 && (
+            {availableVariants.length > 0 && (
               <div className="bg-grey-50 rounded-lg p-4">
                 <p className="text-sm text-grey-600 mb-3">Available Variants</p>
                 <div className="flex flex-wrap gap-2">
-                  {variants.map((variant) => (
-                    <span
-                      key={variant}
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        variant === 'Normal' ? 'bg-blue-100 text-blue-800' :
-                        variant === 'Holo' ? 'bg-purple-100 text-purple-800' :
-                        variant === 'Reverse' ? 'bg-green-100 text-green-800' :
-                        'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {variant}
-                    </span>
-                  ))}
+                  {availableVariants.map((variant) => {
+                    const label = getVariantLabel(variant)
+                    return (
+                      <span
+                        key={variant}
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                          variant.includes('normal') ? 'bg-blue-100 text-blue-800' :
+                          variant.includes('holo') ? 'bg-purple-100 text-purple-800' :
+                          variant.includes('reverse') ? 'bg-green-100 text-green-800' :
+                          'bg-yellow-100 text-yellow-800'
+                        }`}
+                      >
+                        {label}
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
             )}

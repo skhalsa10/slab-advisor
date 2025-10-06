@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { CONDITION_OPTIONS } from '@/constants/cards'
+import { getVariantLabel, parseVariantSelection } from '@/utils/variantUtils'
 
 interface AddToCollectionFormProps {
   cardId: string
@@ -74,10 +75,14 @@ export default function AddToCollectionForm({
     setIsSubmitting(true)
 
     try {
+      // Parse variant selection to extract variant and pattern
+      const { variant, variant_pattern } = parseVariantSelection(formData.variant)
+
       const requestData = {
         mode: 'known-card' as const,
         pokemon_card_id: cardId,
-        variant: formData.variant,
+        variant,
+        variant_pattern,
         quantity: formData.quantity,
         condition: formData.condition || undefined,
         acquisition_price: formData.acquisition_price ? parseFloat(formData.acquisition_price) : undefined,
@@ -156,29 +161,11 @@ export default function AddToCollectionForm({
             required
           >
             <option value="">Select Variant</option>
-            {availableVariants.map((variant) => {
-              // Map database values to user-friendly labels
-              const getVariantLabel = (dbValue: string) => {
-                switch (dbValue) {
-                  case 'normal': return 'Normal'
-                  case 'holo': return 'Holo'
-                  case 'reverse_holo': return 'Reverse Holo'
-                  case 'first_edition': return '1st Edition'
-                  case 'illustration_rare': return 'Illustration Rare'
-                  case 'alt_art': return 'Alt Art'
-                  case 'full_art': return 'Full Art'
-                  case 'secret_rare': return 'Secret Rare'
-                  case 'other': return 'Other'
-                  default: return variant
-                }
-              }
-              
-              return (
-                <option key={variant} value={variant}>
-                  {getVariantLabel(variant)}
-                </option>
-              )
-            })}
+            {availableVariants.map((variant) => (
+              <option key={variant} value={variant}>
+                {getVariantLabel(variant)}
+              </option>
+            ))}
           </select>
         </div>
 

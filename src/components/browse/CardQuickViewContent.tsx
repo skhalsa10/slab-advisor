@@ -8,6 +8,7 @@ import { extractMarketPrices } from '@/utils/priceUtils'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import { useAuth } from '@/hooks/useAuth'
 import AddToCollectionForm from '@/components/collection/AddToCollectionForm'
+import { buildAvailableVariants } from '@/utils/variantUtils'
 import type { CardFull } from '@/models/pokemon'
 
 interface CardQuickViewContentProps {
@@ -68,14 +69,7 @@ export default function CardQuickViewContent({
 
   const getAvailableVariants = () => {
     if (!cardData) return []
-    
-    const variants: string[] = []
-    if (cardData.variant_normal) variants.push('normal')
-    if (cardData.variant_holo) variants.push('holo')
-    if (cardData.variant_reverse) variants.push('reverse_holo')
-    if (cardData.variant_first_edition) variants.push('first_edition')
-    
-    return variants.length > 0 ? variants : ['normal']
+    return buildAvailableVariants(cardData)
   }
 
   const handleCollectionSuccess = (message: string) => {

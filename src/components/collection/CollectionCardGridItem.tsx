@@ -36,7 +36,7 @@ export default function CollectionCardGridItem({
   onViewCard, 
   priority = false 
 }: CollectionCardGridItemProps) {
-  const variant = formatVariant(card.variant, true)
+  const variant = formatVariant(card.variant, true, false, card.variant_pattern)
   const condition = formatCondition(card.condition, true)
   const quantity = formatQuantity(card.quantity)
   const grade = formatGrade(card.estimated_grade, card.grading_data)

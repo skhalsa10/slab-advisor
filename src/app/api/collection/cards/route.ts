@@ -2,10 +2,33 @@ import { NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 
+// Allowed variant pattern values - must match database CHECK constraint
+const ALLOWED_VARIANT_PATTERNS = ['poke_ball', 'master_ball'] as const
+
+/**
+ * Validates variant_pattern value against allowed list
+ * @param pattern - The pattern value to validate
+ * @returns Validated pattern or null
+ * @throws Error if pattern is invalid
+ */
+function validateVariantPattern(pattern: string | null | undefined): string | null {
+  if (pattern === null || pattern === undefined || pattern === '') {
+    return null
+  }
+
+  // Type guard to ensure only allowed values
+  if (ALLOWED_VARIANT_PATTERNS.includes(pattern as typeof ALLOWED_VARIANT_PATTERNS[number])) {
+    return pattern
+  }
+
+  throw new Error(`Invalid variant_pattern: ${pattern}. Allowed values: ${ALLOWED_VARIANT_PATTERNS.join(', ')}`)
+}
+
 interface AddToCollectionRequest {
   mode: 'known-card' | 'manual-entry'
   pokemon_card_id?: string
   variant: string
+  variant_pattern?: string | null
   quantity: number
   condition?: string
   acquisition_price?: number
@@ -55,14 +78,22 @@ export async function POST(request: Request) {
         )
       }
 
-      // Check if user already has this card + variant combination
-      const { data: existing, error: checkError } = await supabase
+      // Check if user already has this card + variant + pattern combination
+      let query = supabase
         .from('collection_cards')
         .select('id, quantity')
         .eq('user_id', user.id)
         .eq('pokemon_card_id', data.pokemon_card_id)
         .eq('variant', data.variant)
-        .single()
+
+      // Match on variant_pattern too (null matches null)
+      if (data.variant_pattern) {
+        query = query.eq('variant_pattern', data.variant_pattern)
+      } else {
+        query = query.is('variant_pattern', null)
+      }
+
+      const { data: existing, error: checkError } = await query.single()
 
       if (checkError && checkError.code !== 'PGRST116') {
         console.error('Error checking existing collection:', checkError)
@@ -99,12 +130,24 @@ export async function POST(request: Request) {
           message: `Added ${data.quantity} more. Total: ${updated.quantity}`
         })
       } else {
+        // Validate variant_pattern before insertion
+        let validatedPattern: string | null
+        try {
+          validatedPattern = validateVariantPattern(data.variant_pattern)
+        } catch (error) {
+          return NextResponse.json(
+            { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
+            { status: 400 }
+          )
+        }
+
         // Create new entry for known card (clean data - no manual fields)
         const cleanData = {
           user_id: user.id,
           card_type: 'pokemon',
           pokemon_card_id: data.pokemon_card_id,
           variant: data.variant,
+          variant_pattern: validatedPattern,
           quantity: data.quantity,
           condition: data.condition || null,
           acquisition_price: data.acquisition_price || null,
@@ -143,12 +186,24 @@ export async function POST(request: Request) {
         )
       }
 
+      // Validate variant_pattern before insertion
+      let validatedPattern: string | null
+      try {
+        validatedPattern = validateVariantPattern(data.variant_pattern)
+      } catch (error) {
+        return NextResponse.json(
+          { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
+          { status: 400 }
+        )
+      }
+
       // Create new manual entry (clean data - no pokemon_card_id)
       const cleanData = {
         user_id: user.id,
         card_type: 'pokemon',
         pokemon_card_id: null, // No reference for manual cards
         variant: data.variant,
+        variant_pattern: validatedPattern,
         quantity: data.quantity,
         condition: data.condition || null,
         acquisition_price: data.acquisition_price || null,
@@ -198,7 +253,7 @@ export async function POST(request: Request) {
 }
 
 /**
- * GET - Check if user has specific card + variant in collection
+ * GET - Check if user has specific card + variant + pattern in collection
  */
 export async function GET(request: Request) {
   try {
@@ -213,6 +268,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const pokemon_card_id = searchParams.get('pokemon_card_id')
     const variant = searchParams.get('variant')
+    const variant_pattern = searchParams.get('variant_pattern')
 
     if (!pokemon_card_id || !variant) {
       return NextResponse.json(
@@ -223,13 +279,22 @@ export async function GET(request: Request) {
 
     const supabase = getServerSupabaseClient()
 
-    const { data: existing, error } = await supabase
+    // Build query with variant_pattern support (same logic as POST)
+    let query = supabase
       .from('collection_cards')
-      .select('id, quantity, condition, acquisition_price, acquisition_date, notes')
+      .select('id, quantity, condition, acquisition_price, acquisition_date, notes, variant_pattern')
       .eq('user_id', user.id)
       .eq('pokemon_card_id', pokemon_card_id)
       .eq('variant', variant)
-      .single()
+
+    // Match on variant_pattern too (null matches null)
+    if (variant_pattern) {
+      query = query.eq('variant_pattern', variant_pattern)
+    } else {
+      query = query.is('variant_pattern', null)
+    }
+
+    const { data: existing, error } = await query.single()
 
     if (error && error.code !== 'PGRST116') {
       console.error('Error checking collection:', error)

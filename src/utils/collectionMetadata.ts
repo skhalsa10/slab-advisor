@@ -1,9 +1,11 @@
 /**
  * Collection Metadata Utilities
- * 
+ *
  * Provides formatting and display utilities for collection card metadata
  * including variants, conditions, quantities, and grades.
  */
+
+import DOMPurify from 'isomorphic-dompurify'
 
 /**
  * Professional grading data structure
@@ -154,12 +156,27 @@ export type ConditionType = keyof typeof CONDITION_CONFIG
 /**
  * Format variant text for display
  * Converts snake_case to Title Case
+ * Sanitizes pattern values with DOMPurify to prevent XSS
  */
-function formatVariantText(variant: string): string {
-  return variant
+function formatVariantText(variant: string, pattern?: string | null): string {
+  let baseText = variant
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ')
+
+  // Add pattern suffix if present (with XSS protection)
+  if (pattern) {
+    // For known patterns, use friendly labels
+    // For unknown patterns, sanitize with DOMPurify as defense-in-depth
+    const patternLabel = pattern === 'poke_ball'
+      ? 'Poké Ball'
+      : pattern === 'master_ball'
+        ? 'Master Ball'
+        : DOMPurify.sanitize(pattern, { ALLOWED_TAGS: [] }) // Strip all HTML tags
+    baseText = `${baseText} (${patternLabel})`
+  }
+
+  return baseText
 }
 
 /**
@@ -193,26 +210,36 @@ function createAbbreviation(text: string): string {
  * Format variant for display
  * Handles both known variants and custom/unknown variants
  */
-export function formatVariant(variant: string | null, useAbbreviation = false, forListView = false) {
+export function formatVariant(
+  variant: string | null,
+  useAbbreviation = false,
+  forListView = false,
+  pattern?: string | null
+) {
   if (!variant) return null
-  
+
   // Check if it's a known variant
   const config = VARIANT_CONFIG[variant as VariantType]
-  
+
   if (config) {
+    // Add pattern suffix to text if present
+    const text = config.text
+    const fullText = pattern ? formatVariantText(variant, pattern) : text
+    const displayText = useAbbreviation ? config.abbreviation : fullText
+
     return {
-      text: useAbbreviation ? config.abbreviation : config.text,
+      text: displayText,
       colorClass: forListView ? config.listColorClass : config.colorClass,
       textColor: forListView ? config.listTextColor : config.textColor,
       abbreviation: config.abbreviation
     }
   }
-  
+
   // Handle unknown/custom variants
   // Format the text nicely and create an abbreviation
-  const formattedText = formatVariantText(variant)
+  const formattedText = formatVariantText(variant, pattern)
   const abbreviation = createAbbreviation(formattedText)
-  
+
   return {
     text: useAbbreviation ? abbreviation : formattedText,
     colorClass: forListView ? DEFAULT_VARIANT_STYLE.listColorClass : DEFAULT_VARIANT_STYLE.colorClass,

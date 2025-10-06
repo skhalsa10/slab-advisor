@@ -2,6 +2,28 @@ import { NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 
+// Allowed variant pattern values - must match database CHECK constraint
+const ALLOWED_VARIANT_PATTERNS = ['poke_ball', 'master_ball'] as const
+
+/**
+ * Validates variant_pattern value against allowed list
+ * @param pattern - The pattern value to validate
+ * @returns Validated pattern or null
+ * @throws Error if pattern is invalid
+ */
+function validateVariantPattern(pattern: string | null | undefined): string | null {
+  if (pattern === null || pattern === undefined || pattern === '') {
+    return null
+  }
+
+  // Type guard to ensure only allowed values
+  if (ALLOWED_VARIANT_PATTERNS.includes(pattern as typeof ALLOWED_VARIANT_PATTERNS[number])) {
+    return pattern
+  }
+
+  throw new Error(`Invalid variant_pattern: ${pattern}. Allowed values: ${ALLOWED_VARIANT_PATTERNS.join(', ')}`)
+}
+
 interface UpdateCollectionRequest {
   quantity?: number
   condition?: string
@@ -9,6 +31,7 @@ interface UpdateCollectionRequest {
   acquisition_date?: string | null
   notes?: string | null
   variant?: string
+  variant_pattern?: string | null
 }
 
 /**
@@ -50,6 +73,8 @@ export async function GET(
           variant_holo,
           variant_reverse,
           variant_first_edition,
+          variant_poke_ball,
+          variant_master_ball,
           set:pokemon_sets (
             id,
             name,
@@ -145,8 +170,9 @@ export async function PATCH(
       acquisition_date?: string | null
       notes?: string | null
       variant?: string
+      variant_pattern?: string | null
     }
-    
+
     const updateData: UpdateData = {
       updated_at: new Date().toISOString()
     }
@@ -157,6 +183,18 @@ export async function PATCH(
     if (data.acquisition_date !== undefined) updateData.acquisition_date = data.acquisition_date
     if (data.notes !== undefined) updateData.notes = data.notes
     if (data.variant !== undefined) updateData.variant = data.variant
+
+    // Validate variant_pattern if provided
+    if (data.variant_pattern !== undefined) {
+      try {
+        updateData.variant_pattern = validateVariantPattern(data.variant_pattern)
+      } catch (error) {
+        return NextResponse.json(
+          { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
+          { status: 400 }
+        )
+      }
+    }
 
     // Update the collection card
     const { data: updated, error: updateError } = await supabase
@@ -180,6 +218,8 @@ export async function PATCH(
           variant_holo,
           variant_reverse,
           variant_first_edition,
+          variant_poke_ball,
+          variant_master_ball,
           set:pokemon_sets (
             id,
             name,

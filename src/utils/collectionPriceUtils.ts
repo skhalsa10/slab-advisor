@@ -26,20 +26,36 @@ const VARIANT_TO_PRICE_MAP: Record<string, string[]> = {
  */
 export function getCollectionCardPrice(card: CollectionCardWithPokemon): number | null {
   if (!card.pokemon_card?.price_data) return null
-  
+
   const prices = extractMarketPrices(card.pokemon_card.price_data)
   if (!prices) return null
-  
+
+  // Determine the pattern to look for (default to base if no pattern)
+  const targetPattern = card.variant_pattern || 'base'
+
   // Get the variant price mappings for this card's variant
   const priceVariantNames = VARIANT_TO_PRICE_MAP[card.variant] || []
-  
-  // Try to find a matching price variant
+
+  // For pattern variants, look for exact match on both subTypeName and pattern
+  // The extractMarketPrices function creates keys like "Holofoil (Poké Ball)" or "Holofoil (Master Ball)"
   for (const variantName of priceVariantNames) {
+    // Try to find price with pattern suffix
+    if (targetPattern !== 'base') {
+      // Look for variant with pattern suffix (e.g., "Holofoil (Poké Ball)")
+      const patternSuffix = targetPattern === 'poke_ball' ? '(Poké Ball)' : '(Master Ball)'
+      const keyWithPattern = `${variantName} ${patternSuffix}`
+
+      if (prices[keyWithPattern] && prices[keyWithPattern] > 0) {
+        return prices[keyWithPattern]
+      }
+    }
+
+    // Try base variant name (without pattern)
     if (prices[variantName] && prices[variantName] > 0) {
       return prices[variantName]
     }
   }
-  
+
   // If no exact match, fall back to the lowest available price
   const allPrices = Object.values(prices).filter(price => price > 0)
   return allPrices.length > 0 ? Math.min(...allPrices) : null
