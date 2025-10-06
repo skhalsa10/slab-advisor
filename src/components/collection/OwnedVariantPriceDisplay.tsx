@@ -86,10 +86,6 @@ export function OwnedVariantPriceDisplay({
           </div>
         )}
       </div>
-
-      <p className="text-xs text-grey-500 mt-2.5 text-center">
-        Price from TCGPlayer market data
-      </p>
     </div>
   )
 }

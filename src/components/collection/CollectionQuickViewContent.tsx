@@ -103,7 +103,7 @@ export default function CollectionQuickViewContent({
             
             {/* Collection-specific Details */}
             <div className="border-t pt-3">
-              <h4 className="text-sm font-semibold text-grey-900 mb-2">📦 Collection Details</h4>
+              <h4 className="text-sm font-semibold text-grey-900 mb-2">Your Collection</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-grey-600">Quantity</span>
@@ -113,7 +113,20 @@ export default function CollectionQuickViewContent({
                   <div className="flex justify-between">
                     <span className="text-grey-600">Variant</span>
                     <span className="font-medium capitalize">
-                      {card.variant.replace('_', ' ')}
+                      {(() => {
+                        const baseVariant = card.variant.replace('_', ' ')
+                        if (!card.variant_pattern || card.variant_pattern === 'base') {
+                          return baseVariant
+                        }
+                        const patternMap: Record<string, string> = {
+                          'poke_ball': 'Poké Ball',
+                          'great_ball': 'Great Ball',
+                          'ultra_ball': 'Ultra Ball',
+                          'master_ball': 'Master Ball',
+                        }
+                        const pattern = patternMap[card.variant_pattern] || card.variant_pattern.replace('_', ' ')
+                        return `${baseVariant} (${pattern})`
+                      })()}
                     </span>
                   </div>
                 )}
@@ -202,12 +215,6 @@ function PokemonDetailsCollection({
   variantPattern?: string | null
   quantity: number
 }) {
-  const variants: string[] = []
-  if (card.variant_normal) variants.push('Normal')
-  if (card.variant_holo) variants.push('Holo')
-  if (card.variant_reverse) variants.push('Reverse')
-  if (card.variant_first_edition) variants.push('1st Edition')
-
   // Get the price for the specific variant the user owns
   const getVariantPrice = (): number | null => {
     if (!card.price_data) return null
@@ -286,15 +293,6 @@ function PokemonDetailsCollection({
           <div className="col-span-2 lg:flex lg:justify-between">
             <p className="font-medium text-grey-500">Illustrator</p>
             <p className="text-grey-900 lg:truncate lg:ml-2">{card.illustrator}</p>
-          </div>
-        )}
-
-        {variants.length > 0 && (
-          <div className="col-span-2 lg:flex lg:justify-between">
-            <p className="font-medium text-grey-500">Variants</p>
-            <p className="text-grey-900 lg:text-right lg:ml-2">
-              {variants.join(', ')}
-            </p>
           </div>
         )}
       </div>

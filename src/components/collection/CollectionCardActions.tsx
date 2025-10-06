@@ -72,7 +72,7 @@ export default function CollectionCardActions({
     <div className="flex gap-3">
       <button
         onClick={() => setIsEditing(true)}
-        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
+        className="flex-1 px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
       >
         Edit Details
       </button>
