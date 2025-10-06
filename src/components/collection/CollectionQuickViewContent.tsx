@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import CollectionCardActions from '@/components/collection/CollectionCardActions'
 import DeleteCardDialog from '@/components/collection/DeleteCardDialog'
+import { OwnedVariantPriceDisplay } from '@/components/collection/OwnedVariantPriceDisplay'
 import type { CardFull } from '@/models/pokemon'
 import type { CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
@@ -88,7 +89,14 @@ export default function CollectionQuickViewContent({
           {/* Card Details */}
           <div className="flex-1 space-y-4">
             {/* Card Information */}
-            {pokemonCard && <PokemonDetails card={pokemonCard} />}
+            {pokemonCard && (
+              <PokemonDetailsCollection
+                card={pokemonCard}
+                variant={card.variant}
+                variantPattern={card.variant_pattern}
+                quantity={card.quantity || 1}
+              />
+            )}
             
             {/* Collection-specific Details */}
             <div className="border-t pt-3">
@@ -179,21 +187,72 @@ export default function CollectionQuickViewContent({
   )
 }
 
-// Pokemon-specific details renderer (shared with browse context)
-function PokemonDetails({ card }: { card: CardFull }) {
+// Pokemon-specific details renderer for collection context
+function PokemonDetailsCollection({
+  card,
+  variant,
+  variantPattern,
+  quantity,
+}: {
+  card: CardFull
+  variant: string
+  variantPattern?: string | null
+  quantity: number
+}) {
   const variants: string[] = []
   if (card.variant_normal) variants.push('Normal')
   if (card.variant_holo) variants.push('Holo')
   if (card.variant_reverse) variants.push('Reverse')
   if (card.variant_first_edition) variants.push('1st Edition')
-  
-  const prices = extractMarketPrices(card.price_data)
-  const availablePrices = prices ? Object.entries(prices)
-    .filter(([, price]) => price > 0)
-    .map(([variant, price]) => ({
-      label: variant,
-      price: price as number
-    })) : []
+
+  // Get the price for the specific variant the user owns
+  const getVariantPrice = (): number | null => {
+    if (!card.price_data) return null
+
+    const prices = extractMarketPrices(card.price_data)
+    if (!prices) return null
+
+    // Map collection variant to price variant names
+    const variantMap: Record<string, string[]> = {
+      'normal': ['Normal'],
+      'holo': ['Holofoil', 'Holo'],
+      'reverse_holo': ['Reverse Holofoil', 'Reverse'],
+      'first_edition': ['1st Edition Normal', '1st Edition Holofoil', '1st Edition']
+    }
+
+    const targetPattern = variantPattern || 'base'
+    const priceVariantNames = variantMap[variant] || []
+
+    // Try to find price with pattern suffix first
+    for (const variantName of priceVariantNames) {
+      if (targetPattern !== 'base') {
+        const patternMap: Record<string, string> = {
+          'poke_ball': '(Poké Ball)',
+          'master_ball': '(Master Ball)',
+          'great_ball': '(Great Ball)',
+          'ultra_ball': '(Ultra Ball)',
+        }
+        const patternSuffix = patternMap[targetPattern]
+        if (patternSuffix) {
+          const keyWithPattern = `${variantName} ${patternSuffix}`
+          if (prices[keyWithPattern] && prices[keyWithPattern] > 0) {
+            return prices[keyWithPattern]
+          }
+        }
+      }
+
+      // Try base variant name (without pattern)
+      if (prices[variantName] && prices[variantName] > 0) {
+        return prices[variantName]
+      }
+    }
+
+    // Fallback to lowest available price
+    const allPrices = Object.values(prices).filter(price => price > 0)
+    return allPrices.length > 0 ? Math.min(...allPrices) : null
+  }
+
+  const variantPrice = getVariantPrice()
 
   return (
     <div className="space-y-3">
@@ -212,7 +271,7 @@ function PokemonDetails({ card }: { card: CardFull }) {
             <p className="text-grey-900">{card.category}</p>
           </div>
         )}
-        
+
         {card.rarity && (
           <div className="lg:flex lg:justify-between">
             <p className="font-medium text-grey-500">Rarity</p>
@@ -237,24 +296,23 @@ function PokemonDetails({ card }: { card: CardFull }) {
         )}
       </div>
 
-      {/* Market Prices Section */}
-      <div className="border-t pt-3 mt-3">
-        <h4 className="text-sm font-semibold text-grey-900 mb-2">💰 Market Prices</h4>
-        {availablePrices.length === 0 ? (
-          <p className="text-sm text-grey-500 italic">Price data unavailable</p>
-        ) : (
-          <div className="space-y-1.5">
-            {availablePrices.map(({ label, price }) => (
-              <div key={label} className="flex justify-between text-sm">
-                <span className="text-grey-600">{label}</span>
-                <span className="font-semibold text-green-600">
-                  ${price.toFixed(2)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Owned Variant Price Display */}
+      {variantPrice !== null && (
+        <OwnedVariantPriceDisplay
+          price={variantPrice}
+          variant={variant}
+          variantPattern={variantPattern}
+          quantity={quantity}
+        />
+      )}
+
+      {variantPrice === null && (
+        <div className="border-t pt-4 mt-4">
+          <p className="text-sm text-grey-500 italic text-center">
+            Price data unavailable for this variant
+          </p>
+        </div>
+      )}
     </div>
   )
 }
