@@ -258,7 +258,202 @@ These features deliver unique value that competitors don't have and form the fou
 
 These features enable viral growth, user acquisition, and retention.
 
-#### 5. Username + Shareable Collections ❌ NOT STARTED
+#### 5. AI Collection Advisor (Claude Agent SDK) ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟠 High (Premium Feature)
+**Estimated Effort:** 2-3 weeks
+**Revenue Potential:** $9.99/month premium tier
+
+**What's Done:**
+- ✅ Collection data exists
+- ✅ Price data pipeline
+- ✅ User authentication
+
+**What's Missing:**
+- ❌ Claude Agent SDK integration
+- ❌ Custom tools for database queries
+- ❌ Chat UI component
+- ❌ Conversation history storage
+- ❌ Premium subscription tier
+- ❌ Credit system for AI queries
+
+**Core Capabilities:**
+
+1. **Grading ROI Analyzer** (Highest Value)
+   - Analyze entire collection for grading profit potential
+   - Calculate profit at different grades (PSA 8, 9, 10)
+   - Subtract grading fees (PSA, BGS, SGC)
+   - Flag cards with >$50 profit potential
+   - Generate prioritized "Send to Grade" list
+
+2. **Collection Insights Chat**
+   - Natural language queries about collection
+   - "What's my most valuable set?"
+   - "Which cards increased most this month?"
+   - "Should I sell my Charizard now?"
+   - Portfolio analysis and trends
+
+3. **Smart Collection Assistant**
+   - Card-specific recommendations
+   - Collection strategy advice
+   - Market context and trends
+   - Set completion suggestions
+   - Investment recommendations
+
+4. **Market Alert Agent** (Future)
+   - Monitor price changes on user's cards
+   - Alert on buying/selling opportunities
+   - Track market trends
+   - Tournament meta impact analysis
+
+**Implementation Tasks:**
+
+1. Set up Claude Agent SDK:
+   ```typescript
+   // src/lib/claude-agent.ts
+   import { Agent } from '@anthropic-ai/agent-sdk'
+
+   export function createCollectionAgent(userId: string)
+   export function chat(message: string, sessionId: string)
+   ```
+
+2. Create custom tools for agent:
+   ```typescript
+   // src/lib/agent-tools/collection-tools.ts
+   - get_collection_stats(user_id)
+   - analyze_grading_roi(user_id, min_profit_threshold)
+   - get_price_history(card_id, days)
+   - get_set_completion(user_id, set_id)
+   - calculate_portfolio_value(user_id)
+   - find_high_value_cards(user_id, criteria)
+   ```
+
+3. Build chat interface:
+   - Chat bubble UI component
+   - Message history display
+   - Streaming responses
+   - Tool execution visualization
+   - Cost tracking per conversation
+
+4. Create conversation management:
+   - `ai_conversations` table (user_id, session_id, messages JSONB)
+   - `ai_usage_logs` table (user_id, tokens_used, cost, timestamp)
+   - Session persistence
+   - Cost tracking and limits
+
+5. Implement premium tier:
+   - Free tier: 10 AI queries/month
+   - Premium tier ($9.99/month): Unlimited AI queries
+   - Credit-based alternative: 1 credit = 1 grading analysis
+
+6. Build API endpoints:
+   - `/api/ai/chat` - Send message to agent
+   - `/api/ai/sessions` - Manage conversation sessions
+   - `/api/ai/usage` - Track usage and costs
+
+**Database Schema:**
+
+```sql
+-- Conversation storage
+CREATE TABLE ai_conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  session_id TEXT UNIQUE NOT NULL,
+  title TEXT,
+  messages JSONB, -- Array of {role, content, timestamp}
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Usage tracking
+CREATE TABLE ai_usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  session_id TEXT,
+  tokens_used INTEGER,
+  cost_usd NUMERIC(10, 4),
+  query_type TEXT, -- 'grading_analysis', 'collection_query', etc.
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Premium subscriptions
+CREATE TABLE premium_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) UNIQUE,
+  tier TEXT, -- 'free', 'premium', 'enterprise'
+  stripe_subscription_id TEXT,
+  status TEXT, -- 'active', 'cancelled', 'past_due'
+  current_period_end TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+**Files to Create:**
+- `/src/lib/claude-agent.ts` - Agent SDK wrapper
+- `/src/lib/agent-tools/collection-tools.ts` - Custom tools
+- `/src/lib/agent-tools/grading-tools.ts` - ROI analysis tools
+- `/src/lib/agent-tools/market-tools.ts` - Price/market tools
+- `/src/components/ai/ChatInterface.tsx` - Chat UI
+- `/src/components/ai/ChatBubble.tsx` - Message display
+- `/src/components/ai/ToolExecutionView.tsx` - Show tool usage
+- `/src/app/api/ai/chat/route.ts` - Chat endpoint
+- `/src/app/api/ai/sessions/route.ts` - Session management
+- `/src/app/(authenticated)/advisor/page.tsx` - AI Advisor page
+- `/src/hooks/useAIChat.ts` - Chat React hook
+
+**Files to Modify:**
+- `/src/app/(authenticated)/layout.tsx` - Add "AI Advisor" nav item
+- `/src/components/navigation/Sidebar.tsx` - Add AI icon
+- `/src/models/database.ts` - Add new table types
+
+**Cost Estimation:**
+- Per grading analysis: $0.50-$2 (analyzes 100+ cards)
+- Per collection query: $0.05-$0.10
+- Monthly cost per active user: $10-$18
+- Premium tier price: $9.99/month
+- Profit margin: 40-50% at scale
+
+**Revenue Model Options:**
+
+1. **Subscription Tier:**
+   - Free: 10 AI queries/month
+   - Premium ($9.99/month): Unlimited AI queries + advanced features
+   - Enterprise ($29.99/month): Multi-user, API access
+
+2. **Credit-Based:**
+   - 1 credit = 1 grading ROI analysis
+   - 1 credit = 5 collection queries
+   - Purchase credits: $4.99 for 10 credits
+
+3. **Hybrid:**
+   - Free: 5 AI queries/month
+   - Pay-per-use: $0.50 per grading analysis
+   - Premium: Unlimited
+
+**Competitive Advantage:**
+- 🚀 AI that understands YOUR specific collection
+- 💰 Personalized profit recommendations
+- 🤖 Natural language insights (not just dashboards)
+- 📊 Contextual market advice based on your holdings
+
+**Dependencies:**
+- Ximilar Grading (Tier 1, Item 2) - Provides estimated grades
+- Historical Pricing (Tier 1, Item 1) - Provides trend data
+- Pre-grading ROI Calculator (Tier 1, Item 4) - Provides base calculations
+- Claude API key (ANTHROPIC_API_KEY)
+- Stripe integration (for premium subscriptions)
+
+**Implementation Priority:**
+Build this AFTER Tier 1 features are complete. The AI layer needs:
+- Grading data (from Ximilar)
+- Price history (from historical pricing)
+- ROI calculations (from pre-grading recommendations)
+
+This becomes the "premium intelligence layer" on top of solid foundations.
+
+---
+
+#### 6. Username + Shareable Collections ❌ NOT STARTED
 **Status:** ❌ 0% Complete
 **Priority:** 🟠 High
 **Estimated Effort:** 1.5 weeks
@@ -332,7 +527,7 @@ These features enable viral growth, user acquisition, and retention.
 
 ---
 
-#### 6. Dashboard Completion ⚠️ IN PROGRESS
+#### 7. Dashboard Completion ⚠️ IN PROGRESS
 **Status:** 🟡 40% Complete
 **Priority:** 🟠 High
 **Estimated Effort:** 3-5 days
@@ -394,7 +589,7 @@ These features enable viral growth, user acquisition, and retention.
 
 ---
 
-#### 7. Card Detail Page Completion ⚠️ IN PROGRESS
+#### 8. Card Detail Page Completion ⚠️ IN PROGRESS
 **Status:** 🟡 80% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 2-3 days
@@ -458,7 +653,7 @@ These features enable viral growth, user acquisition, and retention.
 
 These features ensure production readiness, prevent disasters, and polish the user experience.
 
-#### 8. Gamma/Preprod Pipeline Setup ❌ NOT STARTED
+#### 9. Gamma/Preprod Pipeline Setup ❌ NOT STARTED
 **Status:** ❌ 0% Complete
 **Priority:** 🔴 Critical (before production launch)
 **Estimated Effort:** 3-5 days
@@ -513,7 +708,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 ---
 
-#### 9. App Polish & UX Improvements 🔄 ONGOING
+#### 10. App Polish & UX Improvements 🔄 ONGOING
 **Status:** 🟡 Varies by area
 **Priority:** 🟡 Medium (ongoing after features)
 **Estimated Effort:** Ongoing
@@ -902,7 +1097,18 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Build recommendation UI
 - Integrate into card detail views
 
-### Week 7: Username & Shareable Collections
+### Week 7-9: AI Collection Advisor (Claude Agent SDK)
+**Goal:** Premium intelligence layer with revenue potential
+**Tasks:**
+- Set up Claude Agent SDK integration
+- Create custom tools (collection stats, grading ROI, price history)
+- Build chat interface with streaming responses
+- Implement conversation management and history
+- Create premium subscription tier (Stripe integration)
+- Build API endpoints for chat and sessions
+- Add usage tracking and cost monitoring
+
+### Week 10: Username & Shareable Collections
 **Goal:** Enable viral growth
 **Tasks:**
 - Create profiles and follows tables
@@ -911,7 +1117,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Create public profile pages
 - Implement share functionality
 
-### Week 8: Dashboard & Card Details Completion
+### Week 11: Dashboard & Card Details Completion
 **Goal:** Polish existing features
 **Tasks:**
 - Integrate real data into dashboard
@@ -919,7 +1125,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Build similar cards section
 - Add set completion widget
 
-### Week 9: Gamma/Preprod Pipeline
+### Week 12: Gamma/Preprod Pipeline
 **Goal:** Safe production deployment
 **Tasks:**
 - Set up preprod Supabase project
@@ -927,7 +1133,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Create migration scripts
 - Document workflow
 
-### Week 10+: Polish & Launch Prep
+### Week 13+: Polish & Launch Prep
 **Goal:** Production-ready
 **Tasks:**
 - Search and filtering
@@ -947,6 +1153,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Grading (Ximilar) | ❌ 0% | 🔴 Critical | 2 weeks | Ximilar API |
 | Card Identification | ❌ 0% | 🔴 Critical | 1.5 weeks | Ximilar API |
 | Pre-grading Recs | ❌ 0% | 🟠 High | 1 week | Grading |
+| AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | Grading, Historical Pricing, Claude API |
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
 | Dashboard Completion | 🟡 40% | 🟠 High | 3-5 days | Collection data |
 | Card Detail Polish | 🟡 80% | 🟡 Medium | 2-3 days | Historical pricing |
