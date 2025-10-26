@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn, signUp, signInWithProvider } from '@/lib/auth'
 
 interface AuthFormProps {
@@ -10,6 +10,7 @@ interface AuthFormProps {
 }
 
 export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/dashboard'
   const [isLogin, setIsLogin] = useState(true)
@@ -26,10 +27,27 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
     try {
       if (isLogin) {
         await signIn(email, password)
+        onSuccess()
       } else {
-        await signUp(email, password)
+        // Signup with email/password - redirect to complete-profile
+        const { user, session } = await signUp(email, password)
+
+        if (!user) {
+          throw new Error('Signup failed')
+        }
+
+        // If email confirmation is required, inform user
+        if (!session) {
+          setError(
+            'Account created! Please check your email to confirm your account before signing in.'
+          )
+          setLoading(false)
+          return
+        }
+
+        // Redirect to complete-profile page to set username
+        router.push('/auth/complete-profile')
       }
-      onSuccess()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -128,7 +146,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50"
             >
-              {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
+              {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Sign Up'}
             </button>
           </div>
 

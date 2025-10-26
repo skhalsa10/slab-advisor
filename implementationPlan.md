@@ -474,56 +474,81 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 - ❌ Social preview cards (Open Graph meta tags)
 
 **Implementation Tasks:**
-1. Create database migrations:
-   ```sql
-   CREATE TABLE profiles (
-     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-     user_id UUID REFERENCES auth.users(id) UNIQUE,
-     username TEXT UNIQUE NOT NULL,
-     display_name TEXT,
-     bio TEXT,
-     avatar_url TEXT,
-     is_public BOOLEAN DEFAULT true,
-     created_at TIMESTAMPTZ DEFAULT now(),
-     updated_at TIMESTAMPTZ DEFAULT now()
-   );
 
-   CREATE TABLE follows (
-     follower_id UUID REFERENCES profiles(id),
-     following_id UUID REFERENCES profiles(id),
-     created_at TIMESTAMPTZ DEFAULT now(),
-     PRIMARY KEY (follower_id, following_id)
-   );
-   ```
-2. Update signup flow to require username:
-   - Add username input field
-   - Implement real-time availability check
-   - Validate username format (3-30 chars, alphanumeric + underscore)
-3. Create profile settings page (`/settings/profile`)
-4. Build public profile pages (`/u/[username]`)
-5. Add collection visibility toggle (per-card or entire collection)
-6. Implement share functionality:
+**Phase 1: Username System ✅ COMPLETED**
+1. ✅ Create `profiles` table with RLS policies
+2. ✅ Create database functions (`create_user_profile`, `check_username_available`)
+3. ✅ Update signup flow (redirects to complete-profile page)
+4. ✅ Implement real-time username availability check with authentication
+5. ✅ Validate username format (3-30 chars, alphanumeric + underscore, 70+ reserved words)
+6. ✅ Create complete-profile page for both OAuth and email/password users
+7. ✅ Server-side middleware to enforce profile requirement
+8. ✅ Security hardening:
+   - ✅ Rate limiting (30/min username checks, 5/hour profile creation)
+   - ✅ Race condition protection (INSERT ON CONFLICT)
+   - ✅ Authentication requirements
+   - ✅ Input validation and sanitization
+   - ✅ Generic error messages
+   - ✅ Security headers
+
+**Phase 2: Social Features ❌ TODO**
+1. Create `follows` table with indexes
+2. Create profile settings page (`/settings/profile`)
+3. Build public profile pages (`/u/[username]`)
+4. Add collection visibility toggle (per-card or entire collection)
+5. Implement share functionality:
    - Generate shareable URLs
    - Add Open Graph meta tags
    - QR code generation for in-person sharing
-7. Create social preview cards for link sharing
+6. Create social preview cards for link sharing
 
-**Files to Create:**
+**Files Created:**
+- ✅ `/sql/profiles/001_create_tables.sql`
+- ✅ `/sql/profiles/002_create_indexes.sql`
+- ✅ `/sql/profiles/003_create_rls.sql`
+- ✅ `/sql/profiles/004_create_functions.sql`
+- ✅ `/src/types/profile.ts`
+- ✅ `/src/utils/usernameValidation.ts`
+- ✅ `/src/utils/__tests__/usernameValidation.test.ts`
+- ✅ `/src/utils/sanitization.ts` (XSS prevention)
+- ✅ `/src/app/api/profile/username-check/route.ts`
+- ✅ `/src/app/api/profile/create/route.ts`
+- ✅ `/src/app/auth/complete-profile/page.tsx`
+- ✅ `/src/lib/profile-service.ts`
+- ✅ `/src/middleware/rateLimit.ts`
+
+**Files To Create (Phase 2):**
 - `/src/app/(authenticated)/settings/profile/page.tsx`
 - `/src/app/u/[username]/page.tsx`
 - `/src/components/profile/ProfileHeader.tsx`
 - `/src/components/profile/PublicCollection.tsx`
 - `/src/components/sharing/ShareCollectionButton.tsx`
-- `/src/app/api/profile/username-check/route.ts`
 - `/src/app/api/profile/update/route.ts`
+- `/sql/profiles/005_create_follows_table.sql`
 
-**Files to Modify:**
-- `/src/components/auth/AuthForm.tsx` (add username to signup)
-- `/src/models/database.ts` (add profiles and follows tables)
-- `/src/components/collection/CollectionClient.tsx` (add share button)
+**Files Modified:**
+- ✅ `/src/components/auth/AuthForm.tsx` (removed username field, redirect to complete-profile)
+- ✅ `/src/app/auth/callback/page.tsx` (profile check for OAuth)
+- ✅ `/src/app/(authenticated)/layout.tsx` (profile check before dashboard)
+- ✅ `/middleware.ts` (server-side profile enforcement)
+- ✅ `/next.config.ts` (security headers)
+- ✅ `/src/models/database.ts` (regenerated with profiles table)
+
+**Security Status:** ✅ STRONG
+- All critical vulnerabilities fixed
+- Defense-in-depth implemented
+- Rate limiting active
+- Server-side enforcement
+- Production-ready for single-instance deployments
+
+**Production Notes:**
+- ✅ Works for single-instance (Vercel hobby, single server)
+- ⚠️ **Multi-instance production**: Replace in-memory rate limiting with Redis/Vercel KV before scaling horizontally
+- All database migrations applied and verified in production
 
 **Dependencies:**
-- None (can be built independently)
+- None for Phase 1 ✅ COMPLETED
+- Phase 2 depends on Phase 1 completion
 
 ---
 

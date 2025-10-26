@@ -325,6 +325,42 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          is_public: boolean
+          updated_at: string | null
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_public?: boolean
+          updated_at?: string | null
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_public?: boolean
+          updated_at?: string | null
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           created_at: string | null
@@ -380,20 +416,19 @@ export type Database = {
         }
         Returns: Json
       }
-      deduct_user_credit: {
-        Args: { p_user_id: string }
+      check_username_available: {
+        Args: { p_username: string }
+        Returns: boolean
+      }
+      create_user_profile: {
+        Args: { p_user_id: string; p_username: string }
         Returns: Json
       }
-      get_set_tcgplayer_groups: {
-        Args: { set_id: string }
-        Returns: Json
-      }
-      get_user_credit_details: {
-        Args: { p_user_id: string }
-        Returns: Json
-      }
+      deduct_user_credit: { Args: { p_user_id: string }; Returns: Json }
+      get_set_tcgplayer_groups: { Args: { set_id: string }; Returns: Json }
+      get_user_credit_details: { Args: { p_user_id: string }; Returns: Json }
       reset_monthly_free_credits: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           credits_reset: number
           user_id: string

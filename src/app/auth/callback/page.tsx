@@ -51,8 +51,21 @@ function AuthCallbackContent() {
         if (data.session?.user) {
           // OAuth succeeded - credits are automatically created by database trigger
           // No client-side credit creation needed (and blocked by RLS policies)
-          
-          // Redirect to the intended destination
+
+          // Check if user has a profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('user_id', data.session.user.id)
+            .single()
+
+          if (!profile) {
+            // New OAuth user needs to set username
+            router.push('/auth/complete-profile')
+            return
+          }
+
+          // Existing user with profile, proceed to redirect
           router.push(redirectTo)
         } else {
           // OAuth succeeded but no session - this shouldn't happen
