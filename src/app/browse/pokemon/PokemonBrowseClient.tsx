@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
 import ItemGrid from '@/components/ui/ItemGrid'
 import ItemList from '@/components/ui/ItemList'
 import ViewToggle, { type ViewMode } from '@/components/ui/ViewToggle'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
+import { useURLFilters } from '@/hooks/useURLFilters'
 import SetCard from '@/components/pokemon/SetCard'
 import SetListItem from '@/components/pokemon/SetListItem'
 import NoResultsMessage from '@/components/pokemon/NoResultsMessage'
@@ -20,10 +21,19 @@ interface PokemonBrowseClientProps {
 }
 
 export default function PokemonBrowseClient({ initialSets, seriesOptions }: PokemonBrowseClientProps) {
-  const [selectedSeriesId, setSelectedSeriesId] = useState('')
-  const [setSearchQuery, setSetSearchQuery] = useState('')
-  const [sortOrder, setSortOrder] = useState('newest')
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  // Use URL-synced filters for state persistence across navigation
+  const { values, setters } = useURLFilters('/browse/pokemon', {
+    series: { key: 'series', defaultValue: '' },
+    search: { key: 'q', defaultValue: '' },
+    sort: { key: 'sort', defaultValue: 'newest' },
+    view: { key: 'view', defaultValue: 'grid' }
+  })
+
+  // Destructure for easier access
+  const selectedSeriesId = values.series
+  const setSearchQuery = values.search
+  const sortOrder = values.sort
+  const viewMode = values.view as ViewMode
 
   // Create dropdown options from server-provided series data
   const seriesDropdownOptions = useMemo(() => [
@@ -67,13 +77,13 @@ export default function PokemonBrowseClient({ initialSets, seriesOptions }: Poke
       {/* Search and Sort Controls */}
       <BrowseFilterAndSort
         searchQuery={setSearchQuery}
-        onSearchChange={setSetSearchQuery}
+        onSearchChange={setters.search}
         searchPlaceholder="Search by set name..."
         selectedFilterId={selectedSeriesId}
-        onFilterChange={setSelectedSeriesId}
+        onFilterChange={setters.series}
         filterOptions={seriesDropdownOptions}
         sortOrder={sortOrder}
-        onSortChange={setSortOrder}
+        onSortChange={setters.sort}
         sortOptions={[
           { value: 'newest', label: 'Newest First' },
           { value: 'oldest', label: 'Oldest First' }
@@ -81,7 +91,7 @@ export default function PokemonBrowseClient({ initialSets, seriesOptions }: Poke
         rightContent={
           <ViewToggle
             viewMode={viewMode}
-            onViewModeChange={setViewMode}
+            onViewModeChange={(v) => setters.view(v)}
           />
         }
       />

@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { getLogoUrl } from '@/lib/pokemon-db'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import type { PokemonSet } from '@/models/pokemon'
 
 interface SetListItemProps {
@@ -13,11 +16,12 @@ interface SetListItemProps {
 
 export default function SetListItem({ set, series }: SetListItemProps) {
   const hasLogo = set.logo || set.secondary_logo
+  const { buildHref } = usePreserveFilters()
 
   return (
     <tr className="hover:bg-grey-50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
-        <Link href={`/browse/pokemon/${set.id}`} className="flex items-center">
+        <Link href={buildHref(`/browse/pokemon/${set.id}`)} className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
             {hasLogo ? (
               <Image
@@ -61,7 +65,7 @@ export default function SetListItem({ set, series }: SetListItemProps) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <Link
-          href={`/browse/pokemon/${set.id}`}
+          href={buildHref(`/browse/pokemon/${set.id}`)}
           className="text-orange-600 hover:text-orange-900 transition-colors"
         >
           View details →

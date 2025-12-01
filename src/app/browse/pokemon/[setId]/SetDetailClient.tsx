@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import QuickView from '@/components/ui/QuickView'
 import CardQuickViewContent from '@/components/browse/CardQuickViewContent'
@@ -24,6 +25,7 @@ interface SetDetailClientProps {
 }
 
 export default function SetDetailClient({ initialData, setId }: SetDetailClientProps) {
+  const { buildHref } = usePreserveFilters()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
@@ -171,7 +173,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <PokemonSetHeader setData={initialData} />
+      <PokemonSetHeader setData={initialData} backHref={buildHref('/browse/pokemon')} />
 
       {/* Tabs */}
       <TabNavigation

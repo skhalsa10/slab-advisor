@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { getLogoUrl } from '@/lib/pokemon-db'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import type { PokemonSet } from '@/models/pokemon'
 
 interface SetCardProps {
@@ -13,10 +16,11 @@ interface SetCardProps {
 
 export default function SetCard({ set, series }: SetCardProps) {
   const hasLogo = set.logo || set.secondary_logo
+  const { buildHref } = usePreserveFilters()
 
   return (
     <Link
-      href={`/browse/pokemon/${set.id}`}
+      href={buildHref(`/browse/pokemon/${set.id}`)}
       className="group bg-white border border-grey-200 rounded-lg hover:border-orange-300 hover:shadow-lg transition-all duration-200 overflow-hidden"
     >
       <div className="p-4 sm:p-5">
