@@ -7,6 +7,13 @@ import ItemList from '@/components/ui/ItemList'
 import ViewToggle, { type ViewMode } from '@/components/ui/ViewToggle'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
 import { useURLFilters } from '@/hooks/useURLFilters'
+import {
+  BROWSE_PARAM_SERIES,
+  BROWSE_PARAM_SEARCH,
+  BROWSE_PARAM_SORT,
+  BROWSE_PARAM_VIEW,
+  BROWSE_DEFAULTS,
+} from '@/constants/url-filters'
 import SetCard from '@/components/pokemon/SetCard'
 import SetListItem from '@/components/pokemon/SetListItem'
 import NoResultsMessage from '@/components/pokemon/NoResultsMessage'
@@ -23,10 +30,10 @@ interface PokemonBrowseClientProps {
 export default function PokemonBrowseClient({ initialSets, seriesOptions }: PokemonBrowseClientProps) {
   // Use URL-synced filters for state persistence across navigation
   const { values, setters } = useURLFilters('/browse/pokemon', {
-    series: { key: 'series', defaultValue: '' },
-    search: { key: 'q', defaultValue: '' },
-    sort: { key: 'sort', defaultValue: 'newest' },
-    view: { key: 'view', defaultValue: 'grid' }
+    series: { key: BROWSE_PARAM_SERIES, defaultValue: BROWSE_DEFAULTS.series },
+    search: { key: BROWSE_PARAM_SEARCH, defaultValue: BROWSE_DEFAULTS.search },
+    sort: { key: BROWSE_PARAM_SORT, defaultValue: BROWSE_DEFAULTS.sort },
+    view: { key: BROWSE_PARAM_VIEW, defaultValue: BROWSE_DEFAULTS.view }
   })
 
   // Destructure for easier access

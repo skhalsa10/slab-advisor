@@ -172,14 +172,21 @@ export function useURLFilters<K extends string>(
  * Hook to get current URL query string for navigation purposes
  * Use this in child components that need to preserve parent filters in links
  *
+ * @param stripKeys - Optional array of URL parameter keys to remove when building hrefs
+ *                    Useful when navigating up the hierarchy (e.g., set detail → browse)
  * @returns Object with queryString and buildHref helper
  *
  * @example
- * // In SetCard component
+ * // In SetCard component - preserve all params
  * const { buildHref } = usePreserveFilters()
  * const href = buildHref(`/browse/pokemon/${set.id}`)
+ *
+ * @example
+ * // In SetDetailClient - strip set-level params when going back to browse
+ * const { buildHref } = usePreserveFilters(['cs', 'cso', 'cv', 'ct'])
+ * const backHref = buildHref('/browse/pokemon')
  */
-export function usePreserveFilters(): {
+export function usePreserveFilters(stripKeys?: string[]): {
   queryString: string
   buildHref: (path: string) => string
 } {
@@ -187,8 +194,14 @@ export function usePreserveFilters(): {
   const queryString = searchParams.toString()
 
   const buildHref = useCallback((path: string): string => {
-    return `${path}${queryString ? `?${queryString}` : ''}`
-  }, [queryString])
+    let params = queryString
+    if (stripKeys?.length) {
+      const urlParams = new URLSearchParams(queryString)
+      stripKeys.forEach(key => urlParams.delete(key))
+      params = urlParams.toString()
+    }
+    return `${path}${params ? `?${params}` : ''}`
+  }, [queryString, stripKeys])
 
   return { queryString, buildHref }
 }

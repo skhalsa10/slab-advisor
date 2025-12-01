@@ -1,5 +1,9 @@
+'use client'
+
 import Image from 'next/image'
+import Link from 'next/link'
 import { getCardImageUrl } from '@/lib/pokemon-db'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import PriceDisplay from '@/components/ui/PriceDisplay'
 import type { Json } from '@/models/database'
 
@@ -18,6 +22,7 @@ interface CardListItemProps {
 }
 
 export default function CardListItem({ card, setId, onClick }: CardListItemProps) {
+  const { buildHref } = usePreserveFilters()
   const imageUrl = getCardImageUrl(card.image, 'low', card.tcgplayer_image_url || undefined)
   
   
@@ -75,12 +80,12 @@ export default function CardListItem({ card, setId, onClick }: CardListItemProps
         />
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <a
-          href={`/browse/pokemon/${setId}/${card.id}`}
+        <Link
+          href={buildHref(`/browse/pokemon/${setId}/${card.id}`)}
           className="text-orange-600 hover:text-orange-900 transition-colors"
         >
           View details →
-        </a>
+        </Link>
       </td>
     </tr>
   )

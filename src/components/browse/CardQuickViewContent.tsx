@@ -7,6 +7,7 @@ import { getCardImageUrl } from '@/lib/pokemon-db'
 import { extractMarketPrices } from '@/utils/priceUtils'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import { useAuth } from '@/hooks/useAuth'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import AddToCollectionForm from '@/components/collection/AddToCollectionForm'
 import { buildAvailableVariants } from '@/utils/variantUtils'
 import type { CardFull } from '@/models/pokemon'
@@ -31,6 +32,7 @@ export default function CardQuickViewContent({
   cardType = 'pokemon'
 }: CardQuickViewContentProps) {
   const { user } = useAuth()
+  const { buildHref } = usePreserveFilters()
   const [cardData, setCardData] = useState<CardFull | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -174,7 +176,7 @@ export default function CardQuickViewContent({
           ) : (
             <div className="space-y-2">
               <Link
-                href={`/browse/pokemon/${setId}/${cardId}`}
+                href={buildHref(`/browse/pokemon/${setId}/${cardId}`)}
                 className="w-full inline-flex items-center justify-center py-2.5 px-4 border border-blue-600 text-blue-600 text-sm font-medium rounded-md hover:bg-blue-50 transition-colors"
               >
                 View Details

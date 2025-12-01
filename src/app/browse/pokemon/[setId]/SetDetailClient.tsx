@@ -3,7 +3,20 @@
 import { useState, useMemo } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
-import { usePreserveFilters } from '@/hooks/useURLFilters'
+import { useURLFilters, usePreserveFilters } from '@/hooks/useURLFilters'
+import {
+  SET_PARAM_CARD_SEARCH,
+  SET_PARAM_CARD_SORT,
+  SET_PARAM_CARD_VIEW,
+  SET_PARAM_CARD_TAB,
+  SET_FILTER_KEYS,
+  SET_DEFAULTS,
+  TAB_CARDS,
+  TAB_PRODUCTS,
+  VIEW_MODE_GRID,
+  type SetDetailTabValue,
+  type ViewModeValue,
+} from '@/constants/url-filters'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import QuickView from '@/components/ui/QuickView'
 import CardQuickViewContent from '@/components/browse/CardQuickViewContent'
@@ -25,13 +38,31 @@ interface SetDetailClientProps {
 }
 
 export default function SetDetailClient({ initialData, setId }: SetDetailClientProps) {
+  // URL-synced filters for persistence across card detail navigation
+  const { values: setFilters, setters: setSetters } = useURLFilters(
+    `/browse/pokemon/${setId}`,
+    {
+      cardSearch: { key: SET_PARAM_CARD_SEARCH, defaultValue: SET_DEFAULTS.cardSearch },
+      cardSort: { key: SET_PARAM_CARD_SORT, defaultValue: SET_DEFAULTS.cardSort },
+      cardView: { key: SET_PARAM_CARD_VIEW, defaultValue: SET_DEFAULTS.cardView },
+      cardTab: { key: SET_PARAM_CARD_TAB, defaultValue: SET_DEFAULTS.cardTab }
+    }
+  )
+
+  // Build href that preserves all params (for card links)
   const { buildHref } = usePreserveFilters()
-  const [searchQuery, setSearchQuery] = useState('')
+  // Build href that strips set-level params (for back to browse link)
+  const { buildHref: buildBrowseHref } = usePreserveFilters([...SET_FILTER_KEYS])
+
+  // Destructure URL-synced filters for easier access
+  const searchQuery = setFilters.cardSearch
+  const sortOrder = setFilters.cardSort
+  const viewMode = setFilters.cardView as ViewModeValue
+  const activeTab = setFilters.cardTab as SetDetailTabValue
+
+  // Local state (doesn't need URL persistence)
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'cards' | 'products'>('cards')
-  const [sortOrder, setSortOrder] = useState('num_asc')
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [productViewMode, setProductViewMode] = useState<ViewMode>('grid')
 
   // Filter and sort cards based on search query and sort order
@@ -105,8 +136,8 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   ]
 
   const handleTabChange = (tabId: string) => {
-    if (tabId === 'cards' || tabId === 'products') {
-      setActiveTab(tabId)
+    if (tabId === TAB_CARDS || tabId === TAB_PRODUCTS) {
+      setSetters.cardTab(tabId)
     }
   }
 
@@ -133,7 +164,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
           ...(card.rarity ? [{ value: card.rarity }] : [])
         ]
       }}
-      href={`/browse/pokemon/${setId}/${card.id}`}
+      href={buildHref(`/browse/pokemon/${setId}/${card.id}`)}
       onClick={handleCardClick}
       getImageUrl={(image, quality, fallback) => getCardImageUrl(image, quality as 'low' | 'high', fallback)}
       imageQuality="low"
@@ -173,7 +204,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <PokemonSetHeader setData={initialData} backHref={buildHref('/browse/pokemon')} />
+      <PokemonSetHeader setData={initialData} backHref={buildBrowseHref('/browse/pokemon')} />
 
       {/* Tabs */}
       <TabNavigation
@@ -183,22 +214,22 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
       />
 
       {/* Search and Sort */}
-      {activeTab === 'cards' ? (
+      {activeTab === TAB_CARDS ? (
         <BrowseFilterAndSort
           searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
+          onSearchChange={setSetters.cardSearch}
           searchPlaceholder="Search by card name or number..."
           sortOrder={sortOrder}
-          onSortChange={setSortOrder}
+          onSortChange={setSetters.cardSort}
           sortOptions={sortOptions}
           rightContent={
             <ViewToggle
               viewMode={viewMode}
-              onViewModeChange={setViewMode}
+              onViewModeChange={(v) => setSetters.cardView(v)}
             />
           }
         />
-      ) : activeTab === 'products' ? (
+      ) : activeTab === TAB_PRODUCTS ? (
         <div className="flex justify-end">
           <ViewToggle
             viewMode={productViewMode}
@@ -208,8 +239,8 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
       ) : null}
 
       {/* Content based on active tab */}
-      {activeTab === 'cards' ? (
-        viewMode === 'grid' ? (
+      {activeTab === TAB_CARDS ? (
+        viewMode === VIEW_MODE_GRID ? (
           <ItemGrid
             items={filteredCards}
             renderItem={(card) => renderCard(card)}

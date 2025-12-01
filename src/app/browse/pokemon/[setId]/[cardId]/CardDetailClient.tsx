@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
+import { usePreserveFilters } from '@/hooks/useURLFilters'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import AddToCollectionModal from '@/components/collection/AddToCollectionModal'
@@ -18,6 +19,7 @@ interface CardDetailClientProps {
 
 export default function CardDetailClient({ card, set, setId }: CardDetailClientProps) {
   const { user } = useAuth()
+  const { buildHref } = usePreserveFilters()
   const [showCollectionModal, setShowCollectionModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -70,7 +72,7 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
           Pokemon
         </Link>
         <span className="text-grey-400">/</span>
-        <Link href={`/browse/pokemon/${setId}`} className="text-grey-600 hover:text-grey-900">
+        <Link href={buildHref(`/browse/pokemon/${setId}`)} className="text-grey-600 hover:text-grey-900">
           {set.name}
         </Link>
         <span className="text-grey-400">/</span>
@@ -80,7 +82,7 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
-          href={`/browse/pokemon/${setId}`}
+          href={buildHref(`/browse/pokemon/${setId}`)}
           className="text-sm text-orange-600 hover:text-orange-700"
         >
           ← Back to Set
@@ -88,7 +90,7 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
         <div className="flex items-center space-x-4">
           {previousCard && (
             <Link
-              href={`/browse/pokemon/${setId}/${previousCard.id}`}
+              href={buildHref(`/browse/pokemon/${setId}/${previousCard.id}`)}
               className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
               title="Previous card"
             >
@@ -102,7 +104,7 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
           </span>
           {nextCard && (
             <Link
-              href={`/browse/pokemon/${setId}/${nextCard.id}`}
+              href={buildHref(`/browse/pokemon/${setId}/${nextCard.id}`)}
               className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
               title="Next card"
             >
