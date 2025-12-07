@@ -11,7 +11,7 @@
  */
 
 import { getServerSupabaseClient } from './supabase-server'
-import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts, CardFull, SetWithCards } from '@/models/pokemon'
+import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts, CardFull, SetWithCards, PokemonCard } from '@/models/pokemon'
 
 
 /**
@@ -168,6 +168,172 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
  * }
  * ```
  */
+/**
+ * Fetch newest Pokemon sets by release date (for widgets)
+ *
+ * Returns the most recently released sets, useful for explore page widgets
+ * or any component showing recent releases.
+ *
+ * @param limit - Maximum number of sets to return (default: 8)
+ * @returns Promise containing array of newest sets
+ * @throws Error if database query fails
+ *
+ * @example
+ * ```typescript
+ * export default async function NewestSetsWidget() {
+ *   const sets = await getNewestSetsServer(8)
+ *   return <SetCarousel sets={sets} />
+ * }
+ * ```
+ */
+export async function getNewestSetsServer(limit = 8): Promise<PokemonSetWithSeries[]> {
+  try {
+    const supabase = getServerSupabaseClient()
+
+    const { data, error } = await supabase
+      .from('pokemon_sets')
+      .select(`
+        *,
+        series:pokemon_series(
+          id,
+          name
+        )
+      `)
+      .order('release_date', { ascending: false })
+      .limit(limit)
+
+    if (error) {
+      console.error('Error fetching newest sets (server):', error)
+      throw new Error('Failed to fetch newest Pokemon sets')
+    }
+
+    return (data || []) as PokemonSetWithSeries[]
+  } catch (error) {
+    console.error('Error in getNewestSetsServer:', error)
+    throw new Error('Failed to fetch newest Pokemon sets')
+  }
+}
+
+/**
+ * Fetch top priced cards from the most recent sets (for widgets)
+ *
+ * Returns high-value cards from recently released sets. Useful for
+ * explore page widgets showing valuable new releases.
+ *
+ * @param numSets - Number of recent sets to fetch cards from (default: 2)
+ * @param cardsPerSet - Maximum cards per set (default: 5)
+ * @returns Promise containing array of cards with set info
+ * @throws Error if database query fails
+ *
+ * @example
+ * ```typescript
+ * export default async function TopCardsWidget() {
+ *   const cards = await getTopCardsFromNewestSetsServer(2, 5)
+ *   return <CardCarousel cards={cards} />
+ * }
+ * ```
+ */
+export async function getTopCardsFromNewestSetsServer(
+  numSets = 2,
+  cardsPerSet = 5
+): Promise<Array<PokemonCard & { set: PokemonSetWithSeries }>> {
+  try {
+    const supabase = getServerSupabaseClient()
+
+    // First get the N most recent sets
+    const { data: recentSets, error: setsError } = await supabase
+      .from('pokemon_sets')
+      .select('id, name, release_date')
+      .order('release_date', { ascending: false })
+      .limit(numSets)
+
+    if (setsError) {
+      console.error('Error fetching recent sets (server):', setsError)
+      throw new Error('Failed to fetch recent Pokemon sets')
+    }
+
+    if (!recentSets || recentSets.length === 0) {
+      return []
+    }
+
+    const setIds = recentSets.map(s => s.id)
+
+    // Fetch cards from these sets with their set info
+    // Note: We fetch more than needed and then filter/sort in JS
+    // because Supabase doesn't support complex ordering on JSONB fields
+    const { data: cards, error: cardsError } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        *,
+        set:pokemon_sets(
+          *,
+          series:pokemon_series(
+            id,
+            name
+          )
+        )
+      `)
+      .in('set_id', setIds)
+      .not('price_data', 'is', null)
+
+    if (cardsError) {
+      console.error('Error fetching cards from recent sets (server):', cardsError)
+      throw new Error('Failed to fetch cards from recent sets')
+    }
+
+    if (!cards || cards.length === 0) {
+      return []
+    }
+
+    // Helper to extract the best market price from price_data JSONB
+    const getBestPrice = (priceData: unknown): number => {
+      if (!priceData || typeof priceData !== 'object') return 0
+
+      const data = priceData as Record<string, unknown>
+      let maxPrice = 0
+
+      // Check all variants for the highest market price
+      for (const key of Object.keys(data)) {
+        const variant = data[key] as Record<string, unknown> | undefined
+        if (variant && typeof variant.market === 'number' && variant.market > maxPrice) {
+          maxPrice = variant.market
+        }
+      }
+
+      return maxPrice
+    }
+
+    // Group cards by set, sort by price, take top N from each
+    const cardsBySet: Record<string, typeof cards> = {}
+    for (const card of cards) {
+      const setId = card.set_id
+      if (setId && !cardsBySet[setId]) {
+        cardsBySet[setId] = []
+      }
+      if (setId) {
+        cardsBySet[setId].push(card)
+      }
+    }
+
+    const result: Array<PokemonCard & { set: PokemonSetWithSeries }> = []
+
+    for (const setId of setIds) {
+      const setCards = cardsBySet[setId] || []
+      // Sort by price descending and take top N
+      const topCards = setCards
+        .sort((a, b) => getBestPrice(b.price_data) - getBestPrice(a.price_data))
+        .slice(0, cardsPerSet)
+
+      result.push(...topCards as Array<PokemonCard & { set: PokemonSetWithSeries }>)
+    }
+
+    return result
+  } catch (error) {
+    console.error('Error in getTopCardsFromNewestSetsServer:', error)
+    throw new Error('Failed to fetch top cards from newest sets')
+  }
+}
+
 export async function getCardWithSetServer(cardId: string): Promise<{ card: CardFull; set: SetWithCards }> {
   try {
     const supabase = getServerSupabaseClient()
