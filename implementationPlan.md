@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 6, 2025
+**Last Updated:** November 30, 2025
 
 ### Project Completion: ~65%
 
@@ -14,6 +14,7 @@
 - **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (90%)
 - **Collection Management**: CRUD operations, grid/list views (70%)
 - **Browse Experience**: Card browsing, set viewing, filtering (80%)
+- **Explore Page**: Game selection hub (100%) - needs polish
 
 #### 🟡 Partially Completed
 - **Phase 3**: Dashboard & Navigation (60%)
@@ -21,6 +22,7 @@
 - **Phase 5**: Add Card Flow (85%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking missing
 - **Ximilar Integration**: Types defined (20%), API implementation pending (0%)
+- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (0%)
 
 #### ❌ Not Started
 - **Historical Portfolio Tracking**: Portfolio snapshots, value charts (0%)
@@ -801,6 +803,76 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 ---
 
+#### 11. Explore & Browse Page Polish 🆕 NEW
+**Status:** ❌ 0% Complete
+**Priority:** 🟡 Medium
+**Estimated Effort:** 3-5 days
+
+**What's Done:**
+- ✅ Explore page exists with game grid
+- ✅ Pokemon browse page with set listing
+- ✅ Set detail page with card grid
+- ✅ Card quick view modal
+- ✅ Filter persistence via URL params
+
+**What's Missing:**
+
+**1. Explore Page Refresh**
+- ❌ Remove "Coming Soon" placeholder cards (Yu-Gi-Oh!, Magic, Sports)
+- ❌ Professional design with subtle hint about future TCG support
+- ❌ Clean, minimal layout focusing on available content
+
+**2. Browse Page Mobile Filter UX**
+- ❌ Filter/sort controls hard to read on mobile
+- ❌ Need multi-row layout for better legibility
+- ❌ Touch-friendly filter dropdowns
+- ❌ Consider collapsible filter panel
+
+**3. Set Detail Page UI Cleanup**
+- ❌ Set metadata takes up too much vertical space
+- ❌ Redesign header to be more compact
+- ❌ Better information hierarchy
+- ❌ Consider collapsible/expandable sections
+
+**4. Ownership Aware Component Completion**
+- ❌ Component shows "Ownership Aware Component" as title (placeholder)
+- ❌ Finish implementing proper title/labeling
+- ❌ Add variant breakdown in ownership stats
+- ❌ Show value of owned cards vs total set value
+
+**5. Variant Count Display Bug (Investigation Required)**
+- ❌ Card grid shows "2 variants" but quick view shows 3 variants (Normal, Holo, Reverse)
+- ❌ Investigate: Is this "2 variants WITH prices" vs "3 variants total"?
+- ❌ Clarify wording to avoid user confusion
+- ❌ Possible solutions:
+  - "2 variants available" (with prices)
+  - "3 variants (2 priced)"
+  - Show all variants, mark unpriced ones
+
+**Implementation Tasks:**
+1. Redesign explore page - remove coming soon cards, add elegant "more coming" message
+2. Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
+3. Redesign `PokemonSetHeader.tsx` for compact metadata display
+4. Complete `OwnershipAwareComponent` - proper title, variant stats, value calculation
+5. Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
+6. Update variant display logic to clarify priced vs total variants
+
+**Files to Modify:**
+- `/src/app/explore/page.tsx`
+- `/src/components/explore/GameGrid.tsx`
+- `/src/components/explore/ComingSoonBanner.tsx` (remove or repurpose)
+- `/src/constants/tcg-games.ts`
+- `/src/components/browse/BrowseFilterAndSort.tsx`
+- `/src/components/browse/pokemon/PokemonSetHeader.tsx`
+- `/src/app/browse/pokemon/[setId]/SetDetailClient.tsx`
+- `/src/components/pokemon/CardListItem.tsx` (variant count fix)
+- `/src/components/browse/CardQuickViewContent.tsx`
+
+**Dependencies:**
+- None (UI polish work)
+
+---
+
 ## 🗄️ Database Schema Status
 
 ### ✅ Implemented Tables
@@ -1044,12 +1116,12 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Card collection dashboard
 - Individual card details view
 
-🟡 **Phase 3: Core Navigation & Dashboard** (60%)
+🟡 **Phase 3: Core Navigation & Dashboard** (70%)
 - ✅ Sidebar navigation (Dashboard, Collection, Add Card)
 - ✅ Mobile hamburger menu
 - ✅ Credits display in navigation
 - ⚠️ Dashboard shows placeholders ("Coming Soon")
-- ❌ Discover page not implemented
+- ✅ Explore page implemented (was "Discover") - needs polish (see Tier 3, Item 11)
 - ❌ Settings page not implemented
 
 🟡 **Phase 4: Enhanced Collection Management** (70%)
@@ -1184,6 +1256,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Card Detail Polish | 🟡 80% | 🟡 Medium | 2-3 days | Historical pricing |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
+| **Explore/Browse Polish** | ❌ 0% | 🟡 Medium | 3-5 days | None |
 
 *Critical before production launch, not for development
 
