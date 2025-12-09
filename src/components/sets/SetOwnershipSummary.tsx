@@ -1,39 +1,58 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { useSetOwnership } from '@/hooks/useSetOwnership'
 
 interface SetOwnershipSummaryProps {
   totalCards: number
   setId: string
+  onRefetchReady?: (refetch: () => Promise<void>) => void
 }
 
-export default function SetOwnershipSummary({ totalCards, setId }: SetOwnershipSummaryProps) {
-  const { user } = useAuth()
-  
-  // Don't render if user is not logged in
-  if (!user) {
+export default function SetOwnershipSummary({ totalCards, setId, onRefetchReady }: SetOwnershipSummaryProps) {
+  const { user, loading: authLoading } = useAuth()
+  const { ownedCount, percentage, isLoading, refetch } = useSetOwnership(setId, totalCards)
+
+  // Pass refetch function to parent when ready
+  useEffect(() => {
+    if (onRefetchReady && user) {
+      onRefetchReady(refetch)
+    }
+  }, [onRefetchReady, refetch, user])
+
+  // Don't render if not logged in (hide for unauthenticated users)
+  if (!authLoading && !user) {
     return null
   }
-  
-  // TODO: Replace with actual ownership data from database
-  // Will use setId to query user's collection for this specific set
-  // For now, using mocked data
-  void setId // Will be used when implementing database query
-  const ownedCards = 50
-  const percentage = totalCards > 0 ? (ownedCards / totalCards) * 100 : 0
-  
+
+  // Loading skeleton
+  if (authLoading || isLoading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-5 bg-grey-200 rounded w-32 mb-3" />
+        <div className="space-y-3">
+          <div className="h-4 bg-grey-200 rounded w-48" />
+          <div className="h-6 bg-grey-200 rounded-full" />
+        </div>
+      </div>
+    )
+  }
+
+  const hasCards = ownedCount > 0
+
   return (
     <div>
-      <h3 className="text-lg font-semibold text-grey-900 mb-3">Ownership Aware Component</h3>
-      
+      <h3 className="text-lg font-semibold text-grey-900 mb-3">Your Collection</h3>
+
       <div className="space-y-3">
         <p className="text-sm text-grey-700">
-          You own <span className="font-semibold">{ownedCards}</span> out of <span className="font-semibold">{totalCards}</span> cards
+          You own <span className="font-semibold">{ownedCount}</span> out of <span className="font-semibold">{totalCards}</span> cards
         </p>
-        
+
         <div className="relative">
           <div className="h-6 bg-grey-100 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-orange-500 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${percentage}%` }}
             />
@@ -44,10 +63,12 @@ export default function SetOwnershipSummary({ totalCards, setId }: SetOwnershipS
             </span>
           </div>
         </div>
-        
-        <p className="text-xs text-grey-500">
-          Holo Cards: <span className="font-medium">1</span>
-        </p>
+
+        {!hasCards && (
+          <p className="text-xs text-grey-500">
+            Start your collection!
+          </p>
+        )}
       </div>
     </div>
   )

@@ -17,6 +17,7 @@ interface CardQuickViewContentProps {
   setId?: string
   cardType?: 'pokemon' | 'onepiece' | 'sports' | 'other'
   onClose?: () => void
+  onCollectionUpdate?: () => void
 }
 
 /**
@@ -29,7 +30,8 @@ interface CardQuickViewContentProps {
 export default function CardQuickViewContent({
   cardId,
   setId,
-  cardType = 'pokemon'
+  cardType = 'pokemon',
+  onCollectionUpdate
 }: CardQuickViewContentProps) {
   const { user } = useAuth()
   const { buildHref } = usePreserveFilters()
@@ -83,7 +85,12 @@ export default function CardQuickViewContent({
     setSuccessMessage(message)
     setErrorMessage(null)
     setShowCollectionForm(false)
-    
+
+    // Notify parent to refresh ownership stats
+    if (onCollectionUpdate) {
+      onCollectionUpdate()
+    }
+
     setTimeout(() => {
       setSuccessMessage(null)
     }, 3000)

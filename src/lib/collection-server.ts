@@ -67,9 +67,62 @@ export async function getUserCollectionCards(): Promise<CollectionCard[]> {
     }
     
     return cardsData || []
-    
+
   } catch (error) {
     console.error('Error in getUserCollectionCards:', error)
     throw error instanceof Error ? error : new Error('Failed to load collection')
+  }
+}
+
+/**
+ * Gets ownership statistics for a specific set
+ *
+ * Returns the count of unique cards the authenticated user owns from a given set.
+ * This function handles unauthenticated users gracefully by returning 0.
+ *
+ * @param setId - The ID of the Pokemon set to check ownership for
+ * @returns Promise containing ownership stats { ownedCount: number }
+ *
+ * @example
+ * ```typescript
+ * const stats = await getSetOwnershipStats('sv8pt5')
+ * console.log(`You own ${stats.ownedCount} cards from this set`)
+ * ```
+ */
+export async function getSetOwnershipStats(setId: string): Promise<{ ownedCount: number }> {
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    // Return 0 for unauthenticated users (graceful handling)
+    if (authError || !user) {
+      return { ownedCount: 0 }
+    }
+
+    // Query collection_cards joined with pokemon_cards to filter by set_id
+    // Count unique pokemon_card_id entries (a user may have multiple variants of the same card)
+    const { data, error } = await supabase
+      .from('collection_cards')
+      .select(`
+        pokemon_card_id,
+        pokemon_card:pokemon_cards!inner(set_id)
+      `)
+      .eq('user_id', user.id)
+      .eq('pokemon_card.set_id', setId)
+
+    if (error) {
+      console.error('Error fetching set ownership stats:', error)
+      return { ownedCount: 0 }
+    }
+
+    // Count unique pokemon_card_ids (user may own multiple variants of same card)
+    const uniqueCardIds = new Set(data?.map(item => item.pokemon_card_id) || [])
+
+    return { ownedCount: uniqueCardIds.size }
+
+  } catch (error) {
+    console.error('Error in getSetOwnershipStats:', error)
+    return { ownedCount: 0 }
   }
 }

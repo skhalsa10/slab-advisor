@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
 import { useURLFilters, usePreserveFilters } from '@/hooks/useURLFilters'
@@ -64,6 +64,21 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
   const [productViewMode, setProductViewMode] = useState<ViewMode>('grid')
+
+  // Ref to hold the ownership refetch function
+  const ownershipRefetchRef = useRef<(() => Promise<void>) | null>(null)
+
+  // Callback to receive the refetch function from SetOwnershipSummary
+  const handleOwnershipRefetchReady = useCallback((refetch: () => Promise<void>) => {
+    ownershipRefetchRef.current = refetch
+  }, [])
+
+  // Handler to refresh ownership stats after collection update
+  const handleCollectionUpdate = useCallback(() => {
+    if (ownershipRefetchRef.current) {
+      ownershipRefetchRef.current()
+    }
+  }, [])
 
   // Filter and sort cards based on search query and sort order
   const filteredCards = useMemo(() => {
@@ -204,7 +219,11 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   return (
     <div className="space-y-6">
       {/* Header */}
-      <PokemonSetHeader setData={initialData} backHref={buildBrowseHref('/browse/pokemon')} />
+      <PokemonSetHeader
+        setData={initialData}
+        backHref={buildBrowseHref('/browse/pokemon')}
+        onOwnershipRefetchReady={handleOwnershipRefetchReady}
+      />
 
       {/* Tabs */}
       <TabNavigation
@@ -347,6 +366,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             cardId={selectedCardId}
             setId={setId}
             onClose={handleQuickViewClose}
+            onCollectionUpdate={handleCollectionUpdate}
           />
         </QuickView>
       )}

@@ -11,12 +11,14 @@ interface PokemonSetHeaderProps {
   setData: PokemonSetWithCardsAndProducts
   backHref?: string
   backText?: string
+  onOwnershipRefetchReady?: (refetch: () => Promise<void>) => void
 }
 
 export default function PokemonSetHeader({
   setData,
   backHref = "/browse/pokemon",
-  backText = "← Back to Sets"
+  backText = "← Back to Sets",
+  onOwnershipRefetchReady
 }: PokemonSetHeaderProps) {
   // Safely validate TCGPlayer groups data
   const validatedTCGPlayerGroups = validateTCGPlayerGroups(setData.tcgplayer_groups)
@@ -90,6 +92,7 @@ export default function PokemonSetHeader({
           <SetOwnershipSummary
             totalCards={setData.card_count_total || 0}
             setId={setData.id}
+            onRefetchReady={onOwnershipRefetchReady}
           />
         </div>
 

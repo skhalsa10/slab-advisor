@@ -2,9 +2,9 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** November 30, 2025
+**Last Updated:** December 8, 2025
 
-### Project Completion: ~65%
+### Project Completion: ~68%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
@@ -14,7 +14,7 @@
 - **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (90%)
 - **Collection Management**: CRUD operations, grid/list views (70%)
 - **Browse Experience**: Card browsing, set viewing, filtering (80%)
-- **Explore Page**: Game selection hub (100%) - needs polish
+- **Explore Page**: Game selection hub + widgets (100%)
 
 #### 🟡 Partially Completed
 - **Phase 3**: Dashboard & Navigation (60%)
@@ -22,7 +22,7 @@
 - **Phase 5**: Add Card Flow (85%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking missing
 - **Ximilar Integration**: Types defined (20%), API implementation pending (0%)
-- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (0%)
+- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (40%)
 
 #### ❌ Not Started
 - **Historical Portfolio Tracking**: Portfolio snapshots, value charts (0%)
@@ -803,8 +803,8 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 ---
 
-#### 11. Explore & Browse Page Polish 🆕 NEW
-**Status:** ❌ 0% Complete
+#### 11. Explore & Browse Page Polish 🆕 IN PROGRESS
+**Status:** 🟡 40% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-5 days
 
@@ -814,10 +814,20 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ Set detail page with card grid
 - ✅ Card quick view modal
 - ✅ Filter persistence via URL params
+- ✅ **Pokemon Hero Section redesign** - Dark gradient background with fanned cards
+- ✅ **HorizontalScroll improvements** - Arrow navigation + gradient fade indicators
+- ✅ **NewestSetsWidget** - Self-contained widget with horizontal scroll
+- ✅ **NewlyReleasedTopCardsWidget** - Top priced cards from recent sets
+- ✅ **WidgetSection component** - Reusable section wrapper with "View All" link
+- ✅ **Responsive hero layout** - Stacks on mobile, side-by-side on large screens
+- ✅ **Text readability** - Text shadows for visibility against dynamic card backgrounds
 
 **What's Missing:**
 
 **1. Explore Page Refresh**
+- ✅ Pokemon Hero Section with dark theme and fanned cards (COMPLETED)
+- ✅ Newest Sets horizontal carousel (COMPLETED)
+- ✅ Newly Released Top Cards carousel (COMPLETED)
 - ❌ Remove "Coming Soon" placeholder cards (Yu-Gi-Oh!, Magic, Sports)
 - ❌ Professional design with subtle hint about future TCG support
 - ❌ Clean, minimal layout focusing on available content
@@ -850,15 +860,30 @@ These features ensure production readiness, prevent disasters, and polish the us
   - Show all variants, mark unpriced ones
 
 **Implementation Tasks:**
-1. Redesign explore page - remove coming soon cards, add elegant "more coming" message
-2. Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
-3. Redesign `PokemonSetHeader.tsx` for compact metadata display
-4. Complete `OwnershipAwareComponent` - proper title, variant stats, value calculation
-5. Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
-6. Update variant display logic to clarify priced vs total variants
+1. ✅ Redesign Pokemon Hero Section with dark gradient and fanned cards
+2. ✅ Create HorizontalScroll component with arrow navigation
+3. ✅ Create NewestSetsWidget with horizontal carousel
+4. ✅ Create NewlyReleasedTopCardsWidget with top priced cards
+5. ✅ Create WidgetSection wrapper component
+6. ❌ Redesign explore page - remove coming soon cards, add elegant "more coming" message
+7. ❌ Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
+8. ❌ Redesign `PokemonSetHeader.tsx` for compact metadata display
+9. ❌ Complete `OwnershipAwareComponent` - proper title, variant stats, value calculation
+10. ❌ Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
+11. ❌ Update variant display logic to clarify priced vs total variants
 
-**Files to Modify:**
-- `/src/app/explore/page.tsx`
+**Files Created:**
+- ✅ `/src/components/explore/PokemonHeroSection.tsx` - Dark gradient hero with fanned cards
+- ✅ `/src/components/widgets/HorizontalScroll.tsx` - Client component with arrow navigation
+- ✅ `/src/components/widgets/NewestSetsWidget.tsx` - Self-contained sets carousel
+- ✅ `/src/components/widgets/NewlyReleasedTopCardsWidget.tsx` - Top cards carousel
+- ✅ `/src/components/widgets/WidgetSection.tsx` - Reusable section wrapper
+
+**Files Modified:**
+- ✅ `/src/lib/pokemon-db-server.ts` - Added `getNewestSetsServer()` and `getTopCardsFromNewestSetsServer()`
+- ✅ `/src/app/explore/page.tsx` - Integrated new widgets
+
+**Files Still To Modify:**
 - `/src/components/explore/GameGrid.tsx`
 - `/src/components/explore/ComingSoonBanner.tsx` (remove or repurpose)
 - `/src/constants/tcg-games.ts`
@@ -1256,7 +1281,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Card Detail Polish | 🟡 80% | 🟡 Medium | 2-3 days | Historical pricing |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
-| **Explore/Browse Polish** | ❌ 0% | 🟡 Medium | 3-5 days | None |
+| **Explore/Browse Polish** | 🟡 40% | 🟡 Medium | 3-5 days | None |
 
 *Critical before production launch, not for development
 
@@ -1322,5 +1347,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 6, 2025
-**Document Version:** 2.0 (Unified)
+**Last Updated:** December 8, 2025
+**Document Version:** 2.1 (Explore Page Polish)
