@@ -26,7 +26,7 @@ export default async function PokemonHeroSection() {
   return (
     <div className="relative rounded-xl border border-grey-200 bg-white">
       {/* Fanned cards - positioned relative to main container */}
-      <div className="hidden md:block">
+      <div className="hidden sm:block">
         {cards.slice(0, 4).map((card, index) => {
           const imageUrl = getCardImageUrl(
             card.image || undefined,
@@ -59,24 +59,24 @@ export default async function PokemonHeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative px-6 py-8 md:px-8 md:py-10 flex items-center justify-between gap-4 z-10">
+      <div className="relative px-6 py-8 sm:px-8 sm:py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 z-10">
         {/* Left: Text */}
-        <div className="max-w-md flex-shrink-0">
-          <h2 className="text-2xl font-bold text-grey-900 md:text-3xl">
+        <div className="max-w-md">
+          <h2 className="text-2xl font-bold text-grey-900 sm:text-3xl">
             Pokemon Trading Cards
           </h2>
-          <p className="mt-2 text-grey-600 md:text-lg">
+          <p className="mt-2 text-grey-600 sm:text-lg">
             Explore all series, sets, and prices
           </p>
         </div>
 
         {/* Spacer for cards area */}
-        <div className="hidden md:block flex-1" />
+        <div className="hidden sm:block flex-1" />
 
-        {/* Right: CTA */}
+        {/* CTA */}
         <Link
           href="/browse/pokemon"
-          className="flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors"
+          className="self-start sm:self-auto flex-shrink-0 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors"
         >
           Browse Sets
           <svg

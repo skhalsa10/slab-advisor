@@ -7,6 +7,7 @@ import HorizontalScroll from './HorizontalScroll'
 
 interface NewestSetsWidgetProps {
   limit?: number
+  viewAllHref?: string
 }
 
 /**
@@ -19,9 +20,9 @@ interface NewestSetsWidgetProps {
  * - Horizontal scrolling carousel
  * - Set logo + name display
  * - Links to set detail pages
- * - "View All" link to browse page
+ * - Optional "View All" link
  */
-export default async function NewestSetsWidget({ limit = 8 }: NewestSetsWidgetProps) {
+export default async function NewestSetsWidget({ limit = 8, viewAllHref }: NewestSetsWidgetProps) {
   const sets = await getNewestSetsServer(limit)
 
   if (sets.length === 0) {
@@ -29,7 +30,7 @@ export default async function NewestSetsWidget({ limit = 8 }: NewestSetsWidgetPr
   }
 
   return (
-    <WidgetSection title="Newest Sets" viewAllHref="/browse/pokemon">
+    <WidgetSection title="Newest Sets" viewAllHref={viewAllHref}>
       <HorizontalScroll>
         {sets.map((set) => {
           const hasLogo = set.logo || set.secondary_logo

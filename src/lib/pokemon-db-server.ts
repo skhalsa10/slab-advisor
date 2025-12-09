@@ -240,12 +240,25 @@ export async function getTopCardsFromNewestSetsServer(
   try {
     const supabase = getServerSupabaseClient()
 
-    // First get the N most recent sets
-    const { data: recentSets, error: setsError } = await supabase
+    // First get the ID of the "Pokémon TCG Pocket" series to exclude
+    const { data: pocketSeries } = await supabase
+      .from('pokemon_series')
+      .select('id')
+      .eq('name', 'Pokémon TCG Pocket')
+      .single()
+
+    // Get the N most recent sets, excluding TCG Pocket series
+    let setsQuery = supabase
       .from('pokemon_sets')
-      .select('id, name, release_date')
+      .select('id, name, release_date, series_id')
       .order('release_date', { ascending: false })
-      .limit(numSets)
+
+    // Exclude TCG Pocket series if it exists
+    if (pocketSeries?.id) {
+      setsQuery = setsQuery.neq('series_id', pocketSeries.id)
+    }
+
+    const { data: recentSets, error: setsError } = await setsQuery.limit(numSets)
 
     if (setsError) {
       console.error('Error fetching recent sets (server):', setsError)
@@ -285,22 +298,55 @@ export async function getTopCardsFromNewestSetsServer(
       return []
     }
 
-    // Helper to extract the best market price from price_data JSONB
-    const getBestPrice = (priceData: unknown): number => {
-      if (!priceData || typeof priceData !== 'object') return 0
+    // Helper to extract the highest market price from price_data JSONB
+    // price_data may come as a JSON string or already-parsed array
+    const getHighestPrice = (priceData: unknown): number => {
+      if (!priceData) return 0
 
-      const data = priceData as Record<string, unknown>
-      let maxPrice = 0
-
-      // Check all variants for the highest market price
-      for (const key of Object.keys(data)) {
-        const variant = data[key] as Record<string, unknown> | undefined
-        if (variant && typeof variant.market === 'number' && variant.market > maxPrice) {
-          maxPrice = variant.market
+      // Parse JSON string if needed (Supabase sometimes returns JSONB as string)
+      let parsedData = priceData
+      if (typeof priceData === 'string') {
+        try {
+          parsedData = JSON.parse(priceData)
+        } catch {
+          return 0
         }
       }
 
-      return maxPrice
+      // Handle array format (standard format from TCGCSV)
+      if (Array.isArray(parsedData)) {
+        let maxPrice = 0
+        for (const variant of parsedData) {
+          if (variant && typeof variant === 'object') {
+            const v = variant as Record<string, unknown>
+            if (typeof v.marketPrice === 'number' && v.marketPrice > maxPrice) {
+              maxPrice = v.marketPrice
+            }
+          }
+        }
+        return maxPrice
+      }
+
+      // Fallback for object format (legacy or alternative structure)
+      if (typeof parsedData === 'object' && parsedData !== null) {
+        const data = parsedData as Record<string, unknown>
+        let maxPrice = 0
+        for (const key of Object.keys(data)) {
+          const variant = data[key]
+          if (variant && typeof variant === 'object') {
+            const v = variant as Record<string, unknown>
+            if (typeof v.market === 'number' && v.market > maxPrice) {
+              maxPrice = v.market
+            }
+            if (typeof v.marketPrice === 'number' && v.marketPrice > maxPrice) {
+              maxPrice = v.marketPrice
+            }
+          }
+        }
+        return maxPrice
+      }
+
+      return 0
     }
 
     // Group cards by set, sort by price, take top N from each
@@ -321,7 +367,7 @@ export async function getTopCardsFromNewestSetsServer(
       const setCards = cardsBySet[setId] || []
       // Sort by price descending and take top N
       const topCards = setCards
-        .sort((a, b) => getBestPrice(b.price_data) - getBestPrice(a.price_data))
+        .sort((a, b) => getHighestPrice(b.price_data) - getHighestPrice(a.price_data))
         .slice(0, cardsPerSet)
 
       result.push(...topCards as Array<PokemonCard & { set: PokemonSetWithSeries }>)

@@ -32,7 +32,7 @@ export default async function NewlyReleasedTopCardsWidget({
   }
 
   return (
-    <WidgetSection title="Newly Released Top Cards" viewAllHref="/browse/pokemon">
+    <WidgetSection title="Newly Released Top Cards">
       <HorizontalScroll>
         {cards.map((card) => {
           // Pre-compute image URL on server
