@@ -804,7 +804,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 ---
 
 #### 11. Explore & Browse Page Polish 🆕 IN PROGRESS
-**Status:** 🟡 50% Complete
+**Status:** 🟡 60% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-5 days
 
@@ -822,16 +822,17 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ **Responsive hero layout** - Stacks on mobile, side-by-side on large screens
 - ✅ **Text readability** - Text shadows for visibility against dynamic card backgrounds
 - ✅ **SetOwnershipSummary widget** - Dynamic ownership stats from database with real-time refresh
+- ✅ **Explore page cleanup** - Removed coming soon cards, added "More TCGs coming soon" message
 
 **What's Missing:**
 
-**1. Explore Page Refresh**
-- ✅ Pokemon Hero Section with dark theme and fanned cards (COMPLETED)
-- ✅ Newest Sets horizontal carousel (COMPLETED)
-- ✅ Newly Released Top Cards carousel (COMPLETED)
-- ❌ Remove "Coming Soon" placeholder cards (Yu-Gi-Oh!, Magic, Sports)
-- ❌ Professional design with subtle hint about future TCG support
-- ❌ Clean, minimal layout focusing on available content
+**1. Explore Page Refresh** ✅ COMPLETED
+- ✅ Pokemon Hero Section with dark theme and fanned cards
+- ✅ Newest Sets horizontal carousel
+- ✅ Newly Released Top Cards carousel
+- ✅ Remove "Coming Soon" placeholder cards (Yu-Gi-Oh!, Magic, Sports)
+- ✅ Professional design with subtle hint about future TCG support
+- ✅ Clean, minimal layout focusing on available content
 
 **2. Browse Page Mobile Filter UX**
 - ❌ Filter/sort controls hard to read on mobile
@@ -866,7 +867,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 3. ✅ Create NewestSetsWidget with horizontal carousel
 4. ✅ Create NewlyReleasedTopCardsWidget with top priced cards
 5. ✅ Create WidgetSection wrapper component
-6. ❌ Redesign explore page - remove coming soon cards, add elegant "more coming" message
+6. ✅ Redesign explore page - remove coming soon cards, add elegant "more coming" message
 7. ❌ Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
 8. ❌ Redesign `PokemonSetHeader.tsx` for compact metadata display
 9. ✅ Complete `SetOwnershipSummary` - proper title "Your Collection", real DB data, refresh on add (variant stats/value TBD)
