@@ -804,7 +804,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 ---
 
 #### 11. Explore & Browse Page Polish 🆕 IN PROGRESS
-**Status:** 🟡 40% Complete
+**Status:** 🟡 50% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-5 days
 
@@ -821,6 +821,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ **WidgetSection component** - Reusable section wrapper with "View All" link
 - ✅ **Responsive hero layout** - Stacks on mobile, side-by-side on large screens
 - ✅ **Text readability** - Text shadows for visibility against dynamic card backgrounds
+- ✅ **SetOwnershipSummary widget** - Dynamic ownership stats from database with real-time refresh
 
 **What's Missing:**
 
@@ -868,7 +869,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 6. ❌ Redesign explore page - remove coming soon cards, add elegant "more coming" message
 7. ❌ Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
 8. ❌ Redesign `PokemonSetHeader.tsx` for compact metadata display
-9. ❌ Complete `OwnershipAwareComponent` - proper title, variant stats, value calculation
+9. ✅ Complete `SetOwnershipSummary` - proper title "Your Collection", real DB data, refresh on add (variant stats/value TBD)
 10. ❌ Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
 11. ❌ Update variant display logic to clarify priced vs total variants
 
