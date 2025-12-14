@@ -92,6 +92,7 @@ export default function PokemonSetHeader({
           <SetOwnershipSummary
             totalCards={setData.card_count_total || 0}
             setId={setData.id}
+            setName={setData.name}
             onRefetchReady={onOwnershipRefetchReady}
           />
         </div>

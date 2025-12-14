@@ -846,13 +846,26 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ❌ Better information hierarchy
 - ❌ Consider collapsible/expandable sections
 
-**4. Ownership Aware Component Completion**
-- ❌ Component shows "Ownership Aware Component" as title (placeholder)
-- ❌ Finish implementing proper title/labeling
+**4. Set Detail Page Ownership Awareness**
+- ❌ Visual indicator on owned cards (badge/icon/border overlay)
+- ❌ "Owned" / "Not Owned" filter dropdown (members only)
+- ❌ Filter UI hidden for non-authenticated users
+- ❌ Persist ownership filter in URL params
+- ❌ Show ownership count in filter label (e.g., "Owned (12)")
+
+**5. Ownership Widget Completion**
+- ✅ Redesigned widget with circular progress indicator
+- ✅ Dynamic color gradient (red → orange → yellow → green based on ownership %)
+- ✅ Center content shows cards remaining + percentage complete
+- ✅ "Start your collection!" message for 0% ownership
+- ✅ Green glow animation for 100% ownership ("Set Complete")
+- ✅ Set name in title ("{Set Name} Set")
+- ❌ Add flip animation to show rarity breakdown on click
+- ❌ Test 100% ownership state with glow animation
 - ❌ Add variant breakdown in ownership stats
 - ❌ Show value of owned cards vs total set value
 
-**5. Variant Count Display Bug (Investigation Required)**
+**6. Variant Count Display Bug (Investigation Required)**
 - ❌ Card grid shows "2 variants" but quick view shows 3 variants (Normal, Holo, Reverse)
 - ❌ Investigate: Is this "2 variants WITH prices" vs "3 variants total"?
 - ❌ Clarify wording to avoid user confusion
@@ -873,6 +886,9 @@ These features ensure production readiness, prevent disasters, and polish the us
 9. ✅ Complete `SetOwnershipSummary` - proper title "Your Collection", real DB data, refresh on add (variant stats/value TBD)
 10. ❌ Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
 11. ❌ Update variant display logic to clarify priced vs total variants
+12. ❌ Add owned card visual indicator to `CardListItem.tsx` and card grid
+13. ❌ Add ownership filter dropdown to `BrowseFilterAndSort.tsx` (members only)
+14. ❌ Wire ownership filter to card list filtering logic
 
 **Files Created:**
 - ✅ `/src/components/explore/PokemonHeroSection.tsx` - Dark gradient hero with fanned cards
@@ -1314,6 +1330,72 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - [ ] Privacy policy
 - [ ] User documentation
 - [ ] Support system
+
+---
+
+## 🚀 Post-Launch Features
+
+Features to implement after initial launch to drive engagement and retention.
+
+#### 12. Gamification System with Badges ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟢 Low (Post-Launch)
+**Estimated Effort:** 1-2 weeks
+
+**What's Done:**
+- Nothing yet
+
+**What's Missing:**
+- ❌ Badge system database schema (`badges`, `user_badges` tables)
+- ❌ Badge definitions and artwork
+- ❌ Achievement tracking service
+- ❌ Badge unlock notifications/toasts
+- ❌ User profile badge display
+- ❌ Badge progress indicators
+
+**Badge Categories:**
+1. **Collection Milestones**
+   - First Card Added
+   - 10 Cards Collected
+   - 50 Cards Collected
+   - 100 Cards Collected
+   - Complete a Set
+
+2. **Set Completion**
+   - Set Starter (own 10% of a set)
+   - Set Enthusiast (own 50% of a set)
+   - Set Master (own 100% of a set)
+
+3. **Value Milestones**
+   - $100 Portfolio Value
+   - $500 Portfolio Value
+   - $1,000 Portfolio Value
+
+4. **Activity Badges**
+   - Weekly Collector (add cards 7 days in a row)
+   - Card Analyzer (use AI identification 10 times)
+   - Grade Hunter (grade 5 cards)
+
+**Implementation Tasks:**
+1. Create database migrations for badges tables
+2. Define badge criteria and artwork requirements
+3. Create `src/lib/badge-service.ts` for achievement tracking
+4. Build badge unlock logic triggered on collection updates
+5. Create badge notification component
+6. Add badge display to user profile/dashboard
+7. Implement badge progress tracking UI
+
+**Files to Create:**
+- `/src/lib/badge-service.ts`
+- `/src/types/badges.ts`
+- `/src/components/badges/BadgeDisplay.tsx`
+- `/src/components/badges/BadgeUnlockToast.tsx`
+- `/src/components/badges/BadgeProgress.tsx`
+- `/src/app/api/badges/route.ts`
+
+**Dependencies:**
+- Collection system (already implemented)
+- User authentication (already implemented)
 
 ---
 

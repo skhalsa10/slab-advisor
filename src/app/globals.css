@@ -90,3 +90,17 @@ body {
     width: 0%;
   }
 }
+
+/* Set Completion Glow Animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(34, 197, 94, 0.6));
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
