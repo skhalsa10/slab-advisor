@@ -31,8 +31,7 @@ export default function ShopTheSet({ tcgPlayerUrl, tcgPlayerGroups, setName }: S
 
   return (
     <div>
-      <h3 className="text-lg font-semibold text-grey-900 mb-2">Shop the set</h3>
-      <p className="text-xs text-grey-500 mb-4">Shopping links may contain affiliate links</p>
+      <h3 className="text-lg font-semibold text-grey-900 mb-4">Shop the set</h3>
 
       <div className="flex flex-col gap-3">
         {/* TCGPlayer Options */}
@@ -95,6 +94,8 @@ export default function ShopTheSet({ tcgPlayerUrl, tcgPlayerGroups, setName }: S
           Shop on eBay
         </a>
       </div>
+
+      <p className="text-xs text-grey-500 mt-3 text-center">Shopping links may contain affiliate links</p>
     </div>
   )
 }
