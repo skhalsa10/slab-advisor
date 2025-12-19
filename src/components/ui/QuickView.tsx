@@ -7,11 +7,31 @@ import { calculateAdjacentCards, type AdjacentCards } from '@/utils/card-navigat
 export type QuickViewLayout = 'modal' | 'sidesheet' | 'bottomsheet' | 'auto'
 export type QuickViewLayoutResolved = 'modal' | 'sidesheet' | 'bottomsheet'
 
-// Context to provide layout type to children
-const QuickViewLayoutContext = createContext<QuickViewLayoutResolved>('sidesheet')
+// Navigation context for bottomsheet to render its own navigation in sticky footer
+interface QuickViewContextValue {
+  layout: QuickViewLayoutResolved
+  navigation: {
+    prevCard: { id: string; name: string } | null
+    nextCard: { id: string; name: string } | null
+    onNavigate: (cardId: string) => void
+  }
+}
+
+const QuickViewContext = createContext<QuickViewContextValue>({
+  layout: 'sidesheet',
+  navigation: {
+    prevCard: null,
+    nextCard: null,
+    onNavigate: () => {}
+  }
+})
 
 export function useQuickViewLayout(): QuickViewLayoutResolved {
-  return useContext(QuickViewLayoutContext)
+  return useContext(QuickViewContext).layout
+}
+
+export function useQuickViewNavigation() {
+  return useContext(QuickViewContext).navigation
 }
 
 interface QuickViewProps {
@@ -207,10 +227,20 @@ export default function QuickView({
     )
   }
 
+  // Build context value with navigation
+  const contextValue: QuickViewContextValue = {
+    layout,
+    navigation: {
+      prevCard: adjacentCards.prevCard,
+      nextCard: adjacentCards.nextCard,
+      onNavigate: handleNavigateToCard
+    }
+  }
+
   // DESKTOP: Side Sheet Layout
   if (layout === 'sidesheet') {
     return (
-      <QuickViewLayoutContext.Provider value="sidesheet">
+      <QuickViewContext.Provider value={contextValue}>
         {/* Backdrop */}
         <div
           className="absolute top-0 left-0 bg-black/30 backdrop-blur-sm z-40"
@@ -255,14 +285,14 @@ export default function QuickView({
           {/* Navigation Footer */}
           {renderNavigation()}
         </div>
-      </QuickViewLayoutContext.Provider>
+      </QuickViewContext.Provider>
     )
   }
 
   // TABLET: Center Modal Layout
   if (layout === 'modal') {
     return (
-      <QuickViewLayoutContext.Provider value="modal">
+      <QuickViewContext.Provider value={contextValue}>
         {/* Backdrop */}
         <div
           className="absolute top-0 left-0 bg-black/50 backdrop-blur-sm z-40"
@@ -310,48 +340,39 @@ export default function QuickView({
           {/* Navigation Footer */}
           {renderNavigation()}
         </div>
-      </QuickViewLayoutContext.Provider>
+      </QuickViewContext.Provider>
     )
   }
 
   // MOBILE: Bottom Sheet Layout
+  // Note: Navigation is handled by content component via sticky footer for bottomsheet
   return (
-    <QuickViewLayoutContext.Provider value="bottomsheet">
+    <QuickViewContext.Provider value={contextValue}>
       {/* Backdrop */}
       <div
-        className="absolute top-0 left-0 bg-black/50 backdrop-blur-sm z-40"
-        style={{
-          height: `${document.documentElement.scrollHeight}px`,
-          width: '100%'
-        }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
         onClick={onClose}
       />
 
-      {/* Bottom Sheet */}
+      {/* Bottom Sheet Container */}
       <div className={`fixed z-50 bottom-0 left-0 right-0
-        rounded-t-2xl max-h-[85vh]
-        bg-white shadow-2xl overflow-hidden flex flex-col
+        rounded-t-2xl max-h-[92vh]
+        bg-white shadow-2xl flex flex-col
         transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}>
 
-        {/* Handle bar */}
-        <div className="flex justify-center pt-2 pb-1">
-          <div className="w-8 h-1 bg-grey-300 rounded-full"></div>
-        </div>
-
-        {/* Header - Close button only, or with title */}
-        <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
-          {showTitle && title ? (
-            <h2 className="text-lg font-semibold text-grey-900 truncate">
-              {title}
-            </h2>
-          ) : (
-            <div />
-          )}
+        {/* Handle bar + Close button row */}
+        <div className="flex-shrink-0 relative">
+          {/* Centered handle */}
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 bg-grey-300 rounded-full"></div>
+          </div>
+          {/* Close button - absolute positioned top right */}
           <button
             onClick={onClose}
-            className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+            className="absolute top-2 right-3 text-grey-400 hover:text-grey-600 transition-colors p-1"
+            aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -359,16 +380,13 @@ export default function QuickView({
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto min-h-0">
+        {/* Content - CardQuickViewContent handles scrolling and sticky footer for bottomsheet */}
+        <div className="flex-1 overflow-hidden min-h-0 flex flex-col">
           {loading && renderLoading()}
           {error && renderError()}
           {!loading && !error && children}
         </div>
-
-        {/* Navigation Footer */}
-        {renderNavigation()}
       </div>
-    </QuickViewLayoutContext.Provider>
+    </QuickViewContext.Provider>
   )
 }
