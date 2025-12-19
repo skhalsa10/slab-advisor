@@ -874,6 +874,17 @@ These features ensure production readiness, prevent disasters, and polish the us
   - "3 variants (2 priced)"
   - Show all variants, mark unpriced ones
 
+**7. Quick Add to Collection Feature** 🆕 IN PROGRESS
+- ❌ Add "+" button overlay on cards for quick collection add
+- ❌ Desktop: button appears on hover, opens anchored popover
+- ❌ Tablet: button always visible, opens centered modal
+- ❌ Mobile: button always visible, opens bottom sheet
+- ❌ Form fields: Variant, Quantity (default: 1), Condition (default: Near Mint)
+- ❌ Only visible for authenticated users
+- ❌ List view: Quick Add as first column
+- ❌ Success: close modal + show toast + refresh ownership widget
+- ❌ Create reusable Toast component for app-wide notifications
+
 **Implementation Tasks:**
 1. ✅ Redesign Pokemon Hero Section with dark gradient and fanned cards
 2. ✅ Create HorizontalScroll component with arrow navigation

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import PriceDisplay from '@/components/ui/PriceDisplay'
+import QuickAddButton from '@/components/collection/QuickAddButton'
 import type { Json } from '@/models/database'
 
 interface TCGCardProps {
@@ -19,6 +20,9 @@ interface TCGCardProps {
   imageQuality?: 'low' | 'high'
   className?: string
   getImageUrl?: (image?: string, quality?: string, fallback?: string) => string
+  // Quick Add props
+  showQuickAdd?: boolean
+  onQuickAdd?: (e: React.MouseEvent, cardId: string) => void
 }
 
 export default function TCGCard({
@@ -27,12 +31,20 @@ export default function TCGCard({
   onClick,
   imageQuality = 'low',
   className = '',
-  getImageUrl
+  getImageUrl,
+  showQuickAdd = false,
+  onQuickAdd
 }: TCGCardProps) {
-  
+
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
       onClick(e, card.id)
+    }
+  }
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    if (onQuickAdd) {
+      onQuickAdd(e, card.id)
     }
   }
 
@@ -59,6 +71,12 @@ export default function TCGCard({
             e.currentTarget.src = '/card-placeholder.svg'
           }}
         />
+        {/* Quick Add Button - always visible on touch devices, hover-reveal on devices with mouse */}
+        {showQuickAdd && (
+          <div className="absolute bottom-2 right-2 z-10 touch:flex can-hover:hidden can-hover:group-hover:flex">
+            <QuickAddButton onClick={handleQuickAdd} />
+          </div>
+        )}
       </div>
       <div className="p-2">
         <h3 className="text-xs font-medium text-grey-900 truncate">

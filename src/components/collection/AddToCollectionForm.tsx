@@ -147,86 +147,88 @@ export default function AddToCollectionForm({
         </div>
       )}
 
-      <div className="space-y-4">
-        {/* Variant Selection */}
-        <div>
-          <label htmlFor="variant" className="block text-sm font-medium text-grey-700 mb-2">
-            Variant *
-          </label>
-          <select
-            id="variant"
-            value={formData.variant}
-            onChange={(e) => handleInputChange('variant', e.target.value)}
-            className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            required
-          >
-            <option value="">Select Variant</option>
-            {availableVariants.map((variant) => (
-              <option key={variant} value={variant}>
-                {getVariantLabel(variant)}
-              </option>
-            ))}
-          </select>
+      <div className="space-y-3">
+        {/* Row 1: Variant | Condition */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="variant" className="block text-sm font-medium text-grey-700 mb-1">
+              Variant *
+            </label>
+            <select
+              id="variant"
+              value={formData.variant}
+              onChange={(e) => handleInputChange('variant', e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              required
+            >
+              <option value="">Select</option>
+              {availableVariants.map((variant) => (
+                <option key={variant} value={variant}>
+                  {getVariantLabel(variant)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="condition" className="block text-sm font-medium text-grey-700 mb-1">
+              Condition
+            </label>
+            <select
+              id="condition"
+              value={formData.condition}
+              onChange={(e) => handleInputChange('condition', e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            >
+              {CONDITION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        {/* Quantity */}
-        <div>
-          <label htmlFor="quantity" className="block text-sm font-medium text-grey-700 mb-2">
-            Quantity *
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            min="1"
-            value={formData.quantity}
-            onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
-            className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            required
-          />
-        </div>
+        {/* Row 2: Price Paid | Quantity */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="acquisition_price" className="block text-sm font-medium text-grey-700 mb-1">
+              Price Paid
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2 text-grey-500 text-sm">$</span>
+              <input
+                type="number"
+                id="acquisition_price"
+                step="0.01"
+                min="0"
+                value={formData.acquisition_price}
+                onChange={(e) => handleInputChange('acquisition_price', e.target.value)}
+                className="w-full pl-7 pr-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
 
-        {/* Condition */}
-        <div>
-          <label htmlFor="condition" className="block text-sm font-medium text-grey-700 mb-2">
-            Condition
-          </label>
-          <select
-            id="condition"
-            value={formData.condition}
-            onChange={(e) => handleInputChange('condition', e.target.value)}
-            className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-          >
-            {CONDITION_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Acquisition Price */}
-        <div>
-          <label htmlFor="acquisition_price" className="block text-sm font-medium text-grey-700 mb-2">
-            Purchase Price
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-2 text-grey-500">$</span>
+          <div>
+            <label htmlFor="quantity" className="block text-sm font-medium text-grey-700 mb-1">
+              Quantity *
+            </label>
             <input
               type="number"
-              id="acquisition_price"
-              step="0.01"
-              min="0"
-              value={formData.acquisition_price}
-              onChange={(e) => handleInputChange('acquisition_price', e.target.value)}
-              className="w-full pl-8 pr-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="0.00"
+              id="quantity"
+              min="1"
+              value={formData.quantity}
+              onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
+              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              required
             />
           </div>
         </div>
 
-        {/* Acquisition Date */}
+        {/* Row 3: Purchase Date (full width for now, graded toggle can be added later) */}
         <div>
-          <label htmlFor="acquisition_date" className="block text-sm font-medium text-grey-700 mb-2">
+          <label htmlFor="acquisition_date" className="block text-sm font-medium text-grey-700 mb-1">
             Purchase Date
           </label>
           <input
@@ -234,22 +236,22 @@ export default function AddToCollectionForm({
             id="acquisition_date"
             value={formData.acquisition_date}
             onChange={(e) => handleInputChange('acquisition_date', e.target.value)}
-            className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           />
         </div>
 
-        {/* Notes */}
+        {/* Row 4: Notes (Full Width) */}
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-grey-700 mb-2">
+          <label htmlFor="notes" className="block text-sm font-medium text-grey-700 mb-1">
             Notes
           </label>
           <textarea
             id="notes"
-            rows={3}
+            rows={2}
             value={formData.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
-            className="w-full px-3 py-2 border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-            placeholder="Optional notes about this card..."
+            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            placeholder="Optional notes..."
           />
         </div>
       </div>

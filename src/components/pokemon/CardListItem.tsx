@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { usePreserveFilters } from '@/hooks/useURLFilters'
 import PriceDisplay from '@/components/ui/PriceDisplay'
+import QuickAddButton from '@/components/collection/QuickAddButton'
 import type { Json } from '@/models/database'
 
 interface CardListItemProps {
@@ -19,15 +20,36 @@ interface CardListItemProps {
   }
   setId: string
   onClick: (e: React.MouseEvent, cardId: string) => void
+  // Quick Add props
+  showQuickAdd?: boolean
+  onQuickAdd?: (e: React.MouseEvent, cardId: string) => void
 }
 
-export default function CardListItem({ card, setId, onClick }: CardListItemProps) {
+export default function CardListItem({
+  card,
+  setId,
+  onClick,
+  showQuickAdd = false,
+  onQuickAdd
+}: CardListItemProps) {
   const { buildHref } = usePreserveFilters()
   const imageUrl = getCardImageUrl(card.image, 'low', card.tcgplayer_image_url || undefined)
   
   
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    if (onQuickAdd) {
+      onQuickAdd(e, card.id)
+    }
+  }
+
   return (
     <tr className="hover:bg-grey-50 transition-colors">
+      {/* Quick Add Column - First column when enabled */}
+      {showQuickAdd && (
+        <td className="px-4 py-4 whitespace-nowrap w-16">
+          <QuickAddButton onClick={handleQuickAdd} />
+        </td>
+      )}
       <td className="px-6 py-4 whitespace-nowrap">
         <button
           onClick={(e) => onClick(e, card.id)}

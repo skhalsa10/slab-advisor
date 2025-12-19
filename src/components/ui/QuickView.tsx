@@ -1,40 +1,51 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, createContext, useContext } from 'react'
 import { useBreakpoint } from '@/hooks/useIsDesktop'
 import { calculateAdjacentCards, type AdjacentCards } from '@/utils/card-navigation'
 
 export type QuickViewLayout = 'modal' | 'sidesheet' | 'bottomsheet' | 'auto'
+export type QuickViewLayoutResolved = 'modal' | 'sidesheet' | 'bottomsheet'
+
+// Context to provide layout type to children
+const QuickViewLayoutContext = createContext<QuickViewLayoutResolved>('sidesheet')
+
+export function useQuickViewLayout(): QuickViewLayoutResolved {
+  return useContext(QuickViewLayoutContext)
+}
 
 interface QuickViewProps {
   isOpen: boolean
   onClose: () => void
-  title: string
+  title?: string
   children: React.ReactNode
-  
+
   // Navigation
   onNavigateToCard?: (cardId: string) => void
   cardList?: Array<{ id: string; name: string }>
   currentCardId?: string
-  
+
   // Layout preference (override auto-detection)
   preferredLayout?: QuickViewLayout
-  
+
   // Loading state
   loading?: boolean
-  
+
   // Error state
   error?: string | null
+
+  // Hide the title in header (useful when content has its own title)
+  showTitle?: boolean
 }
 
 /**
  * QuickView Component
- * 
+ *
  * Responsive quickview that automatically adapts its presentation:
  * - Mobile (<768px): Bottom sheet that slides up
  * - Tablet (768-1023px): Centered modal overlay
  * - Desktop (≥1024px): Side sheet that slides in from right
- * 
+ *
  * Content remains the same across all layouts, only the container changes.
  */
 export default function QuickView({
@@ -47,12 +58,13 @@ export default function QuickView({
   currentCardId,
   preferredLayout = 'auto',
   loading = false,
-  error = null
+  error = null,
+  showTitle = true
 }: QuickViewProps) {
   const breakpoints = useBreakpoint()
-  const [adjacentCards, setAdjacentCards] = useState<AdjacentCards>({ 
-    prevCard: null, 
-    nextCard: null 
+  const [adjacentCards, setAdjacentCards] = useState<AdjacentCards>({
+    prevCard: null,
+    nextCard: null
   })
 
   // Determine layout based on screen size and preference
@@ -60,7 +72,7 @@ export default function QuickView({
     if (preferredLayout !== 'auto') {
       return preferredLayout as 'bottomsheet' | 'modal' | 'sidesheet'
     }
-    
+
     // Auto layout logic based on viewport:
     if (!breakpoints.md) {
       // Mobile: Bottom sheet
@@ -99,9 +111,44 @@ export default function QuickView({
     }
   }, [isOpen])
 
-  const handleNavigateToCard = (cardId: string) => {
+  const handleNavigateToCard = useCallback((cardId: string) => {
     onNavigateToCard?.(cardId)
-  }
+  }, [onNavigateToCard])
+
+  // Keyboard navigation: Arrow keys for prev/next, Escape to close
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input/textarea/select
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        return
+      }
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          if (adjacentCards.prevCard) {
+            e.preventDefault()
+            handleNavigateToCard(adjacentCards.prevCard.id)
+          }
+          break
+        case 'ArrowRight':
+          if (adjacentCards.nextCard) {
+            e.preventDefault()
+            handleNavigateToCard(adjacentCards.nextCard.id)
+          }
+          break
+        case 'Escape':
+          e.preventDefault()
+          onClose()
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, adjacentCards, onClose, handleNavigateToCard])
 
   if (!isOpen) return null
 
@@ -163,7 +210,7 @@ export default function QuickView({
   // DESKTOP: Side Sheet Layout
   if (layout === 'sidesheet') {
     return (
-      <>
+      <QuickViewLayoutContext.Provider value="sidesheet">
         {/* Backdrop */}
         <div
           className="absolute top-0 left-0 bg-black/30 backdrop-blur-sm z-40"
@@ -179,11 +226,15 @@ export default function QuickView({
           className="fixed top-0 right-0 h-screen w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col"
           style={{ boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)' }}
         >
-          {/* Header */}
+          {/* Header - Close button only, or with title */}
           <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-grey-900 truncate">
-              {title}
-            </h2>
+            {showTitle && title ? (
+              <h2 className="text-lg font-semibold text-grey-900 truncate">
+                {title}
+              </h2>
+            ) : (
+              <div />
+            )}
             <button
               onClick={onClose}
               className="text-grey-400 hover:text-grey-600 transition-colors p-1"
@@ -204,37 +255,41 @@ export default function QuickView({
           {/* Navigation Footer */}
           {renderNavigation()}
         </div>
-      </>
+      </QuickViewLayoutContext.Provider>
     )
   }
 
   // TABLET: Center Modal Layout
   if (layout === 'modal') {
     return (
-      <>
+      <QuickViewLayoutContext.Provider value="modal">
         {/* Backdrop */}
-        <div 
+        <div
           className="absolute top-0 left-0 bg-black/50 backdrop-blur-sm z-40"
-          style={{ 
-            height: `${document.documentElement.scrollHeight}px`, 
-            width: '100%' 
+          style={{
+            height: `${document.documentElement.scrollHeight}px`,
+            width: '100%'
           }}
           onClick={onClose}
         />
-        
+
         {/* Center Modal */}
-        <div className={`fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+        <div className={`fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
           w-full max-w-xl rounded-lg max-h-[90vh]
           bg-white shadow-2xl overflow-hidden flex flex-col
           transform transition-all duration-300 ease-out ${
           isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}>
-          
-          {/* Header */}
+
+          {/* Header - Close button only, or with title */}
           <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-grey-900 truncate">
-              {title}
-            </h2>
+            {showTitle && title ? (
+              <h2 className="text-lg font-semibold text-grey-900 truncate">
+                {title}
+              </h2>
+            ) : (
+              <div />
+            )}
             <button
               onClick={onClose}
               className="text-grey-400 hover:text-grey-600 transition-colors p-1"
@@ -255,41 +310,45 @@ export default function QuickView({
           {/* Navigation Footer */}
           {renderNavigation()}
         </div>
-      </>
+      </QuickViewLayoutContext.Provider>
     )
   }
 
   // MOBILE: Bottom Sheet Layout
   return (
-    <>
+    <QuickViewLayoutContext.Provider value="bottomsheet">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute top-0 left-0 bg-black/50 backdrop-blur-sm z-40"
-        style={{ 
-          height: `${document.documentElement.scrollHeight}px`, 
-          width: '100%' 
+        style={{
+          height: `${document.documentElement.scrollHeight}px`,
+          width: '100%'
         }}
         onClick={onClose}
       />
-      
+
       {/* Bottom Sheet */}
-      <div className={`fixed z-50 bottom-0 left-0 right-0 
+      <div className={`fixed z-50 bottom-0 left-0 right-0
         rounded-t-2xl max-h-[85vh]
         bg-white shadow-2xl overflow-hidden flex flex-col
         transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}>
-        
+
         {/* Handle bar */}
         <div className="flex justify-center pt-2 pb-1">
           <div className="w-8 h-1 bg-grey-300 rounded-full"></div>
         </div>
-        
-        {/* Header */}
+
+        {/* Header - Close button only, or with title */}
         <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-grey-900 truncate">
-            {title}
-          </h2>
+          {showTitle && title ? (
+            <h2 className="text-lg font-semibold text-grey-900 truncate">
+              {title}
+            </h2>
+          ) : (
+            <div />
+          )}
           <button
             onClick={onClose}
             className="text-grey-400 hover:text-grey-600 transition-colors p-1"
@@ -310,6 +369,6 @@ export default function QuickView({
         {/* Navigation Footer */}
         {renderNavigation()}
       </div>
-    </>
+    </QuickViewLayoutContext.Provider>
   )
 }

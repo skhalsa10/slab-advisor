@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Custom variant for touch devices (devices without hover capability) */
+@custom-variant touch (@media (hover: none));
+/* Custom variant for devices with hover capability (mouse/trackpad) */
+@custom-variant can-hover (@media (hover: hover));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
