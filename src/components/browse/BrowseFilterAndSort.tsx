@@ -34,28 +34,26 @@ export default function BrowseFilterAndSort({
   const showFilter = filterOptions && selectedFilterId !== undefined && onFilterChange
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4">
+    <div className="flex items-center gap-3">
       <div className="flex-1">
-        <SearchBar 
+        <SearchBar
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={onSearchChange}
         />
       </div>
-      <div className="flex gap-4">
+      <div className="flex items-center gap-2">
         {showFilter && (
           <SortDropdown
             options={filterOptions}
             value={selectedFilterId}
             onChange={onFilterChange}
-            className="sm:w-48"
           />
         )}
         <SortDropdown
           options={sortOptions}
           value={sortOrder}
           onChange={onSortChange}
-          className="sm:w-48"
         />
         {rightContent}
       </div>
