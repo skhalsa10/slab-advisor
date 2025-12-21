@@ -75,8 +75,8 @@ export default function SetStatistics({
         />
       </div>
 
-      {/* Desktop: Inline metadata with bullet separators */}
-      <div className="hidden sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-1 sm:gap-y-1 text-sm">
+      {/* Tablet: Inline metadata with bullet separators */}
+      <div className="hidden sm:flex xl:hidden sm:flex-wrap sm:items-baseline sm:gap-x-1 sm:gap-y-1 text-sm">
         {seriesName && (
           <>
             <span className="text-grey-500">Series:</span>
@@ -121,6 +121,57 @@ export default function SetStatistics({
             <span className="text-grey-400 mx-1">•</span>
             <span className="font-medium text-grey-900">{firstEditionCount} 1st Ed</span>
           </>
+        )}
+      </div>
+
+      {/* Desktop: Premium Key/Value Grid */}
+      <div className="hidden xl:grid xl:grid-cols-2 xl:gap-x-8 xl:gap-y-4">
+        {/* Row 1: Series & Released */}
+        {seriesName && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Series</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{seriesName}</dd>
+          </div>
+        )}
+        {formattedDate && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Released</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{formattedDate}</dd>
+          </div>
+        )}
+
+        {/* Row 2: Total Cards & Official */}
+        <div>
+          <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Total Cards</dt>
+          <dd className="mt-1 text-sm font-semibold text-grey-900">{totalCards || 0}</dd>
+        </div>
+        {officialCount !== null && officialCount !== undefined && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Official</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{officialCount}</dd>
+          </div>
+        )}
+
+        {/* Optional Row 3: Holo & Reverse (only if they have values) */}
+        {holoCount !== null && holoCount !== undefined && holoCount > 0 && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Holo</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{holoCount}</dd>
+          </div>
+        )}
+        {reverseCount !== null && reverseCount !== undefined && reverseCount > 0 && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">Reverse</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{reverseCount}</dd>
+          </div>
+        )}
+
+        {/* Optional: 1st Edition */}
+        {firstEditionCount !== null && firstEditionCount !== undefined && firstEditionCount > 0 && (
+          <div>
+            <dt className="text-xs font-medium text-grey-500 uppercase tracking-wider">1st Edition</dt>
+            <dd className="mt-1 text-sm font-semibold text-grey-900">{firstEditionCount}</dd>
+          </div>
         )}
       </div>
     </div>

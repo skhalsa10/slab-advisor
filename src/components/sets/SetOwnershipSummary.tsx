@@ -80,7 +80,7 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
     }
     return (
       <div className="animate-pulse flex flex-col items-center">
-        <div className="h-6 bg-grey-200 rounded w-40 mb-4" />
+        {showTitle && <div className="h-6 bg-grey-200 rounded w-40 mb-4" />}
         <div className="w-44 h-44 bg-grey-200 rounded-full" />
       </div>
     )

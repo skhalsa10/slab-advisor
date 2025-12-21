@@ -160,60 +160,59 @@ export default function PokemonSetHeader({
           </div>
         </div>
 
-        {/* ===== DESKTOP LAYOUT (xl+) ===== */}
-        <div className="hidden xl:block space-y-6">
-          {/* Header with logo and title */}
-          <div className="flex items-center space-x-4">
-            {(setData.logo || setData.secondary_logo) && (
-              <Image
-                src={getLogoUrl(setData.logo, setData.secondary_logo)}
-                alt={setData.name}
-                width={80}
-                height={80}
-                className="object-contain"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                }}
-              />
-            )}
-            <h1 className="text-2xl font-bold text-grey-900">{setData.name}</h1>
+        {/* ===== DESKTOP LAYOUT (xl+) - 3-Column Triad ===== */}
+        <div className="hidden xl:grid xl:grid-cols-[1fr_auto_1fr] xl:gap-8 xl:items-center">
+          {/* Column 1: Identity & Data (Left) */}
+          <div className="space-y-4">
+            {/* Logo and Title */}
+            <div className="flex items-center gap-4">
+              {(setData.logo || setData.secondary_logo) && (
+                <Image
+                  src={getLogoUrl(setData.logo, setData.secondary_logo)}
+                  alt={setData.name}
+                  width={80}
+                  height={80}
+                  className="object-contain flex-shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              )}
+              <h1 className="text-2xl font-bold text-grey-900">{setData.name}</h1>
+            </div>
+
+            {/* Metadata / Statistics */}
+            <SetStatistics
+              totalCards={setData.card_count_total || 0}
+              officialCount={setData.card_count_official}
+              holoCount={setData.card_count_holo}
+              reverseCount={setData.card_count_reverse}
+              firstEditionCount={setData.card_count_first_ed}
+              seriesName={setData.series?.name}
+              releaseDate={setData.release_date}
+            />
           </div>
 
-          {/* Divider */}
-          <hr className="border-grey-200" />
+          {/* Column 2: The Scoreboard (Center) - Hero Metric */}
+          <div className="flex justify-center">
+            <SetOwnershipSummary
+              totalCards={setData.card_count_total || 0}
+              setId={setData.id}
+              setName={setData.name}
+              onRefetchReady={onOwnershipRefetchReady}
+              variant="circle"
+              showTitle={false}
+            />
+          </div>
 
-          {/* Desktop row layout */}
-          <div className="flex gap-6">
-            <div className="flex-[2]">
-              <SetStatistics
-                totalCards={setData.card_count_total || 0}
-                officialCount={setData.card_count_official}
-                holoCount={setData.card_count_holo}
-                reverseCount={setData.card_count_reverse}
-                firstEditionCount={setData.card_count_first_ed}
-                seriesName={setData.series?.name}
-                releaseDate={setData.release_date}
-              />
-            </div>
-
-            <div className="flex-1">
-              <SetOwnershipSummary
-                totalCards={setData.card_count_total || 0}
-                setId={setData.id}
-                setName={setData.name}
-                onRefetchReady={onOwnershipRefetchReady}
-                variant="circle"
-              />
-            </div>
-
-            <div className="flex-1">
-              <ShopTheSet
-                tcgPlayerUrl={setData.tcgplayer_url || undefined}
-                tcgPlayerGroups={validatedTCGPlayerGroups}
-                setName={setData.name}
-                showTitle={false}
-              />
-            </div>
+          {/* Column 3: Action Center (Right) */}
+          <div className="flex justify-end">
+            <ShopTheSet
+              tcgPlayerUrl={setData.tcgplayer_url || undefined}
+              tcgPlayerGroups={validatedTCGPlayerGroups}
+              setName={setData.name}
+              showTitle={false}
+            />
           </div>
         </div>
       </div>

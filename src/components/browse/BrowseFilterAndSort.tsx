@@ -35,13 +35,16 @@ export default function BrowseFilterAndSort({
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-1">
+      {/* Search bar: full width on mobile/tablet, capped width on desktop */}
+      <div className="flex-1 xl:flex-none xl:w-96">
         <SearchBar
           placeholder={searchPlaceholder}
           value={searchQuery}
           onChange={onSearchChange}
         />
       </div>
+      {/* Spacer to push controls to the right on desktop */}
+      <div className="hidden xl:block xl:flex-1" />
       <div className="flex items-center gap-2">
         {showFilter && (
           <SortDropdown
