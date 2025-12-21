@@ -47,6 +47,66 @@ export type Match = {
 export type IdentificationData = {
   error?: string;
   best_match?: Match;
+  alternatives?: Match[];
+};
+
+// Identification API response types
+export type XimilarIdentificationResponse = {
+  records: IdentificationRecord[];
+  status: Status;
+  statistics: Statistics;
+};
+
+export type IdentificationRecord = {
+  _url?: string;
+  _base64?: string;
+  _status: Status;
+  _id: string;
+  _width: number;
+  _height: number;
+  _objects: IdentificationObject[];
+};
+
+export type IdentificationObject = {
+  name: string;
+  id: string;
+  bound_box: [number, number, number, number];
+  prob: number;
+  area?: number;
+  "Top Category"?: CategoryItem[];
+  _tags?: Tags;
+  _tags_simple?: string[];
+  _identification?: IdentificationData;
+};
+
+// Simplified result for our frontend
+export type CardIdentificationResult = {
+  success: boolean;
+  bestMatch?: {
+    ximilarMatch: Match;
+    databaseCard?: DatabaseCardMatch;
+    confidence: number;
+  };
+  alternatives?: Array<{
+    ximilarMatch: Match;
+    databaseCard?: DatabaseCardMatch;
+    confidence: number;
+  }>;
+  capturedImage: string; // base64 of the photo they took
+  error?: string;
+};
+
+export type DatabaseCardMatch = {
+  id: string;
+  name: string;
+  local_id: string | null;
+  image: string | null;
+  tcgplayer_image_url: string | null;
+  rarity: string | null;
+  set_name: string;
+  set_id: string;
+  price_data: unknown;
+  card_type: 'pokemon';
 };
 
 export type Tags = {

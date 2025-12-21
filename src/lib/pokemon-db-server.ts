@@ -12,6 +12,7 @@
 
 import { getServerSupabaseClient } from './supabase-server'
 import type { PokemonSetWithSeries, PokemonBrowseData, PokemonSetWithCardsAndProducts, CardFull, SetWithCards, PokemonCard } from '@/models/pokemon'
+import type { Match, DatabaseCardMatch } from '@/types/ximilar'
 
 
 /**
@@ -426,4 +427,328 @@ export async function getCardWithSetServer(cardId: string): Promise<{ card: Card
     console.error('Error in getCardWithSetServer:', error)
     throw new Error(`Failed to fetch card with set: ${cardId}`)
   }
+}
+
+/**
+ * Match a card in our database using Ximilar identification metadata
+ *
+ * Uses multiple strategies to find the best match:
+ * 1. Card number + set code (most accurate)
+ * 2. Card name + set name
+ * 3. Card name only (fallback)
+ *
+ * @param match - Ximilar Match data containing card metadata
+ * @returns DatabaseCardMatch if found, null otherwise
+ *
+ * @example
+ * ```typescript
+ * const ximilarMatch = { card_number: '181', set_code: 'sv7', full_name: 'Pikachu ex' }
+ * const dbCard = await matchCardByXimilarMetadata(ximilarMatch)
+ * if (dbCard) {
+ *   console.log('Found:', dbCard.name, 'in', dbCard.set_name)
+ * }
+ * ```
+ */
+export async function matchCardByXimilarMetadata(
+  match: Match
+): Promise<DatabaseCardMatch | null> {
+  const supabase = getServerSupabaseClient()
+
+  console.log('matchCardByXimilarMetadata input:', JSON.stringify(match, null, 2))
+
+  // Extract TCGPlayer product ID from links
+  const extractTcgplayerProductId = (links: Match['links']): string | null => {
+    if (!links) return null
+
+    let tcgplayerUrl: string | null = null
+
+    if (Array.isArray(links)) {
+      tcgplayerUrl = links.find(link => typeof link === 'string' && link.includes('tcgplayer.com/product/')) || null
+    } else if (typeof links === 'object') {
+      tcgplayerUrl = (links as Record<string, string>)['tcgplayer.com'] || null
+    }
+
+    if (tcgplayerUrl) {
+      // Extract product ID from URL like "https://www.tcgplayer.com/product/654409"
+      const match = tcgplayerUrl.match(/\/product\/(\d+)/)
+      if (match) {
+        return match[1]
+      }
+    }
+    return null
+  }
+
+  // Helper to transform result - handles both array and object formats from Supabase
+  const toDbMatch = (card: unknown): DatabaseCardMatch => {
+    const c = card as Record<string, unknown>
+    const sets = c.pokemon_sets
+    // Supabase can return pokemon_sets as array or object depending on query
+    const setData = Array.isArray(sets) ? sets[0] : sets
+    const setName = (setData as { name?: string } | null)?.name || 'Unknown Set'
+
+    return {
+      id: c.id as string,
+      name: c.name as string,
+      local_id: c.local_id as string | null,
+      image: c.image as string | null,
+      tcgplayer_image_url: c.tcgplayer_image_url as string | null,
+      rarity: c.rarity as string | null,
+      set_name: setName,
+      set_id: c.set_id as string,
+      price_data: c.price_data,
+      card_type: 'pokemon'
+    }
+  }
+
+  /**
+   * Extract clean Pokemon name from Ximilar full_name
+   * Examples:
+   * - "Salazzle Sword & Shield (SSH) #028" -> "Salazzle"
+   * - "Pikachu ex - Stellar Crown" -> "Pikachu ex"
+   * - "Charizard VMAX" -> "Charizard VMAX"
+   */
+  const extractPokemonName = (fullName: string): string => {
+    let name = fullName
+
+    // Remove set code in parentheses: "Salazzle Sword & Shield (SSH) #028" -> "Salazzle Sword & Shield #028"
+    name = name.replace(/\s*\([A-Z0-9]+\)\s*/g, ' ')
+
+    // Remove card number: "#028" or "028/210"
+    name = name.replace(/\s*#?\d+(?:\/\d+)?\s*$/, '')
+
+    // Remove set name after " - ": "Pikachu ex - Stellar Crown" -> "Pikachu ex"
+    name = name.split(' - ')[0]
+
+    // Remove common set name patterns that might be appended
+    // e.g., "Salazzle Sword & Shield" -> "Salazzle"
+    const setPatterns = [
+      'Sword & Shield',
+      'Scarlet & Violet',
+      'Sun & Moon',
+      'XY',
+      'Black & White',
+      'Diamond & Pearl',
+      'Platinum',
+      'HeartGold & SoulSilver',
+      'Legendary Collection',
+      'Base Set',
+      'Jungle',
+      'Fossil',
+      'Team Rocket',
+      'Gym Heroes',
+      'Gym Challenge',
+      'Neo Genesis',
+      'Neo Discovery',
+      'Neo Revelation',
+      'Neo Destiny'
+    ]
+
+    for (const pattern of setPatterns) {
+      if (name.includes(pattern)) {
+        name = name.replace(pattern, '').trim()
+      }
+    }
+
+    return name.trim()
+  }
+
+  // Strategy 0: Match by TCGPlayer product ID (most accurate)
+  const tcgplayerProductId = extractTcgplayerProductId(match.links)
+  if (tcgplayerProductId) {
+    console.log('Strategy 0 - TCGPlayer product ID:', tcgplayerProductId)
+
+    const { data: cards, error } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        id,
+        name,
+        local_id,
+        image,
+        tcgplayer_image_url,
+        rarity,
+        set_id,
+        price_data,
+        pokemon_sets!inner(name, id)
+      `)
+      .eq('tcgplayer_product_id', parseInt(tcgplayerProductId))
+      .limit(1)
+
+    if (!error && cards && cards.length > 0) {
+      console.log('Strategy 0 - Found match:', cards[0])
+      return toDbMatch(cards[0])
+    }
+    console.log('Strategy 0 - No match found')
+  }
+
+  // Strategy 1: Match by card_number and set_code
+  if (match.card_number && match.set_code) {
+    console.log('Strategy 1 - card_number:', match.card_number, 'set_code:', match.set_code)
+
+    // Try exact set code match first
+    const { data: cards, error } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        id,
+        name,
+        local_id,
+        image,
+        tcgplayer_image_url,
+        rarity,
+        set_id,
+        price_data,
+        pokemon_sets!inner(name, id)
+      `)
+      .eq('local_id', match.card_number)
+      .ilike('pokemon_sets.id', `%${match.set_code.toLowerCase()}%`)
+      .limit(1)
+
+    if (!error && cards && cards.length > 0) {
+      console.log('Strategy 1 - Found match:', cards[0])
+      return toDbMatch(cards[0])
+    }
+    console.log('Strategy 1 - No match found')
+  }
+
+  // Strategy 2: Match by name and set name
+  if (match.full_name && match.set) {
+    // Extract clean Pokemon name from Ximilar format
+    const baseName = extractPokemonName(match.full_name)
+    console.log('Strategy 2 - baseName:', baseName, 'set:', match.set)
+
+    const { data: cards, error } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        id,
+        name,
+        local_id,
+        image,
+        tcgplayer_image_url,
+        rarity,
+        set_id,
+        price_data,
+        pokemon_sets!inner(name, id)
+      `)
+      .ilike('name', `%${baseName}%`)
+      .ilike('pokemon_sets.name', `%${match.set}%`)
+      .limit(5)
+
+    if (!error && cards && cards.length > 0) {
+      // If we have a card number, try to find exact match
+      if (match.card_number) {
+        const exactMatch = cards.find(
+          (c: { local_id: string | null }) => c.local_id === match.card_number
+        )
+        if (exactMatch) {
+          return toDbMatch(exactMatch)
+        }
+      }
+      // Return first match
+      return toDbMatch(cards[0])
+    }
+  }
+
+  // Strategy 3: Fallback to name-only search
+  if (match.full_name) {
+    const baseName = extractPokemonName(match.full_name)
+    console.log('Strategy 3 - baseName:', baseName)
+
+    const { data: cards, error } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        id,
+        name,
+        local_id,
+        image,
+        tcgplayer_image_url,
+        rarity,
+        set_id,
+        price_data,
+        pokemon_sets!inner(name, id)
+      `)
+      .ilike('name', `%${baseName}%`)
+      .limit(1)
+
+    if (!error && cards && cards.length > 0) {
+      console.log('Strategy 3 - Found match:', cards[0])
+      return toDbMatch(cards[0])
+    }
+  }
+
+  // Strategy 4: Match by card number and extracted name (for when set doesn't match)
+  if (match.card_number && match.full_name) {
+    const baseName = extractPokemonName(match.full_name)
+    console.log('Strategy 4 - baseName:', baseName, 'card_number:', match.card_number)
+
+    const { data: cards, error } = await supabase
+      .from('pokemon_cards')
+      .select(`
+        id,
+        name,
+        local_id,
+        image,
+        tcgplayer_image_url,
+        rarity,
+        set_id,
+        price_data,
+        pokemon_sets!inner(name, id)
+      `)
+      .eq('local_id', match.card_number)
+      .ilike('name', `%${baseName}%`)
+      .limit(1)
+
+    if (!error && cards && cards.length > 0) {
+      console.log('Strategy 4 - Found match:', cards[0])
+      return toDbMatch(cards[0])
+    }
+    console.log('Strategy 4 - No match found')
+  }
+
+  // Strategy 5: Match by card number + set name partial match (for set name variations)
+  if (match.card_number && match.set) {
+    // Try to match set by partial name - Ximilar may return "Sword & Shield" while DB has "Sword & Shield Base Set"
+    const setWords = match.set.split(/\s+/).filter(word => word.length > 2)
+    console.log('Strategy 5 - card_number:', match.card_number, 'set words:', setWords)
+
+    if (setWords.length > 0) {
+      // Build a search using the first significant word of the set name
+      const primarySetWord = setWords[0]
+
+      const { data: cards, error } = await supabase
+        .from('pokemon_cards')
+        .select(`
+          id,
+          name,
+          local_id,
+          image,
+          tcgplayer_image_url,
+          rarity,
+          set_id,
+          price_data,
+          pokemon_sets!inner(name, id)
+        `)
+        .eq('local_id', match.card_number)
+        .ilike('pokemon_sets.name', `%${primarySetWord}%`)
+        .limit(5)
+
+      if (!error && cards && cards.length > 0) {
+        // If multiple matches, try to find one where more set words match
+        if (cards.length > 1 && setWords.length > 1) {
+          for (const card of cards) {
+            const cardSetName = ((card.pokemon_sets as { name?: string })?.name || '').toLowerCase()
+            const matchCount = setWords.filter(word => cardSetName.includes(word.toLowerCase())).length
+            if (matchCount >= 2) {
+              console.log('Strategy 5 - Found best match with multiple word matches:', card)
+              return toDbMatch(card)
+            }
+          }
+        }
+        console.log('Strategy 5 - Found match:', cards[0])
+        return toDbMatch(cards[0])
+      }
+    }
+    console.log('Strategy 5 - No match found')
+  }
+
+  console.log('No match found for:', match.full_name, 'in set:', match.set)
+  return null
 }

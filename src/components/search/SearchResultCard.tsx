@@ -146,9 +146,14 @@ export default function SearchResultCard({
                            focus:outline-none focus:ring-1 focus:ring-orange-500"
               >
                 <option value="normal">Normal</option>
-                <option value="reverse">Reverse Holo</option>
                 <option value="holo">Holo</option>
-                <option value="first_edition">First Edition</option>
+                <option value="reverse_holo">Reverse Holo</option>
+                <option value="first_edition">1st Edition</option>
+                <option value="illustration_rare">Illustration Rare</option>
+                <option value="alt_art">Alt Art</option>
+                <option value="full_art">Full Art</option>
+                <option value="secret_rare">Secret Rare</option>
+                <option value="other">Other</option>
               </select>
             </div>
 

@@ -12,6 +12,7 @@ export const CREDIT_COSTS = {
 export const XIMILAR_API = {
   GRADE_URL: 'https://api.ximilar.com/card-grader/v2/grade',
   ANALYZE_URL: 'https://api.ximilar.com/collectibles/v2/analyze',
+  IDENTIFY_URL: 'https://api.ximilar.com/collectibles/v2/tcg_id',
 } as const
 
 // File upload limits

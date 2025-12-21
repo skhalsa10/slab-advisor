@@ -8,21 +8,27 @@ import { getCurrentUser } from '@/lib/auth'
 interface QuickAddContentProps {
   onAddSuccess?: (message: string) => void
   onAddError?: (error: string) => void
+  onFocusChange?: (isFocused: boolean) => void
+  onCameraClick?: () => void
 }
 
 /**
  * QuickAddContent Component
- * 
+ *
  * Main content component for the Quick Add feature.
  * Handles search state, displays results, and manages add to collection flow.
  * Designed to be used inside a QuickView component.
- * 
+ *
  * @param onAddSuccess - Optional callback when card is successfully added
  * @param onAddError - Optional callback when card add fails
+ * @param onFocusChange - Optional callback when search input focus changes
+ * @param onCameraClick - Optional callback when camera icon is clicked
  */
 export default function QuickAddContent({
   onAddSuccess,
-  onAddError
+  onAddError,
+  onFocusChange,
+  onCameraClick
 }: QuickAddContentProps) {
   const {
     query,
@@ -57,23 +63,9 @@ export default function QuickAddContent({
   }
 
   const renderEmptyState = () => {
+    // No empty state needed when query is empty - the SearchBar hints are sufficient
     if (query.length === 0) {
-      return (
-        <div className="text-center py-12 px-4">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-medium text-grey-900 mb-2">Search for Cards</h3>
-          <p className="text-sm text-grey-600 mb-4">
-            Find any Pokemon card to quickly add to your collection
-          </p>
-          <div className="text-xs text-grey-500 space-y-1">
-            <p>Try searching by:</p>
-            <p>• Card name: <span className="font-mono">pikachu</span></p>
-            <p>• Name + number: <span className="font-mono">pikachu 181</span></p>
-            <p>• Exact ID: <span className="font-mono">#025</span></p>
-            <p>• Structured: <span className="font-mono">name:&quot;charizard&quot; set:&quot;base set&quot;</span></p>
-          </div>
-        </div>
-      )
+      return null
     }
 
     if (query.length > 0 && query.length < 2 && !query.startsWith('#') && !query.includes(':')) {
@@ -115,6 +107,9 @@ export default function QuickAddContent({
         value={query}
         onChange={setQuery}
         className="w-full"
+        onFocusChange={onFocusChange}
+        onCameraClick={onCameraClick}
+        showCameraIcon={!!onCameraClick}
       />
 
       {/* Error Message */}
