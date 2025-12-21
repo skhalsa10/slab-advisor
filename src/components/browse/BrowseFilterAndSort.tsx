@@ -51,6 +51,8 @@ export default function BrowseFilterAndSort({
             options={filterOptions}
             value={selectedFilterId}
             onChange={onFilterChange}
+            icon="filter"
+            title="Filter by"
           />
         )}
         <SortDropdown

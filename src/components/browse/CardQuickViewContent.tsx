@@ -165,7 +165,7 @@ export default function CardQuickViewContent({
               </p>
               <Link
                 href={buildHref(`/browse/pokemon/${setId}/${cardId}`)}
-                className="inline-flex items-center text-sm text-grey-500 hover:text-orange-600 mt-1 transition-colors"
+                className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 hover:underline mt-1 transition-colors"
               >
                 View card details
                 <svg className="w-3.5 h-3.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -414,10 +414,9 @@ function PokemonDetails({ card, detailsHref, isTwoColumn = false }: { card: Card
         <p className="text-sm text-grey-600">
           {card.set?.name || 'Unknown Set'} • #{card.local_id || 'No Number'}
         </p>
-        {/* Neutral gray link - lets orange Add button stand out */}
         <Link
           href={detailsHref}
-          className="inline-flex items-center text-sm text-grey-500 hover:text-orange-600 mt-0.5 transition-colors"
+          className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 hover:underline mt-0.5 transition-colors"
         >
           View card details
           <svg className="w-3.5 h-3.5 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
