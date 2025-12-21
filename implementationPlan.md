@@ -2,9 +2,9 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** December 18, 2025
+**Last Updated:** December 20, 2025
 
-### Project Completion: ~72%
+### Project Completion: ~75%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
@@ -22,7 +22,7 @@
 - **Phase 5**: Add Card Flow (85%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking missing
 - **Ximilar Integration**: Types defined (20%), API implementation pending (0%)
-- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (70%)
+- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (85%)
 
 #### ❌ Not Started
 - **Historical Portfolio Tracking**: Portfolio snapshots, value charts (0%)
@@ -804,7 +804,7 @@ These features ensure production readiness, prevent disasters, and polish the us
 ---
 
 #### 11. Explore & Browse Page Polish 🆕 IN PROGRESS
-**Status:** 🟡 70% Complete
+**Status:** 🟡 85% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 3-5 days
 
@@ -823,6 +823,11 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ **Text readability** - Text shadows for visibility against dynamic card backgrounds
 - ✅ **SetOwnershipSummary widget** - Dynamic ownership stats from database with real-time refresh
 - ✅ **Explore page cleanup** - Removed coming soon cards, added "More TCGs coming soon" message
+- ✅ **Set Detail Desktop Redesign** - 3-column "Triad" layout (Identity/Scoreboard/Actions)
+- ✅ **Premium Stats Grid** - Key/value grid with uppercase labels on desktop
+- ✅ **Search Bar Toolbar** - Capped width (w-96) on desktop with controls pushed right
+- ✅ **Responsive SetStatistics** - Mobile pills, tablet inline bullets, desktop key/value grid
+- ✅ **Compact Sort/View Controls** - Icon-only buttons with dropdown/bottom sheet
 
 **What's Missing:**
 
@@ -834,17 +839,19 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ Professional design with subtle hint about future TCG support
 - ✅ Clean, minimal layout focusing on available content
 
-**2. Browse Page Mobile Filter UX**
-- ❌ Filter/sort controls hard to read on mobile
-- ❌ Need multi-row layout for better legibility
-- ❌ Touch-friendly filter dropdowns
-- ❌ Consider collapsible filter panel
+**2. Browse Page Mobile Filter UX** ✅ COMPLETED
+- ✅ Compact icon-only sort/view toggle buttons
+- ✅ Sort dropdown with mobile bottom sheet
+- ✅ Touch-friendly controls with proper sizing
+- ✅ Single-row toolbar layout
 
-**3. Set Detail Page UI Cleanup**
-- ❌ Set metadata takes up too much vertical space
-- ❌ Redesign header to be more compact
-- ❌ Better information hierarchy
-- ❌ Consider collapsible/expandable sections
+**3. Set Detail Page UI Cleanup** ✅ COMPLETED
+- ✅ Desktop: 3-column "Triad" layout (Identity | Scoreboard | Actions)
+- ✅ Desktop: Premium key/value grid for stats with uppercase labels
+- ✅ Tablet: 2-column layout with logo row + content row
+- ✅ Mobile: Stacked layout with horizontal scrolling stat pills
+- ✅ Removed redundant ownership title on desktop
+- ✅ Better information hierarchy across all breakpoints
 
 **4. Set Detail Page Ownership Awareness**
 - ❌ Visual indicator on owned cards (badge/icon/border overlay)
@@ -892,14 +899,17 @@ These features ensure production readiness, prevent disasters, and polish the us
 4. ✅ Create NewlyReleasedTopCardsWidget with top priced cards
 5. ✅ Create WidgetSection wrapper component
 6. ✅ Redesign explore page - remove coming soon cards, add elegant "more coming" message
-7. ❌ Refactor `BrowseFilterAndSort.tsx` for mobile-friendly multi-row layout
-8. ❌ Redesign `PokemonSetHeader.tsx` for compact metadata display
-9. ✅ Complete `SetOwnershipSummary` - proper title "Your Collection", real DB data, refresh on add (variant stats/value TBD)
-10. ❌ Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
-11. ❌ Update variant display logic to clarify priced vs total variants
-12. ❌ Add owned card visual indicator to `CardListItem.tsx` and card grid
-13. ❌ Add ownership filter dropdown to `BrowseFilterAndSort.tsx` (members only)
-14. ❌ Wire ownership filter to card list filtering logic
+7. ✅ Refactor `BrowseFilterAndSort.tsx` - capped search width, toolbar layout, icon buttons
+8. ✅ Redesign `PokemonSetHeader.tsx` - 3-column triad layout, responsive breakpoints
+9. ✅ Complete `SetOwnershipSummary` - circle/bar variants, showTitle prop, skeleton states
+10. ✅ Refactor `SetStatistics.tsx` - mobile pills, tablet bullets, desktop key/value grid
+11. ✅ Refactor `SortDropdown.tsx` - icon button with dropdown menu + mobile bottom sheet
+12. ✅ Refactor `ViewToggle.tsx` - single toggle icon button
+13. ❌ Investigate variant count discrepancy in `CardListItem.tsx` / `CardQuickViewContent.tsx`
+14. ❌ Update variant display logic to clarify priced vs total variants
+15. ❌ Add owned card visual indicator to `CardListItem.tsx` and card grid
+16. ❌ Add ownership filter dropdown to `BrowseFilterAndSort.tsx` (members only)
+17. ❌ Wire ownership filter to card list filtering logic
 
 **Files Created:**
 - ✅ `/src/components/explore/PokemonHeroSection.tsx` - Dark gradient hero with fanned cards
@@ -921,14 +931,19 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ✅ `/src/components/collection/AddToCollectionForm.tsx` - Compact 2-column grid layout
 - ✅ `/src/components/pokemon/CardListItem.tsx` - Quick Add column
 - ✅ `/src/components/ui/QuickView.tsx` - Layout context + mobile bottom sheet improvements
-- ✅ `/src/app/globals.css` - Custom touch/hover-capable Tailwind variants
+- ✅ `/src/app/globals.css` - Custom touch/hover-capable Tailwind variants + slide-up animation
+- ✅ `/src/components/browse/BrowseFilterAndSort.tsx` - Capped search width, toolbar layout
+- ✅ `/src/components/browse/pokemon/PokemonSetHeader.tsx` - 3-column triad, responsive layouts
+- ✅ `/src/components/sets/SetOwnershipSummary.tsx` - Circle/bar variants, showTitle prop
+- ✅ `/src/components/sets/SetStatistics.tsx` - Mobile pills, tablet bullets, desktop key/value grid
+- ✅ `/src/components/sets/ShopTheSet.tsx` - Flex-wrap buttons, showTitle prop
+- ✅ `/src/components/ui/SortDropdown.tsx` - Icon button with dropdown + mobile bottom sheet
+- ✅ `/src/components/ui/ViewToggle.tsx` - Single toggle icon button
 
 **Files Still To Modify:**
 - `/src/components/explore/GameGrid.tsx`
 - `/src/components/explore/ComingSoonBanner.tsx` (remove or repurpose)
 - `/src/constants/tcg-games.ts`
-- `/src/components/browse/BrowseFilterAndSort.tsx`
-- `/src/components/browse/pokemon/PokemonSetHeader.tsx`
 
 **Dependencies:**
 - None (UI polish work)
@@ -1318,7 +1333,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Card Detail Polish | 🟡 80% | 🟡 Medium | 2-3 days | Historical pricing |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
-| **Explore/Browse Polish** | 🟡 70% | 🟡 Medium | 3-5 days | None |
+| **Explore/Browse Polish** | 🟡 85% | 🟡 Medium | 3-5 days | None |
 
 *Critical before production launch, not for development
 
@@ -1450,5 +1465,5 @@ Services Layer
 
 ---
 
-**Last Updated:** December 18, 2025
-**Document Version:** 2.2 (Quick Add Feature Complete)
+**Last Updated:** December 20, 2025
+**Document Version:** 2.3 (Set Detail Desktop Redesign Complete)
