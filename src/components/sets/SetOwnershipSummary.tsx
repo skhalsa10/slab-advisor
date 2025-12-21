@@ -9,6 +9,8 @@ interface SetOwnershipSummaryProps {
   setId: string
   setName: string
   onRefetchReady?: (refetch: () => Promise<void>) => void
+  variant?: 'circle' | 'bar'
+  showTitle?: boolean
 }
 
 /**
@@ -50,7 +52,7 @@ function getProgressColor(percentage: number): string {
   return `rgb(${r}, ${g}, ${b})`
 }
 
-export default function SetOwnershipSummary({ totalCards, setId, setName, onRefetchReady }: SetOwnershipSummaryProps) {
+export default function SetOwnershipSummary({ totalCards, setId, setName, onRefetchReady, variant = 'circle', showTitle = true }: SetOwnershipSummaryProps) {
   const { user, loading: authLoading } = useAuth()
   const { ownedCount, percentage, isLoading, refetch } = useSetOwnership(setId, totalCards)
 
@@ -66,8 +68,16 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
     return null
   }
 
-  // Loading skeleton - circular layout
+  // Loading skeleton
   if (authLoading || isLoading) {
+    if (variant === 'bar') {
+      return (
+        <div className="animate-pulse">
+          <div className="h-5 bg-grey-200 rounded w-32 mb-2" />
+          <div className="h-3 bg-grey-200 rounded-full w-full" />
+        </div>
+      )
+    }
     return (
       <div className="animate-pulse flex flex-col items-center">
         <div className="h-6 bg-grey-200 rounded w-40 mb-4" />
@@ -80,6 +90,67 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
   const isComplete = percentage >= 100
   const progressColor = getProgressColor(percentage)
 
+  // Bar variant - compact horizontal progress bar
+  if (variant === 'bar') {
+    return (
+      <div>
+        {/* Header with title and stats */}
+        <div className="flex items-center justify-between mb-2">
+          {showTitle ? (
+            <>
+              <h3 className="text-sm font-semibold text-grey-900">
+                {setName} Set
+              </h3>
+              <span className="text-sm font-medium text-grey-700">
+                {isComplete ? '100%' : `${percentage.toFixed(0)}%`}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm font-semibold text-grey-900">
+              {isComplete ? '100% complete' : `${percentage.toFixed(0)}% complete`}
+            </span>
+          )}
+        </div>
+
+        {/* Progress bar */}
+        <div className="relative h-3 bg-grey-200 rounded-full overflow-hidden">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out"
+            style={{
+              width: `${Math.min(percentage, 100)}%`,
+              backgroundColor: progressColor,
+              boxShadow: isComplete ? '0 0 8px rgba(34, 197, 94, 0.5)' : undefined
+            }}
+          />
+        </div>
+
+        {/* Stats row */}
+        <div className="flex items-center justify-between mt-1.5">
+          <span className="text-xs text-grey-600">
+            {ownedCount} / {totalCards} cards
+          </span>
+          {!isComplete && remaining > 0 && (
+            <span className="text-xs text-grey-500">
+              {remaining} to go
+            </span>
+          )}
+          {isComplete && (
+            <span className="text-xs font-medium text-green-600">
+              Complete!
+            </span>
+          )}
+        </div>
+
+        {/* Encouraging message for empty collection */}
+        {ownedCount === 0 && (
+          <p className="text-xs text-grey-500 mt-1">
+            Start your collection!
+          </p>
+        )}
+      </div>
+    )
+  }
+
   // SVG circle calculations
   const size = 176 // w-44 = 176px
   const strokeWidth = 12
@@ -90,9 +161,11 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
   return (
     <div className="flex flex-col items-center">
       {/* Title - centered */}
-      <h3 className="text-lg font-semibold text-grey-900 mb-4 text-center">
-        {setName} Set
-      </h3>
+      {showTitle && (
+        <h3 className="text-lg font-semibold text-grey-900 mb-4 text-center">
+          {setName} Set
+        </h3>
+      )}
 
       {/* Circular progress container */}
       <div className="relative">
