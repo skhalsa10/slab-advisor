@@ -1,0 +1,108 @@
+{
+  "last_updated": "2025-12-31 21:12:53",
+  "total_skipped": 12,
+  "sets": {
+    "sv10-destined-rivals": {
+      "set_name": "Destined Rivals",
+      "set_id": "sv10",
+      "cards": [
+        {
+          "name": "Code Card - Destined Rivals Premium Checklane Blister [Togekiss]",
+          "tcgPlayerId": "637655",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 1 Pack Blister [Eevee]",
+          "tcgPlayerId": "636303",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 1 Pack Blister [Gastrodon]",
+          "tcgPlayerId": "636302",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 1 Pack Blister [Rabsca]",
+          "tcgPlayerId": "636304",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 1 Pack Blister [Zarude]",
+          "tcgPlayerId": "636301",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 3 Pack Blister [Kangaskhan]",
+          "tcgPlayerId": "636300",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals 3 Pack Blister [Zebstrika]",
+          "tcgPlayerId": "636299",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals Booster Pack",
+          "tcgPlayerId": "633169",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals Build & Battle Box",
+          "tcgPlayerId": "633167",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals Elite Trainer Box",
+          "tcgPlayerId": "633151",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals Pokemon Center Elite Trainer Box (Exclusive)",
+          "tcgPlayerId": "633152",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Destined Rivals Premium Checklane Blister [Skeledirge]",
+          "tcgPlayerId": "637654",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV10: Destined Rivals",
+          "pptId": null
+        }
+      ]
+    }
+  }
+}

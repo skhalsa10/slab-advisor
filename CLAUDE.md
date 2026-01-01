@@ -74,6 +74,8 @@ npm run test:coverage # Run tests with coverage report
 - **Ximilar API**: https://docs.ximilar.com/
 - **Vitest**: https://vitest.dev/guide/
 - **TCGDEX**: https://tcgdex.dev/
+- **Card Hedger API**: https://api.cardhedger.com/docs
+- **PokemonPricePracker API**: https://www.pokemonpricetracker.com/docs
 
 ## Development Process Requirements
 
