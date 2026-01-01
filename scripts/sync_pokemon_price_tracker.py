@@ -299,26 +299,27 @@ class PokemonPriceTrackerSync:
         change_180d = self.calc_percent_change(primary_180d)
         change_365d = self.calc_percent_change(primary_history)
 
+        # Note: For JSONB columns, pass Python dicts directly - Supabase handles serialization
         return {
             'pokemon_card_id': our_card_id,
             'tcgplayer_product_id': tcgplayer_product_id,
             'current_market_price': market_price,
             'current_market_price_condition': condition,
-            'psa10': json.dumps(psa10) if psa10 else None,
-            'psa9': json.dumps(psa9) if psa9 else None,
-            'psa8': json.dumps(psa8) if psa8 else None,
+            'psa10': psa10,
+            'psa9': psa9,
+            'psa8': psa8,
             'change_7d_percent': change_7d,
             'change_30d_percent': change_30d,
             'change_90d_percent': change_90d,
             'change_180d_percent': change_180d,
             'change_365d_percent': change_365d,
-            'prices_raw': json.dumps(prices) if prices else None,
-            'ebay_price_history': json.dumps(ebay_price_history) if ebay_price_history else None,
-            'raw_history_7d': json.dumps(raw_history_7d) if raw_history_7d else None,
-            'raw_history_30d': json.dumps(raw_history_30d) if raw_history_30d else None,
-            'raw_history_90d': json.dumps(raw_history_90d) if raw_history_90d else None,
-            'raw_history_180d': json.dumps(raw_history_180d) if raw_history_180d else None,
-            'raw_history_365d': json.dumps(raw_history_365d) if raw_history_365d else None,
+            'prices_raw': prices,
+            'ebay_price_history': ebay_price_history,
+            'raw_history_7d': raw_history_7d,
+            'raw_history_30d': raw_history_30d,
+            'raw_history_90d': raw_history_90d,
+            'raw_history_180d': raw_history_180d,
+            'raw_history_365d': raw_history_365d,
             'raw_history_variants_tracked': variants_tracked,
             'raw_history_conditions_tracked': conditions_tracked,
             'last_updated': datetime.now(timezone.utc).isoformat()
@@ -545,6 +546,7 @@ class PokemonPriceTrackerSync:
         }
 
         # Process each set
+        sets_since_pause = 0
         for i, set_info in enumerate(sets):
             stats = self.process_set(set_info, dry_run)
 
@@ -552,10 +554,13 @@ class PokemonPriceTrackerSync:
             for key in total_stats:
                 total_stats[key] += stats.get(key, 0)
 
-            # Rate limit between sets (unless it's the last one)
-            if i < len(sets) - 1:
-                console.print(f"\n[yellow]Rate limiting: waiting {SET_RATE_LIMIT_SECONDS} seconds before next set...[/yellow]")
+            sets_since_pause += 1
+
+            # Rate limit: pause for 60 seconds after every 3 sets (unless it's the last one)
+            if sets_since_pause >= 3 and i < len(sets) - 1:
+                console.print(f"\n[yellow]Rate limiting: waiting {SET_RATE_LIMIT_SECONDS} seconds after 3 sets...[/yellow]")
                 time.sleep(SET_RATE_LIMIT_SECONDS)
+                sets_since_pause = 0
 
         # Display final results
         console.print(f"\n[bold]Final Results:[/bold]")

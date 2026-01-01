@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import { getCardWithSetServer } from '@/lib/pokemon-db-server'
 import AppNavigation from '@/components/layout/AppNavigation'
 import CardDetailClient from './CardDetailClient'
+import { PriceWidgetServer, PriceWidgetSkeleton } from '@/components/prices'
 import Link from 'next/link'
 
 interface CardDetailsPageProps {
@@ -26,6 +28,13 @@ export default async function CardDetailsPage({ params }: CardDetailsPageProps) 
       <AppNavigation>
         {/* Pass server-fetched data to client component for interactivity */}
         <CardDetailClient card={card} set={set} setId={setId} />
+
+        {/* Price Widget - fetches its own data server-side */}
+        <div className="mt-8">
+          <Suspense fallback={<PriceWidgetSkeleton />}>
+            <PriceWidgetServer cardId={cardId} />
+          </Suspense>
+        </div>
       </AppNavigation>
     )
   } catch (error) {

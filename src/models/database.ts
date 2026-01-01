@@ -100,6 +100,95 @@ export type Database = {
           },
         ]
       }
+      pokemon_card_prices: {
+        Row: {
+          change_180d_percent: number | null
+          change_30d_percent: number | null
+          change_365d_percent: number | null
+          change_7d_percent: number | null
+          change_90d_percent: number | null
+          created_at: string | null
+          current_market_price: number | null
+          current_market_price_condition: string | null
+          ebay_price_history: Json | null
+          id: string
+          last_updated: string | null
+          pokemon_card_id: string
+          prices_raw: Json | null
+          psa10: Json | null
+          psa8: Json | null
+          psa9: Json | null
+          raw_history_180d: Json | null
+          raw_history_30d: Json | null
+          raw_history_365d: Json | null
+          raw_history_7d: Json | null
+          raw_history_90d: Json | null
+          raw_history_conditions_tracked: string[] | null
+          raw_history_variants_tracked: string[] | null
+          tcgplayer_product_id: number | null
+        }
+        Insert: {
+          change_180d_percent?: number | null
+          change_30d_percent?: number | null
+          change_365d_percent?: number | null
+          change_7d_percent?: number | null
+          change_90d_percent?: number | null
+          created_at?: string | null
+          current_market_price?: number | null
+          current_market_price_condition?: string | null
+          ebay_price_history?: Json | null
+          id?: string
+          last_updated?: string | null
+          pokemon_card_id: string
+          prices_raw?: Json | null
+          psa10?: Json | null
+          psa8?: Json | null
+          psa9?: Json | null
+          raw_history_180d?: Json | null
+          raw_history_30d?: Json | null
+          raw_history_365d?: Json | null
+          raw_history_7d?: Json | null
+          raw_history_90d?: Json | null
+          raw_history_conditions_tracked?: string[] | null
+          raw_history_variants_tracked?: string[] | null
+          tcgplayer_product_id?: number | null
+        }
+        Update: {
+          change_180d_percent?: number | null
+          change_30d_percent?: number | null
+          change_365d_percent?: number | null
+          change_7d_percent?: number | null
+          change_90d_percent?: number | null
+          created_at?: string | null
+          current_market_price?: number | null
+          current_market_price_condition?: string | null
+          ebay_price_history?: Json | null
+          id?: string
+          last_updated?: string | null
+          pokemon_card_id?: string
+          prices_raw?: Json | null
+          psa10?: Json | null
+          psa8?: Json | null
+          psa9?: Json | null
+          raw_history_180d?: Json | null
+          raw_history_30d?: Json | null
+          raw_history_365d?: Json | null
+          raw_history_7d?: Json | null
+          raw_history_90d?: Json | null
+          raw_history_conditions_tracked?: string[] | null
+          raw_history_variants_tracked?: string[] | null
+          tcgplayer_product_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_card_prices_pokemon_card_id_fkey"
+            columns: ["pokemon_card_id"]
+            isOneToOne: true
+            referencedRelation: "pokemon_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pokemon_cards: {
         Row: {
           category: string | null
@@ -270,6 +359,7 @@ export type Database = {
           symbol: string | null
           tcgplayer_group_id: number | null
           tcgplayer_groups: Json | null
+          tcgplayer_set_id: string | null
           tcgplayer_url: string | null
           updated_at: string | null
         }
@@ -291,6 +381,7 @@ export type Database = {
           symbol?: string | null
           tcgplayer_group_id?: number | null
           tcgplayer_groups?: Json | null
+          tcgplayer_set_id?: string | null
           tcgplayer_url?: string | null
           updated_at?: string | null
         }
@@ -312,6 +403,7 @@ export type Database = {
           symbol?: string | null
           tcgplayer_group_id?: number | null
           tcgplayer_groups?: Json | null
+          tcgplayer_set_id?: string | null
           tcgplayer_url?: string | null
           updated_at?: string | null
         }
