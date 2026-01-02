@@ -100,6 +100,7 @@ export function transformRawHistoryToChartData(
     date: entry.date,
     value: entry.market,
     label: formatCurrency(entry.market),
+    volume: entry.volume ?? null,
   }));
 }
 
@@ -130,6 +131,7 @@ export function getPsaHistoryForPeriod(
       date,
       value: data.sevenDayAverage ?? data.average,
       label: formatCurrency(data.sevenDayAverage ?? data.average),
+      volume: data.count ?? null,
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -224,12 +226,12 @@ export function formatPriceChange(change: number | null): {
 export function formatChartDate(dateStr: string, timeRange: TimeRange): string {
   const date = new Date(dateStr);
 
-  // For short ranges, show "Dec 15" format
-  // For year range, show "Dec '24" format
+  // For year range, show just month name (e.g., "Jan", "Feb")
   if (timeRange === '365d') {
-    return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    return date.toLocaleDateString('en-US', { month: 'short' });
   }
 
+  // For shorter ranges, show "Dec 15" format
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 

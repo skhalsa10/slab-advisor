@@ -158,6 +158,7 @@ export interface ChartDataPoint {
   date: string;
   value: number;
   label?: string;
+  volume?: number | null;
 }
 
 // =============================================================================

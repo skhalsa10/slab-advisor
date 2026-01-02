@@ -22,7 +22,6 @@ import {
   formatChartDate,
   formatTooltipDate,
   getRawHistoryForTimeRange,
-  getChangeForTimeRange,
   transformRawHistoryToChartData,
   getPsaHistoryForPeriod,
   timeRangeToDays,
@@ -71,7 +70,7 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
   );
 
   // Chart data based on current view mode
-  const chartData: ChartDataPoint[] = useMemo(() => {
+  const rawChartData: ChartDataPoint[] = useMemo(() => {
     if (viewMode === 'Raw') {
       const history = getRawHistoryForTimeRange(priceData, timeRange);
       return transformRawHistoryToChartData(history, variant, condition);
@@ -83,6 +82,49 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
       );
     }
   }, [viewMode, timeRange, variant, condition, grade, priceData]);
+
+  // Handle single data point by creating a flat line
+  // Recharts can't draw a line/area with only 1 point
+  // For graded view, append today's smart market price so chart ends at displayed price
+  const chartData: ChartDataPoint[] = useMemo(() => {
+    let data = rawChartData;
+
+    // For graded view, add today's data point with smart market price
+    // This ensures the chart ends at the price shown in the header
+    if (viewMode === 'Graded' && data.length > 0) {
+      const gradeData = priceData[grade];
+      const smartPrice = gradeData?.smartMarketPrice?.price ?? gradeData?.avgPrice;
+
+      if (smartPrice !== null && smartPrice !== undefined) {
+        const today = new Date().toISOString().split('T')[0];
+        const lastDate = data[data.length - 1].date;
+
+        // Only add if today is different from the last data point
+        if (today !== lastDate.split('T')[0]) {
+          data = [
+            ...data,
+            { date: today, value: smartPrice, volume: null },
+          ];
+        }
+      }
+    }
+
+    // Handle single data point - create flat line
+    if (data.length === 1) {
+      const point = data[0];
+      const pointDate = new Date(point.date);
+      const daysBack = timeRangeToDays(timeRange);
+      const startDate = new Date(pointDate);
+      startDate.setDate(startDate.getDate() - daysBack);
+
+      return [
+        { date: startDate.toISOString().split('T')[0], value: point.value },
+        point,
+      ];
+    }
+
+    return data;
+  }, [rawChartData, timeRange, viewMode, grade, priceData]);
 
   // Current price display - get the most recent price from chart data
   const currentPrice = useMemo(() => {
@@ -100,22 +142,46 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
     }
   }, [viewMode, grade, priceData, chartData]);
 
-  // Price change (only for raw mode with our pre-computed values)
-  // Only show when we have data for the current selection
+  // Calculate price change from chart data (first vs last data point)
+  // Works for both Raw and Graded views
   const priceChange = useMemo(() => {
-    if (viewMode === 'Raw') {
-      // Don't show change if there's no data for this variant/condition
-      if (chartData.length === 0) return null;
-      return getChangeForTimeRange(priceData, timeRange);
-    }
-    // For graded, we don't have pre-computed changes
-    return null;
-  }, [viewMode, timeRange, priceData, chartData]);
+    if (chartData.length < 2) return null;
+
+    const firstValue = chartData[0].value;
+    const lastValue = chartData[chartData.length - 1].value;
+
+    // Avoid division by zero
+    if (firstValue === 0) return null;
+
+    const percentChange = ((lastValue - firstValue) / firstValue) * 100;
+    return percentChange;
+  }, [chartData]);
 
   const changeDisplay = formatPriceChange(priceChange);
 
+  // Calculate evenly spaced tick values for X-axis (4-5 ticks max)
+  const xAxisTicks = useMemo(() => {
+    if (chartData.length === 0) return [];
+    if (chartData.length <= 5) return chartData.map((d) => d.date);
+
+    // Show 4 ticks: start, 1/3, 2/3, end
+    const indices = [
+      0,
+      Math.floor(chartData.length / 3),
+      Math.floor((chartData.length * 2) / 3),
+      chartData.length - 1,
+    ];
+
+    return indices.map((i) => chartData[i].date);
+  }, [chartData]);
+
   // PSA 10 potential (shown in footer when viewing Raw)
   const psa10Potential = priceData.psa10?.smartMarketPrice?.price ?? priceData.psa10?.avgPrice ?? null;
+
+  // Calculate total volume (sales count) for the current period
+  const totalVolume = useMemo(() => {
+    return chartData.reduce((sum, point) => sum + (point.volume ?? 0), 0);
+  }, [chartData]);
 
   return (
     <div
@@ -276,9 +342,13 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
                 tick={{ fontSize: 11, fill: '#9ca3af' }}
                 tickFormatter={(value) => formatChartDate(value, timeRange)}
                 tickMargin={8}
+                ticks={xAxisTicks}
               />
               <YAxis
-                domain={['auto', 'auto']}
+                domain={[
+                  (dataMin: number) => Math.floor(dataMin * 0.9),
+                  (dataMax: number) => Math.ceil(dataMax * 1.1),
+                ]}
                 axisLine={false}
                 tickLine={false}
                 tick={{ fontSize: 11, fill: '#9ca3af' }}
@@ -301,7 +371,7 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
                 }}
               />
               <Area
-                type="monotone"
+                type="natural"
                 dataKey="value"
                 stroke="#f97316"
                 strokeWidth={2}
@@ -344,37 +414,48 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
           ))}
         </div>
 
-        {/* "The Hook" - PSA 10 Potential (shown when viewing Raw) */}
-        {viewMode === 'Raw' && psa10Potential !== null && (
+        {/* Right side info for Raw mode */}
+        {viewMode === 'Raw' && (
           <div className="text-right">
-            <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              PSA 10 Potential
-            </div>
-            <div className="text-lg font-semibold text-orange-600">
-              {formatCurrency(psa10Potential)}
+            {/* PSA 10 Potential (only for Near Mint) */}
+            {psa10Potential !== null && condition === 'Near Mint' && (
+              <>
+                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  PSA 10 Potential
+                </div>
+                <div className="text-lg font-semibold text-orange-600">
+                  {formatCurrency(psa10Potential)}
+                </div>
+              </>
+            )}
+            {/* Volume for all conditions */}
+            <div className="text-xs text-gray-400">
+              {totalVolume} {totalVolume === 1 ? 'sale' : 'sales'} this period
             </div>
           </div>
         )}
 
         {/* Confidence indicator for graded view */}
-        {viewMode === 'Graded' && priceData[grade]?.smartMarketPrice && (
+        {viewMode === 'Graded' && (
           <div className="text-right">
-            <div className="flex items-center gap-1.5 justify-end">
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  priceData[grade]?.smartMarketPrice?.confidence === 'high'
-                    ? 'bg-green-500'
-                    : priceData[grade]?.smartMarketPrice?.confidence === 'medium'
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
-                }`}
-              />
-              <span className="text-xs text-gray-500 capitalize">
-                {priceData[grade]?.smartMarketPrice?.confidence} confidence
-              </span>
-            </div>
+            {priceData[grade]?.smartMarketPrice && (
+              <div className="flex items-center gap-1.5 justify-end">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    priceData[grade]?.smartMarketPrice?.confidence === 'high'
+                      ? 'bg-green-500'
+                      : priceData[grade]?.smartMarketPrice?.confidence === 'medium'
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500'
+                  }`}
+                />
+                <span className="text-xs text-gray-500 capitalize">
+                  {priceData[grade]?.smartMarketPrice?.confidence} confidence
+                </span>
+              </div>
+            )}
             <div className="text-xs text-gray-400">
-              {priceData[grade]?.totalSales} sales
+              {totalVolume} {totalVolume === 1 ? 'sale' : 'sales'} this period
             </div>
           </div>
         )}
