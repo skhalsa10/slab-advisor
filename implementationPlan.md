@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** December 21, 2025
+**Last Updated:** January 1, 2026
 
 ### Project Completion: ~80%
 
@@ -41,10 +41,10 @@
 
 These features deliver unique value that competitors don't have and form the foundation of the product's value proposition.
 
-#### 1. Historical Pricing with Redis Cache ⚠️ IN PROGRESS
-**Status:** 🟡 60% Complete
+#### 1. Historical Pricing ⚠️ IN PROGRESS
+**Status:** 🟡 85% Complete
 **Priority:** 🔴 Critical
-**Estimated Effort:** 1-2 weeks
+**Estimated Effort:** 3-5 days remaining
 
 **What's Done:**
 - ✅ Python price update script (`scripts/update_pokemon_prices.py`)
@@ -52,34 +52,34 @@ These features deliver unique value that competitors don't have and form the fou
 - ✅ Smart price display utilities (`src/utils/priceUtils.ts`)
 - ✅ Multi-variant price support (Poké Ball, Master Ball patterns)
 - ✅ Daily price fetching from TCGCSV API
+- ✅ **PokemonPriceTracker sync script** (`scripts/sync_pokemon_price_tracker.ts`) - Fetches raw + graded historical prices
+- ✅ **pokemon_card_prices table** - Stores historical price data with pre-sliced time ranges (serves as our price cache)
+- ✅ **PriceWidget component** - Interactive price chart with Raw/Graded toggle
+- ✅ **Price history chart** with Recharts (AreaChart, natural curves)
+- ✅ **Time range selector** (7D, 1M, 3M, 1Y)
+- ✅ **Condition/grade selectors** for filtering chart data
+- ✅ **Variant selector** for multi-variant cards
+- ✅ **Volume display** - Shows sales count for selected period
+- ✅ **On-the-fly percent change** - Calculated from chart data (works for all conditions/grades)
+- ✅ **PSA 10 potential upsell** - Shows graded value for Near Mint raw cards
+- ✅ **Confidence indicator** - Shows price confidence for graded cards
+- ✅ **Chart UX improvements** - Limited X-axis ticks, Y-axis padding, single data point handling, smooth curves
 
 **What's Missing:**
-- ❌ `daily_raw_prices` table (store historical price snapshots)
 - ❌ `portfolio_snapshots` table (track portfolio value over time)
-- ❌ `price_cache` table (cache expensive API calls)
-- ❌ Redis cache wrapper around PokemonPriceTracker API
-- ❌ Historical price chart components
 - ❌ Portfolio value calculation service (`src/lib/portfolio-service.ts`)
 - ❌ Vercel cron job configuration (`vercel.json`)
 - ❌ API endpoint `/api/cron/update-prices`
 
 **Implementation Tasks:**
-1. Create database migrations for missing tables:
-   ```sql
-   -- daily_raw_prices: historical price snapshots
-   -- portfolio_snapshots: user portfolio value tracking
-   -- price_cache: API response caching
-   ```
-2. Set up Redis/Upstash for caching layer
-3. Create `src/lib/pricing-service.ts` with PokemonPriceTracker API wrapper
-4. Create `src/lib/portfolio-service.ts` for portfolio calculations
-5. Build `/api/cron/update-prices` Vercel endpoint
-6. Create `vercel.json` with cron configuration
-7. Implement portfolio value calculation API
-8. Build historical price chart components
+1. Create database migration for portfolio_snapshots table
+2. Create `src/lib/portfolio-service.ts` for portfolio calculations
+3. Build `/api/cron/update-prices` Vercel endpoint
+4. Create `vercel.json` with cron configuration
+5. Implement portfolio value calculation API
+6. Build portfolio chart components
 
 **Files to Create:**
-- `/src/lib/pricing-service.ts`
 - `/src/lib/portfolio-service.ts`
 - `/src/app/api/cron/update-prices/route.ts`
 - `/src/app/api/portfolio/calculate/route.ts`
@@ -88,7 +88,6 @@ These features deliver unique value that competitors don't have and form the fou
 - `/vercel.json`
 
 **Dependencies:**
-- Upstash Redis account (or alternative Redis provider)
 - PokemonPriceTracker API key
 - CRON_SECRET environment variable
 
@@ -613,9 +612,9 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 ---
 
 #### 8. Card Detail Page Completion ⚠️ IN PROGRESS
-**Status:** 🟡 80% Complete
+**Status:** 🟡 90% Complete
 **Priority:** 🟡 Medium
-**Estimated Effort:** 2-3 days
+**Estimated Effort:** 1-2 days
 
 **What's Done:**
 - ✅ Browse card detail page (`src/app/browse/pokemon/[setId]/[cardId]/page.tsx`)
@@ -624,21 +623,19 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 - ✅ Price display (current price)
 - ✅ Add to collection functionality
 - ✅ Edit/delete for owned cards
+- ✅ **Historical price chart** - PriceWidget with Raw/Graded toggle, multiple time ranges
+- ✅ **Market trend indicators** - Percent change calculated on-the-fly from chart data
+- ✅ **Volume display** - Shows sales count for selected period
+- ✅ **Confidence indicators** - For graded prices
 
 **What's Missing:**
-- ❌ Historical price chart
 - ❌ Grading information display (when implemented)
 - ❌ Pre-grading recommendations (when implemented)
 - ❌ Similar cards suggestions
 - ❌ Set completion progress
-- ❌ Market trend indicators
 
 **Implementation Tasks:**
-1. Add historical price chart component:
-   - Fetch price history from daily_raw_prices
-   - Display 7-day, 30-day, 1-year views
-   - Show price change percentage
-   - Requires Tier 1, Item 1 (Historical Pricing)
+1. ~~Add historical price chart component~~ ✅ COMPLETED (PriceWidget)
 2. Integrate grading display:
    - Show estimated grade if graded
    - Display detailed grading breakdown
@@ -976,28 +973,6 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 ### ❌ Missing Tables
 
-#### daily_raw_prices
-**Purpose:** Store historical price snapshots for charting and trend analysis
-**Schema:**
-```sql
-CREATE TABLE daily_raw_prices (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  pokemon_card_id UUID REFERENCES pokemon_cards(id),
-  variant TEXT,
-  variant_pattern TEXT,
-  price NUMERIC(10, 2),
-  market_price NUMERIC(10, 2),
-  low_price NUMERIC(10, 2),
-  mid_price NUMERIC(10, 2),
-  high_price NUMERIC(10, 2),
-  recorded_at TIMESTAMPTZ DEFAULT now(),
-  source TEXT -- 'tcgcsv', 'pokemonpricetracker', etc.
-);
-
-CREATE INDEX idx_daily_raw_prices_card ON daily_raw_prices(pokemon_card_id);
-CREATE INDEX idx_daily_raw_prices_date ON daily_raw_prices(recorded_at);
-```
-
 #### portfolio_snapshots
 **Purpose:** Track user portfolio value over time
 **Schema:**
@@ -1013,22 +988,6 @@ CREATE TABLE portfolio_snapshots (
 
 CREATE INDEX idx_portfolio_snapshots_user ON portfolio_snapshots(user_id);
 CREATE INDEX idx_portfolio_snapshots_date ON portfolio_snapshots(snapshot_date);
-```
-
-#### price_cache
-**Purpose:** Cache expensive API calls to PokemonPriceTracker
-**Schema:**
-```sql
-CREATE TABLE price_cache (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  cache_key TEXT UNIQUE NOT NULL, -- e.g., "card:{cardId}:variant:{variant}"
-  data JSONB,
-  expires_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE INDEX idx_price_cache_key ON price_cache(cache_key);
-CREATE INDEX idx_price_cache_expires ON price_cache(expires_at);
 ```
 
 #### profiles
@@ -1234,9 +1193,8 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 ### Week 1-2: Historical Pricing Foundation
 **Goal:** Enable portfolio tracking and value charts
 **Tasks:**
-- Create missing database tables (daily_raw_prices, portfolio_snapshots, price_cache)
-- Set up Redis/Upstash for caching
-- Build pricing-service.ts and portfolio-service.ts
+- Create portfolio_snapshots database table
+- Build portfolio-service.ts for portfolio calculations
 - Create Vercel cron endpoints
 - Implement portfolio value calculation API
 
@@ -1319,14 +1277,14 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 | Feature | Status | Priority | Effort | Dependencies |
 |---------|--------|----------|--------|--------------|
-| Historical Pricing | 🟡 60% | 🔴 Critical | 1-2 weeks | Redis, API keys |
+| Historical Pricing | 🟡 85% | 🔴 Critical | 1 week | API keys |
 | Grading (Ximilar) | ❌ 0% | 🔴 Critical | 2 weeks | Ximilar API |
 | Card Identification | ❌ 0% | 🔴 Critical | 1.5 weeks | Ximilar API |
 | Pre-grading Recs | ❌ 0% | 🟠 High | 1 week | Grading |
 | AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | Grading, Historical Pricing, Claude API |
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
 | Dashboard Completion | 🟡 40% | 🟠 High | 3-5 days | Collection data |
-| Card Detail Polish | 🟡 80% | 🟡 Medium | 2-3 days | Historical pricing |
+| Card Detail Polish | 🟡 90% | 🟡 Medium | 1-2 days | Historical pricing |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
 | **Explore/Browse Polish** | 🟡 85% | 🟡 Medium | 3-5 days | None |
@@ -1451,15 +1409,14 @@ Frontend (Next.js 15)
   API Routes
       ↓
 Services Layer
-      ├── Supabase (Auth & DB)
+      ├── Supabase (Auth & DB & Price Cache)
       ├── Ximilar (Grading & Recognition)
       ├── TCGCSV (Price Data)
       ├── PokemonPriceTracker (Historical Prices)
-      ├── Redis/Upstash (Caching)
       └── Stripe (Payments - future)
 ```
 
 ---
 
-**Last Updated:** December 20, 2025
-**Document Version:** 2.3 (Set Detail Desktop Redesign Complete)
+**Last Updated:** January 1, 2026
+**Document Version:** 2.4 (PriceWidget with Historical Charts Complete)
