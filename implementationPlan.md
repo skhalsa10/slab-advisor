@@ -194,46 +194,47 @@ Full camera-based card identification integrated into Quick Add flow. Users can 
 
 ---
 
-#### 4. Pre-grading Recommendations ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### 4. Pre-grading Recommendations ⚠️ IN PROGRESS
+**Status:** 🟡 60% Complete
 **Priority:** 🟠 High
-**Estimated Effort:** 1 week
+**Estimated Effort:** 3-5 days remaining
 
 **What's Done:**
-- ✅ Price data exists for graded cards
+- ✅ Price data exists for graded cards (psa10, psa9, psa8 in `pokemon_card_prices`)
+- ✅ Raw market prices available (`current_market_price`)
 - ✅ Grading data structure defined
+- ✅ Price sync script exists (`sync_pokemon_price_tracker.py`)
+- ✅ **Grading ROI Engine implemented** in sync script:
+  - `grading_cost_basis_entry` - Upfront cash required (Entry Fee + Shipping)
+  - `grading_fee_entry` - PSA fee tier based on raw price
+  - `grading_fee_psa9` / `grading_fee_psa10` - Final fees including upcharges
+  - `profit_at_psa9` / `profit_at_psa10` - Value Added calculations
+  - `roi_psa10` - ROI percentage on PSA 10
+  - `upcharge_potential` - Flag for tier bump scenarios
+  - `grading_safety_tier` - SAFE_BET, GAMBLE, or DO_NOT_GRADE
+- ✅ **PSA fee ladder** implemented (all tiers from Bulk $19.99 to Premium 10+ $9,999+)
+- ✅ **Database columns & indexes** added to `pokemon_card_prices`
+- ✅ **Integrated into price sync** - calculates on every sync
 
 **What's Missing:**
-- ❌ ROI calculation engine
-- ❌ Grading service cost data (PSA, BGS, SGC)
-- ❌ Break-even analysis
-- ❌ Recommendation algorithm
-- ❌ UI displaying recommendations
-- ❌ Service comparison (which grading service to use)
+- ❌ UI displaying recommendations (GradingRecommendation widget)
+- ❌ Service comparison UI (PSA vs BGS vs SGC)
+- ❌ Dashboard "Top Cards to Grade" widget
 
 **Implementation Tasks:**
-1. Research and compile grading service pricing:
-   - PSA: Economy, Regular, Express, Super Express
-   - BGS: Standard, Premium, Crossover
-   - SGC: Standard, Express
-2. Create grading cost calculator:
-   ```typescript
-   // src/lib/grading-calculator.ts
-   export function calculateGradingROI(card, estimatedGrade, service)
-   export function recommendGradingService(card, estimatedGrade)
-   export function shouldGrade(card, estimatedGrade)
-   ```
-3. Build recommendation engine:
-   - Compare ungraded price vs. graded price at estimated grade
-   - Subtract grading costs (service + shipping + insurance)
-   - Calculate percentage ROI
-   - Factor in confidence score
+1. ~~Research and compile grading service pricing~~ ✅ COMPLETED (PSA tiers implemented)
+2. ~~Create grading cost calculator~~ ✅ COMPLETED (`get_grading_fee()` + `calculate_grading_potential()`)
+3. ~~Build recommendation engine~~ ✅ COMPLETED (safety tier logic: SAFE_BET/GAMBLE/DO_NOT_GRADE)
+
 4. Create recommendation UI components:
-   - "Should You Grade?" widget
-   - Service comparison table
-   - Expected profit/loss breakdown
-   - Best service recommendation
+   - "Should You Grade?" widget with safety tier badge
+   - Profit breakdown (PSA 9 vs PSA 10 scenarios)
+   - Fee transparency display
+   - Service comparison table (future: BGS, SGC)
 5. Integrate into card detail and collection views
+6. Build Dashboard "Top Cards to Grade" widget:
+   - Query cards with `grading_safety_tier = 'SAFE_BET'`
+   - Order by `profit_at_psa10 DESC`
 
 **Files to Create:**
 - `/src/lib/grading-calculator.ts`
@@ -242,12 +243,13 @@ Full camera-based card identification integrated into Quick Add flow. Users can 
 - `/src/components/grading/ServiceComparison.tsx`
 
 **Files to Modify:**
+- `/scripts/sync_pokemon_price_tracker.py` (add grading recommendation calculation)
 - `/src/components/collection/CollectionQuickViewContent.tsx` (show recommendations)
 - `/src/app/browse/pokemon/[setId]/[cardId]/page.tsx` (show recommendations)
 
 **Dependencies:**
-- Grading implementation (Tier 1, Item 2)
 - Price data (already implemented)
+- Note: Ximilar grading integration (Tier 1, Item 2) is optional - pre-grading recommendations work with existing price data
 
 ---
 
@@ -1280,7 +1282,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Historical Pricing | 🟡 85% | 🔴 Critical | 1 week | API keys |
 | Grading (Ximilar) | ❌ 0% | 🔴 Critical | 2 weeks | Ximilar API |
 | Card Identification | ❌ 0% | 🔴 Critical | 1.5 weeks | Ximilar API |
-| Pre-grading Recs | ❌ 0% | 🟠 High | 1 week | Grading |
+| Pre-grading Recs | 🟡 60% | 🟠 High | 3-5 days | Price data ✅ |
 | AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | Grading, Historical Pricing, Claude API |
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
 | Dashboard Completion | 🟡 40% | 🟠 High | 3-5 days | Collection data |
@@ -1418,5 +1420,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 1, 2026
-**Document Version:** 2.4 (PriceWidget with Historical Charts Complete)
+**Last Updated:** January 3, 2026
+**Document Version:** 2.5 (Grading ROI Engine Implemented)

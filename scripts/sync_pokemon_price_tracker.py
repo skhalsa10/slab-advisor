@@ -44,6 +44,86 @@ PPT_API_BASE = "https://www.pokemonpricetracker.com/api/v2"
 # Rate limiting: wait 60 seconds between sets
 SET_RATE_LIMIT_SECONDS = 60
 
+# =============================================================================
+# PSA Grading Fee Constants (Verified Market Rates as of Jan 2026)
+# =============================================================================
+
+# Shipping cost per submission
+COST_SHIPPING = 9.99
+
+# Standard Service Tiers
+COST_BULK = 19.99       # Value Service (up to $499)
+COST_VAL_MAX = 59.99    # Value Max (up to $1,000)
+COST_REGULAR = 74.99    # Regular (up to $1,500)
+COST_EXPRESS = 149.00   # Express (up to $2,500)
+COST_SUPER = 299.00     # Super Express (up to $5,000)
+COST_WALK = 599.00      # Walk-Through (up to $10,000)
+
+# Premium Tiers
+COST_PREM_1 = 999.00    # Premium 1 (up to $25,000)
+COST_PREM_2 = 1999.00   # Premium 2 (up to $50,000)
+COST_PREM_3 = 2999.00   # Premium 3 (up to $100,000)
+COST_PREM_5 = 4999.00   # Premium 5 (up to $250,000)
+COST_PREM_10_BASE = 9999.00  # Premium 10 base (up to $350,000)
+COST_PREM_10_ADD = 399.00    # Additional per $10k over $350,000
+
+# Max Declared Value Limits for each tier
+LIMIT_BULK = 499.00
+LIMIT_VAL_MAX = 1000.00
+LIMIT_REGULAR = 1500.00
+LIMIT_EXPRESS = 2500.00
+LIMIT_SUPER = 5000.00
+LIMIT_WALK = 10000.00
+LIMIT_PREM_1 = 25000.00
+LIMIT_PREM_2 = 50000.00
+LIMIT_PREM_3 = 100000.00
+LIMIT_PREM_5 = 250000.00
+LIMIT_PREM_10_BASE = 350000.00
+
+
+def get_grading_fee(value: float) -> float:
+    """
+    Determine the PSA grading fee based on declared card value.
+    Uses ladder logic to find the appropriate tier.
+
+    Args:
+        value: The declared value of the card
+
+    Returns:
+        The grading fee for that value tier
+    """
+    if value is None or value <= 0:
+        return COST_BULK  # Default to lowest tier
+
+    if value <= LIMIT_BULK:
+        return COST_BULK
+    elif value <= LIMIT_VAL_MAX:
+        return COST_VAL_MAX
+    elif value <= LIMIT_REGULAR:
+        return COST_REGULAR
+    elif value <= LIMIT_EXPRESS:
+        return COST_EXPRESS
+    elif value <= LIMIT_SUPER:
+        return COST_SUPER
+    elif value <= LIMIT_WALK:
+        return COST_WALK
+    elif value <= LIMIT_PREM_1:
+        return COST_PREM_1
+    elif value <= LIMIT_PREM_2:
+        return COST_PREM_2
+    elif value <= LIMIT_PREM_3:
+        return COST_PREM_3
+    elif value <= LIMIT_PREM_5:
+        return COST_PREM_5
+    elif value <= LIMIT_PREM_10_BASE:
+        return COST_PREM_10_BASE
+    else:
+        # Premium 10+: base + $399 per $10k over $350,000
+        import math
+        overage = value - LIMIT_PREM_10_BASE
+        additional_increments = math.ceil(overage / 10000)
+        return COST_PREM_10_BASE + (COST_PREM_10_ADD * additional_increments)
+
 
 class PokemonPriceTrackerSync:
     def __init__(self):
@@ -227,6 +307,123 @@ class PokemonPriceTrackerSync:
 
         return conditions.get(condition_name, [])
 
+    def calculate_grading_potential(self, price_raw: Optional[float], psa9_data: Optional[Dict], psa10_data: Optional[Dict]) -> Dict:
+        """
+        Calculate the grading ROI potential for a card.
+
+        Rationale:
+        - We measure "Value Added": Does grading create value over selling raw?
+        - Safety Net: Check if user breaks even on PSA 9
+        - Upcharge Accuracy: Calculate fees based on final graded value
+        - Transparency: Store potential profit for both grades
+
+        Args:
+            price_raw: The raw card market price
+            psa9_data: PSA 9 graded data from eBay sales
+            psa10_data: PSA 10 graded data from eBay sales
+
+        Returns:
+            Dict with grading ROI fields
+        """
+        # Default result for cards without sufficient data
+        default_result = {
+            'grading_cost_basis_entry': None,
+            'grading_fee_entry': None,
+            'grading_fee_psa9': None,
+            'grading_fee_psa10': None,
+            'profit_at_psa9': None,
+            'profit_at_psa10': None,
+            'roi_psa10': None,
+            'upcharge_potential': False,
+            'grading_safety_tier': None
+        }
+
+        # Need raw price and at least one graded price to calculate
+        if not price_raw or price_raw <= 0:
+            return default_result
+
+        # Extract PSA 9 price (smartMarketPrice.price)
+        price_psa9 = None
+        if psa9_data and isinstance(psa9_data, dict):
+            smart_price = psa9_data.get('smartMarketPrice', {})
+            if isinstance(smart_price, dict):
+                price_psa9 = smart_price.get('price')
+
+        # Extract PSA 10 price (smartMarketPrice.price)
+        price_psa10 = None
+        if psa10_data and isinstance(psa10_data, dict):
+            smart_price = psa10_data.get('smartMarketPrice', {})
+            if isinstance(smart_price, dict):
+                price_psa10 = smart_price.get('price')
+
+        # Need at least one graded price
+        if not price_psa9 and not price_psa10:
+            return default_result
+
+        # Step A: Determine Entry Cost (based on raw price)
+        grading_fee_entry = get_grading_fee(price_raw)
+        grading_cost_basis_entry = grading_fee_entry + COST_SHIPPING
+
+        # Step B: PSA 9 Scenario (Safety Net)
+        grading_fee_psa9 = None
+        profit_at_psa9 = None
+        if price_psa9 and price_psa9 > 0:
+            # Fee is the higher of entry fee or fee for graded value
+            grading_fee_psa9 = max(grading_fee_entry, get_grading_fee(price_psa9))
+            total_cost_psa9 = grading_fee_psa9 + COST_SHIPPING + price_raw
+            profit_at_psa9 = round(price_psa9 - total_cost_psa9, 2)
+
+        # Step C: PSA 10 Scenario (Jackpot)
+        grading_fee_psa10 = None
+        profit_at_psa10 = None
+        roi_psa10 = None
+        if price_psa10 and price_psa10 > 0:
+            # Fee is the higher of entry fee or fee for graded value
+            grading_fee_psa10 = max(grading_fee_entry, get_grading_fee(price_psa10))
+            total_cost_psa10 = grading_fee_psa10 + COST_SHIPPING + price_raw
+            profit_at_psa10 = round(price_psa10 - total_cost_psa10, 2)
+            # ROI = (profit / investment) * 100
+            if total_cost_psa10 > 0:
+                roi_psa10 = round((profit_at_psa10 / total_cost_psa10) * 100, 2)
+
+        # Step D: Flags & Tiers
+        upcharge_potential = False
+        if grading_fee_psa9 and grading_fee_psa9 > grading_fee_entry:
+            upcharge_potential = True
+        if grading_fee_psa10 and grading_fee_psa10 > grading_fee_entry:
+            upcharge_potential = True
+
+        # Determine safety tier
+        grading_safety_tier = None
+        if profit_at_psa9 is not None:
+            if profit_at_psa9 >= 0:
+                # SAFE_BET: Profit even on a PSA 9
+                grading_safety_tier = 'SAFE_BET'
+            elif roi_psa10 is not None and roi_psa10 > 125:
+                # GAMBLE: Loss on 9 but >125% ROI on 10
+                grading_safety_tier = 'GAMBLE'
+            else:
+                # DO_NOT_GRADE: All other cases
+                grading_safety_tier = 'DO_NOT_GRADE'
+        elif profit_at_psa10 is not None:
+            # Only have PSA 10 data - use ROI threshold
+            if roi_psa10 is not None and roi_psa10 > 125:
+                grading_safety_tier = 'GAMBLE'
+            else:
+                grading_safety_tier = 'DO_NOT_GRADE'
+
+        return {
+            'grading_cost_basis_entry': round(grading_cost_basis_entry, 2) if grading_cost_basis_entry else None,
+            'grading_fee_entry': round(grading_fee_entry, 2) if grading_fee_entry else None,
+            'grading_fee_psa9': round(grading_fee_psa9, 2) if grading_fee_psa9 else None,
+            'grading_fee_psa10': round(grading_fee_psa10, 2) if grading_fee_psa10 else None,
+            'profit_at_psa9': profit_at_psa9,
+            'profit_at_psa10': profit_at_psa10,
+            'roi_psa10': roi_psa10,
+            'upcharge_potential': upcharge_potential,
+            'grading_safety_tier': grading_safety_tier
+        }
+
     def get_market_price_condition(self, prices: Dict) -> tuple[Optional[float], Optional[str]]:
         """
         Extract the market price and condition from the prices object.
@@ -299,6 +496,9 @@ class PokemonPriceTrackerSync:
         change_180d = self.calc_percent_change(primary_180d)
         change_365d = self.calc_percent_change(primary_history)
 
+        # Calculate grading ROI potential
+        grading_potential = self.calculate_grading_potential(market_price, psa9, psa10)
+
         # Note: For JSONB columns, pass Python dicts directly - Supabase handles serialization
         return {
             'pokemon_card_id': our_card_id,
@@ -322,7 +522,17 @@ class PokemonPriceTrackerSync:
             'raw_history_365d': raw_history_365d,
             'raw_history_variants_tracked': variants_tracked,
             'raw_history_conditions_tracked': conditions_tracked,
-            'last_updated': datetime.now(timezone.utc).isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat(),
+            # Grading ROI fields
+            'grading_cost_basis_entry': grading_potential['grading_cost_basis_entry'],
+            'grading_fee_entry': grading_potential['grading_fee_entry'],
+            'grading_fee_psa9': grading_potential['grading_fee_psa9'],
+            'grading_fee_psa10': grading_potential['grading_fee_psa10'],
+            'profit_at_psa9': grading_potential['profit_at_psa9'],
+            'profit_at_psa10': grading_potential['profit_at_psa10'],
+            'roi_psa10': grading_potential['roi_psa10'],
+            'upcharge_potential': grading_potential['upcharge_potential'],
+            'grading_safety_tier': grading_potential['grading_safety_tier']
         }
 
     def find_our_card_id(self, ppt_card: Dict, cards_by_tcgplayer_id: Dict) -> Optional[str]:
