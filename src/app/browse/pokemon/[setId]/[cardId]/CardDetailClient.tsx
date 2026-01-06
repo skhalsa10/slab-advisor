@@ -8,16 +8,19 @@ import { usePreserveFilters } from '@/hooks/useURLFilters'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import AddToCollectionModal from '@/components/collection/AddToCollectionModal'
-import { buildAvailableVariants, getVariantLabel } from '@/utils/variantUtils'
+import { buildAvailableVariants } from '@/utils/variantUtils'
+import { PriceWidget, PriceWidgetEmpty, PriceWidgetProvider, VariantSwatch, PriceHeadline } from '@/components/prices'
 import type { CardFull, SetWithCards } from '@/models/pokemon'
+import type { PokemonCardPrices } from '@/types/prices'
 
 interface CardDetailClientProps {
   card: CardFull
   set: SetWithCards
   setId: string
+  priceData?: PokemonCardPrices | null
 }
 
-export default function CardDetailClient({ card, set, setId }: CardDetailClientProps) {
+export default function CardDetailClient({ card, set, setId, priceData }: CardDetailClientProps) {
   const { user } = useAuth()
   const { buildHref } = usePreserveFilters()
   const [showCollectionModal, setShowCollectionModal] = useState(false)
@@ -60,25 +63,9 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
     setSuccessMessage(null)
   }
 
-  return (
+  // Content to render (used with or without provider)
+  const content = (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <div className="flex items-center space-x-2 text-sm">
-        <Link href="/explore" className="text-grey-600 hover:text-grey-900">
-          Explore
-        </Link>
-        <span className="text-grey-400">/</span>
-        <Link href="/browse/pokemon" className="text-grey-600 hover:text-grey-900">
-          Pokemon
-        </Link>
-        <span className="text-grey-400">/</span>
-        <Link href={buildHref(`/browse/pokemon/${setId}`)} className="text-grey-600 hover:text-grey-900">
-          {set.name}
-        </Link>
-        <span className="text-grey-400">/</span>
-        <span className="text-grey-900 font-medium">{card.name}</span>
-      </div>
-
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
@@ -116,35 +103,73 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
         </div>
       </div>
 
-      {/* Card Details */}
-      <div className="grid lg:grid-cols-2 gap-8">
-        {/* Card Image */}
-        <div className="space-y-4">
-          <div className="aspect-[2.5/3.5] relative rounded-lg overflow-hidden bg-grey-100 max-w-md mx-auto lg:mx-0">
-            <Image
-              src={getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)}
-              alt={card.name}
-              fill
-              className="object-contain"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority
-              onError={(e) => {
-                e.currentTarget.src = '/card-placeholder.svg'
-              }}
-            />
+      {/* Card Details - Finance Layout
+          Mobile: flex-col with order classes to reorder sections
+          Desktop: 35/65 grid split */}
+      <div className="flex flex-col lg:grid lg:grid-cols-[2fr_3fr] gap-6 lg:gap-8">
+
+        {/* SECTION 1: Card Image + Metadata - order-1 on mobile (top), left column on desktop */}
+        <div className="order-1 lg:order-none flex flex-col items-center lg:items-start gap-4">
+          <Image
+            src={getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)}
+            alt={card.name}
+            width={320}
+            height={448}
+            className="rounded-lg max-w-xs w-full h-auto"
+            sizes="(max-width: 1024px) 100vw, 320px"
+            priority
+            onError={(e) => {
+              e.currentTarget.src = '/card-placeholder.svg'
+            }}
+          />
+
+          {/* Card Specs - visible on desktop only (mobile shows at bottom) */}
+          <div className="hidden lg:block max-w-xs w-full border border-gray-100 rounded-lg bg-white divide-y divide-gray-100">
+            <div className="flex justify-between items-center px-3 py-2.5">
+              <span className="text-xs text-gray-400">Number</span>
+              <span className="text-sm font-medium text-gray-900">#{card.local_id}</span>
+            </div>
+            {card.rarity && (
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Rarity</span>
+                <span className="text-sm font-medium text-gray-900">{card.rarity}</span>
+              </div>
+            )}
+            {card.category && (
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Category</span>
+                <span className="text-sm font-medium text-gray-900">{card.category}</span>
+              </div>
+            )}
+            {card.illustrator && (
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Illustrator</span>
+                <span className="text-sm font-medium text-gray-900">{card.illustrator}</span>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Card Information */}
-        <div className="space-y-6">
+        {/* SECTION 2: Data Column - order-2 on mobile (after image), normal on desktop */}
+        <div className="order-2 lg:order-none space-y-5">
+          {/* 1. Title (compact) */}
           <div>
-            <h1 className="text-3xl font-bold text-grey-900">{card.name}</h1>
-            <p className="mt-2 text-lg text-grey-600">
-              {card.category} • {set.name}
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900">{card.name}</h1>
+            <p className="text-sm text-gray-500">{set.name}</p>
           </div>
 
-          {/* Success/Error Messages */}
+          {/* 2. Price Section - tightly coupled: Headline → Swatch → Chart */}
+          <div className="space-y-2">
+            {priceData && <PriceHeadline />}
+            {priceData && <VariantSwatch />}
+            {priceData ? (
+              <PriceWidget hideVariantSwatch hidePriceHeadline />
+            ) : (
+              <PriceWidgetEmpty />
+            )}
+          </div>
+
+          {/* 3. Success/Error Messages */}
           {successMessage && (
             <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
               {successMessage}
@@ -156,106 +181,113 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <button 
+          {/* 4. Action Rows - hidden on mobile (moved to sticky footer) */}
+          <div className="hidden lg:block space-y-2">
+            {/* Primary CTA */}
+            <button
               onClick={handleAddToCollectionClick}
-              className="w-full bg-orange-600 text-white py-3 px-4 rounded-md text-sm font-medium hover:bg-orange-700 transition-colors"
+              className="w-full bg-orange-600 text-white py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
             >
               {user ? 'Add to Collection' : 'Sign Up to Collect'}
             </button>
 
-            {/* Shop Links */}
-            <div className="space-y-3">
+            {/* Shop Links Row - TCG first, then eBay */}
+            <div className="flex items-center gap-2">
               {card.tcgplayer_product_id && (
                 <a
                   href={`https://www.tcgplayer.com/product/${card.tcgplayer_product_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center px-4 py-3 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  Shop on TCGPlayer
-                  <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
+                  TCGPlayer
                 </a>
               )}
-              
               <a
                 href={getEbaySearchUrl(`${card.name} ${card.local_id} ${set.name}`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full inline-flex items-center justify-center px-4 py-3 border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                Shop on eBay
-                <svg className="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
+                eBay
               </a>
-              
-              <p className="text-xs text-grey-500 text-center">Shopping links may contain affiliate links</p>
             </div>
           </div>
+        </div>
 
-          {/* Basic Info Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-grey-50 rounded-lg p-4">
-              <p className="text-sm text-grey-600 mb-1">Card Number</p>
-              <p className="text-lg font-semibold">#{card.local_id}</p>
+        {/* SECTION 3: Card Specs - mobile only (desktop shows in left column with image) */}
+        <div className="order-last lg:hidden flex justify-center">
+          <div className="max-w-xs w-full border border-gray-100 rounded-lg bg-white divide-y divide-gray-100">
+            <div className="flex justify-between items-center px-3 py-2.5">
+              <span className="text-xs text-gray-400">Number</span>
+              <span className="text-sm font-medium text-gray-900">#{card.local_id}</span>
             </div>
             {card.rarity && (
-              <div className="bg-grey-50 rounded-lg p-4">
-                <p className="text-sm text-grey-600 mb-1">Rarity</p>
-                <p className="text-lg font-semibold">{card.rarity}</p>
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Rarity</span>
+                <span className="text-sm font-medium text-gray-900">{card.rarity}</span>
               </div>
             )}
-          </div>
-
-          {/* Additional Card Info */}
-          <div className="space-y-4">
-            {/* Category */}
             {card.category && (
-              <div className="bg-grey-50 rounded-lg p-4">
-                <p className="text-sm text-grey-600 mb-1">Category</p>
-                <p className="font-semibold">{card.category}</p>
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Category</span>
+                <span className="text-sm font-medium text-gray-900">{card.category}</span>
               </div>
             )}
-
-            {/* Illustrator */}
             {card.illustrator && (
-              <div className="bg-grey-50 rounded-lg p-4">
-                <p className="text-sm text-grey-600 mb-1">Illustrator</p>
-                <p className="font-semibold">{card.illustrator}</p>
-              </div>
-            )}
-
-            {/* Variants */}
-            {availableVariants.length > 0 && (
-              <div className="bg-grey-50 rounded-lg p-4">
-                <p className="text-sm text-grey-600 mb-3">Available Variants</p>
-                <div className="flex flex-wrap gap-2">
-                  {availableVariants.map((variant) => {
-                    const label = getVariantLabel(variant)
-                    return (
-                      <span
-                        key={variant}
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                          variant.includes('normal') ? 'bg-blue-100 text-blue-800' :
-                          variant.includes('holo') ? 'bg-purple-100 text-purple-800' :
-                          variant.includes('reverse') ? 'bg-green-100 text-green-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {label}
-                      </span>
-                    )
-                  })}
-                </div>
+              <div className="flex justify-between items-center px-3 py-2.5">
+                <span className="text-xs text-gray-400">Illustrator</span>
+                <span className="text-sm font-medium text-gray-900">{card.illustrator}</span>
               </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Action Bar - fixed at bottom on mobile only */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-10 z-50">
+        <div className="flex items-center gap-2 max-w-lg mx-auto">
+          <button
+            onClick={handleAddToCollectionClick}
+            className="flex-1 bg-orange-600 text-white py-3 px-4 rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors"
+          >
+            {user ? 'Add to Collection' : 'Sign Up to Collect'}
+          </button>
+          {card.tcgplayer_product_id && (
+            <a
+              href={`https://www.tcgplayer.com/product/${card.tcgplayer_product_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+              title="Shop on TCGPlayer"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </a>
+          )}
+          <a
+            href={getEbaySearchUrl(`${card.name} ${card.local_id} ${set.name}`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+            title="Shop on eBay"
+          >
+            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      {/* Spacer for mobile sticky footer */}
+      <div className="lg:hidden h-20" />
 
       {/* Collection Modal */}
       <AddToCollectionModal
@@ -269,4 +301,16 @@ export default function CardDetailClient({ card, set, setId }: CardDetailClientP
       />
     </div>
   )
+
+  // Wrap in PriceWidgetProvider when we have price data
+  // This allows VariantSwatch and PriceWidget to share state
+  if (priceData) {
+    return (
+      <PriceWidgetProvider priceData={priceData}>
+        {content}
+      </PriceWidgetProvider>
+    )
+  }
+
+  return content
 }

@@ -15,6 +15,14 @@
  * import { PriceWidget } from '@/components/prices';
  *
  * <PriceWidget priceData={priceData} />
+ *
+ * // Distributed UI with shared context
+ * import { PriceWidgetProvider, VariantSwatch, PriceWidget } from '@/components/prices';
+ *
+ * <PriceWidgetProvider priceData={priceData}>
+ *   <VariantSwatch className="mt-2" />
+ *   <PriceWidget hideVariantSwatch />
+ * </PriceWidgetProvider>
  * ```
  */
 
@@ -22,3 +30,6 @@ export { PriceWidget } from './PriceWidget';
 export { PriceWidgetServer } from './PriceWidgetServer';
 export { PriceWidgetSkeleton } from './PriceWidgetSkeleton';
 export { PriceWidgetEmpty } from './PriceWidgetEmpty';
+export { PriceWidgetProvider, usePriceWidget, usePriceWidgetContext } from './PriceWidgetContext';
+export { VariantSwatch } from './VariantSwatch';
+export { PriceHeadline } from './PriceHeadline';

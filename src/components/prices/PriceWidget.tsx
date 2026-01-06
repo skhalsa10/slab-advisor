@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type {
-  PriceWidgetProps,
+  PokemonCardPrices,
   TimeRange,
   ViewMode,
   PsaGradeKey,
@@ -32,6 +32,18 @@ import {
   getDefaultGrade,
   gradeKeyToLabel,
 } from '@/utils/priceHistoryUtils';
+import { usePriceWidgetContext } from './PriceWidgetContext';
+
+interface PriceWidgetProps {
+  /** Price data - required when used standalone, optional when inside PriceWidgetProvider */
+  priceData?: PokemonCardPrices;
+  /** Additional CSS classes */
+  className?: string;
+  /** Hide the variant selector (use when VariantSwatch is placed elsewhere) */
+  hideVariantSwatch?: boolean;
+  /** Hide the price headline section (use when PriceHeadline is placed elsewhere) */
+  hidePriceHeadline?: boolean;
+}
 
 const TIME_RANGES: { value: TimeRange; label: string }[] = [
   { value: '7d', label: '7D' },
@@ -48,29 +60,60 @@ const PSA_GRADES: { value: PsaGradeKey; label: string }[] = [
 
 /**
  * Main PriceWidget client component with 3-zone layout.
- * Receives price data from server, handles all UI state internally.
+ *
+ * Can be used in two modes:
+ * 1. Standalone: Pass priceData prop, manages state internally
+ * 2. With Provider: Inside PriceWidgetProvider, shares state via context
  */
-export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
-  // UI State
-  const [viewMode, setViewMode] = useState<ViewMode>('Raw');
-  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
-  const [condition, setCondition] = useState(() => getDefaultCondition(priceData));
-  const [variant, setVariant] = useState(() => getDefaultVariant(priceData));
-  const [grade, setGrade] = useState<PsaGradeKey>(() => getDefaultGrade(priceData));
+export function PriceWidget({
+  priceData: priceDataProp,
+  className = '',
+  hideVariantSwatch = false,
+  hidePriceHeadline = false,
+}: PriceWidgetProps) {
+  // Try to get state from context (when inside PriceWidgetProvider)
+  const context = usePriceWidgetContext();
 
-  // Derived data
-  const hasRaw = hasRawHistory(priceData);
-  const hasGraded = hasGradedData(priceData);
+  // Local state for standalone mode (when no context)
+  const [localViewMode, setLocalViewMode] = useState<ViewMode>('Raw');
+  const [localTimeRange, setLocalTimeRange] = useState<TimeRange>('30d');
+  const [localCondition, setLocalCondition] = useState(() =>
+    priceDataProp ? getDefaultCondition(priceDataProp) : 'Near Mint'
+  );
+  const [localVariant, setLocalVariant] = useState(() =>
+    priceDataProp ? getDefaultVariant(priceDataProp) : 'Normal'
+  );
+  const [localGrade, setLocalGrade] = useState<PsaGradeKey>(() =>
+    priceDataProp ? getDefaultGrade(priceDataProp) : 'psa10'
+  );
+
+  // Use context values if available, otherwise use local state
+  const priceData = context?.priceData ?? priceDataProp;
+  const viewMode = context?.viewMode ?? localViewMode;
+  const setViewMode = context?.setViewMode ?? setLocalViewMode;
+  const timeRange = context?.timeRange ?? localTimeRange;
+  const setTimeRange = context?.setTimeRange ?? setLocalTimeRange;
+  const condition = context?.condition ?? localCondition;
+  const setCondition = context?.setCondition ?? setLocalCondition;
+  const variant = context?.variant ?? localVariant;
+  const setVariant = context?.setVariant ?? setLocalVariant;
+  const grade = context?.grade ?? localGrade;
+  const setGrade = context?.setGrade ?? setLocalGrade;
+
+  // Derived data - use context if available
+  const hasRaw = context?.hasRaw ?? (priceData ? hasRawHistory(priceData) : false);
+  const hasGraded = context?.hasGraded ?? (priceData ? hasGradedData(priceData) : false);
 
   // Get available options
-  const availableVariants = priceData.raw_history_variants_tracked || [];
-  const availableConditions = priceData.raw_history_conditions_tracked || [];
+  const availableVariants = context?.availableVariants ?? priceData?.raw_history_variants_tracked ?? [];
+  const availableConditions = context?.availableConditions ?? priceData?.raw_history_conditions_tracked ?? [];
   const availableGrades = PSA_GRADES.filter(
-    (g) => priceData[g.value] !== null
+    (g) => priceData?.[g.value] !== null
   );
 
   // Chart data based on current view mode
   const rawChartData: ChartDataPoint[] = useMemo(() => {
+    if (!priceData) return [];
     if (viewMode === 'Raw') {
       const history = getRawHistoryForTimeRange(priceData, timeRange);
       return transformRawHistoryToChartData(history, variant, condition);
@@ -87,6 +130,7 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
   // Recharts can't draw a line/area with only 1 point
   // For graded view, append today's smart market price so chart ends at displayed price
   const chartData: ChartDataPoint[] = useMemo(() => {
+    if (!priceData) return [];
     let data = rawChartData;
 
     // For graded view, add today's data point with smart market price
@@ -128,6 +172,7 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
 
   // Current price display - get the most recent price from chart data
   const currentPrice = useMemo(() => {
+    if (!priceData) return null;
     if (viewMode === 'Raw') {
       // Get the latest price from the chart data (most recent entry)
       // Only show price if we have data for the selected variant/condition
@@ -175,164 +220,177 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
     return indices.map((i) => chartData[i].date);
   }, [chartData]);
 
-  // PSA 10 potential (shown in footer when viewing Raw)
-  const psa10Potential = priceData.psa10?.smartMarketPrice?.price ?? priceData.psa10?.avgPrice ?? null;
-
   // Calculate total volume (sales count) for the current period
   const totalVolume = useMemo(() => {
     return chartData.reduce((sum, point) => sum + (point.volume ?? 0), 0);
   }, [chartData]);
 
+  // Early return if no price data available (after all hooks)
+  if (!priceData) {
+    return null;
+  }
+
   return (
     <div
-      className={`bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col ${className}`}
+      className={`flex flex-col ${className}`}
     >
       {/* ================================================================= */}
-      {/* ZONE 1: HEADER (Control Deck) */}
+      {/* ZONE 1: HEADER (Control Deck) - hidden when PriceHeadline used */}
       {/* ================================================================= */}
-      <div className="p-5 border-b border-gray-100">
-        {/* Top row: Label + Dropdown + Mode Toggle */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-              Market Value
-            </span>
+      {!hidePriceHeadline && (
+        <div className="p-5 border-b border-gray-100">
+          {/* Top row: Label + Dropdown + Mode Toggle */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                Market Value
+              </span>
 
-            {/* Condition/Grade Dropdown */}
-            {viewMode === 'Raw' ? (
-              availableConditions.length > 1 ? (
-                <select
-                  value={condition}
-                  onChange={(e) => setCondition(e.target.value)}
-                  className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
-                >
-                  {availableConditions.map((cond) => (
-                    <option key={cond} value={cond}>
-                      {cond}
-                    </option>
-                  ))}
-                </select>
+              {/* Condition/Grade Dropdown */}
+              {viewMode === 'Raw' ? (
+                availableConditions.length > 1 ? (
+                  <select
+                    value={condition}
+                    onChange={(e) => setCondition(e.target.value)}
+                    className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  >
+                    {availableConditions.map((cond) => (
+                      <option key={cond} value={cond}>
+                        {cond}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-sm text-gray-600">{condition}</span>
+                )
               ) : (
-                <span className="text-sm text-gray-600">{condition}</span>
-              )
-            ) : (
-              availableGrades.length > 1 ? (
-                <select
-                  value={grade}
-                  onChange={(e) => setGrade(e.target.value as PsaGradeKey)}
-                  className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                availableGrades.length > 1 ? (
+                  <select
+                    value={grade}
+                    onChange={(e) => setGrade(e.target.value as PsaGradeKey)}
+                    className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  >
+                    {availableGrades.map((g) => (
+                      <option key={g.value} value={g.value}>
+                        {g.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="text-sm text-gray-600">
+                    {gradeKeyToLabel(grade)}
+                  </span>
+                )
+              )}
+            </div>
+
+            {/* Mode Toggle (Raw/Graded) */}
+            {hasRaw && hasGraded && (
+              <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setViewMode('Raw')}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    viewMode === 'Raw'
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
                 >
-                  {availableGrades.map((g) => (
-                    <option key={g.value} value={g.value}>
-                      {g.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <span className="text-sm text-gray-600">
-                  {gradeKeyToLabel(grade)}
-                </span>
-              )
+                  Raw
+                </button>
+                <button
+                  onClick={() => setViewMode('Graded')}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                    viewMode === 'Graded'
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  Graded
+                </button>
+              </div>
             )}
           </div>
 
-          {/* Mode Toggle (Raw/Graded) */}
-          {hasRaw && hasGraded && (
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setViewMode('Raw')}
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                  viewMode === 'Raw'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                Raw
-              </button>
-              <button
-                onClick={() => setViewMode('Graded')}
-                className={`px-3 py-1.5 text-sm font-medium transition-colors ${
-                  viewMode === 'Graded'
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                Graded
-              </button>
+          {/* Variant selector (if multiple variants and not hidden) */}
+          {!hideVariantSwatch && viewMode === 'Raw' && availableVariants.length > 1 && (
+            <div className="flex gap-2 mb-3">
+              {availableVariants.map((v) => (
+                <button
+                  key={v}
+                  onClick={() => setVariant(v)}
+                  className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                    variant === v
+                      ? 'bg-gray-800 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {v}
+                </button>
+              ))}
             </div>
           )}
-        </div>
 
-        {/* Variant selector (if multiple variants) */}
-        {viewMode === 'Raw' && availableVariants.length > 1 && (
-          <div className="flex gap-2 mb-3">
-            {availableVariants.map((v) => (
-              <button
-                key={v}
-                onClick={() => setVariant(v)}
-                className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                  variant === v
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          {/* Hero row: Price + Trend Badge */}
+          <div className="flex items-baseline gap-3">
+            {currentPrice !== null ? (
+              <span className="text-3xl font-bold text-gray-900">
+                {formatCurrency(currentPrice)}
+              </span>
+            ) : (
+              <span className="text-xl font-medium text-gray-400">
+                No price available
+              </span>
+            )}
+            {priceChange !== null && (
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium ${
+                  changeDisplay.isPositive
+                    ? 'bg-green-100 text-green-700'
+                    : changeDisplay.isNegative
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-600'
                 }`}
               >
-                {v}
-              </button>
-            ))}
+                {changeDisplay.isPositive && (
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                )}
+                {changeDisplay.isNegative && (
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+                {changeDisplay.text}
+              </span>
+            )}
           </div>
-        )}
-
-        {/* Hero row: Price + Trend Badge */}
-        <div className="flex items-baseline gap-3">
-          {currentPrice !== null ? (
-            <span className="text-3xl font-bold text-gray-900">
-              {formatCurrency(currentPrice)}
-            </span>
-          ) : (
-            <span className="text-xl font-medium text-gray-400">
-              No price available
-            </span>
-          )}
-          {priceChange !== null && (
-            <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-medium ${
-                changeDisplay.isPositive
-                  ? 'bg-green-100 text-green-700'
-                  : changeDisplay.isNegative
-                  ? 'bg-red-100 text-red-700'
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              {changeDisplay.isPositive && (
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              )}
-              {changeDisplay.isNegative && (
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              )}
-              {changeDisplay.text}
-            </span>
-          )}
         </div>
-      </div>
+      )}
 
       {/* ================================================================= */}
       {/* ZONE 2: STAGE (Visualization) */}
       {/* ================================================================= */}
-      <div className="h-48 sm:h-64">
+      <div className={`h-48 sm:h-64 ${hidePriceHeadline ? 'rounded-t-2xl' : ''}`}>
         {chartData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={chartData}
-              margin={{ top: 20, right: 20, left: 0, bottom: 0 }}
+              margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
             >
               <defs>
-                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#f97316" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#f97316" stopOpacity={0.05} />
+                {/* Dynamic gradient based on price change sentiment */}
+                <linearGradient id="priceGradientUp" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="priceGradientDown" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="priceGradientNeutral" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -349,21 +407,22 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
                   (dataMin: number) => Math.floor(dataMin * 0.9),
                   (dataMax: number) => Math.ceil(dataMax * 1.1),
                 ]}
+                orientation="right"
                 axisLine={false}
                 tickLine={false}
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
+                tick={{ fontSize: 10, fill: '#9ca3af' }}
                 tickFormatter={(value) => formatCurrency(value, false)}
-                width={60}
-                tickMargin={4}
+                width={45}
+                tickCount={3}
               />
               <Tooltip
                 content={({ active, payload }) => {
                   if (!active || !payload || !payload.length) return null;
                   const data = payload[0].payload as ChartDataPoint;
                   return (
-                    <div className="bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg text-sm">
-                      <div className="font-medium">{formatCurrency(data.value)}</div>
-                      <div className="text-gray-400 text-xs">
+                    <div className="bg-gray-900 px-3 py-2 rounded-lg shadow-lg">
+                      <div className="text-white font-bold text-base">{formatCurrency(data.value)}</div>
+                      <div className="text-gray-400 text-xs mt-0.5">
                         {formatTooltipDate(data.date)}
                       </div>
                     </div>
@@ -373,13 +432,30 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
               <Area
                 type="natural"
                 dataKey="value"
-                stroke="#f97316"
+                stroke={
+                  priceChange !== null && priceChange > 0
+                    ? '#22c55e'
+                    : priceChange !== null && priceChange < 0
+                    ? '#ef4444'
+                    : '#6366f1'
+                }
                 strokeWidth={2}
-                fill="url(#priceGradient)"
+                fill={
+                  priceChange !== null && priceChange > 0
+                    ? 'url(#priceGradientUp)'
+                    : priceChange !== null && priceChange < 0
+                    ? 'url(#priceGradientDown)'
+                    : 'url(#priceGradientNeutral)'
+                }
                 dot={false}
                 activeDot={{
                   r: 4,
-                  fill: '#f97316',
+                  fill:
+                    priceChange !== null && priceChange > 0
+                      ? '#22c55e'
+                      : priceChange !== null && priceChange < 0
+                      ? '#ef4444'
+                      : '#6366f1',
                   stroke: '#fff',
                   strokeWidth: 2,
                 }}
@@ -396,7 +472,7 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
       {/* ================================================================= */}
       {/* ZONE 3: FOOTER (Context) */}
       {/* ================================================================= */}
-      <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
+      <div className="py-4 flex items-center justify-between">
         {/* Time range pills */}
         <div className="flex gap-1">
           {TIME_RANGES.map((range) => (
@@ -417,18 +493,6 @@ export function PriceWidget({ priceData, className = '' }: PriceWidgetProps) {
         {/* Right side info for Raw mode */}
         {viewMode === 'Raw' && (
           <div className="text-right">
-            {/* PSA 10 Potential (only for Near Mint) */}
-            {psa10Potential !== null && condition === 'Near Mint' && (
-              <>
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  PSA 10 Potential
-                </div>
-                <div className="text-lg font-semibold text-orange-600">
-                  {formatCurrency(psa10Potential)}
-                </div>
-              </>
-            )}
-            {/* Volume for all conditions */}
             <div className="text-xs text-gray-400">
               {totalVolume} {totalVolume === 1 ? 'sale' : 'sales'} this period
             </div>
