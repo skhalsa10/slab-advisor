@@ -65,7 +65,7 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
 
   // Content to render (used with or without provider)
   const content = (
-    <div className="space-y-6 bg-white lg:bg-transparent min-h-screen lg:min-h-0">
+    <div className="space-y-6 bg-white md:bg-transparent min-h-screen md:min-h-0">
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
@@ -105,11 +105,11 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
 
       {/* Card Details - Finance Layout
           Mobile: flex-col with order classes to reorder sections
-          Desktop: 35/65 grid split */}
-      <div className="flex flex-col lg:grid lg:grid-cols-[2fr_3fr] gap-6 lg:gap-8">
+          Tablet+Desktop: 35/65 grid split */}
+      <div className="flex flex-col md:grid md:grid-cols-[2fr_3fr] gap-6 md:gap-8">
 
-        {/* SECTION 1: Card Image + Metadata - order-1 on mobile (top), left column on desktop */}
-        <div className="order-1 lg:order-none flex flex-col items-center lg:items-start gap-4">
+        {/* SECTION 1: Card Image + Metadata - order-1 on mobile (top), left column on tablet/desktop */}
+        <div className="order-1 md:order-none flex flex-col items-center md:items-start gap-4">
           <Image
             src={getCardImageUrl(card.image, 'low', card.tcgplayer_image_url)}
             alt={card.name}
@@ -123,43 +123,45 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
             }}
           />
 
-          {/* Card Specs - visible on desktop only (mobile shows at bottom) */}
-          <div className="hidden lg:block max-w-xs w-full border border-gray-100 rounded-lg bg-white divide-y divide-gray-100">
-            <div className="flex justify-between items-center px-3 py-2.5">
-              <span className="text-xs text-gray-400">Number</span>
-              <span className="text-sm font-medium text-gray-900">#{card.local_id}</span>
+          {/* Card Specs - Tablet/Desktop: Technical Spec Sheet Grid */}
+          <div className="hidden md:block mt-6 border-t border-gray-100 pt-4 max-w-xs">
+            <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+              <div>
+                <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Card Number</dt>
+                <dd className="text-sm font-medium text-gray-900 leading-tight">#{card.local_id}</dd>
+              </div>
+              {card.category && (
+                <div>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Category</dt>
+                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.category}</dd>
+                </div>
+              )}
+              {card.rarity && (
+                <div>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Rarity</dt>
+                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.rarity}</dd>
+                </div>
+              )}
+              {card.illustrator && (
+                <div>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Illustrator</dt>
+                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.illustrator}</dd>
+                </div>
+              )}
             </div>
-            {card.rarity && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Rarity</span>
-                <span className="text-sm font-medium text-gray-900">{card.rarity}</span>
-              </div>
-            )}
-            {card.category && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Category</span>
-                <span className="text-sm font-medium text-gray-900">{card.category}</span>
-              </div>
-            )}
-            {card.illustrator && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Illustrator</span>
-                <span className="text-sm font-medium text-gray-900">{card.illustrator}</span>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* SECTION 2: Data Column - order-2 on mobile (after image), normal on desktop */}
-        <div className="order-2 lg:order-none space-y-5">
+        {/* SECTION 2: Data Column - order-2 on mobile (after image), normal on tablet/desktop */}
+        <div className="order-2 md:order-none space-y-5">
           {/* 1. Title (compact) */}
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{card.name}</h1>
             <p className="text-sm text-gray-500">{set.name}</p>
           </div>
 
-          {/* Mobile: Scrollable metadata pills - directly under title */}
-          <div className="lg:hidden relative -mx-6">
+          {/* Mobile-only: Scrollable metadata pills (tablet/desktop show in left column) */}
+          <div className="md:hidden relative -mx-6">
             <div className="flex gap-2 overflow-x-auto px-6 pb-2">
               <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
                 <span className="text-grey-500 mr-1">Number:</span>
@@ -214,8 +216,8 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
             </div>
           )}
 
-          {/* 4. Action Rows - hidden on mobile (moved to sticky footer) */}
-          <div className="hidden lg:block space-y-2">
+          {/* 4. Action Rows - hidden on mobile (moved to sticky footer), visible on tablet+ */}
+          <div className="hidden md:block space-y-2">
             {/* Primary CTA */}
             <button
               onClick={handleAddToCollectionClick}
@@ -256,8 +258,8 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
 
       </div>
 
-      {/* Mobile Sticky Action Bar - fixed at bottom on mobile only */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-10 z-50">
+      {/* Mobile Sticky Action Bar - fixed at bottom on mobile only, hidden on tablet+ */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-10 z-50">
         {/* Extended white background to cover any gaps below */}
         <div className="absolute left-0 right-0 top-full h-20 bg-white" />
         <div className="flex items-center gap-2 max-w-lg mx-auto">
@@ -295,7 +297,7 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
       </div>
 
       {/* Spacer for mobile sticky footer */}
-      <div className="lg:hidden h-28" />
+      <div className="md:hidden h-28" />
 
       {/* Collection Modal */}
       <AddToCollectionModal
