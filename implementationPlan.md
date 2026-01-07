@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 1, 2026
+**Last Updated:** January 6, 2026
 
 ### Project Completion: ~80%
 
@@ -614,7 +614,7 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 ---
 
 #### 8. Card Detail Page Completion ⚠️ IN PROGRESS
-**Status:** 🟡 90% Complete
+**Status:** 🟡 95% Complete
 **Priority:** 🟡 Medium
 **Estimated Effort:** 1-2 days
 
@@ -629,6 +629,13 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 - ✅ **Market trend indicators** - Percent change calculated on-the-fly from chart data
 - ✅ **Volume display** - Shows sales count for selected period
 - ✅ **Confidence indicators** - For graded prices
+- ✅ **PriceHeadline responsiveness** - Percent change badge wraps when space is tight
+- ✅ **Chart stability** - Added debounce to ResponsiveContainer to prevent infinite re-renders
+- ✅ **Tablet-optimized layout** - Split view kicks in at md: breakpoint (768px)
+- ✅ **Technical spec sheet grid** - 2-column metadata grid under image (tablet/desktop)
+- ✅ **Mobile scrollable pills** - Horizontal scroll metadata under title (mobile only)
+- ✅ **Responsive sticky footer** - Hidden on tablet+, shows inline action buttons instead
+- ✅ **Background gap fix** - Extended white div prevents grey background showing below sticky footer
 
 **What's Missing:**
 - ❌ Grading information display (when implemented)
@@ -1420,5 +1427,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 3, 2026
-**Document Version:** 2.5 (Grading ROI Engine Implemented)
+**Last Updated:** January 6, 2026
+**Document Version:** 2.6 (Card Detail Tablet Responsive Layout)
