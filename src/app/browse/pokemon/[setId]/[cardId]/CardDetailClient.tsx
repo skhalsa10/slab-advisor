@@ -158,6 +158,39 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
             <p className="text-sm text-gray-500">{set.name}</p>
           </div>
 
+          {/* Mobile: Scrollable metadata pills - directly under title */}
+          <div className="lg:hidden relative -mx-6">
+            <div className="flex gap-2 overflow-x-auto px-6 pb-2">
+              <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
+                <span className="text-grey-500 mr-1">Number:</span>
+                <span className="font-medium">#{card.local_id}</span>
+              </span>
+              {card.rarity && (
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
+                  <span className="text-grey-500 mr-1">Rarity:</span>
+                  <span className="font-medium">{card.rarity}</span>
+                </span>
+              )}
+              {card.category && (
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
+                  <span className="text-grey-500 mr-1">Category:</span>
+                  <span className="font-medium">{card.category}</span>
+                </span>
+              )}
+              {card.illustrator && (
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
+                  <span className="text-grey-500 mr-1">Illustrator:</span>
+                  <span className="font-medium">{card.illustrator}</span>
+                </span>
+              )}
+            </div>
+            {/* Right gradient fade indicator */}
+            <div
+              className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none"
+              aria-hidden="true"
+            />
+          </div>
+
           {/* 2. Price Section - tightly coupled: Headline → Swatch → Chart */}
           <div className="space-y-2">
             {priceData && <PriceHeadline />}
@@ -221,33 +254,6 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
           </div>
         </div>
 
-        {/* SECTION 3: Card Specs - mobile only (desktop shows in left column with image) */}
-        <div className="order-last lg:hidden flex justify-center">
-          <div className="max-w-xs w-full border border-gray-100 rounded-lg bg-white divide-y divide-gray-100">
-            <div className="flex justify-between items-center px-3 py-2.5">
-              <span className="text-xs text-gray-400">Number</span>
-              <span className="text-sm font-medium text-gray-900">#{card.local_id}</span>
-            </div>
-            {card.rarity && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Rarity</span>
-                <span className="text-sm font-medium text-gray-900">{card.rarity}</span>
-              </div>
-            )}
-            {card.category && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Category</span>
-                <span className="text-sm font-medium text-gray-900">{card.category}</span>
-              </div>
-            )}
-            {card.illustrator && (
-              <div className="flex justify-between items-center px-3 py-2.5">
-                <span className="text-xs text-gray-400">Illustrator</span>
-                <span className="text-sm font-medium text-gray-900">{card.illustrator}</span>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Mobile Sticky Action Bar - fixed at bottom on mobile only */}
@@ -287,7 +293,7 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
       </div>
 
       {/* Spacer for mobile sticky footer */}
-      <div className="lg:hidden h-20" />
+      <div className="lg:hidden h-28" />
 
       {/* Collection Modal */}
       <AddToCollectionModal
