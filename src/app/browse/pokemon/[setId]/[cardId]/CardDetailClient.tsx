@@ -65,7 +65,7 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
 
   // Content to render (used with or without provider)
   const content = (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white lg:bg-transparent min-h-screen lg:min-h-0">
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
@@ -258,6 +258,8 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
 
       {/* Mobile Sticky Action Bar - fixed at bottom on mobile only */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-10 z-50">
+        {/* Extended white background to cover any gaps below */}
+        <div className="absolute left-0 right-0 top-full h-20 bg-white" />
         <div className="flex items-center gap-2 max-w-lg mx-auto">
           <button
             onClick={handleAddToCollectionClick}
