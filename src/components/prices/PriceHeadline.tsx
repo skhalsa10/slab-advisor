@@ -43,9 +43,9 @@ export function PriceHeadline({ className = '' }: PriceHeadlineProps) {
   return (
     <div className={`space-y-3 ${className}`}>
       {/* ROW 1: Hero price + trend badge | Raw/Graded toggle */}
-      <div className="flex items-center justify-between gap-4">
-        {/* Left: Price + Trend */}
-        <div className="flex items-baseline gap-2">
+      <div className="flex items-start justify-between gap-4">
+        {/* Left: Price + Trend - wraps when needed */}
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 min-w-0">
           {currentPrice !== null ? (
             <span className="text-4xl font-extrabold text-gray-900">
               {formatCurrency(currentPrice)}
@@ -82,7 +82,7 @@ export function PriceHeadline({ className = '' }: PriceHeadlineProps) {
 
         {/* Right: Raw/Graded Toggle */}
         {hasRaw && hasGraded && (
-          <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1 flex-shrink-0">
             <button
               onClick={() => setViewMode('Raw')}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${

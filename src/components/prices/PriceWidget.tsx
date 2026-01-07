@@ -373,7 +373,7 @@ export function PriceWidget({
       {/* ================================================================= */}
       <div className={`h-48 sm:h-64 ${hidePriceHeadline ? 'rounded-t-2xl' : ''}`}>
         {chartData.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" debounce={50}>
             <AreaChart
               data={chartData}
               margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
