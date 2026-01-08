@@ -8,7 +8,7 @@
  */
 
 import { getAuthenticatedSupabaseClient } from './supabase-server'
-import { type CollectionCard } from '@/types/database'
+import { type CollectionCard, type DashboardStats } from '@/types/database'
 
 /**
  * Gets the authenticated user's collection cards from server-side context
@@ -124,5 +124,54 @@ export async function getSetOwnershipStats(setId: string): Promise<{ ownedCount:
   } catch (error) {
     console.error('Error in getSetOwnershipStats:', error)
     return { ownedCount: 0 }
+  }
+}
+
+/**
+ * Gets dashboard statistics for the authenticated user
+ *
+ * Returns aggregated stats including total cards, estimated value,
+ * and cards analyzed. Uses efficient PostgreSQL functions for server-side computation.
+ *
+ * @returns Promise containing dashboard stats
+ * @throws {Error} When user is not authenticated or query fails
+ *
+ * @example
+ * ```typescript
+ * export default async function DashboardPage() {
+ *   const stats = await getDashboardStats()
+ *   return <DashboardStats stats={stats} />
+ * }
+ * ```
+ */
+export async function getDashboardStats(): Promise<DashboardStats> {
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Call PostgreSQL function for server-side SUM
+    const { data: totalCards, error } = await supabase.rpc('get_user_total_cards', {
+      p_user_id: user.id
+    })
+
+    if (error) {
+      console.error('Error fetching total cards:', error)
+      throw new Error('Failed to load dashboard stats')
+    }
+
+    return {
+      totalCards: totalCards ?? 0,
+      estimatedValue: null,  // TODO: Implement in future
+      cardsAnalyzed: null    // TODO: Implement in future
+    }
+
+  } catch (error) {
+    console.error('Error in getDashboardStats:', error)
+    throw error instanceof Error ? error : new Error('Failed to load dashboard stats')
   }
 }

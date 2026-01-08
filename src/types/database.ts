@@ -41,3 +41,18 @@ export type CollectionCardUpdate = Database['public']['Tables']['collection_card
 export type UserCreditsInsert = Database['public']['Tables']['user_credits']['Insert']
 export type UserCreditsUpdate = Database['public']['Tables']['user_credits']['Update']
 
+/**
+ * Dashboard Statistics
+ *
+ * Aggregated stats for the user dashboard, computed server-side.
+ * All values are calculated via PostgreSQL functions for efficiency.
+ */
+export interface DashboardStats {
+  /** Total number of cards in user's collection (sum of quantities) */
+  totalCards: number
+  /** Estimated total value of collection in USD (null = not yet implemented) */
+  estimatedValue: number | null
+  /** Number of cards that have been analyzed/graded (null = not yet implemented) */
+  cardsAnalyzed: number | null
+}
+
