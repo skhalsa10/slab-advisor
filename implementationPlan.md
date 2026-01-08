@@ -744,6 +744,20 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 **Areas to Polish:**
 
+**Code Cleanup / Tech Debt:**
+- ❌ Remove unused `manual_` columns from `collection_cards` table OR implement manual card entry UI
+  - Columns: `manual_card_name`, `manual_set_name`, `manual_card_number`, `manual_rarity`, `manual_series`, `manual_year`
+  - Backend API supports `mode: 'manual-entry'` but NO UI exists to use it
+  - All UI forms hardcode `mode: 'known-card'`
+  - Decision: Either implement manual entry form OR remove columns + API code
+  - Files to clean up if removing:
+    - `src/app/api/collection/cards/route.ts` (remove manual-entry mode)
+    - `src/utils/collectionCardUtils.ts` (remove fallback logic)
+    - `src/app/(authenticated)/collection/CollectionClient.tsx` (remove fallback display)
+    - `sql/collection/001_create_tables.sql` (remove columns)
+    - `sql/collection/002_create_indexes.sql` (remove index)
+    - Database migration to drop columns
+
 **Search & Filtering:**
 - ❌ Collection search by card name
 - ❌ Filter by category, grade, price range
