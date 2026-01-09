@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      collection_card_gradings: {
+        Row: {
+          back_annotated_exact_url: string | null
+          back_annotated_full_url: string | null
+          back_centering_lr: string | null
+          back_centering_tb: string | null
+          back_grade_final: number | null
+          collection_card_id: string
+          condition: string | null
+          created_at: string | null
+          front_annotated_exact_url: string | null
+          front_annotated_full_url: string | null
+          front_centering_lr: string | null
+          front_centering_tb: string | null
+          front_grade_final: number | null
+          grade_centering: number | null
+          grade_corners: number | null
+          grade_edges: number | null
+          grade_final: number | null
+          grade_surface: number | null
+          id: string
+          raw_response: Json
+          user_id: string
+        }
+        Insert: {
+          back_annotated_exact_url?: string | null
+          back_annotated_full_url?: string | null
+          back_centering_lr?: string | null
+          back_centering_tb?: string | null
+          back_grade_final?: number | null
+          collection_card_id: string
+          condition?: string | null
+          created_at?: string | null
+          front_annotated_exact_url?: string | null
+          front_annotated_full_url?: string | null
+          front_centering_lr?: string | null
+          front_centering_tb?: string | null
+          front_grade_final?: number | null
+          grade_centering?: number | null
+          grade_corners?: number | null
+          grade_edges?: number | null
+          grade_final?: number | null
+          grade_surface?: number | null
+          id?: string
+          raw_response: Json
+          user_id: string
+        }
+        Update: {
+          back_annotated_exact_url?: string | null
+          back_annotated_full_url?: string | null
+          back_centering_lr?: string | null
+          back_centering_tb?: string | null
+          back_grade_final?: number | null
+          collection_card_id?: string
+          condition?: string | null
+          created_at?: string | null
+          front_annotated_exact_url?: string | null
+          front_annotated_full_url?: string | null
+          front_centering_lr?: string | null
+          front_centering_tb?: string | null
+          front_grade_final?: number | null
+          grade_centering?: number | null
+          grade_corners?: number | null
+          grade_edges?: number | null
+          grade_final?: number | null
+          grade_surface?: number | null
+          id?: string
+          raw_response?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_card_gradings_collection_card_id_fkey"
+            columns: ["collection_card_id"]
+            isOneToOne: false
+            referencedRelation: "collection_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collection_cards: {
         Row: {
           acquisition_date: string | null
@@ -111,10 +191,17 @@ export type Database = {
           current_market_price: number | null
           current_market_price_condition: string | null
           ebay_price_history: Json | null
+          grading_cost_basis_entry: number | null
+          grading_fee_entry: number | null
+          grading_fee_psa10: number | null
+          grading_fee_psa9: number | null
+          grading_safety_tier: string | null
           id: string
           last_updated: string | null
           pokemon_card_id: string
           prices_raw: Json | null
+          profit_at_psa10: number | null
+          profit_at_psa9: number | null
           psa10: Json | null
           psa8: Json | null
           psa9: Json | null
@@ -125,7 +212,9 @@ export type Database = {
           raw_history_90d: Json | null
           raw_history_conditions_tracked: string[] | null
           raw_history_variants_tracked: string[] | null
+          roi_psa10: number | null
           tcgplayer_product_id: number | null
+          upcharge_potential: boolean | null
         }
         Insert: {
           change_180d_percent?: number | null
@@ -137,10 +226,17 @@ export type Database = {
           current_market_price?: number | null
           current_market_price_condition?: string | null
           ebay_price_history?: Json | null
+          grading_cost_basis_entry?: number | null
+          grading_fee_entry?: number | null
+          grading_fee_psa10?: number | null
+          grading_fee_psa9?: number | null
+          grading_safety_tier?: string | null
           id?: string
           last_updated?: string | null
           pokemon_card_id: string
           prices_raw?: Json | null
+          profit_at_psa10?: number | null
+          profit_at_psa9?: number | null
           psa10?: Json | null
           psa8?: Json | null
           psa9?: Json | null
@@ -151,7 +247,9 @@ export type Database = {
           raw_history_90d?: Json | null
           raw_history_conditions_tracked?: string[] | null
           raw_history_variants_tracked?: string[] | null
+          roi_psa10?: number | null
           tcgplayer_product_id?: number | null
+          upcharge_potential?: boolean | null
         }
         Update: {
           change_180d_percent?: number | null
@@ -163,10 +261,17 @@ export type Database = {
           current_market_price?: number | null
           current_market_price_condition?: string | null
           ebay_price_history?: Json | null
+          grading_cost_basis_entry?: number | null
+          grading_fee_entry?: number | null
+          grading_fee_psa10?: number | null
+          grading_fee_psa9?: number | null
+          grading_safety_tier?: string | null
           id?: string
           last_updated?: string | null
           pokemon_card_id?: string
           prices_raw?: Json | null
+          profit_at_psa10?: number | null
+          profit_at_psa9?: number | null
           psa10?: Json | null
           psa8?: Json | null
           psa9?: Json | null
@@ -177,7 +282,9 @@ export type Database = {
           raw_history_90d?: Json | null
           raw_history_conditions_tracked?: string[] | null
           raw_history_variants_tracked?: string[] | null
+          roi_psa10?: number | null
           tcgplayer_product_id?: number | null
+          upcharge_potential?: boolean | null
         }
         Relationships: [
           {
@@ -519,6 +626,7 @@ export type Database = {
       deduct_user_credit: { Args: { p_user_id: string }; Returns: Json }
       get_set_tcgplayer_groups: { Args: { set_id: string }; Returns: Json }
       get_user_credit_details: { Args: { p_user_id: string }; Returns: Json }
+      get_user_total_cards: { Args: { p_user_id: string }; Returns: number }
       reset_monthly_free_credits: {
         Args: never
         Returns: {

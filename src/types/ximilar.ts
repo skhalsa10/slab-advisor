@@ -208,4 +208,79 @@ export type Grades = {
 
 export type Statistics = {
   "processing time": number;
+  time_stats?: Record<string, number>;
+};
+
+// ============================================
+// Card Grading API Types (card-grader/v2/grade)
+// ============================================
+
+/**
+ * Request body for Ximilar card grading API
+ * Supports both URL and base64 encoded images
+ */
+export type XimilarGradingRequest = {
+  records: Array<{ _url: string } | { _base64: string }>;
+};
+
+/**
+ * Full response from Ximilar card grading API
+ * Contains individual records for front/back + combined grades
+ */
+export type XimilarGradingResponse = {
+  records: XimilarGradingRecord[];
+  grades: Grades;  // Combined grades for both front and back
+  status: Status;
+  statistics: Statistics;
+};
+
+/**
+ * Individual card record in grading response (one per image - front/back)
+ */
+export type XimilarGradingRecord = {
+  _url?: string;
+  _base64?: string;
+  _status: Status;
+  _id: string;
+  _width: number;
+  _height: number;
+  _objects: ObjectItem[];
+  _points: [number, number][];
+  corners: CornerItem[];
+  edges: EdgeItem[];
+  card: GradedCardItem[];
+  grades: Grades;
+  versions: Versions;
+  _full_url_card: string;   // Annotated image with all grades visualized
+  _exact_url_card: string;  // Cropped/corrected card image with annotations
+};
+
+/**
+ * Extracted grading data for database storage
+ * Flattened structure for easier querying
+ */
+export type ExtractedGradingData = {
+  // Combined grades
+  grade_corners: number;
+  grade_edges: number;
+  grade_surface: number;
+  grade_centering: number;
+  grade_final: number;
+  condition: string;
+
+  // Front side
+  front_grade_final: number;
+  front_centering_lr: string;
+  front_centering_tb: string;
+
+  // Back side
+  back_grade_final: number;
+  back_centering_lr: string;
+  back_centering_tb: string;
+
+  // Annotated image URLs (temporary - need to download and store)
+  front_full_url_card: string;
+  front_exact_url_card: string;
+  back_full_url_card: string;
+  back_exact_url_card: string;
 };

@@ -42,6 +42,16 @@ export type UserCreditsInsert = Database['public']['Tables']['user_credits']['In
 export type UserCreditsUpdate = Database['public']['Tables']['user_credits']['Update']
 
 /**
+ * Collection Card Gradings - Card grading results from Ximilar API
+ *
+ * References the auto-generated database type.
+ * Stores grading data including front/back analysis and combined grades.
+ */
+export type CollectionCardGrading = Database['public']['Tables']['collection_card_gradings']['Row']
+export type CollectionCardGradingInsert = Database['public']['Tables']['collection_card_gradings']['Insert']
+export type CollectionCardGradingUpdate = Database['public']['Tables']['collection_card_gradings']['Update']
+
+/**
  * Dashboard Statistics
  *
  * Aggregated stats for the user dashboard, computed server-side.

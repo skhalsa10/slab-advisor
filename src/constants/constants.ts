@@ -5,6 +5,7 @@
 // Credit costs for different operations
 export const CREDIT_COSTS = {
   CARD_ANALYSIS: 1,
+  CARD_GRADING: 1,
   BULK_ANALYSIS: 5,
 } as const
 
@@ -29,5 +30,10 @@ export const HTTP_STATUS = {
   PAYMENT_REQUIRED: 402,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
+} as const
+
+// Storage bucket names
+export const STORAGE_BUCKETS = {
+  COLLECTION_CARD_IMAGES: 'collection-card-images',
 } as const
 
