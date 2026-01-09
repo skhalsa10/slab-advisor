@@ -105,12 +105,22 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       )
     }
 
-    // Check user has sufficient credits
-    const creditCheck = await checkUserCredits(supabase, user.id, CREDIT_COSTS.CARD_GRADING)
-    if (!creditCheck.hasCredits) {
+    // Deduct credit FIRST to prevent race conditions
+    // This is atomic - if user doesn't have credits, it will fail
+    const deductResult = await deductUserCredits(supabase, user.id)
+    if (!deductResult.success) {
+      // Check if it's insufficient credits vs other error
+      const creditCheck = await checkUserCredits(supabase, user.id, CREDIT_COSTS.CARD_GRADING)
+      if (!creditCheck.hasCredits) {
+        return NextResponse.json(
+          { success: false, error: 'Insufficient credits for grading' },
+          { status: HTTP_STATUS.PAYMENT_REQUIRED }
+        )
+      }
+      // Other deduction error
       return NextResponse.json(
-        { success: false, error: 'Insufficient credits for grading' },
-        { status: HTTP_STATUS.PAYMENT_REQUIRED }
+        { success: false, error: 'Failed to process credits. Please try again.' },
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
       )
     }
 
@@ -246,12 +256,7 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       // Don't fail the request for this
     }
 
-    // Deduct credit
-    const deductResult = await deductUserCredits(supabase, user.id)
-    if (!deductResult.success) {
-      console.warn('Failed to deduct credit:', deductResult.error)
-      // Don't fail the request - grading is already done
-    }
+    // Credit was already deducted at the start of the request
 
     return NextResponse.json({
       success: true,

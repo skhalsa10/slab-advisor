@@ -68,16 +68,37 @@ export async function POST(request: Request): Promise<NextResponse<UploadImageRe
       )
     }
 
-    // Validate image format (basic check)
-    const isValidBase64 =
-      body.image.includes('base64,') ||
-      /^[A-Za-z0-9+/=]+$/.test(body.image.substring(0, 100))
+    // Validate image format
+    // Check for data URI format first (e.g., "data:image/jpeg;base64,/9j/4AAQ...")
+    const dataUriMatch = body.image.match(/^data:([^;]+);base64,(.+)$/)
 
-    if (!isValidBase64) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid image format. Expected base64 encoded image.' },
-        { status: HTTP_STATUS.BAD_REQUEST }
-      )
+    if (dataUriMatch) {
+      // Validate the MIME type in the data URI
+      const mimeType = dataUriMatch[1]
+      const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validMimeTypes.includes(mimeType)) {
+        return NextResponse.json(
+          { success: false, error: `Invalid image type: ${mimeType}. Allowed: JPEG, PNG, WebP` },
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
+
+      // Validate the base64 portion is well-formed (check full string, not just first 100 chars)
+      const base64Portion = dataUriMatch[2]
+      if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64Portion)) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid base64 encoding in image data' },
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
+    } else {
+      // Raw base64 without data URI prefix - validate entire string
+      if (!/^[A-Za-z0-9+/]*={0,2}$/.test(body.image)) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid image format. Expected base64 encoded image.' },
+          { status: HTTP_STATUS.BAD_REQUEST }
+        )
+      }
     }
 
     // Verify user owns the collection card

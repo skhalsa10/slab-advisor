@@ -168,6 +168,22 @@ export async function downloadAndStoreImage(
   const supabase = getServerSupabaseClient()
 
   try {
+    // SSRF Protection: Only allow downloads from trusted Ximilar domains
+    const url = new URL(sourceUrl)
+    const allowedDomains = ['.ximilar.com', 'ximilar.com']
+    const isAllowedDomain = allowedDomains.some(
+      (domain) => url.hostname === domain || url.hostname.endsWith(domain)
+    )
+
+    if (!isAllowedDomain) {
+      return { path: '', error: 'Invalid image source: only Ximilar URLs are allowed' }
+    }
+
+    // Ensure HTTPS only
+    if (url.protocol !== 'https:') {
+      return { path: '', error: 'Invalid image source: HTTPS required' }
+    }
+
     // Download the external image
     const response = await fetch(sourceUrl)
 
