@@ -9,6 +9,12 @@ interface CameraCaptureProps {
   onGallerySelect?: () => void
   onSearchByText?: () => void
   isProcessing?: boolean
+  /** Custom header title (default: "Scan Card") */
+  title?: string
+  /** Custom instruction text (default: "Align card within the frame") */
+  instructionText?: string
+  /** Hide the "or search by text" link (default: false) */
+  hideSearchByText?: boolean
 }
 
 /**
@@ -22,7 +28,10 @@ export default function CameraCapture({
   onClose,
   onGallerySelect,
   onSearchByText,
-  isProcessing = false
+  isProcessing = false,
+  title = 'Scan Card',
+  instructionText = 'Align card within the frame',
+  hideSearchByText = false,
 }: CameraCaptureProps) {
   const {
     videoRef,
@@ -104,7 +113,7 @@ export default function CameraCapture({
           </svg>
         </button>
 
-        <span className="text-white font-medium">Scan Card</span>
+        <span className="text-white font-medium">{title}</span>
 
         <button
           onClick={switchCamera}
@@ -154,7 +163,7 @@ export default function CameraCapture({
           {/* Instruction text */}
           <div className="absolute bottom-44 left-0 right-0 text-center">
             <p className="text-white text-sm font-medium drop-shadow-lg">
-              Align card within the frame
+              {instructionText}
             </p>
           </div>
         </div>
@@ -230,13 +239,15 @@ export default function CameraCapture({
           </div>
 
           {/* Search by text link */}
-          <button
-            onClick={onSearchByText}
-            disabled={isProcessing}
-            className="mt-4 text-white/80 hover:text-white text-sm transition-colors disabled:opacity-50"
-          >
-            or search by text
-          </button>
+          {!hideSearchByText && (
+            <button
+              onClick={onSearchByText}
+              disabled={isProcessing}
+              className="mt-4 text-white/80 hover:text-white text-sm transition-colors disabled:opacity-50"
+            >
+              or search by text
+            </button>
+          )}
         </div>
       </div>
     </div>

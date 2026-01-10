@@ -7,7 +7,7 @@ import {
   extractGradingData,
   validateGradingResponse,
 } from '@/lib/ximilar-grading-service'
-import { checkUserCredits, deductUserCredits } from '@/utils/credits'
+import { checkUserCredits, deductUserCredits, refundUserCredit } from '@/utils/credits'
 import { HTTP_STATUS, CREDIT_COSTS } from '@/constants/constants'
 import type { CollectionCardGradingInsert } from '@/types/database'
 import type { XimilarGradingResponse } from '@/types/ximilar'
@@ -124,20 +124,37 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       )
     }
 
+    // Helper function to refund credit and return error response
+    const refundAndReturnError = async (
+      errorMessage: string,
+      status: number
+    ): Promise<NextResponse<GradeCardResponse>> => {
+      console.error('Grading failed, refunding credit:', errorMessage)
+      const refundResult = await refundUserCredit(supabase, user.id)
+      if (!refundResult.success) {
+        console.error('Failed to refund credit:', refundResult.error)
+        // Still return the original error, but log the refund failure
+      }
+      return NextResponse.json(
+        { success: false, error: errorMessage },
+        { status }
+      )
+    }
+
     // Download images from storage and convert to base64
     const { base64: frontBase64, error: frontError } = await getImageAsBase64(card.front_image_url)
     if (frontError) {
-      return NextResponse.json(
-        { success: false, error: `Failed to load front image: ${frontError}` },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      return refundAndReturnError(
+        `Failed to load front image: ${frontError}`,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
       )
     }
 
     const { base64: backBase64, error: backError } = await getImageAsBase64(card.back_image_url)
     if (backError) {
-      return NextResponse.json(
-        { success: false, error: `Failed to load back image: ${backError}` },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      return refundAndReturnError(
+        `Failed to load back image: ${backError}`,
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
       )
     }
 
@@ -147,18 +164,15 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       gradingResponse = await gradeCard(frontBase64, backBase64)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Grading service error'
-      return NextResponse.json(
-        { success: false, error: message },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
-      )
+      return refundAndReturnError(message, HTTP_STATUS.INTERNAL_SERVER_ERROR)
     }
 
     // Validate the response
     const validation = validateGradingResponse(gradingResponse)
     if (!validation.isValid) {
-      return NextResponse.json(
-        { success: false, error: validation.error },
-        { status: HTTP_STATUS.BAD_REQUEST }
+      return refundAndReturnError(
+        validation.error || 'Invalid grading response',
+        HTTP_STATUS.BAD_REQUEST
       )
     }
 
@@ -208,6 +222,17 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       console.warn('Failed to store back exact annotated image:', backExactResult.error)
     }
 
+    // Delete any existing grading records for this card (we only keep the latest)
+    const { error: deleteError } = await supabase
+      .from('collection_card_gradings')
+      .delete()
+      .eq('collection_card_id', body.collectionCardId)
+
+    if (deleteError) {
+      console.warn('Failed to delete existing grading records:', deleteError)
+      // Don't fail - we can still insert the new one
+    }
+
     // Create grading record
     const gradingInsert: CollectionCardGradingInsert = {
       collection_card_id: body.collectionCardId,
@@ -239,24 +264,14 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
 
     if (insertError || !grading) {
       console.error('Failed to insert grading record:', insertError)
-      return NextResponse.json(
-        { success: false, error: 'Failed to save grading results' },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      return refundAndReturnError(
+        'Failed to save grading results',
+        HTTP_STATUS.INTERNAL_SERVER_ERROR
       )
     }
 
-    // Update collection card with estimated grade
-    const { error: updateError } = await supabase
-      .from('collection_cards')
-      .update({ estimated_grade: Math.round(extractedData.grade_final) })
-      .eq('id', body.collectionCardId)
-
-    if (updateError) {
-      console.warn('Failed to update collection card estimated_grade:', updateError)
-      // Don't fail the request for this
-    }
-
     // Credit was already deducted at the start of the request
+    // Grading completed successfully, no refund needed
 
     return NextResponse.json({
       success: true,
@@ -277,6 +292,8 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
   } catch (error) {
     console.error('Grade card API error:', error)
 
+    // Note: We can't refund here because we don't have supabase or user context
+    // and we don't know if credit was already deducted
     const errorMessage =
       error instanceof Error ? error.message : 'Failed to grade card. Please try again.'
 

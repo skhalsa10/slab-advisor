@@ -101,11 +101,17 @@ export async function uploadCardImage(
   const filename = `${side}_original.${extension}`
   const path = getImagePath(userId, collectionCardId, filename)
 
+  // If uploading front image, clear the entire folder first (fresh grading session)
+  // Back image upload happens after front, so folder will already be cleared
+  // Supabase remove() is idempotent - it won't error if files don't exist
+  if (side === 'front') {
+    await deleteCardImages(userId, collectionCardId)
+  }
+
   const { error } = await supabase.storage
     .from(STORAGE_BUCKETS.COLLECTION_CARD_IMAGES)
     .upload(path, buffer, {
       contentType: mimeType,
-      upsert: true, // Replace if exists (for re-uploads)
     })
 
   if (error) {
@@ -169,13 +175,21 @@ export async function downloadAndStoreImage(
 
   try {
     // SSRF Protection: Only allow downloads from trusted Ximilar domains
+    // Ximilar hosts temporary annotated images on AWS S3 (ximilar-tmp-images bucket)
     const url = new URL(sourceUrl)
     const allowedDomains = ['.ximilar.com', 'ximilar.com']
-    const isAllowedDomain = allowedDomains.some(
+    const allowedS3Buckets = ['ximilar-tmp-images']
+
+    const isAllowedXimilarDomain = allowedDomains.some(
       (domain) => url.hostname === domain || url.hostname.endsWith(domain)
     )
 
-    if (!isAllowedDomain) {
+    // Check for Ximilar's S3 bucket (format: s3-region.amazonaws.com/ximilar-tmp-images/...)
+    const isAllowedS3Bucket =
+      url.hostname.endsWith('.amazonaws.com') &&
+      allowedS3Buckets.some((bucket) => url.pathname.startsWith(`/${bucket}/`))
+
+    if (!isAllowedXimilarDomain && !isAllowedS3Bucket) {
       return { path: '', error: 'Invalid image source: only Ximilar URLs are allowed' }
     }
 
@@ -191,7 +205,23 @@ export async function downloadAndStoreImage(
       return { path: '', error: `Failed to download image: ${response.statusText}` }
     }
 
-    const contentType = response.headers.get('content-type') || 'image/webp'
+    // Determine content type - S3 often returns binary/octet-stream for images
+    // so we need to detect from the URL extension or use a sensible default
+    let contentType = response.headers.get('content-type') || ''
+
+    // If content type is generic or missing, detect from filename/URL
+    if (!contentType || contentType === 'binary/octet-stream' || contentType === 'application/octet-stream') {
+      const extension = filename.split('.').pop()?.toLowerCase() || url.pathname.split('.').pop()?.toLowerCase()
+      const extToMime: Record<string, string> = {
+        'webp': 'image/webp',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif',
+      }
+      contentType = extToMime[extension || ''] || 'image/webp' // Ximilar returns webp by default
+    }
+
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 

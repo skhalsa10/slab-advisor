@@ -2,6 +2,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import DashboardStats from '@/components/dashboard/DashboardStats'
 import QuickActions from '@/components/dashboard/QuickActions'
 import RecentActivity from '@/components/dashboard/RecentActivity'
+import GradingOpportunitiesWidget from '@/components/dashboard/GradingOpportunitiesWidget'
 import { getDashboardStats } from '@/lib/collection-server'
 
 export const dynamic = 'force-dynamic'
@@ -20,6 +21,8 @@ export default async function DashboardPage() {
         <DashboardStats stats={stats} />
 
         <QuickActions />
+
+        <GradingOpportunitiesWidget limit={5} />
 
         <RecentActivity />
       </div>

@@ -1,0 +1,634 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
+import { useBreakpoint } from '@/hooks/useIsDesktop'
+import type { GradingOpportunity } from '@/types/grading-opportunity'
+import { formatPrice } from '@/utils/collectionPriceUtils'
+import CameraCapture from '@/components/camera/CameraCapture'
+import ImagePreview from './ImagePreview'
+import GradingConfirmation from './GradingConfirmation'
+import GradingResultView from './GradingResultView'
+
+/**
+ * Capture step state for the grading flow
+ */
+type CaptureStep =
+  | 'info' // Current modal content (profit analysis)
+  | 'front-capture' // Camera UI for front
+  | 'front-preview' // Preview front image
+  | 'back-capture' // Camera UI for back
+  | 'back-preview' // Preview back image
+  | 'confirmation' // Review both images before grading
+  | 'processing' // Uploading + grading in progress
+  | 'complete' // Show grading results
+  | 'error' // Show error with retry option
+
+/**
+ * Grading result from the API
+ */
+interface GradingResult {
+  id: string
+  grade_final: number
+  grade_corners: number
+  grade_edges: number
+  grade_surface: number
+  grade_centering: number
+  condition: string
+  front_centering_lr: string
+  front_centering_tb: string
+  back_centering_lr: string
+  back_centering_tb: string
+}
+
+interface GradingAnalysisModalProps {
+  opportunity: GradingOpportunity | null
+  isOpen: boolean
+  onClose: () => void
+}
+
+/**
+ * Responsive modal for grading analysis with multi-step capture flow
+ *
+ * Flow:
+ * 1. Info View - Shows profit analysis and "Start AI Pre-Grade" button
+ * 2. Front Capture - Camera UI to capture front of card
+ * 3. Front Preview - Preview with "Use This Photo" / "Retake" options
+ * 4. Back Capture - Camera UI to capture back of card
+ * 5. Back Preview - Preview with "Use This Photo" / "Retake" options
+ * 6. Confirmation - Review both images before grading
+ * 7. Processing - Upload images and call grading API
+ * 8. Complete - Show grading results
+ * 9. Error - Show error with retry option
+ */
+export default function GradingAnalysisModal({
+  opportunity,
+  isOpen,
+  onClose,
+}: GradingAnalysisModalProps) {
+  const breakpoints = useBreakpoint()
+
+  // Step state machine
+  const [captureStep, setCaptureStep] = useState<CaptureStep>('info')
+  const [frontImage, setFrontImage] = useState<string | null>(null)
+  const [backImage, setBackImage] = useState<string | null>(null)
+  const [processingStatus, setProcessingStatus] = useState<string>('')
+  const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setCaptureStep('info')
+      setFrontImage(null)
+      setBackImage(null)
+      setProcessingStatus('')
+      setGradingResult(null)
+      setError(null)
+    }
+  }, [isOpen])
+
+  // Close on Escape key (only on info step)
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && captureStep === 'info') {
+        e.preventDefault()
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose, captureStep])
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = ''
+      }
+    }
+  }, [isOpen])
+
+  // Handle closing modal - reset to info or close entirely
+  const handleClose = useCallback(() => {
+    if (captureStep === 'info' || captureStep === 'complete') {
+      onClose()
+    } else {
+      // Go back to info view from other steps
+      setCaptureStep('info')
+      setFrontImage(null)
+      setBackImage(null)
+      setError(null)
+    }
+  }, [captureStep, onClose])
+
+  // Start the capture flow
+  const handleStartPreGrade = useCallback(() => {
+    setCaptureStep('front-capture')
+  }, [])
+
+  // Handle front image capture
+  const handleFrontCapture = useCallback((base64Image: string) => {
+    setFrontImage(base64Image)
+    setCaptureStep('front-preview')
+  }, [])
+
+  // Handle front image confirmation
+  const handleFrontConfirm = useCallback(() => {
+    setCaptureStep('back-capture')
+  }, [])
+
+  // Handle front image retake
+  const handleFrontRetake = useCallback(() => {
+    setFrontImage(null)
+    setCaptureStep('front-capture')
+  }, [])
+
+  // Handle back image capture
+  const handleBackCapture = useCallback((base64Image: string) => {
+    setBackImage(base64Image)
+    setCaptureStep('back-preview')
+  }, [])
+
+  // Handle back image confirmation
+  const handleBackConfirm = useCallback(() => {
+    setCaptureStep('confirmation')
+  }, [])
+
+  // Handle back image retake
+  const handleBackRetake = useCallback(() => {
+    setBackImage(null)
+    setCaptureStep('back-capture')
+  }, [])
+
+  // Handle retake from confirmation view
+  const handleRetakeFront = useCallback(() => {
+    setFrontImage(null)
+    setCaptureStep('front-capture')
+  }, [])
+
+  const handleRetakeBack = useCallback(() => {
+    setBackImage(null)
+    setCaptureStep('back-capture')
+  }, [])
+
+  // Handle cancel from confirmation
+  const handleCancelConfirmation = useCallback(() => {
+    setCaptureStep('info')
+    setFrontImage(null)
+    setBackImage(null)
+  }, [])
+
+  // Handle start grading (upload + grade)
+  const handleStartGrading = useCallback(async () => {
+    if (!opportunity || !frontImage || !backImage) return
+
+    setCaptureStep('processing')
+    setError(null)
+
+    try {
+      // Step 1: Upload front image
+      setProcessingStatus('Uploading front image...')
+      const frontResponse = await fetch('/api/cards/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collectionCardId: opportunity.collectionCardId,
+          side: 'front',
+          image: frontImage,
+        }),
+      })
+
+      if (!frontResponse.ok) {
+        const data = await frontResponse.json()
+        throw new Error(data.error || 'Failed to upload front image')
+      }
+
+      // Step 2: Upload back image
+      setProcessingStatus('Uploading back image...')
+      const backResponse = await fetch('/api/cards/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collectionCardId: opportunity.collectionCardId,
+          side: 'back',
+          image: backImage,
+        }),
+      })
+
+      if (!backResponse.ok) {
+        const data = await backResponse.json()
+        throw new Error(data.error || 'Failed to upload back image')
+      }
+
+      // Step 3: Call grading API
+      setProcessingStatus('Analyzing card...')
+      const gradeResponse = await fetch('/api/cards/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          collectionCardId: opportunity.collectionCardId,
+        }),
+      })
+
+      const gradeData = await gradeResponse.json()
+
+      if (!gradeResponse.ok) {
+        // Handle specific error cases
+        if (gradeResponse.status === 402) {
+          throw new Error('Insufficient credits. Please purchase more credits to continue.')
+        }
+        throw new Error(gradeData.error || 'Failed to grade card')
+      }
+
+      // Success!
+      setGradingResult(gradeData.grading)
+      setCaptureStep('complete')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred')
+      setCaptureStep('error')
+    }
+  }, [opportunity, frontImage, backImage])
+
+  // Handle retry from error state
+  const handleRetry = useCallback(() => {
+    // If we have both images, go back to confirmation to retry grading
+    if (frontImage && backImage) {
+      setCaptureStep('confirmation')
+    } else {
+      // Otherwise start over
+      setCaptureStep('info')
+      setFrontImage(null)
+      setBackImage(null)
+    }
+    setError(null)
+  }, [frontImage, backImage])
+
+  // Handle complete - close modal
+  const handleComplete = useCallback(() => {
+    onClose()
+  }, [onClose])
+
+  if (!isOpen || !opportunity) return null
+
+  const isMobile = !breakpoints.md
+
+  // Calculate display values for info view
+  const rawValue = Number(opportunity.currentMarketPrice) || 0
+  const gradingFee =
+    Number(opportunity.gradingFeeEntry) || Number(opportunity.gradingFeePsa10) || 25
+  const profitPsa10 = Number(opportunity.profitAtPsa10) || 0
+  const psa10Value =
+    Number(opportunity.psa10Price) || rawValue + gradingFee + profitPsa10
+
+  // Validate image URL for info view
+  const imageUrl =
+    opportunity.imageUrl &&
+    opportunity.imageUrl.trim() &&
+    opportunity.imageUrl !== 'null'
+      ? opportunity.imageUrl
+      : '/card-placeholder.svg'
+
+  // Render camera capture views (full screen, outside modal)
+  if (captureStep === 'front-capture') {
+    return (
+      <CameraCapture
+        onCapture={handleFrontCapture}
+        onClose={handleClose}
+        title="Capture Front"
+        instructionText="Position the front of your card within the frame"
+        hideSearchByText
+      />
+    )
+  }
+
+  if (captureStep === 'back-capture') {
+    return (
+      <CameraCapture
+        onCapture={handleBackCapture}
+        onClose={handleClose}
+        title="Capture Back"
+        instructionText="Position the back of your card within the frame"
+        hideSearchByText
+      />
+    )
+  }
+
+  // Render preview views (full screen, outside modal)
+  if (captureStep === 'front-preview' && frontImage) {
+    return (
+      <ImagePreview
+        image={frontImage}
+        title="Front of Card"
+        onConfirm={handleFrontConfirm}
+        onRetake={handleFrontRetake}
+      />
+    )
+  }
+
+  if (captureStep === 'back-preview' && backImage) {
+    return (
+      <ImagePreview
+        image={backImage}
+        title="Back of Card"
+        onConfirm={handleBackConfirm}
+        onRetake={handleBackRetake}
+      />
+    )
+  }
+
+  // Determine modal content based on step
+  let content: React.ReactNode
+
+  if (captureStep === 'confirmation' && frontImage && backImage) {
+    content = (
+      <GradingConfirmation
+        opportunity={opportunity}
+        frontImage={frontImage}
+        backImage={backImage}
+        onStartGrading={handleStartGrading}
+        onRetakeFront={handleRetakeFront}
+        onRetakeBack={handleRetakeBack}
+        onCancel={handleCancelConfirmation}
+      />
+    )
+  } else if (captureStep === 'processing') {
+    content = (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
+          <h2 className="text-lg font-semibold text-grey-900">Processing</h2>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mb-4" />
+          <p className="text-grey-700 font-medium">{processingStatus}</p>
+          <p className="text-grey-500 text-sm mt-2">Please wait...</p>
+        </div>
+      </div>
+    )
+  } else if (captureStep === 'complete' && gradingResult) {
+    content = (
+      <GradingResultView
+        gradingResult={gradingResult}
+        cardName={opportunity.cardName}
+        onClose={handleComplete}
+      />
+    )
+  } else if (captureStep === 'error') {
+    content = (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
+          <h2 className="text-lg font-semibold text-grey-900">Error</h2>
+          <button
+            onClick={handleClose}
+            className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+            aria-label="Close"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center p-8">
+          <svg
+            className="w-16 h-16 text-red-500 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <p className="text-grey-900 font-medium text-center mb-2">
+            Something went wrong
+          </p>
+          <p className="text-grey-600 text-sm text-center mb-6">{error}</p>
+          <button
+            onClick={handleRetry}
+            className="px-6 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
+  } else {
+    // Default: Info view
+    content = (
+      <>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
+          <h2 className="text-lg font-semibold text-grey-900">Grading Analysis</h2>
+          <button
+            onClick={onClose}
+            className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+            aria-label="Close"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 space-y-4 overflow-y-auto flex-1">
+          {/* Card info header */}
+          <div className="flex items-center gap-3">
+            <Image
+              src={imageUrl}
+              alt={opportunity.cardName}
+              width={60}
+              height={84}
+              className="rounded-md"
+              unoptimized={imageUrl.includes('ximilar.com')}
+            />
+            <div>
+              <p className="font-semibold text-grey-900">{opportunity.cardName}</p>
+              <p className="text-sm text-grey-500">{opportunity.setName}</p>
+              <span
+                className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+                  opportunity.gradingSafetyTier === 'SAFE_BET'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-orange-100 text-orange-700'
+                }`}
+              >
+                {opportunity.gradingSafetyTier === 'SAFE_BET'
+                  ? 'Safe Bet'
+                  : 'Gamble'}
+              </span>
+            </div>
+          </div>
+
+          {/* Math breakdown card */}
+          <div className="bg-grey-50 rounded-lg p-4 space-y-3">
+            <p className="text-xs text-grey-500 font-medium uppercase tracking-wide">
+              Profit Formula
+            </p>
+            <p className="text-sm text-grey-700">
+              Graded Value - (Raw Value + Grading Fee) = Profit
+            </p>
+
+            {/* PSA 10 breakdown */}
+            <div className="bg-white rounded-md p-3 border border-green-200">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-grey-900">PSA 10 Potential</span>
+                <span className="text-lg font-bold text-green-600">
+                  +{formatPrice(profitPsa10)}
+                </span>
+              </div>
+              <div className="mt-2 text-xs text-grey-500 space-y-1">
+                <div className="flex justify-between">
+                  <span>Graded Value (PSA 10)</span>
+                  <span>{formatPrice(psa10Value)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Raw Value</span>
+                  <span>-{formatPrice(rawValue)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Grading Fee</span>
+                  <span>-{formatPrice(gradingFee)}</span>
+                </div>
+                {opportunity.roiPsa10 != null && (
+                  <div className="flex justify-between pt-1 border-t border-grey-200 font-medium">
+                    <span>ROI</span>
+                    <span className="text-green-600">
+                      {Number(opportunity.roiPsa10).toFixed(0)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* PSA 9 safety net (if available) */}
+            {opportunity.profitAtPsa9 != null && (
+              <div className="bg-grey-100 rounded-md p-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-grey-600">PSA 9 Safety Net</span>
+                  <span
+                    className={`font-medium ${
+                      Number(opportunity.profitAtPsa9) >= 0
+                        ? 'text-grey-700'
+                        : 'text-red-600'
+                    }`}
+                  >
+                    {Number(opportunity.profitAtPsa9) >= 0 ? '+' : ''}
+                    {formatPrice(Number(opportunity.profitAtPsa9))}
+                  </span>
+                </div>
+                <p className="text-xs text-grey-500 mt-1">
+                  If graded PSA 9 instead of 10
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Disclaimers */}
+          <div className="bg-orange-50 rounded-lg p-3 space-y-2">
+            <p className="text-xs font-medium text-orange-800">
+              Important Disclaimers
+            </p>
+            <ul className="text-xs text-orange-700 space-y-1 list-disc list-inside">
+              <li>AI grading results do not guarantee actual PSA grade</li>
+              <li>Always perform visual inspection for major damage</li>
+              <li>This tool assists pre-grading decisions only</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Footer with CTA */}
+        <div className="p-4 border-t border-grey-200 flex-shrink-0">
+          <button
+            onClick={handleStartPreGrade}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
+          >
+            {/* Sparkles icon */}
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              />
+            </svg>
+            Start AI Pre-Grade
+          </button>
+        </div>
+      </>
+    )
+  }
+
+  // Modal container (only for non-camera views)
+  if (isMobile) {
+    return (
+      <>
+        <div
+          className="fixed inset-0 bg-black/50 z-50"
+          onClick={captureStep === 'info' ? onClose : undefined}
+          aria-hidden="true"
+        />
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl flex flex-col"
+          style={{ maxHeight: '90vh' }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="grading-analysis-title"
+        >
+          {content}
+        </div>
+      </>
+    )
+  }
+
+  // Tablet/Desktop: Centered modal
+  return (
+    <>
+      <div
+        className="fixed inset-0 bg-black/50 z-50"
+        onClick={captureStep === 'info' ? onClose : undefined}
+        aria-hidden="true"
+      />
+      <div
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col"
+        style={{ maxHeight: '90vh' }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="grading-analysis-title"
+      >
+        {content}
+      </div>
+    </>
+  )
+}
