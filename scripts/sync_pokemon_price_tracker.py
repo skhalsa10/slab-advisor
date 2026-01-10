@@ -394,20 +394,25 @@ class PokemonPriceTrackerSync:
             upcharge_potential = True
 
         # Determine safety tier
+        # SAFE_BET: Requires profit at PSA 9 AND profit at PSA 10 >= $20
+        # GAMBLE: Loss on PSA 9 (or no PSA 9 data) but >125% ROI on PSA 10
+        # DO_NOT_GRADE: All other cases
+        MIN_PSA10_PROFIT_FOR_SAFE_BET = 20.0
+
         grading_safety_tier = None
         if profit_at_psa9 is not None:
-            if profit_at_psa9 >= 0:
-                # SAFE_BET: Profit even on a PSA 9
+            if profit_at_psa9 >= 0 and profit_at_psa10 is not None and profit_at_psa10 >= MIN_PSA10_PROFIT_FOR_SAFE_BET:
+                # SAFE_BET: Profit even on a PSA 9 AND solid profit ($20+) on PSA 10
                 grading_safety_tier = 'SAFE_BET'
-            elif roi_psa10 is not None and roi_psa10 > 125:
-                # GAMBLE: Loss on 9 but >125% ROI on 10
+            elif roi_psa10 is not None and roi_psa10 > 125 and profit_at_psa10 is not None and profit_at_psa10 > 0:
+                # GAMBLE: Loss on 9 (or low PSA 10 profit) but >125% ROI on 10 with positive profit
                 grading_safety_tier = 'GAMBLE'
             else:
                 # DO_NOT_GRADE: All other cases
                 grading_safety_tier = 'DO_NOT_GRADE'
         elif profit_at_psa10 is not None:
-            # Only have PSA 10 data - use ROI threshold
-            if roi_psa10 is not None and roi_psa10 > 125:
+            # Only have PSA 10 data - use ROI threshold and require positive profit
+            if roi_psa10 is not None and roi_psa10 > 125 and profit_at_psa10 > 0:
                 grading_safety_tier = 'GAMBLE'
             else:
                 grading_safety_tier = 'DO_NOT_GRADE'

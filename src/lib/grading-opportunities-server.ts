@@ -26,6 +26,7 @@ interface RawOpportunityData {
     name: string
     image: string | null
     tcgplayer_image_url: string | null
+    local_id: string | null
     set: {
       name: string
     } | null
@@ -82,6 +83,16 @@ export async function getGradingOpportunities(
       return { opportunities: [], totalCount: 0 }
     }
 
+    // Get IDs of collection cards that already have gradings (to exclude them)
+    const { data: gradedCards } = await supabase
+      .from('collection_card_gradings')
+      .select('collection_card_id')
+      .eq('user_id', user.id)
+
+    const gradedCardIds = new Set(
+      gradedCards?.map((g) => g.collection_card_id) || []
+    )
+
     // Step 1: Get all user's collection cards with pokemon card data
     const { data: collectionData, error: collectionError } = await supabase
       .from('collection_cards')
@@ -96,6 +107,7 @@ export async function getGradingOpportunities(
           name,
           image,
           tcgplayer_image_url,
+          local_id,
           set:pokemon_sets(name)
         )
       `
@@ -166,7 +178,12 @@ export async function getGradingOpportunities(
     // 1. grading_safety_tier (SAFE_BET first - profitable at both PSA 9 & 10)
     // 2. profit_at_psa10 descending within each tier
     const sortedCollectionData = collectionData
-      .filter((card) => card.pokemon_card_id && priceMap.has(card.pokemon_card_id))
+      .filter(
+        (card) =>
+          card.pokemon_card_id &&
+          priceMap.has(card.pokemon_card_id) &&
+          !gradedCardIds.has(card.id) // Exclude already-graded cards
+      )
       .sort((a, b) => {
         const priceA = priceMap.get(a.pokemon_card_id!)
         const priceB = priceMap.get(b.pokemon_card_id!)
@@ -208,6 +225,7 @@ export async function getGradingOpportunities(
         pokemonCardId: pokemon.id,
         cardName: pokemon.name,
         setName: pokemon.set?.name || 'Unknown Set',
+        cardNumber: pokemon.local_id || null,
         imageUrl,
         frontImageUrl: card.front_image_url,
         backImageUrl: card.back_image_url,

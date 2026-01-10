@@ -42,9 +42,11 @@ interface GradingResult {
 }
 
 interface GradingAnalysisModalProps {
-  opportunity: GradingOpportunity | null
+  opportunities: GradingOpportunity[]
+  initialIndex: number
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
 /**
@@ -62,11 +64,22 @@ interface GradingAnalysisModalProps {
  * 9. Error - Show error with retry option
  */
 export default function GradingAnalysisModal({
-  opportunity,
+  opportunities,
+  initialIndex,
   isOpen,
   onClose,
+  onSuccess,
 }: GradingAnalysisModalProps) {
   const breakpoints = useBreakpoint()
+
+  // Carousel state
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+
+  // Derive current opportunity from array
+  const opportunity = opportunities[currentIndex] ?? null
+  const totalCount = opportunities.length
+  const canGoPrevious = currentIndex > 0
+  const canGoNext = currentIndex < totalCount - 1
 
   // Step state machine
   const [captureStep, setCaptureStep] = useState<CaptureStep>('info')
@@ -76,7 +89,7 @@ export default function GradingAnalysisModal({
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // Reset state when modal closes
+  // Reset state when modal closes or opens with new initialIndex
   useEffect(() => {
     if (!isOpen) {
       setCaptureStep('info')
@@ -85,23 +98,57 @@ export default function GradingAnalysisModal({
       setProcessingStatus('')
       setGradingResult(null)
       setError(null)
+    } else {
+      // Sync currentIndex with initialIndex when modal opens
+      setCurrentIndex(initialIndex)
     }
-  }, [isOpen])
+  }, [isOpen, initialIndex])
 
-  // Close on Escape key (only on info step)
+  // Navigation handlers
+  const handlePrevious = useCallback(() => {
+    if (canGoPrevious && captureStep === 'info') {
+      setCurrentIndex((prev) => prev - 1)
+      // Reset capture state for new card
+      setFrontImage(null)
+      setBackImage(null)
+      setGradingResult(null)
+      setError(null)
+    }
+  }, [canGoPrevious, captureStep])
+
+  const handleNext = useCallback(() => {
+    if (canGoNext && captureStep === 'info') {
+      setCurrentIndex((prev) => prev + 1)
+      // Reset capture state for new card
+      setFrontImage(null)
+      setBackImage(null)
+      setGradingResult(null)
+      setError(null)
+    }
+  }, [canGoNext, captureStep])
+
+  // Keyboard navigation: Escape to close, Arrow keys to navigate (only on info step)
   useEffect(() => {
     if (!isOpen) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && captureStep === 'info') {
+      if (captureStep !== 'info') return
+
+      if (e.key === 'Escape') {
         e.preventDefault()
         onClose()
+      } else if (e.key === 'ArrowLeft' && canGoPrevious) {
+        e.preventDefault()
+        handlePrevious()
+      } else if (e.key === 'ArrowRight' && canGoNext) {
+        e.preventDefault()
+        handleNext()
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, onClose, captureStep])
+  }, [isOpen, onClose, captureStep, canGoPrevious, canGoNext, handlePrevious, handleNext])
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -268,12 +315,13 @@ export default function GradingAnalysisModal({
     setError(null)
   }, [frontImage, backImage])
 
-  // Handle complete - close modal
+  // Handle complete - close modal and trigger refresh
   const handleComplete = useCallback(() => {
+    onSuccess?.()
     onClose()
-  }, [onClose])
+  }, [onClose, onSuccess])
 
-  if (!isOpen || !opportunity) return null
+  if (!isOpen || opportunities.length === 0 || !opportunity) return null
 
   const isMobile = !breakpoints.md
 
@@ -471,17 +519,19 @@ export default function GradingAnalysisModal({
             />
             <div>
               <p className="font-semibold text-grey-900">{opportunity.cardName}</p>
-              <p className="text-sm text-grey-500">{opportunity.setName}</p>
+              <p className="text-sm text-grey-500">
+                {opportunity.setName}
+                {opportunity.cardNumber ? ` #${opportunity.cardNumber}` : ''}
+              </p>
+              {/* Strategy Badge - based on PSA 9 profitability */}
               <span
                 className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
-                  opportunity.gradingSafetyTier === 'SAFE_BET'
+                  (opportunity.profitAtPsa9 ?? 0) > 0
                     ? 'bg-green-100 text-green-700'
                     : 'bg-orange-100 text-orange-700'
                 }`}
               >
-                {opportunity.gradingSafetyTier === 'SAFE_BET'
-                  ? 'Safe Bet'
-                  : 'Gamble'}
+                {(opportunity.profitAtPsa9 ?? 0) > 0 ? 'Safe Bet' : 'PSA 10 Required'}
               </span>
             </div>
           </div>
@@ -489,10 +539,7 @@ export default function GradingAnalysisModal({
           {/* Math breakdown card */}
           <div className="bg-grey-50 rounded-lg p-4 space-y-3">
             <p className="text-xs text-grey-500 font-medium uppercase tracking-wide">
-              Profit Formula
-            </p>
-            <p className="text-sm text-grey-700">
-              Graded Value - (Raw Value + Grading Fee) = Profit
+              Profit Analysis
             </p>
 
             {/* PSA 10 breakdown */}
@@ -529,7 +576,11 @@ export default function GradingAnalysisModal({
 
             {/* PSA 9 safety net (if available) */}
             {opportunity.profitAtPsa9 != null && (
-              <div className="bg-grey-100 rounded-md p-3">
+              <div
+                className={`${
+                  (opportunity.profitAtPsa9 ?? 0) < 0 ? 'bg-red-50' : 'bg-grey-100'
+                } rounded-md p-3`}
+              >
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-grey-600">PSA 9 Safety Net</span>
                   <span
@@ -564,7 +615,7 @@ export default function GradingAnalysisModal({
         </div>
 
         {/* Footer with CTA */}
-        <div className="p-4 border-t border-grey-200 flex-shrink-0">
+        <div className="p-4 border-t border-grey-200 flex-shrink-0 space-y-3">
           <button
             onClick={handleStartPreGrade}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
@@ -585,6 +636,70 @@ export default function GradingAnalysisModal({
             </svg>
             Start AI Pre-Grade
           </button>
+          {opportunity.cardNumber && (
+            <p className="text-xs text-grey-500 text-center">
+              Make sure you have Card #{opportunity.cardNumber} ready.
+            </p>
+          )}
+
+          {/* Mobile Navigation Bar */}
+          {isMobile && totalCount > 1 && (
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handlePrevious}
+                disabled={!canGoPrevious}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  canGoPrevious
+                    ? 'text-grey-700 hover:bg-grey-100'
+                    : 'text-grey-300 cursor-not-allowed'
+                }`}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+                Prev
+              </button>
+
+              <span className="text-sm text-grey-500">
+                {currentIndex + 1} of {totalCount}
+              </span>
+
+              <button
+                onClick={handleNext}
+                disabled={!canGoNext}
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  canGoNext
+                    ? 'text-grey-700 hover:bg-grey-100'
+                    : 'text-grey-300 cursor-not-allowed'
+                }`}
+              >
+                Next
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </>
     )
@@ -612,7 +727,7 @@ export default function GradingAnalysisModal({
     )
   }
 
-  // Tablet/Desktop: Centered modal
+  // Tablet/Desktop: Centered modal with floating navigation arrows
   return (
     <>
       <div
@@ -620,6 +735,63 @@ export default function GradingAnalysisModal({
         onClick={captureStep === 'info' ? onClose : undefined}
         aria-hidden="true"
       />
+
+      {/* Floating Previous Button (Desktop/Tablet) */}
+      {totalCount > 1 && captureStep === 'info' && (
+        <button
+          onClick={handlePrevious}
+          disabled={!canGoPrevious}
+          className={`fixed left-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white shadow-lg transition-all ${
+            canGoPrevious
+              ? 'hover:bg-grey-100 text-grey-700 cursor-pointer'
+              : 'text-grey-300 cursor-not-allowed'
+          }`}
+          aria-label="Previous card"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+      )}
+
+      {/* Floating Next Button (Desktop/Tablet) */}
+      {totalCount > 1 && captureStep === 'info' && (
+        <button
+          onClick={handleNext}
+          disabled={!canGoNext}
+          className={`fixed right-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white shadow-lg transition-all ${
+            canGoNext
+              ? 'hover:bg-grey-100 text-grey-700 cursor-pointer'
+              : 'text-grey-300 cursor-not-allowed'
+          }`}
+          aria-label="Next card"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      )}
+
       <div
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col"
         style={{ maxHeight: '90vh' }}

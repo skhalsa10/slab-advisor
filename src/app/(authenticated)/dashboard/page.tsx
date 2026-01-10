@@ -1,7 +1,7 @@
 import PageHeader from '@/components/ui/PageHeader'
 import DashboardStats from '@/components/dashboard/DashboardStats'
 import QuickActions from '@/components/dashboard/QuickActions'
-import RecentActivity from '@/components/dashboard/RecentActivity'
+import RecentScansWidget from '@/components/dashboard/RecentScansWidget'
 import GradingOpportunitiesWidget from '@/components/dashboard/GradingOpportunitiesWidget'
 import { getDashboardStats } from '@/lib/collection-server'
 
@@ -22,9 +22,9 @@ export default async function DashboardPage() {
 
         <QuickActions />
 
-        <GradingOpportunitiesWidget limit={5} />
+        <GradingOpportunitiesWidget />
 
-        <RecentActivity />
+        <RecentScansWidget />
       </div>
     )
   } catch (error) {

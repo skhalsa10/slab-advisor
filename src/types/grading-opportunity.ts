@@ -14,6 +14,7 @@ export interface GradingOpportunity {
   pokemonCardId: string
   cardName: string
   setName: string
+  cardNumber: string | null // Card local ID (e.g., "179")
   imageUrl: string
   frontImageUrl: string | null
   backImageUrl: string | null

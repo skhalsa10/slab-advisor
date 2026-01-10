@@ -48,12 +48,11 @@ function getSafeImageUrl(url: string | null | undefined): string {
 }
 
 /**
- * Single row in the grading opportunities widget
+ * Single row in the grading opportunities widget (High Density Bento Style)
  *
  * Layout:
- * - Left: Small card thumbnail (h-12 w-9, rounded-md)
- * - Middle: Card name (truncated) + "Raw: $XXX"
- * - Right: "PSA 10: +$XXX" (green) + "PSA 9: +$XXX" (gray)
+ * - Left: Card thumbnail (h-10 w-auto) + Title/Raw Price
+ * - Right: PSA 10 profit (hero number) + Chevron
  */
 export default function GradingOpportunityRow({
   opportunity,
@@ -64,40 +63,56 @@ export default function GradingOpportunityRow({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center gap-3 p-3 hover:bg-grey-50 transition-colors text-left"
+      className="w-full flex items-center justify-between px-4 py-3 border-b border-grey-50 last:border-b-0 hover:bg-grey-50 transition-colors cursor-pointer group text-left"
     >
-      {/* Thumbnail */}
-      <div className="flex-shrink-0">
-        <Image
-          src={imageUrl}
-          alt={opportunity.cardName}
-          width={36}
-          height={48}
-          className="rounded-md object-cover"
-          unoptimized={imageUrl.includes('ximilar.com')}
-        />
-      </div>
+      {/* Left Side: Thumbnail + Info */}
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        {/* Thumbnail */}
+        <div className="flex-shrink-0">
+          <Image
+            src={imageUrl}
+            alt={opportunity.cardName}
+            width={28}
+            height={40}
+            className="h-10 w-auto rounded-md shadow-sm object-cover"
+            unoptimized={imageUrl.includes('ximilar.com')}
+          />
+        </div>
 
-      {/* Middle: Card info */}
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-grey-900 text-sm truncate">
-          {opportunity.cardName}
-        </p>
-        <p className="text-xs text-grey-500">
-          Raw: {formatPrice(opportunity.currentMarketPrice)}
-        </p>
-      </div>
-
-      {/* Right: Profit info */}
-      <div className="flex-shrink-0 text-right">
-        <p className="text-sm font-bold text-green-600">
-          PSA 10: {formatProfit(opportunity.profitAtPsa10)}
-        </p>
-        {opportunity.profitAtPsa9 !== null && (
-          <p className="text-xs font-medium text-grey-400">
-            PSA 9: {formatProfit(opportunity.profitAtPsa9)}
+        {/* Card Info */}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-grey-900 text-sm truncate">
+            {opportunity.cardName}
           </p>
-        )}
+          <p className="text-xs text-grey-400">
+            {opportunity.setName}
+            {opportunity.cardNumber ? ` #${opportunity.cardNumber}` : ''} · Raw:{' '}
+            {formatPrice(opportunity.currentMarketPrice)}
+          </p>
+        </div>
+      </div>
+
+      {/* Right Side: Hero Number + Chevron */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {/* PSA 10 Profit (Hero Number) */}
+        <span className="text-sm font-bold text-green-600">
+          {formatProfit(opportunity.profitAtPsa10)}
+        </span>
+
+        {/* Chevron */}
+        <svg
+          className="w-4 h-4 text-grey-300 group-hover:text-orange-500 transition-colors"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
       </div>
     </button>
   )
