@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useCameraCapture } from '@/hooks/useCameraCapture'
+import { useDeviceLevel } from '@/hooks/useDeviceLevel'
 import { compressImage } from '@/lib/image-compression'
+import LevelIndicator from './LevelIndicator'
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string) => void
@@ -49,14 +51,38 @@ export default function CameraCapture({
     isFrontCamera
   } = useCameraCapture()
 
+  // Device level hook for bubble level indicator
+  const {
+    permission: levelPermission,
+    beta,
+    gamma,
+    isLevel,
+    isListening: isLevelListening,
+    isSupported: isLevelSupported,
+    requestPermission: requestLevelPermission,
+    startListening: startLevelListening,
+    stopListening: stopLevelListening,
+  } = useDeviceLevel({ levelThreshold: 3 })
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isCompressing, setIsCompressing] = useState(false)
 
   // Start camera on mount
   useEffect(() => {
     startCamera()
-    return () => stopCamera()
-  }, [startCamera, stopCamera])
+    return () => {
+      stopCamera()
+      stopLevelListening()
+    }
+  }, [startCamera, stopCamera, stopLevelListening])
+
+  // Handle enabling level indicator (must be triggered by user gesture for iOS)
+  const handleEnableLevel = async () => {
+    const granted = await requestLevelPermission()
+    if (granted) {
+      startLevelListening()
+    }
+  }
 
   const handleCapture = () => {
     if (isProcessing) return
@@ -136,6 +162,24 @@ export default function CameraCapture({
         <span className="text-white font-medium">{title}</span>
 
         <div className="flex items-center gap-2">
+          {/* Enable Level button - show if supported but not yet granted */}
+          {isLevelSupported && levelPermission === 'prompt' && (
+            <button
+              onClick={handleEnableLevel}
+              className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Enable level guide"
+            >
+              {/* Crosshair/target icon */}
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <circle cx="12" cy="12" r="8" strokeWidth={2} />
+                <line x1="12" y1="2" x2="12" y2="6" strokeWidth={2} />
+                <line x1="12" y1="18" x2="12" y2="22" strokeWidth={2} />
+                <line x1="2" y1="12" x2="6" y2="12" strokeWidth={2} />
+                <line x1="18" y1="12" x2="22" y2="12" strokeWidth={2} />
+              </svg>
+            </button>
+          )}
+
           {/* Flash toggle button - only show if flash is available and not front camera */}
           {hasFlash && !isFrontCamera && (
             <button
@@ -184,33 +228,40 @@ export default function CameraCapture({
         />
 
         {/* Card alignment guide overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          {/* Semi-transparent overlay with cutout */}
-          <div className="relative w-full h-full">
-            {/* Dark overlay */}
-            <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Card frame cutout - standard trading card aspect ratio 2.5:3.5 */}
+          {/* Position slightly above center to leave room for instruction text below */}
+          <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[280px] aspect-[2.5/3.5]">
+            {/* Dark overlay surrounding the cutout - box-shadow creates the effect */}
+            {/* The center is completely transparent, only the shadow is dark */}
+            <div
+              className="absolute inset-0 rounded-lg"
+              style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.5)' }}
+            />
 
-            {/* Card frame cutout - standard trading card aspect ratio 2.5:3.5 */}
-            {/* Position slightly above center to leave room for instruction text below */}
-            <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[280px] aspect-[2.5/3.5]">
-              {/* Clear area */}
-              <div className="absolute inset-0 bg-black/40" style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.4)' }} />
+            {/* Border frame */}
+            <div className="absolute inset-0 border-2 border-white rounded-lg">
+              {/* Corner accents */}
+              <div className="absolute -top-0.5 -left-0.5 w-6 h-6 border-t-4 border-l-4 border-orange-500 rounded-tl-lg" />
+              <div className="absolute -top-0.5 -right-0.5 w-6 h-6 border-t-4 border-r-4 border-orange-500 rounded-tr-lg" />
+              <div className="absolute -bottom-0.5 -left-0.5 w-6 h-6 border-b-4 border-l-4 border-orange-500 rounded-bl-lg" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-4 border-r-4 border-orange-500 rounded-br-lg" />
+            </div>
 
-              {/* Border frame */}
-              <div className="absolute inset-0 border-2 border-white rounded-lg">
-                {/* Corner accents */}
-                <div className="absolute -top-0.5 -left-0.5 w-6 h-6 border-t-4 border-l-4 border-orange-500 rounded-tl-lg" />
-                <div className="absolute -top-0.5 -right-0.5 w-6 h-6 border-t-4 border-r-4 border-orange-500 rounded-tr-lg" />
-                <div className="absolute -bottom-0.5 -left-0.5 w-6 h-6 border-b-4 border-l-4 border-orange-500 rounded-bl-lg" />
-                <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-4 border-r-4 border-orange-500 rounded-br-lg" />
-              </div>
+            {/* Level indicator - show inside the card frame when listening */}
+            {isLevelListening && cameraState === 'active' && (
+              <LevelIndicator
+                beta={beta}
+                gamma={gamma}
+                isLevel={isLevel}
+              />
+            )}
 
-              {/* Instruction text - positioned below the card frame */}
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90vw] max-w-[320px] text-center">
-                <p className="text-white text-sm font-medium drop-shadow-lg whitespace-nowrap">
-                  {instructionText}
-                </p>
-              </div>
+            {/* Instruction text - positioned below the card frame */}
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90vw] max-w-[320px] text-center">
+              <p className="text-white text-sm font-medium drop-shadow-lg whitespace-nowrap">
+                {instructionText}
+              </p>
             </div>
           </div>
         </div>
