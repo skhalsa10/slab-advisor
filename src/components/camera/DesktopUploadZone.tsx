@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import QRCode from 'react-qr-code'
+import { compressImage } from '@/lib/image-compression'
 
 interface DesktopUploadZoneProps {
   onUpload: (base64Image: string) => void
@@ -41,6 +42,7 @@ export default function DesktopUploadZone({
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [isCompressing, setIsCompressing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Simple link to dashboard - user can continue grading from there
@@ -49,7 +51,7 @@ export default function DesktopUploadZone({
     : '/dashboard'
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null)
 
       // Validate file type
@@ -65,18 +67,32 @@ export default function DesktopUploadZone({
         return
       }
 
-      // Convert to base64
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string
-        if (base64) {
-          onUpload(base64)
+      try {
+        setIsCompressing(true)
+        // Compress image to avoid Vercel's 4.5MB body size limit
+        const compressed = await compressImage(file, {
+          maxWidth: 1920,
+          maxHeight: 1920,
+          quality: 0.85,
+        })
+        onUpload(compressed)
+      } catch (err) {
+        console.error('Failed to compress image:', err)
+        // Fallback to original file if compression fails
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          const base64 = e.target?.result as string
+          if (base64) {
+            onUpload(base64)
+          }
         }
+        reader.onerror = () => {
+          setError('Failed to read file. Please try again.')
+        }
+        reader.readAsDataURL(file)
+      } finally {
+        setIsCompressing(false)
       }
-      reader.onerror = () => {
-        setError('Failed to read file. Please try again.')
-      }
-      reader.readAsDataURL(file)
     },
     [onUpload]
   )
@@ -199,50 +215,68 @@ export default function DesktopUploadZone({
 
         {/* Drop Zone */}
         <div
-          className={`w-full max-w-lg p-8 border-2 border-dashed rounded-xl text-center transition-colors cursor-pointer ${
-            isDragging
-              ? 'border-orange-500 bg-orange-500/10'
-              : 'border-grey-500 hover:border-orange-500 hover:bg-grey-800/50'
+          className={`w-full max-w-lg p-8 border-2 border-dashed rounded-xl text-center transition-colors relative ${
+            isCompressing
+              ? 'border-orange-500 bg-orange-500/10 cursor-wait'
+              : isDragging
+              ? 'border-orange-500 bg-orange-500/10 cursor-pointer'
+              : 'border-grey-500 hover:border-orange-500 hover:bg-grey-800/50 cursor-pointer'
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={handleBrowseClick}
+          onClick={isCompressing ? undefined : handleBrowseClick}
         >
-          {/* Cloud Upload Icon */}
-          <svg
-            className="w-16 h-16 mx-auto mb-4 text-grey-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-            />
-          </svg>
+          {isCompressing ? (
+            /* Compressing State */
+            <>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4" />
+              <p className="text-grey-300 text-lg mb-2">
+                Preparing image...
+              </p>
+              <p className="text-grey-500 text-sm">
+                Optimizing for upload
+              </p>
+            </>
+          ) : (
+            /* Normal Upload State */
+            <>
+              {/* Cloud Upload Icon */}
+              <svg
+                className="w-16 h-16 mx-auto mb-4 text-grey-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                />
+              </svg>
 
-          <p className="text-grey-300 text-lg mb-2">
-            Drag & drop your card scan here
-          </p>
-          <p className="text-grey-500 text-sm mb-4">or</p>
+              <p className="text-grey-300 text-lg mb-2">
+                Drag & drop your card scan here
+              </p>
+              <p className="text-grey-500 text-sm mb-4">or</p>
 
-          <button
-            type="button"
-            className="px-6 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleBrowseClick()
-            }}
-          >
-            Browse Files
-          </button>
+              <button
+                type="button"
+                className="px-6 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleBrowseClick()
+                }}
+              >
+                Browse Files
+              </button>
 
-          <p className="text-grey-500 text-xs mt-4">
-            Supports: {SUPPORTED_FORMATS}
-          </p>
+              <p className="text-grey-500 text-xs mt-4">
+                Supports: {SUPPORTED_FORMATS}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Error Message */}

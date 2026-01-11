@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useCameraCapture } from '@/hooks/useCameraCapture'
+import { compressImage } from '@/lib/image-compression'
 
 interface CameraCaptureProps {
   onCapture: (base64Image: string) => void
@@ -46,6 +47,7 @@ export default function CameraCapture({
   } = useCameraCapture()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isCompressing, setIsCompressing] = useState(false)
 
   // Start camera on mount
   useEffect(() => {
@@ -62,21 +64,36 @@ export default function CameraCapture({
     }
   }
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string
-      if (base64) {
-        onCapture(base64)
-      }
-    }
-    reader.readAsDataURL(file)
-
     // Reset input for re-selection
     event.target.value = ''
+
+    try {
+      setIsCompressing(true)
+      // Compress image to avoid Vercel's 4.5MB body size limit
+      const compressed = await compressImage(file, {
+        maxWidth: 1920,
+        maxHeight: 1920,
+        quality: 0.85,
+      })
+      onCapture(compressed)
+    } catch (err) {
+      console.error('Failed to compress image:', err)
+      // Fallback to original file if compression fails
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string
+        if (base64) {
+          onCapture(base64)
+        }
+      }
+      reader.readAsDataURL(file)
+    } finally {
+      setIsCompressing(false)
+    }
   }
 
   const handleGalleryClick = () => {
@@ -197,11 +214,13 @@ export default function CameraCapture({
         )}
 
         {/* Processing overlay */}
-        {isProcessing && (
+        {(isProcessing || isCompressing) && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <div className="text-center text-white">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4" />
-              <p className="text-lg font-medium">Identifying card...</p>
+              <p className="text-lg font-medium">
+                {isCompressing ? 'Preparing image...' : 'Identifying card...'}
+              </p>
             </div>
           </div>
         )}
