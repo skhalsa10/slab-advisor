@@ -27,6 +27,8 @@ export interface UseCameraCaptureReturn {
   cameraState: CameraState
   error: string | null
   hasPermission: boolean | null
+  isFlashOn: boolean
+  hasFlash: boolean
 
   // Refs
   videoRef: React.RefObject<HTMLVideoElement | null>
@@ -37,6 +39,7 @@ export interface UseCameraCaptureReturn {
   stopCamera: () => void
   capturePhoto: () => string | null
   switchCamera: () => Promise<boolean>
+  toggleFlash: () => Promise<boolean>
 
   // Utilities
   isFrontCamera: boolean
@@ -90,6 +93,8 @@ export function useCameraCapture(
   const [error, setError] = useState<string | null>(null)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [currentFacingMode, setCurrentFacingMode] = useState<'user' | 'environment'>(facingMode)
+  const [isFlashOn, setIsFlashOn] = useState(false)
+  const [hasFlash, setHasFlash] = useState(false)
 
   // Refs
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -110,6 +115,10 @@ export function useCameraCapture(
     if (videoRef.current) {
       videoRef.current.srcObject = null
     }
+
+    // Reset flash state when stream stops
+    setIsFlashOn(false)
+    setHasFlash(false)
   }, [])
 
   /**
@@ -168,6 +177,19 @@ export function useCameraCapture(
 
       streamRef.current = stream
       setHasPermission(true)
+
+      // Check for flash/torch capability
+      const videoTrack = stream.getVideoTracks()[0]
+      if (videoTrack) {
+        try {
+          const capabilities = videoTrack.getCapabilities?.()
+          // Check if torch is supported (works on Android Chrome, some iOS browsers)
+          const supportsTorch = capabilities && 'torch' in capabilities
+          setHasFlash(!!supportsTorch)
+        } catch {
+          setHasFlash(false)
+        }
+      }
 
       // Attach stream to video element
       if (videoRef.current) {
@@ -269,10 +291,13 @@ export function useCameraCapture(
    */
   const switchCamera = useCallback(async (): Promise<boolean> => {
     const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user'
-    setCurrentFacingMode(newFacingMode)
 
-    // Restart camera with new facing mode
+    // Stop current stream first
     stopMediaStream()
+
+    // Wait for camera hardware to be released
+    // This delay is crucial on mobile devices to prevent "camera in use" errors
+    await new Promise(resolve => setTimeout(resolve, 300))
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -285,23 +310,62 @@ export function useCameraCapture(
       })
 
       streamRef.current = stream
+      setCurrentFacingMode(newFacingMode)
+
+      // Check for flash capability on new camera
+      const videoTrack = stream.getVideoTracks()[0]
+      if (videoTrack) {
+        try {
+          const capabilities = videoTrack.getCapabilities?.()
+          const supportsTorch = capabilities && 'torch' in capabilities
+          setHasFlash(!!supportsTorch)
+        } catch {
+          setHasFlash(false)
+        }
+      }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream
         await videoRef.current.play()
+        setCameraState('active')
         return true
       }
 
       return false
     } catch (err) {
       console.error('Failed to switch camera:', err)
-      setError('Failed to switch camera')
-      // Try to restore previous camera
-      setCurrentFacingMode(currentFacingMode)
-      await startCamera()
+      setError('Failed to switch camera. Please try again.')
+      setCameraState('error')
       return false
     }
-  }, [currentFacingMode, startCamera, stopMediaStream])
+  }, [currentFacingMode, stopMediaStream])
+
+  /**
+   * Toggle flash/torch on or off
+   */
+  const toggleFlash = useCallback(async (): Promise<boolean> => {
+    if (!streamRef.current || !hasFlash) {
+      return false
+    }
+
+    const videoTrack = streamRef.current.getVideoTracks()[0]
+    if (!videoTrack) {
+      return false
+    }
+
+    try {
+      const newFlashState = !isFlashOn
+      // Apply torch constraint to the track
+      await videoTrack.applyConstraints({
+        advanced: [{ torch: newFlashState } as MediaTrackConstraintSet]
+      })
+      setIsFlashOn(newFlashState)
+      return true
+    } catch (err) {
+      console.error('Failed to toggle flash:', err)
+      return false
+    }
+  }, [hasFlash, isFlashOn])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -315,6 +379,8 @@ export function useCameraCapture(
     cameraState,
     error,
     hasPermission,
+    isFlashOn,
+    hasFlash,
 
     // Refs
     videoRef,
@@ -325,6 +391,7 @@ export function useCameraCapture(
     stopCamera,
     capturePhoto,
     switchCamera,
+    toggleFlash,
 
     // Utilities
     isFrontCamera: currentFacingMode === 'user'

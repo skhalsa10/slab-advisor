@@ -43,6 +43,9 @@ export default function CameraCapture({
     stopCamera,
     capturePhoto,
     switchCamera,
+    toggleFlash,
+    isFlashOn,
+    hasFlash,
     isFrontCamera
   } = useCameraCapture()
 
@@ -132,15 +135,41 @@ export default function CameraCapture({
 
         <span className="text-white font-medium">{title}</span>
 
-        <button
-          onClick={switchCamera}
-          className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
-          aria-label="Switch camera"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Flash toggle button - only show if flash is available and not front camera */}
+          {hasFlash && !isFrontCamera && (
+            <button
+              onClick={toggleFlash}
+              className={`p-2 rounded-full transition-colors ${
+                isFlashOn
+                  ? 'bg-yellow-500 text-black'
+                  : 'text-white hover:bg-white/20'
+              }`}
+              aria-label={isFlashOn ? 'Turn off flash' : 'Turn on flash'}
+            >
+              {isFlashOn ? (
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              )}
+            </button>
+          )}
+
+          {/* Switch camera button */}
+          <button
+            onClick={switchCamera}
+            className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
+            aria-label="Switch camera"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Camera viewfinder */}
@@ -155,14 +184,15 @@ export default function CameraCapture({
         />
 
         {/* Card alignment guide overlay */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           {/* Semi-transparent overlay with cutout */}
           <div className="relative w-full h-full">
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-black/40" />
 
             {/* Card frame cutout - standard trading card aspect ratio 2.5:3.5 */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[280px] aspect-[2.5/3.5]">
+            {/* Position slightly above center to leave room for instruction text below */}
+            <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[280px] aspect-[2.5/3.5]">
               {/* Clear area */}
               <div className="absolute inset-0 bg-black/40" style={{ boxShadow: '0 0 0 9999px rgba(0,0,0,0.4)' }} />
 
@@ -174,14 +204,14 @@ export default function CameraCapture({
                 <div className="absolute -bottom-0.5 -left-0.5 w-6 h-6 border-b-4 border-l-4 border-orange-500 rounded-bl-lg" />
                 <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-4 border-r-4 border-orange-500 rounded-br-lg" />
               </div>
-            </div>
-          </div>
 
-          {/* Instruction text */}
-          <div className="absolute bottom-44 left-0 right-0 text-center">
-            <p className="text-white text-sm font-medium drop-shadow-lg">
-              {instructionText}
-            </p>
+              {/* Instruction text - positioned below the card frame */}
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-[90vw] max-w-[320px] text-center">
+                <p className="text-white text-sm font-medium drop-shadow-lg whitespace-nowrap">
+                  {instructionText}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
