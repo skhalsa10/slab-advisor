@@ -1415,6 +1415,311 @@ Features to implement after initial launch to drive engagement and retention.
 
 ---
 
+## 🚀 Future Feature Roadmap & Dashboard Expansion
+
+This section outlines the next wave of features to transform the dashboard into a comprehensive collector's command center.
+
+### Phase 1: The "Fintech" Layer (Money & Value)
+
+#### Portfolio Value Graph (Hero Component) ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 1 week
+
+**Description:**
+A beautiful, interactive portfolio value chart that shows the user's collection value over time. This is the "hero" component that makes users feel like they're managing real investments.
+
+**Location:** Dashboard Top (Main Hero Section)
+
+**Technical Requirements:**
+- `Recharts` (AreaChart with gradient fill)
+- Time-series data (1W, 1M, 1Y, All Time)
+- Hover-to-reveal exact value at point
+- Percentage growth indicator (e.g., "+12% this month")
+- Smooth animations on load
+
+**Dependencies:**
+- `portfolio_snapshots` table (from Historical Pricing task)
+- Portfolio calculation service
+- Daily cron job to snapshot portfolio values
+
+**Files to Create:**
+- `/src/components/dashboard/PortfolioValueChart.tsx`
+- `/src/lib/portfolio-snapshot-service.ts`
+
+---
+
+#### "Top 3 Gems" Leaderboard ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟠 High
+**Estimated Effort:** 2-3 days
+
+**Description:**
+Displays the user's 3 most valuable cards with a "podium" style layout, making them feel special about their collection highlights.
+
+**Location:** Dashboard Sidebar or Main Grid
+
+**Design:**
+- Gold/Silver/Bronze borders for 1st/2nd/3rd
+- Card thumbnail + name + current value
+- Optional: Price change indicator (up/down arrows)
+
+**Technical Requirements:**
+- Query collection_cards JOIN pokemon_card_prices
+- Sort by current market value DESC
+- Limit 3
+
+**Files to Create:**
+- `/src/components/dashboard/TopGemsWidget.tsx`
+- `/src/lib/collection-insights-server.ts`
+
+---
+
+#### Market Movers (Price Alerts) ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟡 Medium
+**Estimated Effort:** 3-4 days
+
+**Description:**
+A "stock ticker" style widget that highlights cards in the user's collection with the biggest price swings in the last 24 hours.
+
+**Location:** Small Ticker or "Stock" Widget
+
+**Features:**
+- Show cards with >5% price change
+- Green for gains, red for losses
+- Percentage and absolute change display
+- Tap to view card details
+
+**Technical Requirements:**
+- Price comparison: current vs 24h ago
+- Requires historical price data per card
+- Sorting by absolute % change
+
+**Files to Create:**
+- `/src/components/dashboard/MarketMoversWidget.tsx`
+- `/src/lib/price-alerts-server.ts`
+
+---
+
+### Phase 2: The "Collector" Layer (Completionism)
+
+#### Interactive Set Completion Widget ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟠 High
+**Estimated Effort:** 1 week
+
+**Description:**
+A horizontal carousel showing the user's progress toward completing various card sets, driving engagement and purchases.
+
+**Location:** Dashboard Main Grid
+
+**Design:**
+- Horizontal scroll carousel of "Set Cards"
+- Circular progress bar (e.g., "134/165 Owned")
+- Set logo/art as background
+- Gradient overlay for readability
+
+**Interaction:**
+- Clicking a set filters the "Explore" view to show *missing* cards from that set
+
+**Technical Requirements:**
+- Group collection cards by set
+- Count owned vs total cards per set
+- Set metadata (logo, total count)
+
+**Files to Create:**
+- `/src/components/dashboard/SetCompletionWidget.tsx`
+- `/src/components/dashboard/SetCompletionCard.tsx`
+- `/src/lib/set-completion-server.ts`
+
+---
+
+#### Digital Binders List ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟡 Medium
+**Estimated Effort:** 1 week
+
+**Description:**
+Allow users to organize cards into custom folders/binders (e.g., "My Charizards", "Trade Binder", "PSA Submission Queue").
+
+**Location:** Dashboard Sidebar or Bottom Grid
+
+**Design:**
+- "Bookshelf" aesthetic or clean scrollable list
+- Binder cover image (first card or custom)
+- Card count per binder
+
+**Technical Requirements:**
+- New `binders` table (id, user_id, name, cover_image_url, created_at)
+- New `binder_cards` junction table (binder_id, collection_card_id)
+- CRUD operations for binders
+
+**Database Schema:**
+```sql
+CREATE TABLE binders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  cover_image_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE binder_cards (
+  binder_id UUID REFERENCES binders(id) ON DELETE CASCADE,
+  collection_card_id UUID REFERENCES collection_cards(id) ON DELETE CASCADE,
+  position INTEGER,
+  added_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (binder_id, collection_card_id)
+);
+```
+
+**Files to Create:**
+- `/src/components/dashboard/BindersWidget.tsx`
+- `/src/components/binders/BinderCard.tsx`
+- `/src/components/binders/CreateBinderModal.tsx`
+- `/src/lib/binders-service.ts`
+- `/src/app/api/binders/route.ts`
+- `/src/app/(authenticated)/binders/[id]/page.tsx`
+
+---
+
+### Phase 3: The "Gamification" Layer (Engagement)
+
+#### User Badging System ("The Trophy Case") ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟡 Medium
+**Estimated Effort:** 1-2 weeks
+
+**Description:**
+A comprehensive achievement system that rewards users for various milestones and activities.
+
+**Location:** Dashboard Header or dedicated Profile Widget
+
+**Badge Examples:**
+- "First Scan" - Scanned first card
+- "Gem Mint Hunter" - Got a PSA 10 prediction
+- "Set Finisher" - Completed a full set
+- "Century Club" - 100 cards in collection
+- "Early Adopter" - Joined during beta
+- "Grading Guru" - Graded 50 cards
+
+**Technical Requirements:**
+- `user_badges` table (user_id, badge_id, unlocked_at)
+- `badge_definitions` table (id, name, description, icon, criteria_json)
+- Background job to check badge eligibility
+- Toast notification on unlock
+
+**Progression System:**
+- XP points for actions (scan = 10 XP, grade = 25 XP, complete set = 100 XP)
+- User levels (Level 1-50+)
+- Level-up rewards (future: credits, discounts)
+
+**Files to Create:**
+- `/src/components/dashboard/TrophyCaseWidget.tsx`
+- `/src/components/badges/BadgeGrid.tsx`
+- `/src/components/badges/LevelProgress.tsx`
+- `/src/lib/gamification-service.ts`
+- `/src/app/api/badges/check/route.ts`
+
+---
+
+#### Daily Streak Counter ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟢 Low
+**Estimated Effort:** 2-3 days
+
+**Description:**
+Tracks consecutive days of logging in or performing actions, encouraging daily engagement.
+
+**Location:** Near User Avatar in Header
+
+**Features:**
+- Flame icon with streak count
+- Animation on streak continuation
+- "Streak at risk" warning
+- Streak milestones (7 days, 30 days, 100 days)
+
+**Technical Requirements:**
+- `user_streaks` table (user_id, current_streak, longest_streak, last_activity_date)
+- Middleware to update on login/action
+- Reset logic at midnight UTC
+
+**Files to Create:**
+- `/src/components/ui/StreakBadge.tsx`
+- `/src/lib/streak-service.ts`
+- `/src/middleware/streak-tracker.ts`
+
+---
+
+### Phase 4: The "Social" Layer (Community)
+
+#### Social Stats Widget ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🟡 Medium
+**Estimated Effort:** 2 weeks
+
+**Description:**
+Display social metrics and enable community features.
+
+**Location:** Profile / Dashboard Sidebar
+
+**Metrics:**
+- Followers count
+- Following count
+- Collection visibility toggle (public/private)
+
+**Interaction:**
+- Click to view follower/following lists
+- Activity feed of what friends are grading/adding
+
+**Technical Requirements:**
+- `follows` table already designed (user_id, following_id)
+- `activity_feed` table for social actions
+- Privacy settings per user
+
+**Database Schema:**
+```sql
+CREATE TABLE activity_feed (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  activity_type TEXT NOT NULL, -- 'graded', 'added_card', 'completed_set', 'badge_earned'
+  target_id UUID, -- Reference to the object (card, set, badge)
+  target_type TEXT, -- 'collection_card', 'set', 'badge'
+  metadata JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  visibility TEXT DEFAULT 'followers' -- 'public', 'followers', 'private'
+);
+```
+
+**Files to Create:**
+- `/src/components/dashboard/SocialStatsWidget.tsx`
+- `/src/components/social/FollowersList.tsx`
+- `/src/components/social/ActivityFeed.tsx`
+- `/src/lib/social-service.ts`
+- `/src/app/api/social/follow/route.ts`
+- `/src/app/api/social/feed/route.ts`
+- `/src/app/(authenticated)/profile/[username]/page.tsx`
+
+---
+
+### Dashboard Widget Priority Order
+
+| Priority | Widget | Effort | Dependencies |
+|----------|--------|--------|--------------|
+| 1 | Portfolio Value Graph | 1 week | Historical Pricing, Snapshots |
+| 2 | Top 3 Gems | 2-3 days | Price data |
+| 3 | Set Completion | 1 week | Set metadata |
+| 4 | Market Movers | 3-4 days | 24h price history |
+| 5 | Digital Binders | 1 week | New DB tables |
+| 6 | Trophy Case | 1-2 weeks | Badge system |
+| 7 | Social Stats | 2 weeks | Follow system |
+| 8 | Daily Streak | 2-3 days | Streak tracking |
+
+---
+
 ## 📖 Technical Documentation References
 
 ### API Documentation
@@ -1447,4 +1752,4 @@ Services Layer
 ---
 
 **Last Updated:** January 10, 2026
-**Document Version:** 2.7 (Ximilar Grading + Dashboard Widgets Complete)
+**Document Version:** 2.8 (Future Dashboard Roadmap Added)

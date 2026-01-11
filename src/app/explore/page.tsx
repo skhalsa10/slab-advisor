@@ -4,6 +4,7 @@ import PageHeader from '@/components/explore/PageHeader'
 import PokemonHeroSection from '@/components/explore/PokemonHeroSection'
 import NewestSetsWidget from '@/components/widgets/NewestSetsWidget'
 import NewlyReleasedTopCardsWidget from '@/components/widgets/NewlyReleasedTopCardsWidget'
+import TopMoversWidget from '@/components/widgets/TopMoversWidget'
 
 // Loading skeletons for widgets
 function HeroSkeleton() {
@@ -50,6 +51,11 @@ export default function ExplorePage() {
         {/* Newly Released Top Cards Widget */}
         <Suspense fallback={<WidgetSkeleton />}>
           <NewlyReleasedTopCardsWidget numSets={2} cardsPerSet={5} />
+        </Suspense>
+
+        {/* Trending This Week - Top 7-Day Price Movers */}
+        <Suspense fallback={<WidgetSkeleton />}>
+          <TopMoversWidget limit={10} />
         </Suspense>
 
         {/* Future TCG note */}
