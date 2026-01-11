@@ -9,6 +9,8 @@ import GradingAnalysisModal from './GradingAnalysisModal'
 interface GradingOpportunityListProps {
   opportunities: GradingOpportunity[]
   totalCount?: number
+  /** Whether to show photography tips before grading */
+  showGradingTips?: boolean
 }
 
 /** Maximum rows to display in compact mode */
@@ -21,6 +23,7 @@ const MAX_VISIBLE_ROWS = 3
 export default function GradingOpportunityList({
   opportunities,
   totalCount,
+  showGradingTips = true,
 }: GradingOpportunityListProps) {
   const router = useRouter()
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -117,6 +120,7 @@ export default function GradingOpportunityList({
         isOpen={selectedIndex !== null}
         onClose={handleCloseModal}
         onSuccess={handleGradingSuccess}
+        showGradingTips={showGradingTips}
       />
     </>
   )

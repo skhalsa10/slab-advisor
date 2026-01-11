@@ -2,9 +2,9 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 6, 2026
+**Last Updated:** January 10, 2026
 
-### Project Completion: ~80%
+### Project Completion: ~85%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
@@ -22,14 +22,12 @@
 - **Phase 4**: Collection Features (70%)
 - **Phase 5**: Add Card Flow (95%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking missing
-- **Ximilar Integration**: Card ID complete (100%), Grading pending (0%)
+- **Ximilar Integration**: Card ID complete (100%), Grading complete (100%)
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (85%)
 
 #### ❌ Not Started
 - **Historical Portfolio Tracking**: Portfolio snapshots, value charts (0%)
 - **Social Features**: Username, followers, shareable collections (0%)
-- **Ximilar Grading**: API integration, UI display (0%)
-- **Pre-grading Recommendations**: Grading ROI analysis (0%)
 - **Gamma/Preprod Pipeline**: Staging environment setup (0%)
 - **Store/Marketplace**: Internal product purchasing (0%)
 
@@ -93,59 +91,64 @@ These features deliver unique value that competitors don't have and form the fou
 
 ---
 
-#### 2. Grading Using Ximilar ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### 2. Grading Using Ximilar ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🔴 Critical
-**Estimated Effort:** 2 weeks
+**Completed:** January 10, 2026
 
-**What's Done:**
-- ✅ TypeScript types defined (`src/types/ximilar.ts`)
-- ✅ Database field: `grading_data` (JSONB) in collection_cards table
-- ✅ API research documentation (`XIMILAR_API_RESEARCH.md`)
+**Implementation Summary:**
+Full AI-powered card grading system integrated with the Grading Opportunities widget. Users can scan cards from a curated list of profitable grading opportunities, capture front/back images, and receive AI grading results with detailed breakdowns.
 
-**What's Missing:**
-- ❌ Ximilar API service layer (`src/lib/ximilar-service.ts`)
-- ❌ Grading API endpoint (`/api/ximilar/grade`)
-- ❌ Image upload and processing flow
-- ❌ Grading results display UI
-- ❌ Grade visualization components (corners, edges, surface, centering)
-- ❌ Credit deduction for grading operations
-- ❌ Error handling for failed grading attempts
+**What Was Implemented:**
+- ✅ Ximilar grading API integration (`/collectibles/v2/pokemon/grading`)
+- ✅ Private image storage (Supabase Storage bucket for user images)
+- ✅ Image upload API with base64 encoding for Ximilar
+- ✅ Grading API endpoint with credit deduction and refunds
+- ✅ Multi-step grading UI flow (capture front → preview → capture back → preview → confirm → process → results)
+- ✅ Grading results display with overall grade and breakdown (corners, edges, surface, centering)
+- ✅ Centering measurements (front/back LR and TB percentages)
+- ✅ Annotated image storage (Ximilar's annotated images downloaded and stored)
+- ✅ Credit system integration (deduct on start, refund on failure)
+- ✅ Race condition protection with idempotency tokens
+- ✅ SSRF protection for downloading external images
+- ✅ `collection_card_gradings` table for grading history
+- ✅ Dashboard widgets: Grading Opportunities (profitable cards to grade) + Recent Scans (grading history carousel)
+- ✅ Grading Analysis Modal with profit breakdown (PSA 10/PSA 9 potential)
+- ✅ Dynamic badges (Safe Bet vs PSA 10 Required based on PSA 9 profitability)
 
-**Implementation Tasks:**
-1. Create Ximilar API service wrapper:
-   ```typescript
-   // src/lib/ximilar-service.ts
-   export async function gradeCard(imageUrl: string)
-   export function parseGradingResults(response: XimilarGradingResponse)
-   ```
-2. Build API endpoint for secure grading requests
-3. Implement image upload flow (front + back card images)
-4. Create grading results display components:
-   - Overall grade with confidence score
-   - Corner grades with visual indicators
-   - Edge quality assessment
-   - Surface condition analysis
-   - Centering measurements
-5. Integrate credit system (charge credits only on success)
-6. Add error handling and retry logic
-7. Update add-to-collection flow with grading option
+**Files Created:**
+- `/src/lib/ximilar-grading-service.ts` - Ximilar grading API integration
+- `/src/lib/storage-service.ts` - Image upload/download/base64 conversion
+- `/src/lib/grading-opportunities-server.ts` - Fetch profitable grading opportunities
+- `/src/lib/recent-scans-server.ts` - Fetch user's recent grading history
+- `/src/app/api/cards/grade/route.ts` - Grading API endpoint
+- `/src/app/api/cards/upload-image/route.ts` - Image upload API endpoint
+- `/src/app/api/grading-opportunities/route.ts` - API for grading opportunities
+- `/src/components/dashboard/GradingOpportunitiesWidget.tsx` - Server component widget
+- `/src/components/dashboard/GradingOpportunityList.tsx` - Client list with modal trigger
+- `/src/components/dashboard/GradingOpportunityRow.tsx` - Row component with card info
+- `/src/components/dashboard/GradingAnalysisModal.tsx` - Multi-step grading flow modal
+- `/src/components/dashboard/GradingConfirmation.tsx` - Pre-grading confirmation view
+- `/src/components/dashboard/GradingResultView.tsx` - Grading results display
+- `/src/components/dashboard/ImagePreview.tsx` - Image preview with retake option
+- `/src/components/dashboard/RecentScansWidget.tsx` - Horizontal carousel of recent scans
+- `/src/types/grading-opportunity.ts` - TypeScript types for grading opportunities
 
-**Files to Create:**
-- `/src/lib/ximilar-service.ts`
-- `/src/app/api/ximilar/grade/route.ts`
-- `/src/components/grading/GradingResults.tsx`
-- `/src/components/grading/GradeVisualizer.tsx`
-- `/src/components/grading/GradingFlow.tsx`
+**Database Changes:**
+- Created `collection_card_gradings` table with RLS policies
+- Added columns: `grade_final`, `grade_corners`, `grade_edges`, `grade_surface`, `grade_centering`, `condition`, centering measurements, annotated image paths
+- Indexes on `user_id` and `collection_card_id`
 
-**Files to Modify:**
-- `/src/components/collection/AddToCollectionForm.tsx` (add grading option)
-- `/src/components/collection/CollectionQuickViewContent.tsx` (display grades)
+**Security Hardening:**
+- Race condition protection using unique constraint on `(collection_card_id, idempotency_token)`
+- SSRF protection: Only allow downloads from trusted Ximilar domains
+- Credit refunds on grading failure
+- Server-side image storage (user images never exposed publicly)
 
 **Dependencies:**
-- Ximilar API key (XIMILAR_API_TOKEN)
-- Image storage (Supabase Storage already configured)
-- Credit system (already implemented)
+- ✅ Ximilar API key (XIMILAR_API_TOKEN)
+- ✅ Image storage (Supabase Storage - private bucket)
+- ✅ Credit system (already implemented)
 
 ---
 
@@ -194,12 +197,15 @@ Full camera-based card identification integrated into Quick Add flow. Users can 
 
 ---
 
-#### 4. Pre-grading Recommendations ⚠️ IN PROGRESS
-**Status:** 🟡 60% Complete
+#### 4. Pre-grading Recommendations ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🟠 High
-**Estimated Effort:** 3-5 days remaining
+**Completed:** January 10, 2026
 
-**What's Done:**
+**Implementation Summary:**
+Complete grading ROI engine with dashboard widget showing profitable cards from user's collection. Integrates safety tier logic to identify cards worth grading.
+
+**What Was Implemented:**
 - ✅ Price data exists for graded cards (psa10, psa9, psa8 in `pokemon_card_prices`)
 - ✅ Raw market prices available (`current_market_price`)
 - ✅ Grading data structure defined
@@ -212,44 +218,46 @@ Full camera-based card identification integrated into Quick Add flow. Users can 
   - `roi_psa10` - ROI percentage on PSA 10
   - `upcharge_potential` - Flag for tier bump scenarios
   - `grading_safety_tier` - SAFE_BET, GAMBLE, or DO_NOT_GRADE
+  - **SAFE_BET criteria updated:** Requires $20+ PSA 10 profit AND positive PSA 9 profit
 - ✅ **PSA fee ladder** implemented (all tiers from Bulk $19.99 to Premium 10+ $9,999+)
 - ✅ **Database columns & indexes** added to `pokemon_card_prices`
 - ✅ **Integrated into price sync** - calculates on every sync
+- ✅ **Dashboard "Grading Opportunities" widget** - Shows top cards to grade from user's collection
+  - Bento box UI with sparkles icon and badge count
+  - High-density row design (thumbnail, card info with set name + card number, hero profit number, chevron)
+  - Footer "View all X opportunities" button
+  - Filters out cards already graded
+  - Sorts by SAFE_BET first, then by profit_at_psa10 descending
+- ✅ **Grading Analysis Modal** - Profit breakdown with PSA 10/PSA 9 scenarios
+  - Dynamic "Safe Bet" vs "PSA 10 Required" badge based on PSA 9 profitability
+  - Safety net box with red background when PSA 9 profit is negative
+  - Card number display for physical search workflow
+  - ROI percentage display
+  - Fee transparency
+- ✅ **Recent Scans widget** - Horizontal carousel showing user's grading history
 
-**What's Missing:**
-- ❌ UI displaying recommendations (GradingRecommendation widget)
+**Files Created:**
+- `/src/lib/grading-opportunities-server.ts` - Server-side fetching of profitable cards
+- `/src/components/dashboard/GradingOpportunitiesWidget.tsx` - Dashboard widget
+- `/src/components/dashboard/GradingOpportunityList.tsx` - List component with modal
+- `/src/components/dashboard/GradingOpportunityRow.tsx` - Row with card info + profit
+- `/src/components/dashboard/GradingAnalysisModal.tsx` - Profit analysis modal
+- `/src/components/dashboard/RecentScansWidget.tsx` - Recent grading history carousel
+- `/src/types/grading-opportunity.ts` - TypeScript types
+
+**Files Modified:**
+- `/scripts/sync_pokemon_price_tracker.py` - Updated SAFE_BET logic to require $20+ PSA 10 profit
+- `/src/app/(authenticated)/dashboard/page.tsx` - Integrated new widgets
+- `/src/components/widgets/WidgetSection.tsx` - Added icon, badgeCount, noPadding props
+- `/src/app/globals.css` - Added scrollbar-hide utility for carousel
+
+**What's Still Missing (Future Enhancements):**
 - ❌ Service comparison UI (PSA vs BGS vs SGC)
-- ❌ Dashboard "Top Cards to Grade" widget
-
-**Implementation Tasks:**
-1. ~~Research and compile grading service pricing~~ ✅ COMPLETED (PSA tiers implemented)
-2. ~~Create grading cost calculator~~ ✅ COMPLETED (`get_grading_fee()` + `calculate_grading_potential()`)
-3. ~~Build recommendation engine~~ ✅ COMPLETED (safety tier logic: SAFE_BET/GAMBLE/DO_NOT_GRADE)
-
-4. Create recommendation UI components:
-   - "Should You Grade?" widget with safety tier badge
-   - Profit breakdown (PSA 9 vs PSA 10 scenarios)
-   - Fee transparency display
-   - Service comparison table (future: BGS, SGC)
-5. Integrate into card detail and collection views
-6. Build Dashboard "Top Cards to Grade" widget:
-   - Query cards with `grading_safety_tier = 'SAFE_BET'`
-   - Order by `profit_at_psa10 DESC`
-
-**Files to Create:**
-- `/src/lib/grading-calculator.ts`
-- `/src/data/grading-costs.ts` (static pricing data)
-- `/src/components/grading/GradingRecommendation.tsx`
-- `/src/components/grading/ServiceComparison.tsx`
-
-**Files to Modify:**
-- `/scripts/sync_pokemon_price_tracker.py` (add grading recommendation calculation)
-- `/src/components/collection/CollectionQuickViewContent.tsx` (show recommendations)
-- `/src/app/browse/pokemon/[setId]/[cardId]/page.tsx` (show recommendations)
+- ❌ Integration into browse card detail page
 
 **Dependencies:**
-- Price data (already implemented)
-- Note: Ximilar grading integration (Tier 1, Item 2) is optional - pre-grading recommendations work with existing price data
+- ✅ Price data (implemented)
+- ✅ Ximilar grading integration (implemented)
 
 ---
 
@@ -552,36 +560,28 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 ---
 
 #### 7. Dashboard Completion ⚠️ IN PROGRESS
-**Status:** 🟡 40% Complete
+**Status:** 🟡 75% Complete
 **Priority:** 🟠 High
-**Estimated Effort:** 3-5 days
+**Estimated Effort:** 1-2 days remaining
 
 **What's Done:**
 - ✅ Dashboard page exists (`src/app/(authenticated)/dashboard/page.tsx`)
-- ✅ Layout components (DashboardStats, QuickActions, RecentActivity)
+- ✅ Layout components (DashboardStats, QuickActions)
 - ✅ Responsive design
 - ✅ Navigation integration
+- ✅ **Total Cards widget** - Server-side count from collection_cards table
+- ✅ **Grading Opportunities widget** - Shows profitable cards to grade with profit potential
+- ✅ **Recent Scans widget** - Horizontal carousel of AI grading history (replaced RecentActivity)
+- ✅ Real data integration for card counts and grading opportunities
 
 **What's Missing:**
-- ❌ Real data integration (currently shows "Coming Soon")
-- ❌ Total cards count from collection
 - ❌ Estimated collection value calculation
 - ❌ Cards by category breakdown (Pokemon, One Piece, Sports, Other TCG)
-- ❌ Recent activity feed (cards added, grades updated)
 - ❌ Portfolio value chart (requires historical tracking)
 - ❌ Followers/following counts (requires social features)
 
 **Implementation Tasks:**
-1. Create dashboard data API:
-   ```typescript
-   // /src/app/api/dashboard/stats/route.ts
-   export async function GET() {
-     // Calculate total cards
-     // Calculate collection value (sum of prices)
-     // Get category breakdown
-     // Fetch recent activity
-   }
-   ```
+1. ~~Create dashboard data API~~ ✅ COMPLETED (via getDashboardStats in collection-server.ts)
 2. Implement collection value calculator:
    - Sum all card prices from collection_cards
    - Use variant-specific pricing
@@ -589,27 +589,32 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 3. Create category breakdown query:
    - Count cards per category
    - Calculate value per category
-4. Build recent activity query:
-   - Last 10 cards added
-   - Recent grade updates
-   - Recent price changes
-5. Update DashboardStats component to fetch real data
+4. ~~Build recent activity query~~ ✅ REPLACED with Recent Scans widget
+5. ~~Update DashboardStats component to fetch real data~~ ✅ COMPLETED
 6. Add loading states and error handling
 7. Create mini sparkline charts for trends
 
-**Files to Modify:**
-- `/src/app/(authenticated)/dashboard/page.tsx`
-- `/src/components/dashboard/DashboardStats.tsx`
-- `/src/components/dashboard/RecentActivity.tsx`
+**Files Modified:**
+- `/src/app/(authenticated)/dashboard/page.tsx` - Integrated new widgets
+- `/src/components/dashboard/DashboardStats.tsx` - Real data from server
+- `/src/lib/collection-server.ts` - Added getDashboardStats function
 
-**Files to Create:**
-- `/src/app/api/dashboard/stats/route.ts`
-- `/src/lib/dashboard-service.ts`
+**Files Created:**
+- `/src/components/dashboard/GradingOpportunitiesWidget.tsx`
+- `/src/components/dashboard/GradingOpportunityList.tsx`
+- `/src/components/dashboard/GradingOpportunityRow.tsx`
+- `/src/components/dashboard/GradingAnalysisModal.tsx`
+- `/src/components/dashboard/RecentScansWidget.tsx`
+- `/src/lib/grading-opportunities-server.ts`
+- `/src/lib/recent-scans-server.ts`
+
+**Files Deleted:**
+- `/src/components/dashboard/RecentActivity.tsx` - Replaced by RecentScansWidget
 
 **Dependencies:**
-- Collection data (already exists)
-- Price data (already exists)
-- Portfolio tracking (Tier 1, Item 1) - for charts
+- ✅ Collection data (implemented)
+- ✅ Price data (implemented)
+- ❌ Portfolio tracking (Tier 1, Item 1) - for value charts
 
 ---
 
@@ -1301,13 +1306,13 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Feature | Status | Priority | Effort | Dependencies |
 |---------|--------|----------|--------|--------------|
 | Historical Pricing | 🟡 85% | 🔴 Critical | 1 week | API keys |
-| Grading (Ximilar) | ❌ 0% | 🔴 Critical | 2 weeks | Ximilar API |
-| Card Identification | ❌ 0% | 🔴 Critical | 1.5 weeks | Ximilar API |
-| Pre-grading Recs | 🟡 60% | 🟠 High | 3-5 days | Price data ✅ |
-| AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | Grading, Historical Pricing, Claude API |
+| Grading (Ximilar) | ✅ 100% | 🔴 Critical | ~~2 weeks~~ Done | ~~Ximilar API~~ ✅ |
+| Card Identification | ✅ 100% | 🔴 Critical | ~~1.5 weeks~~ Done | ~~Ximilar API~~ ✅ |
+| Pre-grading Recs | ✅ 100% | 🟠 High | ~~3-5 days~~ Done | ~~Price data~~ ✅ |
+| AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | ~~Grading~~✅, Historical Pricing, Claude API |
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
-| Dashboard Completion | 🟡 40% | 🟠 High | 3-5 days | Collection data |
-| Card Detail Polish | 🟡 90% | 🟡 Medium | 1-2 days | Historical pricing |
+| Dashboard Completion | 🟡 75% | 🟠 High | 1-2 days | Collection data ✅ |
+| Card Detail Polish | 🟡 95% | 🟡 Medium | 1-2 days | Historical pricing |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
 | **Explore/Browse Polish** | 🟡 85% | 🟡 Medium | 3-5 days | None |
@@ -1320,10 +1325,10 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 ### Before Beta Launch
 - [ ] Historical pricing implemented (Tier 1, Item 1)
-- [ ] Grading implemented (Tier 1, Item 2)
-- [ ] Card identification implemented (Tier 1, Item 3)
-- [ ] Pre-grading recommendations (Tier 1, Item 4)
-- [ ] Dashboard with real data (Tier 2, Item 6)
+- [x] Grading implemented (Tier 1, Item 2) ✅ January 10, 2026
+- [x] Card identification implemented (Tier 1, Item 3) ✅ December 21, 2025
+- [x] Pre-grading recommendations (Tier 1, Item 4) ✅ January 10, 2026
+- [ ] Dashboard with real data (Tier 2, Item 6) - 75% complete
 - [ ] Username system (Tier 2, Item 5)
 - [ ] Preprod pipeline (Tier 3, Item 8)
 - [ ] Mobile responsive (Tier 3, Item 9)
@@ -1441,5 +1446,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 6, 2026
-**Document Version:** 2.6 (Card Detail Tablet Responsive Layout)
+**Last Updated:** January 10, 2026
+**Document Version:** 2.7 (Ximilar Grading + Dashboard Widgets Complete)

@@ -1,4 +1,6 @@
 import { getGradingOpportunities } from '@/lib/grading-opportunities-server'
+import { getShowGradingTips } from '@/lib/profile-service'
+import { getAuthenticatedSupabaseClient } from '@/lib/supabase-server'
 import WidgetSection from '@/components/widgets/WidgetSection'
 import GradingOpportunityList from './GradingOpportunityList'
 
@@ -44,6 +46,21 @@ export default async function GradingOpportunitiesWidget({
     return null
   }
 
+  // Fetch user's grading tips preference
+  let showGradingTips = true
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (user) {
+      showGradingTips = await getShowGradingTips(user.id)
+    }
+  } catch {
+    // Default to showing tips on error
+    showGradingTips = true
+  }
+
   return (
     <WidgetSection
       title="Top Opportunities"
@@ -53,6 +70,7 @@ export default async function GradingOpportunitiesWidget({
       <GradingOpportunityList
         opportunities={opportunities}
         totalCount={totalCount}
+        showGradingTips={showGradingTips}
       />
     </WidgetSection>
   )

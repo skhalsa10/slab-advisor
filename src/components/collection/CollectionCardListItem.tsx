@@ -4,12 +4,11 @@ import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
-import { 
-  formatVariant, 
-  formatCondition, 
-  formatQuantity, 
-  formatGrade, 
-  getListBadgeClasses 
+import {
+  formatVariant,
+  formatCondition,
+  formatQuantity,
+  getListBadgeClasses
 } from '@/utils/collectionMetadata'
 import { getCollectionCardPrice, formatPrice, getCardTotalValue } from '@/utils/collectionPriceUtils'
 
@@ -38,7 +37,6 @@ export default function CollectionCardListItem({
   const variant = formatVariant(card.variant, false, true, card.variant_pattern)
   const condition = formatCondition(card.condition, false, true)
   const quantity = formatQuantity(card.quantity)
-  const grade = formatGrade(card.estimated_grade, card.grading_data)
   const badgeClasses = getListBadgeClasses()
 
   const formatDate = (dateString: string | null): string => {
@@ -104,17 +102,6 @@ export default function CollectionCardListItem({
           <span className={`${badgeClasses} bg-blue-100 text-blue-800 font-semibold`}>
             {quantity.text}
           </span>
-        )}
-      </td>
-
-      {/* Grade column */}
-      <td className="px-6 py-4 whitespace-nowrap">
-        {grade ? (
-          <span className={`${badgeClasses} ${grade.isProfessional ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-green-100 border-green-300 text-green-800'} font-mono`}>
-            {grade.text}
-          </span>
-        ) : (
-          <span className="text-sm text-grey-500">Not graded</span>
         )}
       </td>
 

@@ -102,9 +102,7 @@ export type Database = {
           card_type: string | null
           condition: string | null
           created_at: string | null
-          estimated_grade: number | null
           front_image_url: string | null
-          grading_data: Json | null
           id: string
           manual_card_name: string | null
           manual_card_number: string | null
@@ -127,9 +125,7 @@ export type Database = {
           card_type?: string | null
           condition?: string | null
           created_at?: string | null
-          estimated_grade?: number | null
           front_image_url?: string | null
-          grading_data?: Json | null
           id?: string
           manual_card_name?: string | null
           manual_card_number?: string | null
@@ -152,9 +148,7 @@ export type Database = {
           card_type?: string | null
           condition?: string | null
           created_at?: string | null
-          estimated_grade?: number | null
           front_image_url?: string | null
-          grading_data?: Json | null
           id?: string
           manual_card_name?: string | null
           manual_card_number?: string | null
@@ -532,6 +526,7 @@ export type Database = {
           display_name: string | null
           id: string
           is_public: boolean
+          show_grading_tips: boolean
           updated_at: string | null
           user_id: string
           username: string
@@ -543,6 +538,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_public?: boolean
+          show_grading_tips?: boolean
           updated_at?: string | null
           user_id: string
           username: string
@@ -554,6 +550,7 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_public?: boolean
+          show_grading_tips?: boolean
           updated_at?: string | null
           user_id?: string
           username?: string
@@ -627,6 +624,7 @@ export type Database = {
       get_set_tcgplayer_groups: { Args: { set_id: string }; Returns: Json }
       get_user_credit_details: { Args: { p_user_id: string }; Returns: Json }
       get_user_total_cards: { Args: { p_user_id: string }; Returns: number }
+      refund_user_credit: { Args: { p_user_id: string }; Returns: Json }
       reset_monthly_free_credits: {
         Args: never
         Returns: {

@@ -4,12 +4,11 @@ import Image from 'next/image'
 import type { CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
-import { 
-  formatVariant, 
-  formatCondition, 
-  formatQuantity, 
-  formatGrade, 
-  getBadgeBaseClasses 
+import {
+  formatVariant,
+  formatCondition,
+  formatQuantity,
+  getBadgeBaseClasses
 } from '@/utils/collectionMetadata'
 import { getCollectionPriceDisplay, shouldShowTotalPrice } from '@/utils/collectionPriceUtils'
 
@@ -39,7 +38,7 @@ export default function CollectionCardGridItem({
   const variant = formatVariant(card.variant, true, false, card.variant_pattern)
   const condition = formatCondition(card.condition, true)
   const quantity = formatQuantity(card.quantity)
-  const grade = formatGrade(card.estimated_grade, card.grading_data)
+  // Note: Grade badge removed - grading data now lives in collection_card_gradings table
   const badgeClasses = getBadgeBaseClasses()
 
   return (
@@ -66,14 +65,7 @@ export default function CollectionCardGridItem({
           </div>
         )}
         
-        {/* Top-right: Grade badge */}
-        {grade && (
-          <div className="absolute top-2 right-2">
-            <span className={`${badgeClasses} ${grade.colorClass} ${grade.textColor}`}>
-              {grade.shortText}
-            </span>
-          </div>
-        )}
+        {/* Top-right: Grade badge - TODO: Integrate with collection_card_gradings table */}
         
         {/* Bottom-left: Quantity badge (only if > 1) */}
         {quantity.showBadge && (

@@ -1,6 +1,5 @@
 import PageHeader from '@/components/ui/PageHeader'
 import DashboardStats from '@/components/dashboard/DashboardStats'
-import QuickActions from '@/components/dashboard/QuickActions'
 import RecentScansWidget from '@/components/dashboard/RecentScansWidget'
 import GradingOpportunitiesWidget from '@/components/dashboard/GradingOpportunitiesWidget'
 import { getDashboardStats } from '@/lib/collection-server'
@@ -19,8 +18,6 @@ export default async function DashboardPage() {
         />
 
         <DashboardStats stats={stats} />
-
-        <QuickActions />
 
         <GradingOpportunitiesWidget />
 

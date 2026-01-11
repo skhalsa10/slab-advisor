@@ -135,3 +135,30 @@ export async function checkUsernameAvailable(
 
   return data
 }
+
+/**
+ * Gets the show_grading_tips preference for a user
+ *
+ * @param userId - The user's unique identifier
+ * @returns Whether to show grading tips (defaults to true if no profile)
+ */
+export async function getShowGradingTips(userId: string): Promise<boolean> {
+  const supabase = getSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('show_grading_tips')
+    .eq('user_id', userId)
+    .single()
+
+  if (error) {
+    // User has no profile yet - default to showing tips
+    if (error.code === 'PGRST116') {
+      return true
+    }
+    console.error('Error fetching grading tips preference:', error)
+    return true // Default to showing tips on error
+  }
+
+  return data?.show_grading_tips ?? true
+}
