@@ -76,6 +76,17 @@ export default function CameraCapture({
     }
   }, [startCamera, stopCamera, stopLevelListening])
 
+  // Auto-start level listening when permission is granted
+  // This is needed because React state updates are async - when handleEnableLevel
+  // calls startLevelListening() immediately after requestLevelPermission(), the
+  // startListening callback still has the old 'prompt' permission value in its closure.
+  // This effect triggers after the state update propagates with the correct 'granted' value.
+  useEffect(() => {
+    if (levelPermission === 'granted' && !isLevelListening) {
+      startLevelListening()
+    }
+  }, [levelPermission, isLevelListening, startLevelListening])
+
   // Handle enabling level indicator (must be triggered by user gesture for iOS)
   const handleEnableLevel = async () => {
     const granted = await requestLevelPermission()
