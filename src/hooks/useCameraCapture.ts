@@ -22,16 +22,6 @@ export interface UseCameraCaptureOptions {
   imageFormat?: 'image/jpeg' | 'image/png' | 'image/webp'
 }
 
-/** Debug info for torch/flash detection */
-export interface TorchDebugInfo {
-  trackLabel: string
-  hasGetCapabilities: boolean
-  capabilities: Record<string, unknown> | null
-  torchInCapabilities: boolean
-  facingMode: string
-  error: string | null
-}
-
 export interface UseCameraCaptureReturn {
   // State
   cameraState: CameraState
@@ -53,9 +43,6 @@ export interface UseCameraCaptureReturn {
 
   // Utilities
   isFrontCamera: boolean
-
-  // Debug
-  torchDebug: TorchDebugInfo | null
 }
 
 /**
@@ -108,7 +95,6 @@ export function useCameraCapture(
   const [currentFacingMode, setCurrentFacingMode] = useState<'user' | 'environment'>(facingMode)
   const [isFlashOn, setIsFlashOn] = useState(false)
   const [hasFlash, setHasFlash] = useState(false)
-  const [torchDebug, setTorchDebug] = useState<TorchDebugInfo | null>(null)
 
   // Refs
   const videoRef = useRef<HTMLVideoElement | null>(null)
@@ -192,39 +178,17 @@ export function useCameraCapture(
       streamRef.current = stream
       setHasPermission(true)
 
-      // Check for flash/torch capability with debug info
+      // Check for flash/torch capability
       const videoTrack = stream.getVideoTracks()[0]
       if (videoTrack) {
-        const debugInfo: TorchDebugInfo = {
-          trackLabel: videoTrack.label || 'unknown',
-          hasGetCapabilities: typeof videoTrack.getCapabilities === 'function',
-          capabilities: null,
-          torchInCapabilities: false,
-          facingMode: currentFacingMode,
-          error: null,
-        }
-
         try {
-          if (typeof videoTrack.getCapabilities === 'function') {
-            const capabilities = videoTrack.getCapabilities()
-            // Store a subset of capabilities for debug (avoid huge objects)
-            debugInfo.capabilities = {
-              torch: (capabilities as Record<string, unknown>).torch,
-              facingMode: (capabilities as Record<string, unknown>).facingMode,
-              deviceId: (capabilities as Record<string, unknown>).deviceId,
-            }
-            debugInfo.torchInCapabilities = 'torch' in capabilities
-            setHasFlash('torch' in capabilities)
-          } else {
-            debugInfo.error = 'getCapabilities not a function'
-            setHasFlash(false)
-          }
-        } catch (err) {
-          debugInfo.error = err instanceof Error ? err.message : 'Unknown error'
+          const capabilities = videoTrack.getCapabilities?.()
+          // Check if torch is supported (works on Android Chrome, some iOS browsers)
+          const supportsTorch = capabilities && 'torch' in capabilities
+          setHasFlash(!!supportsTorch)
+        } catch {
           setHasFlash(false)
         }
-
-        setTorchDebug(debugInfo)
       }
 
       // Attach stream to video element
@@ -430,9 +394,6 @@ export function useCameraCapture(
     toggleFlash,
 
     // Utilities
-    isFrontCamera: currentFacingMode === 'user',
-
-    // Debug
-    torchDebug,
+    isFrontCamera: currentFacingMode === 'user'
   }
 }
