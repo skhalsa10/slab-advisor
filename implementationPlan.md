@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 10, 2026
+**Last Updated:** January 13, 2026
 
 ### Project Completion: ~85%
 
@@ -23,6 +23,7 @@
 - **Phase 5**: Add Card Flow (95%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking missing
 - **Ximilar Integration**: Card ID complete (100%), Grading complete (100%)
+- **Camera Configuration**: Use-case specific camera settings (100%)
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (85%)
 
 #### ❌ Not Started
@@ -194,6 +195,48 @@ Full camera-based card identification integrated into Quick Add flow. Users can 
 - Server-side Ximilar API calls (protects API key)
 - Database-only results filtering (only shows cards that exist in our database)
 - 1.5 second delay before returning to camera (allows user to see success message)
+
+---
+
+#### 3.5 Camera Configuration ✅ COMPLETED
+**Status:** ✅ 100% Complete
+**Priority:** 🟡 Medium
+**Completed:** January 13, 2026
+
+**Implementation Summary:**
+Configurable camera settings that allow different use cases (grading vs quick add) to have optimized camera behavior. Flash functionality was removed entirely due to glare issues on card surfaces.
+
+**What Was Implemented:**
+- ✅ Removed all flash/torch functionality (causes glare on cards during grading)
+- ✅ `allowCameraSwitch` prop - Enable/disable front/back camera toggle per use case
+- ✅ `showLevelIndicator` prop - Enable/disable bubble level indicator per use case
+- ✅ Device orientation API integration for level detection (iOS permission handling)
+- ✅ Visual bubble level indicator (turns green when phone is level within ±3°)
+
+**Use Case Configuration:**
+| Use Case | Camera Switch | Level Indicator | Rationale |
+|----------|---------------|-----------------|-----------|
+| **AI Grading** | Disabled | Enabled | Back camera only for quality; level helps with precise alignment |
+| **Quick Add** | Enabled | Disabled | Front camera acceptable for identification; speed over precision |
+
+**Files Modified:**
+- `/src/hooks/useCameraCapture.ts` - Removed flash functionality entirely
+- `/src/components/camera/CameraCapture.tsx` - Added `allowCameraSwitch` and `showLevelIndicator` props
+- `/src/contexts/QuickAddContext.tsx` - Set `allowCameraSwitch={true}` for quick add flow
+- `/src/components/dashboard/GradingAnalysisModal.tsx` - Set `showLevelIndicator={true}` for grading flow
+
+**Files Created:**
+- `/src/hooks/useDeviceLevel.ts` - Device orientation hook with iOS permission handling
+- `/src/components/camera/LevelIndicator.tsx` - Visual bubble level component
+
+**Technical Details:**
+- Level threshold: ±3° (configurable via `levelThreshold` option)
+- Level update frequency: 50ms (configurable via `updateInterval` option)
+- iOS 13+ requires explicit permission request via user gesture
+- Bubble offset calculated from beta (front/back tilt) and gamma (left/right tilt)
+
+**Why Flash Was Removed:**
+Flash/torch causes glare on glossy card surfaces, making it counterproductive for both grading (need to see surface details) and identification (need clear image). The `MediaStreamTrack.getCapabilities()` API also has limited browser compatibility, causing the flash button to not appear on many Android devices.
 
 ---
 
@@ -1751,5 +1794,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 10, 2026
-**Document Version:** 2.8 (Future Dashboard Roadmap Added)
+**Last Updated:** January 13, 2026
+**Document Version:** 2.9 (Camera Configuration Added)
