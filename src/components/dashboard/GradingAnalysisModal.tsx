@@ -387,6 +387,7 @@ export default function GradingAnalysisModal({
         title="Capture Front"
         instructionText="Position the front of your card within the frame"
         hideSearchByText
+        showLevelIndicator
       />
     )
   }
@@ -409,6 +410,7 @@ export default function GradingAnalysisModal({
         title="Capture Back"
         instructionText="Position the back of your card within the frame"
         hideSearchByText
+        showLevelIndicator
       />
     )
   }

@@ -18,6 +18,10 @@ interface CameraCaptureProps {
   instructionText?: string
   /** Hide the "or search by text" link (default: false) */
   hideSearchByText?: boolean
+  /** Allow switching between front and back camera (default: false - back camera only for card quality) */
+  allowCameraSwitch?: boolean
+  /** Show level indicator for precise card alignment (default: false) */
+  showLevelIndicator?: boolean
 }
 
 /**
@@ -35,6 +39,8 @@ export default function CameraCapture({
   title = 'Scan Card',
   instructionText = 'Align card within the frame',
   hideSearchByText = false,
+  allowCameraSwitch = false,
+  showLevelIndicator = false,
 }: CameraCaptureProps) {
   const {
     videoRef,
@@ -170,8 +176,8 @@ export default function CameraCapture({
         <span className="text-white font-medium">{title}</span>
 
         <div className="flex items-center gap-2">
-          {/* Enable Level button - show if supported but not yet granted */}
-          {isLevelSupported && levelPermission === 'prompt' && (
+          {/* Enable Level button - show if level indicator is enabled and supported but not yet granted */}
+          {showLevelIndicator && isLevelSupported && levelPermission === 'prompt' && (
             <button
               onClick={handleEnableLevel}
               className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
@@ -188,16 +194,18 @@ export default function CameraCapture({
             </button>
           )}
 
-          {/* Switch camera button */}
-          <button
-            onClick={switchCamera}
-            className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
-            aria-label="Switch camera"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+          {/* Switch camera button - only show if camera switching is allowed */}
+          {allowCameraSwitch && (
+            <button
+              onClick={switchCamera}
+              className="p-2 text-white hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Switch camera"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -233,8 +241,8 @@ export default function CameraCapture({
               <div className="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-4 border-r-4 border-orange-500 rounded-br-lg" />
             </div>
 
-            {/* Level indicator - show inside the card frame when listening */}
-            {isLevelListening && cameraState === 'active' && (
+            {/* Level indicator - show inside the card frame when enabled and listening */}
+            {showLevelIndicator && isLevelListening && cameraState === 'active' && (
               <LevelIndicator
                 beta={beta}
                 gamma={gamma}

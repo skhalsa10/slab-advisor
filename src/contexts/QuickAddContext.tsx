@@ -201,6 +201,7 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
         onClose={() => setCurrentView('choice')}
         onSearchByText={() => setCurrentView('choice')}
         isProcessing={isIdentifying}
+        allowCameraSwitch
       />
     )
   }
