@@ -48,8 +48,30 @@ export default function CameraCapture({
     toggleFlash,
     isFlashOn,
     hasFlash,
-    isFrontCamera
+    isFrontCamera,
+    torchDebug,
   } = useCameraCapture()
+
+  // Debug mode - tap title 3 times to toggle
+  const [showDebug, setShowDebug] = useState(false)
+  const [, setDebugTapCount] = useState(0)
+  const debugTapTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleTitleTap = () => {
+    setDebugTapCount(prev => {
+      const newCount = prev + 1
+      if (newCount >= 3) {
+        setShowDebug(s => !s)
+        return 0
+      }
+      // Reset tap count after 1 second
+      if (debugTapTimeoutRef.current) {
+        clearTimeout(debugTapTimeoutRef.current)
+      }
+      debugTapTimeoutRef.current = setTimeout(() => setDebugTapCount(0), 1000)
+      return newCount
+    })
+  }
 
   // Device level hook for bubble level indicator
   const {
@@ -170,7 +192,12 @@ export default function CameraCapture({
           </svg>
         </button>
 
-        <span className="text-white font-medium">{title}</span>
+        <span
+          className="text-white font-medium cursor-pointer select-none"
+          onClick={handleTitleTap}
+        >
+          {title}
+        </span>
 
         <div className="flex items-center gap-2">
           {/* Enable Level button - show if supported but not yet granted */}
@@ -314,6 +341,36 @@ export default function CameraCapture({
                 {isCompressing ? 'Preparing image...' : 'Identifying card...'}
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Debug overlay - tap title 3 times to toggle */}
+        {showDebug && torchDebug && (
+          <div className="absolute top-20 left-4 right-4 z-20 bg-black/80 rounded-lg p-3 text-xs font-mono text-green-400 max-h-[40vh] overflow-auto">
+            <div className="font-bold text-white mb-2">Torch Debug Info:</div>
+            <div>Track: {torchDebug.trackLabel}</div>
+            <div>hasGetCapabilities: {String(torchDebug.hasGetCapabilities)}</div>
+            <div>torchInCapabilities: {String(torchDebug.torchInCapabilities)}</div>
+            <div>facingMode: {torchDebug.facingMode}</div>
+            <div>hasFlash state: {String(hasFlash)}</div>
+            <div>isFrontCamera: {String(isFrontCamera)}</div>
+            {torchDebug.error && (
+              <div className="text-red-400">Error: {torchDebug.error}</div>
+            )}
+            {torchDebug.capabilities && (
+              <div className="mt-2">
+                <div className="text-white">Capabilities:</div>
+                <pre className="text-[10px] whitespace-pre-wrap">
+                  {JSON.stringify(torchDebug.capabilities, null, 2)}
+                </pre>
+              </div>
+            )}
+            <button
+              onClick={() => setShowDebug(false)}
+              className="mt-2 px-2 py-1 bg-red-600 text-white rounded text-xs"
+            >
+              Close Debug
+            </button>
           </div>
         )}
       </div>
