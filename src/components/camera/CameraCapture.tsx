@@ -45,9 +45,6 @@ export default function CameraCapture({
     stopCamera,
     capturePhoto,
     switchCamera,
-    toggleFlash,
-    isFlashOn,
-    hasFlash,
     isFrontCamera
   } = useCameraCapture()
 
@@ -188,29 +185,6 @@ export default function CameraCapture({
                 <line x1="2" y1="12" x2="6" y2="12" strokeWidth={2} />
                 <line x1="18" y1="12" x2="22" y2="12" strokeWidth={2} />
               </svg>
-            </button>
-          )}
-
-          {/* Flash toggle button - only show if flash is available and not front camera */}
-          {hasFlash && !isFrontCamera && (
-            <button
-              onClick={toggleFlash}
-              className={`p-2 rounded-full transition-colors ${
-                isFlashOn
-                  ? 'bg-yellow-500 text-black'
-                  : 'text-white hover:bg-white/20'
-              }`}
-              aria-label={isFlashOn ? 'Turn off flash' : 'Turn on flash'}
-            >
-              {isFlashOn ? (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              )}
             </button>
           )}
 
