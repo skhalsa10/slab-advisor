@@ -444,7 +444,7 @@ class PokemonPriceTrackerSync:
 
         return (market_price, 'Near Mint')  # Default to Near Mint if no condition found
 
-    def transform_card_to_price_record(self, card: Dict, our_card_id: str) -> Dict:
+    def transform_card_to_price_record(self, card: Dict, our_card_id: str, variant_pattern: Optional[str] = None) -> Dict:
         """
         Transform a PokemonPriceTracker API card response to a pokemon_card_prices record.
         """
@@ -507,6 +507,7 @@ class PokemonPriceTrackerSync:
         # Note: For JSONB columns, pass Python dicts directly - Supabase handles serialization
         return {
             'pokemon_card_id': our_card_id,
+            'variant_pattern': variant_pattern,  # NULL for base, 'poke_ball' or 'master_ball' for pattern variants
             'tcgplayer_product_id': tcgplayer_product_id,
             'current_market_price': market_price,
             'current_market_price_condition': condition,
@@ -540,10 +541,13 @@ class PokemonPriceTrackerSync:
             'grading_safety_tier': grading_potential['grading_safety_tier']
         }
 
-    def find_our_card_id(self, ppt_card: Dict, cards_by_tcgplayer_id: Dict) -> Optional[str]:
+    def find_our_card_id(self, ppt_card: Dict, cards_by_tcgplayer_id: Dict) -> Optional[tuple]:
         """
-        Find our pokemon_cards.id for a PokemonPriceTracker card.
+        Find our pokemon_cards.id and variant_pattern for a PokemonPriceTracker card.
         Matches by tcgplayer_product_id.
+
+        Returns:
+            Tuple of (pokemon_card_id, variant_pattern) or None if not found
         """
         tcgplayer_id = ppt_card.get('tcgPlayerId')
         if tcgplayer_id:
@@ -554,24 +558,50 @@ class PokemonPriceTrackerSync:
                 pass
         return None
 
-    def get_cards_for_set_from_db(self, set_id: str) -> Dict[int, str]:
+    def get_cards_for_set_from_db(self, set_id: str) -> Dict[int, tuple]:
         """
         Get all cards for a set from our database.
-        Returns a dict mapping tcgplayer_product_id -> pokemon_card.id
+        Returns a dict mapping tcgplayer_product_id -> (pokemon_card.id, variant_pattern)
+
+        Uses tcgplayer_products JSON for ALL cards (even single-variant cards store their
+        product ID there), so we get complete coverage of all product IDs including
+        Poké Ball and Master Ball pattern variants.
         """
         cards_by_tcgplayer_id = {}
 
         try:
-            # Fetch all cards for this set with tcgplayer_product_id
+            # Fetch all cards for this set with tcgplayer_products
             result = self.supabase.table('pokemon_cards')\
-                .select('id, tcgplayer_product_id')\
+                .select('id, tcgplayer_products')\
                 .eq('set_id', set_id)\
-                .not_.is_('tcgplayer_product_id', 'null')\
+                .not_.is_('tcgplayer_products', 'null')\
                 .execute()
 
             for card in result.data:
-                if card.get('tcgplayer_product_id'):
-                    cards_by_tcgplayer_id[card['tcgplayer_product_id']] = card['id']
+                tcgplayer_products = card.get('tcgplayer_products')
+                if tcgplayer_products:
+                    # Parse JSON string if needed
+                    if isinstance(tcgplayer_products, str):
+                        products = json.loads(tcgplayer_products)
+                    else:
+                        products = tcgplayer_products
+
+                    for product in products:
+                        product_id = product.get('product_id')
+                        if not product_id:
+                            continue
+
+                        variant_types = product.get('variant_types', [])
+
+                        # Determine variant_pattern from variant_types
+                        if 'poke_ball' in variant_types:
+                            variant_pattern = 'poke_ball'
+                        elif 'master_ball' in variant_types:
+                            variant_pattern = 'master_ball'
+                        else:
+                            variant_pattern = None  # Base product (normal, holo, reverse, etc.)
+
+                        cards_by_tcgplayer_id[product_id] = (card['id'], variant_pattern)
 
         except Exception as e:
             console.print(f"[red]Error fetching cards from database: {e}[/red]")
@@ -581,21 +611,24 @@ class PokemonPriceTrackerSync:
     def upsert_price_record(self, record: Dict, dry_run: bool = False) -> bool:
         """
         Insert or update a pokemon_card_prices record.
-        Uses upsert with pokemon_card_id as the conflict key.
+        Uses upsert with (pokemon_card_id, variant_pattern) as the composite conflict key.
         """
+        variant_pattern = record.get('variant_pattern')
+        variant_display = f" ({variant_pattern})" if variant_pattern else ""
+
         if dry_run:
-            console.print(f"[yellow]DRY RUN: Would upsert price for {record['pokemon_card_id']}[/yellow]")
+            console.print(f"[yellow]DRY RUN: Would upsert price for {record['pokemon_card_id']}{variant_display}[/yellow]")
             return True
 
         try:
-            # Use upsert to insert or update based on pokemon_card_id
+            # Use upsert to insert or update based on (pokemon_card_id, variant_pattern)
             result = self.supabase.table('pokemon_card_prices')\
-                .upsert(record, on_conflict='pokemon_card_id')\
+                .upsert(record, on_conflict='pokemon_card_id,variant_pattern')\
                 .execute()
 
             return len(result.data) > 0
         except Exception as e:
-            console.print(f"[red]Error upserting price record: {e}[/red]")
+            console.print(f"[red]Error upserting price record for {record['pokemon_card_id']}{variant_display}: {e}[/red]")
             return False
 
     def process_set(self, set_info: Dict, dry_run: bool = False) -> Dict[str, int]:
@@ -646,10 +679,10 @@ class PokemonPriceTrackerSync:
                 card_name = ppt_card.get('name', 'Unknown')
                 progress.update(task, description=f"Processing {card_name}...")
 
-                # Find our card ID
-                our_card_id = self.find_our_card_id(ppt_card, cards_by_tcgplayer_id)
+                # Find our card ID and variant pattern
+                card_info = self.find_our_card_id(ppt_card, cards_by_tcgplayer_id)
 
-                if not our_card_id:
+                if not card_info:
                     stats['cards_skipped'] += 1
                     # Track skipped card for logging
                     if tcgplayer_set_id not in self.skipped_cards:
@@ -669,11 +702,12 @@ class PokemonPriceTrackerSync:
                     progress.advance(task)
                     continue
 
+                our_card_id, variant_pattern = card_info
                 stats['cards_matched'] += 1
 
                 # Transform and upsert
                 try:
-                    price_record = self.transform_card_to_price_record(ppt_card, our_card_id)
+                    price_record = self.transform_card_to_price_record(ppt_card, our_card_id, variant_pattern)
                     success = self.upsert_price_record(price_record, dry_run)
 
                     if success:
@@ -681,7 +715,8 @@ class PokemonPriceTrackerSync:
                     else:
                         stats['errors'] += 1
                 except Exception as e:
-                    console.print(f"[red]Error processing card {card_name}: {e}[/red]")
+                    variant_display = f" ({variant_pattern})" if variant_pattern else ""
+                    console.print(f"[red]Error processing card {card_name}{variant_display}: {e}[/red]")
                     stats['errors'] += 1
 
                 progress.advance(task)

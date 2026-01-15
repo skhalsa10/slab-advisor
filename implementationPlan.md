@@ -2,14 +2,14 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 13, 2026
+**Last Updated:** January 14, 2026
 
-### Project Completion: ~85%
+### Project Completion: ~87%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
 - **Phase 2**: Core Upload & Grading Framework (100%)
-- **Database Schema**: Pokemon cards, collections, pricing infrastructure (85%)
+- **Database Schema**: Pokemon cards, collections, pricing infrastructure, portfolio snapshots (90%)
 - **Pricing Pipeline**: Python scripts for daily price updates (90%)
 - **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (90%)
 - **Collection Management**: CRUD operations, grid/list views (70%)
@@ -27,7 +27,7 @@
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (85%)
 
 #### ❌ Not Started
-- **Historical Portfolio Tracking**: Portfolio snapshots, value charts (0%)
+- **Historical Portfolio Tracking (Frontend)**: Portfolio value chart component (database complete, waiting for data)
 - **Social Features**: Username, followers, shareable collections (0%)
 - **Gamma/Preprod Pipeline**: Staging environment setup (0%)
 - **Store/Marketplace**: Internal product purchasing (0%)
@@ -41,9 +41,9 @@
 These features deliver unique value that competitors don't have and form the foundation of the product's value proposition.
 
 #### 1. Historical Pricing ⚠️ IN PROGRESS
-**Status:** 🟡 85% Complete
+**Status:** 🟡 95% Complete (Database done, frontend pending)
 **Priority:** 🔴 Critical
-**Estimated Effort:** 3-5 days remaining
+**Estimated Effort:** 2-3 days remaining (frontend only)
 
 **What's Done:**
 - ✅ Python price update script (`scripts/update_pokemon_prices.py`)
@@ -63,32 +63,103 @@ These features deliver unique value that competitors don't have and form the fou
 - ✅ **PSA 10 potential upsell** - Shows graded value for Near Mint raw cards
 - ✅ **Confidence indicator** - Shows price confidence for graded cards
 - ✅ **Chart UX improvements** - Limited X-axis ticks, Y-axis padding, single data point handling, smooth curves
+- ✅ **`portfolio_snapshots` table** - Tracks portfolio value over time with RLS policies
+- ✅ **`snapshot_all_portfolios()` function** - Efficient bulk INSERT with variant/condition mapping
+- ✅ **pg_cron job** - Daily midnight UTC snapshots scheduled
+- ✅ **Initial snapshot created** - Verified working (1 user, 91 cards, $2,430.14)
 
-**What's Missing:**
-- ❌ `portfolio_snapshots` table (track portfolio value over time)
-- ❌ Portfolio value calculation service (`src/lib/portfolio-service.ts`)
-- ❌ Vercel cron job configuration (`vercel.json`)
-- ❌ API endpoint `/api/cron/update-prices`
+**What's Missing (Frontend - After Data Accumulates):**
+- ❌ `PortfolioHistoryChart.tsx` component (Recharts AreaChart with time ranges)
+- ❌ Update `getDashboardStats()` to show real estimated value from snapshots
+- ❌ Portfolio history data fetching in `src/lib/portfolio-server.ts`
+- ❌ TypeScript types for `PortfolioSnapshot` in `src/types/database.ts`
 
-**Implementation Tasks:**
-1. Create database migration for portfolio_snapshots table
-2. Create `src/lib/portfolio-service.ts` for portfolio calculations
-3. Build `/api/cron/update-prices` Vercel endpoint
-4. Create `vercel.json` with cron configuration
-5. Implement portfolio value calculation API
-6. Build portfolio chart components
+**Database Implementation Details:**
+
+The `portfolio_snapshots` table stores daily portfolio values:
+```sql
+CREATE TABLE portfolio_snapshots (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recorded_at DATE NOT NULL DEFAULT CURRENT_DATE,
+  total_value NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  card_count INTEGER NOT NULL DEFAULT 0,
+  product_value NUMERIC(12, 2) NOT NULL DEFAULT 0,  -- Future: sealed products
+  product_count INTEGER NOT NULL DEFAULT 0,          -- Future: sealed products
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_date UNIQUE (user_id, recorded_at)
+);
+```
+
+The `snapshot_all_portfolios()` function:
+- **Bulk INSERT with UPSERT** - No loops, efficient for any number of users
+- **Variant mapping**: collection_cards → prices_raw keys
+  - `holo` → `Holofoil`
+  - `reverse_holo` → `Reverse Holofoil`
+  - `first_edition` → `1st Edition Holofoil`
+  - `illustration_rare`, `alt_art`, `full_art`, `secret_rare` → `Holofoil`
+  - Default → `Normal`
+- **Condition mapping**: collection_cards → prices_raw keys
+  - `mint`, `near_mint` → `Near Mint`
+  - `lightly_played` → `Lightly Played`
+  - `moderately_played` → `Moderately Played`
+  - `heavily_played` → `Heavily Played`
+  - `damaged` → `Damaged`
+- **Price fallback priority**:
+  1. Exact variant/condition price from `prices_raw`
+  2. `current_market_price` (reliable default with condition)
+  3. Market average from `prices_raw->>'market'`
+  4. Zero (no price available)
+
+**Next Steps (After Data Accumulates - ~7 days):**
+
+1. **Create TypeScript types** (`/src/types/database.ts`):
+   ```typescript
+   export interface PortfolioSnapshot {
+     id: number;
+     user_id: string;
+     recorded_at: string;
+     total_value: number;
+     card_count: number;
+     product_value: number;
+     product_count: number;
+     created_at: string;
+   }
+   ```
+
+2. **Create data fetcher** (`/src/lib/portfolio-server.ts`):
+   - `getPortfolioHistory(userId, days)` - Fetch snapshots for chart
+   - `getCurrentPortfolioValue(userId)` - Get latest snapshot or live calculation
+
+3. **Create chart component** (`/src/components/dashboard/PortfolioHistoryChart.tsx`):
+   - Use existing Recharts patterns from `PriceWidget.tsx`
+   - Green gradient fill (`#10B981` / emerald-500)
+   - Time range selector: 7D, 30D, 90D, 1Y
+   - Custom tooltip with date + currency formatted value
+   - Empty state: Show current live value as single point if no history
+
+4. **Update Dashboard** (`/src/app/(authenticated)/dashboard/page.tsx`):
+   - Add `PortfolioHistoryChart` below `DashboardStats`
+   - Fetch portfolio history in server component
+
+5. **Update `getDashboardStats()`** (`/src/lib/collection-server.ts`):
+   - Return `estimatedValue` from latest `portfolio_snapshots` entry
+   - Fall back to live calculation if no snapshots
 
 **Files to Create:**
-- `/src/lib/portfolio-service.ts`
-- `/src/app/api/cron/update-prices/route.ts`
-- `/src/app/api/portfolio/calculate/route.ts`
-- `/src/components/portfolio/PortfolioValue.tsx`
-- `/src/components/portfolio/PortfolioChart.tsx`
-- `/vercel.json`
+- `/src/lib/portfolio-server.ts`
+- `/src/components/dashboard/PortfolioHistoryChart.tsx`
+
+**Files to Modify:**
+- `/src/types/database.ts` - Add PortfolioSnapshot type
+- `/src/lib/collection-server.ts` - Update getDashboardStats
+- `/src/app/(authenticated)/dashboard/page.tsx` - Add chart component
 
 **Dependencies:**
-- PokemonPriceTracker API key
-- CRON_SECRET environment variable
+- ✅ pg_cron extension (enabled)
+- ✅ portfolio_snapshots table (created)
+- ✅ snapshot_all_portfolios() function (created)
+- ✅ Daily cron job (scheduled at midnight UTC)
 
 ---
 
@@ -1042,24 +1113,34 @@ These features ensure production readiness, prevent disasters, and polish the us
 #### user_credits
 - ✅ Credit system: `free_credits`, `purchased_credits`, `total_credits`
 
-### ❌ Missing Tables
+### ✅ Recently Implemented Tables
 
-#### portfolio_snapshots
-**Purpose:** Track user portfolio value over time
+#### portfolio_snapshots ✅ IMPLEMENTED (January 14, 2026)
+**Purpose:** Track user portfolio value over time for historical charts
 **Schema:**
 ```sql
 CREATE TABLE portfolio_snapshots (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id),
-  total_value NUMERIC(12, 2),
-  total_cards INTEGER,
-  cards_by_category JSONB, -- {"pokemon": 100, "onepiece": 50}
-  snapshot_date TIMESTAMPTZ DEFAULT now()
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recorded_at DATE NOT NULL DEFAULT CURRENT_DATE,
+  total_value NUMERIC(12, 2) NOT NULL DEFAULT 0,
+  card_count INTEGER NOT NULL DEFAULT 0,
+  product_value NUMERIC(12, 2) NOT NULL DEFAULT 0,  -- Future: sealed products
+  product_count INTEGER NOT NULL DEFAULT 0,          -- Future: sealed products
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_date UNIQUE (user_id, recorded_at)
 );
 
-CREATE INDEX idx_portfolio_snapshots_user ON portfolio_snapshots(user_id);
-CREATE INDEX idx_portfolio_snapshots_date ON portfolio_snapshots(snapshot_date);
+CREATE INDEX idx_portfolio_snapshots_user_date ON portfolio_snapshots(user_id, recorded_at DESC);
+-- RLS: Users can only view their own snapshots
 ```
+
+**Associated Functions:**
+- `snapshot_all_portfolios()` - Efficient bulk INSERT run by pg_cron daily at midnight UTC
+
+---
+
+### ❌ Missing Tables
 
 #### profiles
 **Purpose:** User profiles with usernames for social features
@@ -1348,7 +1429,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 | Feature | Status | Priority | Effort | Dependencies |
 |---------|--------|----------|--------|--------------|
-| Historical Pricing | 🟡 85% | 🔴 Critical | 1 week | API keys |
+| Historical Pricing | 🟡 95% | 🔴 Critical | 2-3 days (frontend) | ~~DB/cron~~ ✅ |
 | Grading (Ximilar) | ✅ 100% | 🔴 Critical | ~~2 weeks~~ Done | ~~Ximilar API~~ ✅ |
 | Card Identification | ✅ 100% | 🔴 Critical | ~~1.5 weeks~~ Done | ~~Ximilar API~~ ✅ |
 | Pre-grading Recs | ✅ 100% | 🟠 High | ~~3-5 days~~ Done | ~~Price data~~ ✅ |
@@ -1367,7 +1448,8 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 ## 🏁 Launch Readiness Checklist
 
 ### Before Beta Launch
-- [ ] Historical pricing implemented (Tier 1, Item 1)
+- [x] Historical pricing database (Tier 1, Item 1) ✅ January 14, 2026 (pg_cron + snapshots)
+- [ ] Historical pricing frontend (Tier 1, Item 1) - Portfolio chart component (after data accumulates)
 - [x] Grading implemented (Tier 1, Item 2) ✅ January 10, 2026
 - [x] Card identification implemented (Tier 1, Item 3) ✅ December 21, 2025
 - [x] Pre-grading recommendations (Tier 1, Item 4) ✅ January 10, 2026
@@ -1464,10 +1546,10 @@ This section outlines the next wave of features to transform the dashboard into 
 
 ### Phase 1: The "Fintech" Layer (Money & Value)
 
-#### Portfolio Value Graph (Hero Component) ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### Portfolio Value Graph (Hero Component) ⚠️ IN PROGRESS
+**Status:** 🟡 50% Complete (Backend done, frontend pending)
 **Priority:** 🔴 Critical
-**Estimated Effort:** 1 week
+**Estimated Effort:** 2-3 days remaining (frontend only)
 
 **Description:**
 A beautiful, interactive portfolio value chart that shows the user's collection value over time. This is the "hero" component that makes users feel like they're managing real investments.
@@ -1476,19 +1558,33 @@ A beautiful, interactive portfolio value chart that shows the user's collection 
 
 **Technical Requirements:**
 - `Recharts` (AreaChart with gradient fill)
-- Time-series data (1W, 1M, 1Y, All Time)
+- Time-series data (7D, 30D, 90D, 1Y)
 - Hover-to-reveal exact value at point
 - Percentage growth indicator (e.g., "+12% this month")
 - Smooth animations on load
 
-**Dependencies:**
-- `portfolio_snapshots` table (from Historical Pricing task)
-- Portfolio calculation service
-- Daily cron job to snapshot portfolio values
+**What's Done (Database Layer):**
+- ✅ `portfolio_snapshots` table created with RLS policies
+- ✅ `snapshot_all_portfolios()` function with efficient bulk UPSERT
+- ✅ pg_cron job scheduled (midnight UTC daily)
+- ✅ Initial snapshot verified working ($2,430.14 for test user)
+- ✅ Extensible schema for future sealed products (product_value, product_count columns)
+
+**What's Missing (Frontend - After ~7 days of data):**
+- ❌ `PortfolioHistoryChart.tsx` component
+- ❌ `portfolio-server.ts` data fetching functions
+- ❌ TypeScript types for PortfolioSnapshot
+- ❌ Integration into dashboard page
+- ❌ Update getDashboardStats() to show real estimated value
 
 **Files to Create:**
-- `/src/components/dashboard/PortfolioValueChart.tsx`
-- `/src/lib/portfolio-snapshot-service.ts`
+- `/src/components/dashboard/PortfolioHistoryChart.tsx`
+- `/src/lib/portfolio-server.ts`
+
+**Files to Modify:**
+- `/src/types/database.ts` - Add PortfolioSnapshot type
+- `/src/lib/collection-server.ts` - Update getDashboardStats
+- `/src/app/(authenticated)/dashboard/page.tsx` - Add chart component
 
 ---
 
@@ -1752,7 +1848,7 @@ CREATE TABLE activity_feed (
 
 | Priority | Widget | Effort | Dependencies |
 |----------|--------|--------|--------------|
-| 1 | Portfolio Value Graph | 1 week | Historical Pricing, Snapshots |
+| 1 | Portfolio Value Graph | 2-3 days | ~~Snapshots~~ ✅ (waiting for data to accumulate) |
 | 2 | Top 3 Gems | 2-3 days | Price data |
 | 3 | Set Completion | 1 week | Set metadata |
 | 4 | Market Movers | 3-4 days | 24h price history |
@@ -1794,5 +1890,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 13, 2026
-**Document Version:** 2.9 (Camera Configuration Added)
+**Last Updated:** January 14, 2026
+**Document Version:** 3.0 (Portfolio Snapshots Database Implemented)
