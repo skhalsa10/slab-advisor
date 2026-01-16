@@ -1,5 +1,5 @@
 import { getCardWithSetServer } from '@/lib/pokemon-db-server'
-import { getCardPrices } from '@/actions/prices'
+import { getAllCardPrices } from '@/actions/prices'
 import AppNavigation from '@/components/layout/AppNavigation'
 import CardDetailClient from './CardDetailClient'
 import Link from 'next/link'
@@ -23,8 +23,8 @@ export default async function CardDetailsPage({ params }: CardDetailsPageProps) 
     // Fetch card and set data server-side for security
     const { card, set } = await getCardWithSetServer(cardId)
 
-    // Fetch price data at page level for flexibility
-    const { data: priceData } = await getCardPrices(cardId)
+    // Fetch price data at page level for flexibility (includes all variant patterns)
+    const { data: priceData } = await getAllCardPrices(cardId)
 
     return (
       <AppNavigation>

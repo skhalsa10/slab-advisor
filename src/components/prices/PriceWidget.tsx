@@ -111,8 +111,11 @@ export function PriceWidget({
     (g) => priceData?.[g.value] !== null
   );
 
-  // Chart data based on current view mode
-  const rawChartData: ChartDataPoint[] = useMemo(() => {
+  // Chart data - use context if available (handles pattern variants correctly),
+  // otherwise compute locally for standalone mode
+  const localRawChartData: ChartDataPoint[] = useMemo(() => {
+    // Skip local computation if we have context (context handles variantKey correctly)
+    if (context) return [];
     if (!priceData) return [];
     if (viewMode === 'Raw') {
       const history = getRawHistoryForTimeRange(priceData, timeRange);
@@ -124,14 +127,16 @@ export function PriceWidget({
         timeRangeToDays(timeRange)
       );
     }
-  }, [viewMode, timeRange, variant, condition, grade, priceData]);
+  }, [context, viewMode, timeRange, variant, condition, grade, priceData]);
 
-  // Handle single data point by creating a flat line
+  // Handle single data point by creating a flat line (for standalone mode only)
   // Recharts can't draw a line/area with only 1 point
   // For graded view, append today's smart market price so chart ends at displayed price
-  const chartData: ChartDataPoint[] = useMemo(() => {
+  const localChartData: ChartDataPoint[] = useMemo(() => {
+    // Skip local computation if we have context
+    if (context) return [];
     if (!priceData) return [];
-    let data = rawChartData;
+    let data = localRawChartData;
 
     // For graded view, add today's data point with smart market price
     // This ensures the chart ends at the price shown in the header
@@ -168,7 +173,10 @@ export function PriceWidget({
     }
 
     return data;
-  }, [rawChartData, timeRange, viewMode, grade, priceData]);
+  }, [context, localRawChartData, timeRange, viewMode, grade, priceData]);
+
+  // Use context chartData if available, otherwise use local computation
+  const chartData = context?.chartData ?? localChartData;
 
   // Current price display - get the most recent price from chart data
   const currentPrice = useMemo(() => {
@@ -313,20 +321,26 @@ export function PriceWidget({
 
           {/* Variant selector (if multiple variants and not hidden) */}
           {!hideVariantSwatch && viewMode === 'Raw' && availableVariants.length > 1 && (
-            <div className="flex gap-2 mb-3">
-              {availableVariants.map((v) => (
-                <button
-                  key={v}
-                  onClick={() => setVariant(v)}
-                  className={`px-2 py-1 text-xs rounded-md transition-colors ${
-                    variant === v
-                      ? 'bg-gray-800 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {v}
-                </button>
-              ))}
+            <div className="flex gap-2 mb-3 flex-wrap">
+              {availableVariants.map((v) => {
+                // Handle both string[] (legacy/standalone) and VariantOption[] (context) formats
+                const displayName = typeof v === 'string' ? v : v.displayName;
+                const key = typeof v === 'string' ? v : `${v.sourcePattern || 'base'}-${v.variantKey}`;
+                const isSelected = typeof v === 'string' ? variant === v : variant === v.displayName;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setVariant(displayName)}
+                    className={`px-2 py-1 text-xs rounded-md transition-colors ${
+                      isSelected
+                        ? 'bg-gray-800 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {displayName}
+                  </button>
+                );
+              })}
             </div>
           )}
 

@@ -5,10 +5,14 @@ import {
   useContext,
   useState,
   useMemo,
+  useCallback,
+  useEffect,
   type ReactNode,
 } from 'react';
 import type {
   PokemonCardPrices,
+  CombinedCardPrices,
+  VariantOption,
   TimeRange,
   ViewMode,
   PsaGradeKey,
@@ -17,7 +21,6 @@ import type {
 import {
   hasRawHistory,
   hasGradedData,
-  getDefaultVariant,
   getDefaultCondition,
   getDefaultGrade,
   getRawHistoryForTimeRange,
@@ -26,38 +29,49 @@ import {
   timeRangeToDays,
 } from '@/utils/priceHistoryUtils';
 
+// Key used for base variant records (null pattern stored as '_base' in Record)
+const BASE_PATTERN_KEY = '_base';
+
 // =============================================================================
 // Context Types
 // =============================================================================
 
 interface PriceWidgetContextValue {
-  // Price data (read-only)
+  // Active price record (changes based on selected variant)
   priceData: PokemonCardPrices;
+
+  // Combined data (all records)
+  combinedPrices: CombinedCardPrices;
 
   // UI State
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
   timeRange: TimeRange;
   setTimeRange: (range: TimeRange) => void;
-  variant: string;
-  setVariant: (variant: string) => void;
+  selectedVariant: VariantOption;
+  setSelectedVariant: (variant: VariantOption) => void;
   condition: string;
   setCondition: (condition: string) => void;
   grade: PsaGradeKey;
   setGrade: (grade: PsaGradeKey) => void;
 
   // Derived values
-  availableVariants: string[];
+  availableVariants: VariantOption[];
   availableConditions: string[];
   availableGrades: { value: PsaGradeKey; label: string }[];
   hasRaw: boolean;
   hasGraded: boolean;
+  hasPatternVariants: boolean;
 
   // Computed price values (for PriceHeadline)
   chartData: ChartDataPoint[];
   currentPrice: number | null;
   priceChange: number | null;
   psa10Potential: number | null;
+
+  // Legacy compatibility - variant as string (display name)
+  variant: string;
+  setVariant: (displayName: string) => void;
 }
 
 // =============================================================================
@@ -71,7 +85,7 @@ const PriceWidgetContext = createContext<PriceWidgetContextValue | null>(null);
 // =============================================================================
 
 interface PriceWidgetProviderProps {
-  priceData: PokemonCardPrices;
+  priceData: CombinedCardPrices;
   children: ReactNode;
 }
 
@@ -82,45 +96,92 @@ const PSA_GRADES: { value: PsaGradeKey; label: string }[] = [
 ];
 
 export function PriceWidgetProvider({
-  priceData,
+  priceData: combinedPrices,
   children,
 }: PriceWidgetProviderProps) {
-  // UI State - initialized with smart defaults
+  // Get default variant (first available)
+  const defaultVariant = useMemo(() => {
+    if (combinedPrices.allVariants.length > 0) {
+      return combinedPrices.allVariants[0];
+    }
+    // Fallback if no variants tracked
+    return {
+      displayName: 'Normal',
+      variantKey: 'Normal',
+      sourcePattern: null,
+    };
+  }, [combinedPrices.allVariants]);
+
+  // Get the initial record based on the default variant
+  const initialRecord = useMemo(() => {
+    const recordKey = defaultVariant.sourcePattern || BASE_PATTERN_KEY;
+    return combinedPrices.records[recordKey] || combinedPrices.primaryRecord;
+  }, [combinedPrices, defaultVariant]);
+
+  // UI State - initialized with smart defaults based on the INITIAL record (not primary)
   const [viewMode, setViewMode] = useState<ViewMode>('Raw');
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
-  const [variant, setVariant] = useState(() => getDefaultVariant(priceData));
-  const [condition, setCondition] = useState(() => getDefaultCondition(priceData));
-  const [grade, setGrade] = useState<PsaGradeKey>(() => getDefaultGrade(priceData));
+  const [selectedVariant, setSelectedVariant] = useState<VariantOption>(defaultVariant);
+  const [condition, setCondition] = useState(() =>
+    getDefaultCondition(initialRecord)
+  );
+  const [grade, setGrade] = useState<PsaGradeKey>(() =>
+    getDefaultGrade(initialRecord)
+  );
 
-  // Derived values
-  const hasRaw = useMemo(() => hasRawHistory(priceData), [priceData]);
-  const hasGraded = useMemo(() => hasGradedData(priceData), [priceData]);
+  // Get active price record based on selected variant's source pattern
+  const activePriceRecord = useMemo(() => {
+    const recordKey = selectedVariant.sourcePattern || BASE_PATTERN_KEY;
+    return combinedPrices.records[recordKey] || combinedPrices.primaryRecord;
+  }, [combinedPrices, selectedVariant]);
+
+  // Derived values from active record
+  const hasRaw = useMemo(() => hasRawHistory(activePriceRecord), [activePriceRecord]);
+  const hasGraded = useMemo(() => hasGradedData(activePriceRecord), [activePriceRecord]);
+
+  // Available variants from all records (combined)
   const availableVariants = useMemo(
-    () => priceData.raw_history_variants_tracked || [],
-    [priceData]
-  );
-  const availableConditions = useMemo(
-    () => priceData.raw_history_conditions_tracked || [],
-    [priceData]
-  );
-  const availableGrades = useMemo(
-    () => PSA_GRADES.filter((g) => priceData[g.value] !== null),
-    [priceData]
+    () => combinedPrices.allVariants,
+    [combinedPrices.allVariants]
   );
 
-  // Chart data based on current view mode
+  // Available conditions from active record
+  const availableConditions = useMemo(
+    () => activePriceRecord.raw_history_conditions_tracked || [],
+    [activePriceRecord]
+  );
+
+  // Reset condition when active record changes (to ensure valid condition for new record)
+  // This handles switching between pattern variants that may have different conditions
+  useEffect(() => {
+    const newConditions = activePriceRecord.raw_history_conditions_tracked || [];
+    if (newConditions.length > 0 && !newConditions.includes(condition)) {
+      // Current condition not available in new record, reset to default
+      const newCondition = newConditions.includes('Near Mint') ? 'Near Mint' : newConditions[0];
+      setCondition(newCondition);
+    }
+  }, [activePriceRecord, condition]);
+
+  // Available grades from active record
+  const availableGrades = useMemo(
+    () => PSA_GRADES.filter((g) => activePriceRecord[g.value] !== null),
+    [activePriceRecord]
+  );
+
+  // Chart data based on current view mode - uses active record
   const rawChartData: ChartDataPoint[] = useMemo(() => {
     if (viewMode === 'Raw') {
-      const history = getRawHistoryForTimeRange(priceData, timeRange);
-      return transformRawHistoryToChartData(history, variant, condition);
+      const history = getRawHistoryForTimeRange(activePriceRecord, timeRange);
+      // Use variantKey (the actual key in raw_history) not displayName
+      return transformRawHistoryToChartData(history, selectedVariant.variantKey, condition);
     } else {
       return getPsaHistoryForPeriod(
-        priceData.ebay_price_history,
+        activePriceRecord.ebay_price_history,
         grade,
         timeRangeToDays(timeRange)
       );
     }
-  }, [viewMode, timeRange, variant, condition, grade, priceData]);
+  }, [viewMode, timeRange, selectedVariant, condition, grade, activePriceRecord]);
 
   // Handle single data point by creating a flat line
   // For graded view, append today's smart market price so chart ends at displayed price
@@ -129,7 +190,7 @@ export function PriceWidgetProvider({
 
     // For graded view, add today's data point with smart market price
     if (viewMode === 'Graded' && data.length > 0) {
-      const gradeData = priceData[grade];
+      const gradeData = activePriceRecord[grade];
       const smartPrice = gradeData?.smartMarketPrice?.price ?? gradeData?.avgPrice;
 
       if (smartPrice !== null && smartPrice !== undefined) {
@@ -160,7 +221,7 @@ export function PriceWidgetProvider({
     }
 
     return data;
-  }, [rawChartData, timeRange, viewMode, grade, priceData]);
+  }, [rawChartData, timeRange, viewMode, grade, activePriceRecord]);
 
   // Current price display
   const currentPrice = useMemo(() => {
@@ -170,10 +231,10 @@ export function PriceWidgetProvider({
       }
       return null;
     } else {
-      const gradeData = priceData[grade];
+      const gradeData = activePriceRecord[grade];
       return gradeData?.smartMarketPrice?.price ?? gradeData?.avgPrice ?? null;
     }
-  }, [viewMode, grade, priceData, chartData]);
+  }, [viewMode, grade, activePriceRecord, chartData]);
 
   // Calculate price change from chart data
   const priceChange = useMemo(() => {
@@ -187,21 +248,38 @@ export function PriceWidgetProvider({
     return ((lastValue - firstValue) / firstValue) * 100;
   }, [chartData]);
 
-  // PSA 10 potential
+  // PSA 10 potential from active record
   const psa10Potential = useMemo(
-    () => priceData.psa10?.smartMarketPrice?.price ?? priceData.psa10?.avgPrice ?? null,
-    [priceData]
+    () =>
+      activePriceRecord.psa10?.smartMarketPrice?.price ??
+      activePriceRecord.psa10?.avgPrice ??
+      null,
+    [activePriceRecord]
+  );
+
+  // Legacy compatibility: setVariant by display name
+  const setVariantByDisplayName = useCallback(
+    (displayName: string) => {
+      const found = combinedPrices.allVariants.find(
+        (v) => v.displayName === displayName
+      );
+      if (found) {
+        setSelectedVariant(found);
+      }
+    },
+    [combinedPrices.allVariants]
   );
 
   const value = useMemo<PriceWidgetContextValue>(
     () => ({
-      priceData,
+      priceData: activePriceRecord,
+      combinedPrices,
       viewMode,
       setViewMode,
       timeRange,
       setTimeRange,
-      variant,
-      setVariant,
+      selectedVariant,
+      setSelectedVariant,
       condition,
       setCondition,
       grade,
@@ -211,16 +289,21 @@ export function PriceWidgetProvider({
       availableGrades,
       hasRaw,
       hasGraded,
+      hasPatternVariants: combinedPrices.hasPatternVariants,
       chartData,
       currentPrice,
       priceChange,
       psa10Potential,
+      // Legacy compatibility
+      variant: selectedVariant.displayName,
+      setVariant: setVariantByDisplayName,
     }),
     [
-      priceData,
+      activePriceRecord,
+      combinedPrices,
       viewMode,
       timeRange,
-      variant,
+      selectedVariant,
       condition,
       grade,
       availableVariants,
@@ -232,6 +315,7 @@ export function PriceWidgetProvider({
       currentPrice,
       priceChange,
       psa10Potential,
+      setVariantByDisplayName,
     ]
   );
 

@@ -8,7 +8,7 @@ interface VariantSwatchProps {
 
 /**
  * Standalone variant selector component.
- * Displays pills for available variants (Normal, Reverse Holofoil, etc.)
+ * Displays pills for available variants (Normal, Reverse Holofoil, Holofoil (Poké Ball), etc.)
  * and syncs with PriceWidget via shared context.
  *
  * Only renders when:
@@ -17,7 +17,7 @@ interface VariantSwatchProps {
  * - Multiple variants are available
  */
 export function VariantSwatch({ className = '' }: VariantSwatchProps) {
-  const { viewMode, variant, setVariant, availableVariants } = usePriceWidget();
+  const { viewMode, selectedVariant, setSelectedVariant, availableVariants } = usePriceWidget();
 
   // Don't render if not in Raw mode or only one variant
   if (viewMode !== 'Raw' || availableVariants.length <= 1) {
@@ -28,15 +28,15 @@ export function VariantSwatch({ className = '' }: VariantSwatchProps) {
     <div className={`flex gap-2 flex-wrap ${className}`}>
       {availableVariants.map((v) => (
         <button
-          key={v}
-          onClick={() => setVariant(v)}
+          key={`${v.sourcePattern || 'base'}-${v.variantKey}`}
+          onClick={() => setSelectedVariant(v)}
           className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
-            variant === v
+            selectedVariant.displayName === v.displayName
               ? 'bg-gray-800 text-white'
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          {v}
+          {v.displayName}
         </button>
       ))}
     </div>

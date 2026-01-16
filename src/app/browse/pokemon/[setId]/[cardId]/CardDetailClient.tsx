@@ -11,13 +11,13 @@ import AddToCollectionModal from '@/components/collection/AddToCollectionModal'
 import { buildAvailableVariants } from '@/utils/variantUtils'
 import { PriceWidget, PriceWidgetEmpty, PriceWidgetProvider, VariantSwatch, PriceHeadline } from '@/components/prices'
 import type { CardFull, SetWithCards } from '@/models/pokemon'
-import type { PokemonCardPrices } from '@/types/prices'
+import type { CombinedCardPrices } from '@/types/prices'
 
 interface CardDetailClientProps {
   card: CardFull
   set: SetWithCards
   setId: string
-  priceData?: PokemonCardPrices | null
+  priceData?: CombinedCardPrices | null
 }
 
 export default function CardDetailClient({ card, set, setId, priceData }: CardDetailClientProps) {

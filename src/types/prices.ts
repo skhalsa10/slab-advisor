@@ -138,6 +138,42 @@ export function castToPokemonCardPrices(
 }
 
 // =============================================================================
+// Combined Price Data (for cards with multiple variant patterns)
+// =============================================================================
+
+/**
+ * Represents a single variant option with its source price record.
+ * Used to build the variant selector UI and map selections back to data.
+ */
+export interface VariantOption {
+  /** Display name shown in UI, e.g., "Holofoil (Poké Ball)" */
+  displayName: string;
+  /** Key used to look up data in raw_history, e.g., "Holofoil" */
+  variantKey: string;
+  /** Which price record this variant comes from (null = base, "poke_ball", "master_ball") */
+  sourcePattern: string | null;
+}
+
+/**
+ * Combined price data from multiple price records for a single card.
+ * Cards with pattern variants (Poké Ball, Master Ball) have separate price records,
+ * each with their own historical data, PSA grades, and conditions.
+ */
+export interface CombinedCardPrices {
+  /** All price records keyed by variant_pattern (null key for base product) */
+  records: Record<string, PokemonCardPrices>;
+
+  /** Combined list of all available variants from all records */
+  allVariants: VariantOption[];
+
+  /** Default/primary price record (base variant with null pattern, or first available) */
+  primaryRecord: PokemonCardPrices;
+
+  /** Whether this card has multiple pattern variants */
+  hasPatternVariants: boolean;
+}
+
+// =============================================================================
 // UI/Widget Types
 // =============================================================================
 

@@ -36,6 +36,8 @@ export function PriceHeadline({ className = '' }: PriceHeadlineProps) {
     currentPrice,
     priceChange,
     psa10Potential,
+    selectedVariant,
+    hasPatternVariants,
   } = usePriceWidget();
 
   const changeDisplay = formatPriceChange(priceChange);
@@ -80,29 +82,37 @@ export function PriceHeadline({ className = '' }: PriceHeadlineProps) {
           )}
         </div>
 
-        {/* Right: Raw/Graded Toggle */}
+        {/* Right: Raw/Graded Toggle + Variant indicator */}
         {hasRaw && hasGraded && (
-          <div className="flex bg-gray-100 rounded-lg p-1 flex-shrink-0">
-            <button
-              onClick={() => setViewMode('Raw')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                viewMode === 'Raw'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'bg-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Raw
-            </button>
-            <button
-              onClick={() => setViewMode('Graded')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-                viewMode === 'Graded'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'bg-transparent text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              Graded
-            </button>
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('Raw')}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                  viewMode === 'Raw'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'bg-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Raw
+              </button>
+              <button
+                onClick={() => setViewMode('Graded')}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
+                  viewMode === 'Graded'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'bg-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Graded
+              </button>
+            </div>
+            {/* Show variant name under toggle when in Graded mode (so user knows which variant's graded prices they're seeing) */}
+            {viewMode === 'Graded' && hasPatternVariants && (
+              <span className="text-xs text-gray-500">
+                {selectedVariant.displayName}
+              </span>
+            )}
           </div>
         )}
       </div>
