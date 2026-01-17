@@ -256,17 +256,9 @@ export default function PortfolioKPIRow({
       <KPICard
         icon={<PackageIcon />}
         label="Sealed Inventory"
-        value={
-          currentValues.sealedValue > 0
-            ? formatCurrency(currentValues.sealedValue)
-            : 'Coming Soon'
-        }
-        subText={
-          currentValues.sealedCount > 0
-            ? `${currentValues.sealedCount.toLocaleString()} products`
-            : undefined
-        }
-        change={currentValues.sealedValue > 0 ? trends.sealedValueChange : null}
+        value={formatCurrency(currentValues.sealedValue)}
+        subText={`${currentValues.sealedCount.toLocaleString()} products`}
+        change={trends.sealedValueChange}
       />
     </div>
   );

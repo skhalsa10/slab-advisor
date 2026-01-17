@@ -1,9 +1,7 @@
 import PageHeader from '@/components/ui/PageHeader'
-import DashboardStats from '@/components/dashboard/DashboardStats'
 import RecentScansWidget from '@/components/dashboard/RecentScansWidget'
 import GradingOpportunitiesWidget from '@/components/dashboard/GradingOpportunitiesWidget'
 import PortfolioSection from '@/components/dashboard/PortfolioSection'
-import { getDashboardStats } from '@/lib/collection-server'
 import { getPortfolioSnapshots, getLivePortfolioData } from '@/lib/portfolio-server'
 
 export const dynamic = 'force-dynamic'
@@ -11,8 +9,7 @@ export const dynamic = 'force-dynamic'
 export default async function DashboardPage() {
   try {
     // Fetch data in parallel for better performance
-    const [stats, portfolioSnapshots, liveData] = await Promise.all([
-      getDashboardStats(),
+    const [portfolioSnapshots, liveData] = await Promise.all([
       getPortfolioSnapshots(),
       getLivePortfolioData(),
     ])
@@ -25,10 +22,9 @@ export default async function DashboardPage() {
         />
 
         {/* Portfolio section: KPI row + Chart */}
-        <PortfolioSection snapshots={portfolioSnapshots} liveData={liveData} />
-
-        {/* Existing dashboard widgets */}
-        <DashboardStats stats={stats} />
+        <div className="mb-6">
+          <PortfolioSection snapshots={portfolioSnapshots} liveData={liveData} />
+        </div>
 
         <GradingOpportunitiesWidget />
 

@@ -245,10 +245,10 @@ export default function PortfolioChart({
               margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
             >
               <defs>
-                {/* Total gradient - green for up, red for down */}
+                {/* Total gradient - green for up, red for down (Robinhood style) */}
                 <linearGradient id="totalGradientUp" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#22c55e" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient
                   id="totalGradientDown"
@@ -257,8 +257,8 @@ export default function PortfolioChart({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient
                   id="totalGradientNeutral"
@@ -267,8 +267,8 @@ export default function PortfolioChart({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.15} />
-                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
                 </linearGradient>
               </defs>
 
