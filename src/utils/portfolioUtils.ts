@@ -11,6 +11,31 @@ import type {
 } from '@/types/portfolio';
 
 // =============================================================================
+// Date Conversion Helpers
+// =============================================================================
+
+/**
+ * Converts a UTC timestamp string to a local date string (YYYY-MM-DD).
+ * Uses the browser's timezone for conversion.
+ *
+ * This is essential for displaying dates correctly to users - the database stores
+ * timestamps in UTC, but users expect to see dates in their local timezone.
+ *
+ * @param utcTimestamp - ISO timestamp string from database (e.g., "2026-01-17 00:00:00.227452+00")
+ * @returns Local date string in YYYY-MM-DD format
+ */
+export function utcToLocalDateString(utcTimestamp: string | null): string {
+  if (!utcTimestamp) {
+    // Fallback to today's local date
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+  const date = new Date(utcTimestamp);
+  // Use 'sv-SE' locale which outputs YYYY-MM-DD format (ISO-like)
+  return date.toLocaleDateString('sv-SE');
+}
+
+// =============================================================================
 // Time Range Helpers
 // =============================================================================
 
@@ -30,6 +55,7 @@ export function timeRangeToDays(range: PortfolioTimeRange): number {
 
 /**
  * Filters snapshots to only include those within the selected time range.
+ * Uses created_at (timestamptz) for timezone-aware comparison.
  * Returns snapshots sorted by date ascending (oldest first).
  */
 export function filterSnapshotsByTimeRange(
@@ -37,19 +63,29 @@ export function filterSnapshotsByTimeRange(
   range: PortfolioTimeRange
 ): PortfolioSnapshot[] {
   if (range === 'ALL' || snapshots.length === 0) {
-    return [...snapshots].sort((a, b) =>
-      a.recorded_at.localeCompare(b.recorded_at)
-    );
+    return [...snapshots].sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return dateA - dateB;
+    });
   }
 
   const days = timeRangeToDays(range);
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - days);
-  const cutoffStr = cutoffDate.toISOString().split('T')[0];
+  cutoffDate.setHours(0, 0, 0, 0); // Start of day in local time
 
   return snapshots
-    .filter((s) => s.recorded_at >= cutoffStr)
-    .sort((a, b) => a.recorded_at.localeCompare(b.recorded_at));
+    .filter((s) => {
+      if (!s.created_at) return false;
+      const snapshotDate = new Date(s.created_at);
+      return snapshotDate >= cutoffDate;
+    })
+    .sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return dateA - dateB;
+    });
 }
 
 // =============================================================================
@@ -58,12 +94,13 @@ export function filterSnapshotsByTimeRange(
 
 /**
  * Transforms portfolio snapshots into chart-ready data points.
+ * Uses created_at (timestamptz) converted to local date for accurate display.
  */
 export function transformToChartData(
   snapshots: PortfolioSnapshot[]
 ): PortfolioChartDataPoint[] {
   return snapshots.map((s) => ({
-    date: s.recorded_at,
+    date: utcToLocalDateString(s.created_at), // Use created_at converted to local timezone
     total: Number(s.total_card_value) + Number(s.total_product_value),
     cards: Number(s.total_card_value),
     sealed: Number(s.total_product_value),
@@ -193,6 +230,16 @@ export function formatPercentChange(change: number | null): {
 }
 
 /**
+ * Parses a date string (YYYY-MM-DD) into a Date object in local timezone.
+ * This prevents timezone shift issues when displaying UTC dates locally.
+ */
+function parseDateLocal(dateStr: string): Date {
+  // Split the date string to avoid timezone interpretation
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
+}
+
+/**
  * Formats a date string for chart X-axis labels.
  * Adapts format based on the time range for optimal readability.
  */
@@ -200,7 +247,7 @@ export function formatChartDate(
   dateStr: string,
   range: PortfolioTimeRange
 ): string {
-  const date = new Date(dateStr);
+  const date = parseDateLocal(dateStr);
 
   switch (range) {
     case '1W':
@@ -237,7 +284,7 @@ export function formatChartDate(
  * Formats a date for tooltip display (full format).
  */
 export function formatTooltipDate(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = parseDateLocal(dateStr);
   return date.toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',

@@ -189,7 +189,10 @@ async function calculateLivePortfolioManually(
     throw new Error('Failed to calculate portfolio data');
   }
 
-  const today = new Date().toISOString().split('T')[0];
+  // Use local date for the user - this ensures the live data point matches
+  // what the user expects as "today" in their timezone
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   if (!cards || cards.length === 0) {
     return {
