@@ -1,73 +1,89 @@
 {
-  "last_updated": "2026-01-13 23:34:16",
-  "total_skipped": 8,
+  "last_updated": "2026-01-16 22:30:25",
+  "total_skipped": 10,
   "sets": {
-    "sv-prismatic-evolutions": {
-      "set_name": "Prismatic Evolutions",
-      "set_id": "sv08.5",
+    "sv08-surging-sparks": {
+      "set_name": "Surging Sparks",
+      "set_id": "sv08",
       "cards": [
         {
-          "name": "Code Card - Prismatic Evolutions 2-Pack Blister",
-          "tcgPlayerId": "630093",
+          "name": "Code Card - Surging Sparks Blister [Sinistcha]",
+          "tcgPlayerId": "616164",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Booster Pack",
-          "tcgPlayerId": "614046",
+          "name": "Code Card - Surging Sparks Blister [Wooper]",
+          "tcgPlayerId": "616166",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Elite Trainer Box",
-          "tcgPlayerId": "616163",
+          "name": "Code Card - Surging Sparks Booster Pack",
+          "tcgPlayerId": "594248",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Pokemon Center Elite Trainer Box",
-          "tcgPlayerId": "616165",
+          "name": "Code Card - Surging Sparks Build & Battle Box",
+          "tcgPlayerId": "616131",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Poster Collection",
-          "tcgPlayerId": "616180",
+          "name": "Code Card - Surging Sparks Elite Trainer Box",
+          "tcgPlayerId": "620134",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Super-Premium Collection",
-          "tcgPlayerId": "632695",
+          "name": "Code Card - Surging Sparks Pokemon Center Elite Trainer Box",
+          "tcgPlayerId": "602788",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Surprise Box",
-          "tcgPlayerId": "625144",
+          "name": "Code Card - Surging Spark Elite Trainer Box",
+          "tcgPlayerId": "598075",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         },
         {
-          "name": "Code Card - Prismatic Evolutions Tech Sticker Collection [Glaceon]",
-          "tcgPlayerId": "616171",
+          "name": "Code Card - Surging Sparks 3 Pack Blister [Zapdos]",
+          "tcgPlayerId": "604405",
           "number": null,
           "rarity": "Code Card",
-          "setName": "SV: Prismatic Evolutions",
+          "setName": "SV08: Surging Sparks",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Surging Sparks Blister [Hisuian Arcanine]",
+          "tcgPlayerId": "616160",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV08: Surging Sparks",
+          "pptId": null
+        },
+        {
+          "name": "Code Card - Surging Sparks Blister [Pachirisu]",
+          "tcgPlayerId": "616169",
+          "number": null,
+          "rarity": "Code Card",
+          "setName": "SV08: Surging Sparks",
           "pptId": null
         }
       ]

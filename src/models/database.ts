@@ -373,6 +373,59 @@ export type Database = {
           },
         ]
       }
+      pokemon_product_prices: {
+        Row: {
+          change_180d_percent: number | null
+          change_30d_percent: number | null
+          change_365d_percent: number | null
+          change_7d_percent: number | null
+          change_90d_percent: number | null
+          created_at: string | null
+          current_market_price: number | null
+          id: string
+          last_updated: string | null
+          pokemon_product_id: number
+          price_history: Json | null
+          tcgplayer_product_id: number
+        }
+        Insert: {
+          change_180d_percent?: number | null
+          change_30d_percent?: number | null
+          change_365d_percent?: number | null
+          change_7d_percent?: number | null
+          change_90d_percent?: number | null
+          created_at?: string | null
+          current_market_price?: number | null
+          id?: string
+          last_updated?: string | null
+          pokemon_product_id: number
+          price_history?: Json | null
+          tcgplayer_product_id: number
+        }
+        Update: {
+          change_180d_percent?: number | null
+          change_30d_percent?: number | null
+          change_365d_percent?: number | null
+          change_7d_percent?: number | null
+          change_90d_percent?: number | null
+          created_at?: string | null
+          current_market_price?: number | null
+          id?: string
+          last_updated?: string | null
+          pokemon_product_id?: number
+          price_history?: Json | null
+          tcgplayer_product_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_product_prices_pokemon_product_id_fkey"
+            columns: ["pokemon_product_id"]
+            isOneToOne: true
+            referencedRelation: "pokemon_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pokemon_products: {
         Row: {
           created_at: string | null

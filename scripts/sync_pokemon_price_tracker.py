@@ -981,24 +981,604 @@ class PokemonPriceTrackerSync:
         except Exception as e:
             console.print(f"[red]Error fetching sample data: {e}[/red]")
 
+    # =========================================================================
+    # SEALED PRODUCT PRICE SYNC METHODS
+    # =========================================================================
+
+    def fetch_sealed_products_for_set(self, tcgplayer_set_id: str) -> List[Dict]:
+        """
+        Fetch all sealed products for a set from PokemonPriceTracker API.
+        Uses the /sealed-products endpoint with fetchAllInSet=true.
+        """
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+            'Content-Type': 'application/json'
+        }
+
+        params = {
+            'setId': tcgplayer_set_id,
+            'includeHistory': 'true',
+            'days': 365,
+            'fetchAllInSet': 'true'
+        }
+
+        try:
+            url = f"{PPT_API_BASE}/sealed-products"
+            console.print(f"[dim]Fetching sealed products for set {tcgplayer_set_id}...[/dim]")
+
+            response = requests.get(url, headers=headers, params=params, timeout=120)
+            response.raise_for_status()
+
+            data = response.json()
+            products = data.get('data', [])
+
+            console.print(f"[dim]  Fetched {len(products)} sealed products[/dim]")
+            return products
+
+        except requests.exceptions.Timeout:
+            console.print(f"[red]Timeout fetching sealed products for set {tcgplayer_set_id}[/red]")
+            return []
+        except requests.exceptions.RequestException as e:
+            console.print(f"[red]Error fetching sealed products: {e}[/red]")
+            if hasattr(e, 'response') and e.response is not None:
+                console.print(f"[red]Response: {e.response.text}[/red]")
+            return []
+        except Exception as e:
+            console.print(f"[red]Unexpected error: {e}[/red]")
+            return []
+
+    def calc_product_percent_change(self, history: List[Dict], days: int) -> Optional[float]:
+        """
+        Calculate percent change for sealed product history within a time window.
+        History format: [{ date: string, price: number }, ...]
+        """
+        if not history or len(history) < 2:
+            return None
+
+        # Filter to entries within the time window
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+        filtered = []
+        for entry in history:
+            try:
+                entry_date_str = entry.get('date', '')
+                if entry_date_str:
+                    entry_date = datetime.fromisoformat(entry_date_str.replace('Z', '+00:00'))
+                    if entry_date >= cutoff_date:
+                        filtered.append(entry)
+            except (ValueError, TypeError):
+                continue
+
+        if len(filtered) < 2:
+            return None
+
+        # Sort by date
+        sorted_history = sorted(filtered, key=lambda x: x.get('date', ''))
+
+        oldest_price = sorted_history[0].get('price')
+        newest_price = sorted_history[-1].get('price')
+
+        if oldest_price is None or newest_price is None or oldest_price == 0:
+            return None
+
+        return round(((newest_price - oldest_price) / oldest_price) * 100, 2)
+
+    def transform_product_to_price_record(self, product: Dict, our_product_id: int) -> Dict:
+        """
+        Transform a PokemonPriceTracker API sealed product response to a pokemon_product_prices record.
+        """
+        # Extract tcgplayer_product_id
+        tcgplayer_product_id = product.get('tcgPlayerId')
+        if tcgplayer_product_id:
+            try:
+                tcgplayer_product_id = int(tcgplayer_product_id)
+            except (ValueError, TypeError):
+                tcgplayer_product_id = None
+
+        # Extract current price
+        current_price = product.get('unopenedPrice')
+
+        # Transform price history: { date, unopenedPrice, _id } -> { date, price }
+        raw_history = product.get('priceHistory', [])
+        price_history = [
+            {'date': entry['date'], 'price': entry['unopenedPrice']}
+            for entry in raw_history
+            if 'date' in entry and 'unopenedPrice' in entry
+        ]
+
+        # Calculate percent changes
+        change_7d = self.calc_product_percent_change(price_history, 7)
+        change_30d = self.calc_product_percent_change(price_history, 30)
+        change_90d = self.calc_product_percent_change(price_history, 90)
+        change_180d = self.calc_product_percent_change(price_history, 180)
+        change_365d = self.calc_product_percent_change(price_history, 365)
+
+        return {
+            'pokemon_product_id': our_product_id,
+            'tcgplayer_product_id': tcgplayer_product_id,
+            'current_market_price': current_price,
+            'change_7d_percent': change_7d,
+            'change_30d_percent': change_30d,
+            'change_90d_percent': change_90d,
+            'change_180d_percent': change_180d,
+            'change_365d_percent': change_365d,
+            'price_history': price_history,
+            'last_updated': datetime.now(timezone.utc).isoformat()
+        }
+
+    def get_products_for_set_from_db(self, set_id: str) -> Dict[int, int]:
+        """
+        Get all sealed products for a set from our database.
+        Returns a dict mapping tcgplayer_product_id -> pokemon_products.id
+        """
+        products_by_tcgplayer_id = {}
+
+        try:
+            result = self.supabase.table('pokemon_products')\
+                .select('id, tcgplayer_product_id')\
+                .eq('pokemon_set_id', set_id)\
+                .execute()
+
+            for product in result.data:
+                tcgplayer_id = product.get('tcgplayer_product_id')
+                if tcgplayer_id:
+                    products_by_tcgplayer_id[tcgplayer_id] = product['id']
+
+        except Exception as e:
+            console.print(f"[red]Error fetching products from database: {e}[/red]")
+
+        return products_by_tcgplayer_id
+
+    def upsert_product_price_record(self, record: Dict, dry_run: bool = False) -> bool:
+        """
+        Insert or update a pokemon_product_prices record.
+        Uses upsert with pokemon_product_id as the conflict key.
+        """
+        if dry_run:
+            console.print(f"[yellow]DRY RUN: Would upsert price for product {record['pokemon_product_id']}[/yellow]")
+            return True
+
+        try:
+            result = self.supabase.table('pokemon_product_prices')\
+                .upsert(record, on_conflict='pokemon_product_id')\
+                .execute()
+
+            return len(result.data) > 0
+        except Exception as e:
+            console.print(f"[red]Error upserting product price record for {record['pokemon_product_id']}: {e}[/red]")
+            return False
+
+    def process_product_set(self, set_info: Dict, dry_run: bool = False) -> Dict[str, int]:
+        """
+        Process sealed products for a single set: fetch from API and update database.
+        Returns statistics about the processing.
+        """
+        stats = {
+            'products_fetched': 0,
+            'products_matched': 0,
+            'products_updated': 0,
+            'products_skipped': 0,
+            'errors': 0
+        }
+
+        set_id = set_info['id']
+        set_name = set_info['name']
+        tcgplayer_set_id = set_info['tcgplayer_set_id']
+
+        console.print(f"\n[blue]Processing sealed products: {set_name}[/blue]")
+        console.print(f"[dim]  Set ID: {set_id}, TCGPlayer Set ID: {tcgplayer_set_id}[/dim]")
+
+        # Fetch products from PokemonPriceTracker API
+        api_products = self.fetch_sealed_products_for_set(tcgplayer_set_id)
+        stats['products_fetched'] = len(api_products)
+
+        if not api_products:
+            console.print(f"[yellow]No sealed products found from API for {set_name}[/yellow]")
+            return stats
+
+        console.print(f"[green]Fetched {len(api_products)} sealed products from API[/green]")
+
+        # Get our products from database for matching
+        products_by_tcgplayer_id = self.get_products_for_set_from_db(set_id)
+        console.print(f"[dim]Found {len(products_by_tcgplayer_id)} products in our database[/dim]")
+
+        # Process each product
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            console=console
+        ) as progress:
+            task = progress.add_task("Processing products...", total=len(api_products))
+
+            for api_product in api_products:
+                product_name = api_product.get('name', 'Unknown')
+                progress.update(task, description=f"Processing {product_name[:30]}...")
+
+                # Find our product ID by tcgplayer_product_id
+                tcgplayer_id = api_product.get('tcgPlayerId')
+                if tcgplayer_id:
+                    try:
+                        tcgplayer_id = int(tcgplayer_id)
+                    except (ValueError, TypeError):
+                        tcgplayer_id = None
+
+                if not tcgplayer_id or tcgplayer_id not in products_by_tcgplayer_id:
+                    stats['products_skipped'] += 1
+                    progress.advance(task)
+                    continue
+
+                our_product_id = products_by_tcgplayer_id[tcgplayer_id]
+                stats['products_matched'] += 1
+
+                # Transform and upsert
+                try:
+                    price_record = self.transform_product_to_price_record(api_product, our_product_id)
+                    success = self.upsert_product_price_record(price_record, dry_run)
+
+                    if success:
+                        stats['products_updated'] += 1
+                    else:
+                        stats['errors'] += 1
+                except Exception as e:
+                    console.print(f"[red]Error processing product {product_name}: {e}[/red]")
+                    stats['errors'] += 1
+
+                progress.advance(task)
+
+        # Display stats for this set
+        console.print(f"[dim]  Fetched: {stats['products_fetched']} | Matched: {stats['products_matched']} | Updated: {stats['products_updated']} | Skipped: {stats['products_skipped']} | Errors: {stats['errors']}[/dim]")
+
+        return stats
+
+    def sync_product_set(self, tcgplayer_set_id: str, dry_run: bool = False):
+        """Sync sealed product prices for a specific set by TCGPlayer set ID."""
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_set_id')\
+                .eq('tcgplayer_set_id', tcgplayer_set_id)\
+                .execute()
+
+            if not result.data:
+                console.print(f"[red]Set with tcgplayer_set_id '{tcgplayer_set_id}' not found[/red]")
+                return
+
+            set_info = result.data[0]
+
+        except Exception as e:
+            console.print(f"[red]Error fetching set info: {e}[/red]")
+            return
+
+        stats = self.process_product_set(set_info, dry_run)
+
+        # Display results
+        console.print(f"\n[bold]Results for {set_info['name']} (Sealed Products):[/bold]")
+        console.print(f"Products fetched from API: [blue]{stats['products_fetched']}[/blue]")
+        console.print(f"Products matched: [green]{stats['products_matched']}[/green]")
+        console.print(f"Products updated: [green]{stats['products_updated']}[/green]")
+        console.print(f"Products skipped (no match): [yellow]{stats['products_skipped']}[/yellow]")
+        console.print(f"Errors: [red]{stats['errors']}[/red]")
+
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+
+    def sync_all_products(self, dry_run: bool = False):
+        """Sync sealed product prices for all sets with tcgplayer_set_id."""
+        console.print("\n[bold]Starting full sealed product price sync from PokemonPriceTracker...[/bold]")
+
+        # Get all sets with tcgplayer_set_id
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_set_id')\
+                .not_.is_('tcgplayer_set_id', 'null')\
+                .order('name')\
+                .execute()
+
+            sets = result.data
+
+        except Exception as e:
+            console.print(f"[red]Error fetching sets: {e}[/red]")
+            return
+
+        if not sets:
+            console.print("[red]No sets with tcgplayer_set_id found[/red]")
+            return
+
+        console.print(f"Found [blue]{len(sets)}[/blue] sets with tcgplayer_set_id")
+
+        # Initialize totals
+        total_stats = {
+            'products_fetched': 0,
+            'products_matched': 0,
+            'products_updated': 0,
+            'products_skipped': 0,
+            'errors': 0
+        }
+
+        # Process each set
+        sets_since_pause = 0
+        for i, set_info in enumerate(sets):
+            stats = self.process_product_set(set_info, dry_run)
+
+            # Add to totals
+            for key in total_stats:
+                total_stats[key] += stats.get(key, 0)
+
+            sets_since_pause += 1
+
+            # Rate limit: pause for 60 seconds after every 3 sets (unless it's the last one)
+            if sets_since_pause >= 3 and i < len(sets) - 1:
+                console.print(f"\n[yellow]Rate limiting: waiting {SET_RATE_LIMIT_SECONDS} seconds after 3 sets...[/yellow]")
+                time.sleep(SET_RATE_LIMIT_SECONDS)
+                sets_since_pause = 0
+
+        # Display final results
+        console.print(f"\n[bold]Final Results (Sealed Products):[/bold]")
+        console.print(f"Sets processed: [blue]{len(sets)}[/blue]")
+        console.print(f"Products fetched from API: [blue]{total_stats['products_fetched']}[/blue]")
+        console.print(f"Products matched: [green]{total_stats['products_matched']}[/green]")
+        console.print(f"Products updated: [green]{total_stats['products_updated']}[/green]")
+        console.print(f"Products skipped (no match): [yellow]{total_stats['products_skipped']}[/yellow]")
+        console.print(f"Errors: [red]{total_stats['errors']}[/red]")
+
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+        else:
+            console.print(f"\n[green]✓ Sealed product price sync completed successfully![/green]")
+
+    def sync_all_both(self, dry_run: bool = False):
+        """Sync both card and sealed product prices for all sets, processing each set fully before moving on."""
+        console.print("\n[bold magenta]═══ SYNCING ALL CARDS AND PRODUCTS ═══[/bold magenta]")
+
+        # Get all sets with tcgplayer_set_id
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_set_id')\
+                .not_.is_('tcgplayer_set_id', 'null')\
+                .order('name')\
+                .execute()
+
+            sets = result.data
+
+        except Exception as e:
+            console.print(f"[red]Error fetching sets: {e}[/red]")
+            return
+
+        if not sets:
+            console.print("[red]No sets with tcgplayer_set_id found[/red]")
+            return
+
+        console.print(f"Found [blue]{len(sets)}[/blue] sets with tcgplayer_set_id")
+
+        # Initialize totals for cards
+        card_totals = {
+            'cards_fetched': 0,
+            'cards_matched': 0,
+            'cards_updated': 0,
+            'cards_skipped': 0,
+            'errors': 0
+        }
+
+        # Initialize totals for products
+        product_totals = {
+            'products_fetched': 0,
+            'products_matched': 0,
+            'products_updated': 0,
+            'products_skipped': 0,
+            'errors': 0
+        }
+
+        # Process each set (cards + products together)
+        sets_since_pause = 0
+        for i, set_info in enumerate(sets):
+            set_name = set_info.get('name', 'Unknown')
+            console.print(f"\n[bold blue]═══ Set {i+1}/{len(sets)}: {set_name} ═══[/bold blue]")
+
+            # Process cards for this set
+            console.print(f"[cyan]  → Syncing cards...[/cyan]")
+            try:
+                card_stats = self.process_set(set_info, dry_run)
+                for key in card_totals:
+                    card_totals[key] += card_stats.get(key, 0)
+            except Exception as e:
+                console.print(f"[red]  Error syncing cards: {e}[/red]")
+                card_totals['errors'] += 1
+
+            # Process products for this set
+            console.print(f"[cyan]  → Syncing sealed products...[/cyan]")
+            try:
+                product_stats = self.process_product_set(set_info, dry_run)
+                for key in product_totals:
+                    product_totals[key] += product_stats.get(key, 0)
+            except Exception as e:
+                console.print(f"[red]  Error syncing products: {e}[/red]")
+                product_totals['errors'] += 1
+
+            sets_since_pause += 1
+
+            # Rate limit: pause for 60 seconds after every 3 sets (unless it's the last one)
+            if sets_since_pause >= 3 and i < len(sets) - 1:
+                console.print(f"\n[yellow]Rate limiting: waiting {SET_RATE_LIMIT_SECONDS} seconds after 3 sets...[/yellow]")
+                time.sleep(SET_RATE_LIMIT_SECONDS)
+                sets_since_pause = 0
+
+        # Display final results
+        console.print(f"\n[bold magenta]═══ FINAL RESULTS ═══[/bold magenta]")
+        console.print(f"Sets processed: [blue]{len(sets)}[/blue]")
+
+        console.print(f"\n[bold]Card Prices:[/bold]")
+        console.print(f"  Cards fetched from API: [blue]{card_totals['cards_fetched']}[/blue]")
+        console.print(f"  Cards matched: [green]{card_totals['cards_matched']}[/green]")
+        console.print(f"  Cards updated: [green]{card_totals['cards_updated']}[/green]")
+        console.print(f"  Cards skipped (no match): [yellow]{card_totals['cards_skipped']}[/yellow]")
+        console.print(f"  Errors: [red]{card_totals['errors']}[/red]")
+
+        console.print(f"\n[bold]Sealed Product Prices:[/bold]")
+        console.print(f"  Products fetched from API: [blue]{product_totals['products_fetched']}[/blue]")
+        console.print(f"  Products matched: [green]{product_totals['products_matched']}[/green]")
+        console.print(f"  Products updated: [green]{product_totals['products_updated']}[/green]")
+        console.print(f"  Products skipped (no match): [yellow]{product_totals['products_skipped']}[/yellow]")
+        console.print(f"  Errors: [red]{product_totals['errors']}[/red]")
+
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+        else:
+            console.print(f"\n[green]✓ Combined sync completed successfully![/green]")
+
+        # Save skipped cards log if any
+        if self.skipped_cards:
+            self.save_skipped_cards_log()
+
+    def sync_set_both(self, tcgplayer_set_id: str, dry_run: bool = False):
+        """Sync both card and sealed product prices for a specific set."""
+        console.print(f"\n[bold magenta]═══ SYNCING SET: {tcgplayer_set_id} (Cards + Products) ═══[/bold magenta]")
+
+        # Look up set info
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, tcgplayer_set_id')\
+                .eq('tcgplayer_set_id', tcgplayer_set_id)\
+                .single()\
+                .execute()
+
+            set_info = result.data
+
+        except Exception as e:
+            console.print(f"[red]Error looking up set: {e}[/red]")
+            return
+
+        if not set_info:
+            console.print(f"[red]Set not found with tcgplayer_set_id: {tcgplayer_set_id}[/red]")
+            return
+
+        set_name = set_info.get('name', 'Unknown')
+        console.print(f"Found set: [blue]{set_name}[/blue]")
+
+        # Process cards
+        console.print(f"\n[cyan]→ Syncing cards...[/cyan]")
+        try:
+            card_stats = self.process_set(set_info, dry_run)
+            console.print(f"  Cards: fetched={card_stats.get('cards_fetched', 0)}, matched={card_stats.get('cards_matched', 0)}, updated={card_stats.get('cards_updated', 0)}")
+        except Exception as e:
+            console.print(f"[red]  Error syncing cards: {e}[/red]")
+
+        # Process products
+        console.print(f"\n[cyan]→ Syncing sealed products...[/cyan]")
+        try:
+            product_stats = self.process_product_set(set_info, dry_run)
+            console.print(f"  Products: fetched={product_stats.get('products_fetched', 0)}, matched={product_stats.get('products_matched', 0)}, updated={product_stats.get('products_updated', 0)}")
+        except Exception as e:
+            console.print(f"[red]  Error syncing products: {e}[/red]")
+
+        if dry_run:
+            console.print("\n[yellow]DRY RUN - No database changes were made[/yellow]")
+        else:
+            console.print(f"\n[green]✓ Set sync completed![/green]")
+
+        # Save skipped cards log if any
+        if self.skipped_cards:
+            self.save_skipped_cards_log()
+
+    def show_product_stats(self):
+        """Show statistics about current price data in pokemon_product_prices."""
+        console.print("\n[bold]Pokemon Product Prices Statistics:[/bold]")
+
+        try:
+            # Total products
+            products_result = self.supabase.table('pokemon_products')\
+                .select('id', count='exact')\
+                .execute()
+            total_products = products_result.count
+
+            # Total price records
+            prices_result = self.supabase.table('pokemon_product_prices')\
+                .select('id', count='exact')\
+                .execute()
+            total_prices = prices_result.count
+
+            # Price records with market price
+            with_market_result = self.supabase.table('pokemon_product_prices')\
+                .select('id', count='exact')\
+                .not_.is_('current_market_price', 'null')\
+                .execute()
+            with_market = with_market_result.count
+
+            # Price records with history
+            with_history_result = self.supabase.table('pokemon_product_prices')\
+                .select('id', count='exact')\
+                .not_.is_('price_history', 'null')\
+                .execute()
+            with_history = with_history_result.count
+
+            # Recent updates (last 24 hours)
+            yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
+            recent_result = self.supabase.table('pokemon_product_prices')\
+                .select('id', count='exact')\
+                .gte('last_updated', yesterday)\
+                .execute()
+            recent = recent_result.count
+
+            # Create table
+            table = Table(title="Sealed Product Price Statistics")
+            table.add_column("Metric", style="cyan")
+            table.add_column("Count", justify="right", style="green")
+            table.add_column("Percentage", justify="right", style="yellow")
+
+            table.add_row("Total products in DB", str(total_products), "-")
+            table.add_row("Total price records", str(total_prices),
+                         f"{(total_prices/total_products*100):.1f}%" if total_products > 0 else "0%")
+            table.add_row("With market price", str(with_market),
+                         f"{(with_market/total_prices*100):.1f}%" if total_prices > 0 else "0%")
+            table.add_row("With price history", str(with_history),
+                         f"{(with_history/total_prices*100):.1f}%" if total_prices > 0 else "0%")
+            table.add_row("Updated (last 24h)", str(recent),
+                         f"{(recent/total_prices*100):.1f}%" if total_prices > 0 else "0%")
+
+            console.print(table)
+
+        except Exception as e:
+            console.print(f"[red]Error fetching statistics: {e}[/red]")
+
 
 def main():
     parser = argparse.ArgumentParser(description='Pokemon Price Tracker API Sync Tool')
-    parser.add_argument('--set', help='Sync prices for a specific set (tcgplayer_set_id, e.g., "me01-mega-evolution")')
-    parser.add_argument('--all', action='store_true', help='Sync prices for all sets with tcgplayer_set_id')
-    parser.add_argument('--stats', action='store_true', help='Show current price statistics')
-    parser.add_argument('--sample', nargs='?', const='', help='Show sample price data (optional tcgplayer_set_id)')
+
+    # Card price sync options
+    parser.add_argument('--set', help='Sync card prices for a specific set (tcgplayer_set_id, e.g., "me01-mega-evolution")')
+    parser.add_argument('--all', action='store_true', help='Sync card prices for all sets with tcgplayer_set_id')
+    parser.add_argument('--stats', action='store_true', help='Show current card price statistics')
+    parser.add_argument('--sample', nargs='?', const='', help='Show sample card price data (optional tcgplayer_set_id)')
+
+    # Sealed product price sync options
+    parser.add_argument('--products', action='store_true', help='Sync sealed product prices for all sets')
+    parser.add_argument('--products-set', help='Sync sealed product prices for a specific set (tcgplayer_set_id)')
+    parser.add_argument('--products-stats', action='store_true', help='Show sealed product price statistics')
+
+    # Combined sync options
+    parser.add_argument('--both', action='store_true', help='Sync both card and product prices for all sets')
+    parser.add_argument('--both-set', help='Sync both card and product prices for a specific set (tcgplayer_set_id)')
+
+    # Common options
     parser.add_argument('--dry-run', action='store_true', help='Preview changes without updating database')
 
     args = parser.parse_args()
 
-    if not any([args.set, args.all, args.stats, args.sample is not None]):
+    if not any([args.set, args.all, args.stats, args.sample is not None,
+                args.products, args.products_set, args.products_stats,
+                args.both, args.both_set]):
         parser.print_help()
         return
 
     syncer = PokemonPriceTrackerSync()
 
-    if args.stats:
+    # Combined sync operations (cards + products per set)
+    if args.both:
+        syncer.sync_all_both(dry_run=args.dry_run)
+    elif args.both_set:
+        syncer.sync_set_both(args.both_set, dry_run=args.dry_run)
+
+    # Card price operations
+    elif args.stats:
         syncer.show_stats()
     elif args.sample is not None:
         tcgplayer_set_id = args.sample if args.sample else None
@@ -1007,6 +1587,14 @@ def main():
         syncer.sync_set(args.set, dry_run=args.dry_run)
     elif args.all:
         syncer.sync_all(dry_run=args.dry_run)
+
+    # Sealed product price operations
+    elif args.products_stats:
+        syncer.show_product_stats()
+    elif args.products_set:
+        syncer.sync_product_set(args.products_set, dry_run=args.dry_run)
+    elif args.products:
+        syncer.sync_all_products(dry_run=args.dry_run)
 
 
 if __name__ == "__main__":
