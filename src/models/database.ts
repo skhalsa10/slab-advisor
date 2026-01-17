@@ -209,6 +209,7 @@ export type Database = {
           roi_psa10: number | null
           tcgplayer_product_id: number | null
           upcharge_potential: boolean | null
+          variant_pattern: string | null
         }
         Insert: {
           change_180d_percent?: number | null
@@ -244,6 +245,7 @@ export type Database = {
           roi_psa10?: number | null
           tcgplayer_product_id?: number | null
           upcharge_potential?: boolean | null
+          variant_pattern?: string | null
         }
         Update: {
           change_180d_percent?: number | null
@@ -279,12 +281,13 @@ export type Database = {
           roi_psa10?: number | null
           tcgplayer_product_id?: number | null
           upcharge_potential?: boolean | null
+          variant_pattern?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "pokemon_card_prices_pokemon_card_id_fkey"
             columns: ["pokemon_card_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "pokemon_cards"
             referencedColumns: ["id"]
           },
@@ -518,6 +521,39 @@ export type Database = {
           },
         ]
       }
+      portfolio_snapshots: {
+        Row: {
+          card_count: number
+          created_at: string | null
+          id: number
+          product_count: number
+          recorded_at: string
+          total_card_value: number
+          total_product_value: number
+          user_id: string
+        }
+        Insert: {
+          card_count?: number
+          created_at?: string | null
+          id?: never
+          product_count?: number
+          recorded_at?: string
+          total_card_value?: number
+          total_product_value?: number
+          user_id: string
+        }
+        Update: {
+          card_count?: number
+          created_at?: string | null
+          id?: never
+          product_count?: number
+          recorded_at?: string
+          total_card_value?: number
+          total_product_value?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -632,6 +668,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      snapshot_all_portfolios: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
