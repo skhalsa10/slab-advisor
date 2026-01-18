@@ -1092,6 +1092,9 @@ class PokemonPriceTrackerSync:
         change_180d = self.calc_product_percent_change(price_history, 180)
         change_365d = self.calc_product_percent_change(price_history, 365)
 
+        # Extract lastScrapedAt from API (when PokemonPriceTracker last scraped TCGPlayer)
+        last_scraped_at = product.get('lastScrapedAt')
+
         return {
             'pokemon_product_id': our_product_id,
             'tcgplayer_product_id': tcgplayer_product_id,
@@ -1102,7 +1105,8 @@ class PokemonPriceTrackerSync:
             'change_180d_percent': change_180d,
             'change_365d_percent': change_365d,
             'price_history': price_history,
-            'last_updated': datetime.now(timezone.utc).isoformat()
+            'last_updated': datetime.now(timezone.utc).isoformat(),
+            'last_scraped_at': last_scraped_at
         }
 
     def get_products_for_set_from_db(self, set_id: str) -> Dict[int, int]:

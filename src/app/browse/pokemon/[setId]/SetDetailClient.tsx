@@ -270,7 +270,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         name: product.name,
         tcgplayer_product_id: product.tcgplayer_product_id,
         tcgplayer_image_url: product.tcgplayer_image_url || undefined,
-        price_data: product.price_data
+        current_market_price: product.pokemon_product_prices?.current_market_price ?? null
       }}
     />
   )
@@ -416,7 +416,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
                   name: product.name,
                   tcgplayer_product_id: product.tcgplayer_product_id,
                   tcgplayer_image_url: product.tcgplayer_image_url || undefined,
-                  price_data: product.price_data
+                  current_market_price: product.pokemon_product_prices?.current_market_price ?? null
                 }}
               />
             )}

@@ -5,6 +5,18 @@ export type PokemonSeries = Database['public']['Tables']['pokemon_series']['Row'
 export type PokemonSet = Database['public']['Tables']['pokemon_sets']['Row']
 export type PokemonCard = Database['public']['Tables']['pokemon_cards']['Row']
 export type PokemonProduct = Database['public']['Tables']['pokemon_products']['Row']
+export type PokemonProductPriceRow = Database['public']['Tables']['pokemon_product_prices']['Row']
+
+// Subset of pokemon_product_prices for joined queries
+export type PokemonProductPrice = Pick<
+  PokemonProductPriceRow,
+  'current_market_price' | 'change_7d_percent' | 'change_30d_percent' | 'last_updated'
+>
+
+// Extended product type with joined price data from pokemon_product_prices table
+export interface PokemonProductWithPrice extends PokemonProduct {
+  pokemon_product_prices: PokemonProductPrice | null
+}
 
 export type PokemonSeriesInsert = Database['public']['Tables']['pokemon_series']['Insert']
 export type PokemonSetInsert = Database['public']['Tables']['pokemon_sets']['Insert']
@@ -73,7 +85,7 @@ export interface PokemonSetWithProducts extends PokemonSet {
 }
 
 export interface PokemonSetWithCardsAndProducts extends PokemonSetWithCards {
-  products: PokemonProduct[]
+  products: PokemonProductWithPrice[]
 }
 
 export interface PokemonSetWithSeries extends PokemonSet {

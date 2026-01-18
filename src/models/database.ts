@@ -383,6 +383,7 @@ export type Database = {
           created_at: string | null
           current_market_price: number | null
           id: string
+          last_scraped_at: string | null
           last_updated: string | null
           pokemon_product_id: number
           price_history: Json | null
@@ -397,6 +398,7 @@ export type Database = {
           created_at?: string | null
           current_market_price?: number | null
           id?: string
+          last_scraped_at?: string | null
           last_updated?: string | null
           pokemon_product_id: number
           price_history?: Json | null
@@ -411,6 +413,7 @@ export type Database = {
           created_at?: string | null
           current_market_price?: number | null
           id?: string
+          last_scraped_at?: string | null
           last_updated?: string | null
           pokemon_product_id?: number
           price_history?: Json | null

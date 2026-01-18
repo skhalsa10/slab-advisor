@@ -129,10 +129,18 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
       throw new Error('Set not found')
     }
     
-    // Fetch products (we need all product fields for display)
+    // Fetch products with joined price data from pokemon_product_prices table
     const { data: products, error: productsError } = await supabase
       .from('pokemon_products')
-      .select('*')
+      .select(`
+        *,
+        pokemon_product_prices(
+          current_market_price,
+          change_7d_percent,
+          change_30d_percent,
+          last_updated
+        )
+      `)
       .eq('pokemon_set_id', setId)
       .order('name')
 

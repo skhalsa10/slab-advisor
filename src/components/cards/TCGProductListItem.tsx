@@ -1,6 +1,5 @@
 import Image from 'next/image'
-import PriceDisplay from '@/components/ui/PriceDisplay'
-import type { Json } from '@/models/database'
+import SimplePriceDisplay from '@/components/ui/SimplePriceDisplay'
 
 interface TCGProductListItemProps {
   product: {
@@ -9,7 +8,7 @@ interface TCGProductListItemProps {
     tcgplayer_product_id?: string | number
     tcgplayer_image_url?: string
     image?: string
-    price_data?: Json | null
+    current_market_price?: number | null
   }
   href?: string
   target?: '_blank' | '_self'
@@ -63,8 +62,8 @@ export default function TCGProductListItem({
         </a>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <PriceDisplay
-          priceData={product.price_data}
+        <SimplePriceDisplay
+          price={product.current_market_price}
           showMarketLabel={false}
         />
       </td>
