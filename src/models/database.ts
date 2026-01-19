@@ -302,8 +302,6 @@ export type Database = {
           image: string | null
           local_id: string | null
           name: string
-          price_data: Json | null
-          price_last_updated: string | null
           rarity: string | null
           set_id: string | null
           tcgplayer_image_url: string | null
@@ -325,8 +323,6 @@ export type Database = {
           image?: string | null
           local_id?: string | null
           name: string
-          price_data?: Json | null
-          price_last_updated?: string | null
           rarity?: string | null
           set_id?: string | null
           tcgplayer_image_url?: string | null
@@ -348,8 +344,6 @@ export type Database = {
           image?: string | null
           local_id?: string | null
           name?: string
-          price_data?: Json | null
-          price_last_updated?: string | null
           rarity?: string | null
           set_id?: string | null
           tcgplayer_image_url?: string | null
@@ -479,8 +473,6 @@ export type Database = {
           id: number
           name: string
           pokemon_set_id: string | null
-          price_data: Json | null
-          price_last_updated: string | null
           tcgplayer_group_id: number
           tcgplayer_image_url: string | null
           tcgplayer_product_id: number
@@ -491,8 +483,6 @@ export type Database = {
           id?: number
           name: string
           pokemon_set_id?: string | null
-          price_data?: Json | null
-          price_last_updated?: string | null
           tcgplayer_group_id: number
           tcgplayer_image_url?: string | null
           tcgplayer_product_id: number
@@ -503,8 +493,6 @@ export type Database = {
           id?: number
           name?: string
           pokemon_set_id?: string | null
-          price_data?: Json | null
-          price_last_updated?: string | null
           tcgplayer_group_id?: number
           tcgplayer_image_url?: string | null
           tcgplayer_product_id?: number

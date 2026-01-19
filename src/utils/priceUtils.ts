@@ -232,3 +232,39 @@ export function getVariantPrice(prices: PriceVariants | null, variantName: strin
   if (!prices || !prices[variantName]) return null
   return prices[variantName] > 0 ? prices[variantName] : null
 }
+
+/**
+ * Transform a pokemon_card_prices record to the legacy price_data variant format
+ * Used for server-side transformation when fetching from pokemon_card_prices table
+ *
+ * @param currentMarketPrice - The current market price from pokemon_card_prices
+ * @param condition - The condition (e.g., "Near Mint") from current_market_price_condition
+ * @param variantPattern - The variant pattern (null, 'poke_ball', 'master_ball')
+ * @returns A price variant object matching the legacy format, or null if no valid price
+ */
+export function transformPriceRecordToVariant(
+  currentMarketPrice: number | null,
+  condition: string | null,
+  variantPattern: string | null
+): TCGCSVPriceVariant | null {
+  if (currentMarketPrice === null || currentMarketPrice <= 0) return null
+
+  // Map variant_pattern to user-friendly subTypeName
+  let subTypeName = condition || 'Near Mint'
+  if (variantPattern === 'poke_ball') {
+    subTypeName = `${subTypeName} (Poké Ball)`
+  } else if (variantPattern === 'master_ball') {
+    subTypeName = `${subTypeName} (Master Ball)`
+  }
+
+  return {
+    productId: 0,
+    lowPrice: 0,
+    midPrice: 0,
+    highPrice: 0,
+    marketPrice: currentMarketPrice,
+    directLowPrice: 0,
+    subTypeName,
+    variant_pattern: variantPattern || undefined
+  }
+}

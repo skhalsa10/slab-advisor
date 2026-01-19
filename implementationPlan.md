@@ -47,7 +47,7 @@ These features deliver unique value that competitors don't have and form the fou
 
 **What's Done:**
 - ✅ Python price update script (`scripts/update_pokemon_prices.py`)
-- ✅ Database columns: `price_data` (JSONB), `price_last_updated`
+- ✅ ~~Database columns: `price_data` (JSONB), `price_last_updated`~~ (Removed - now using pokemon_card_prices table)
 - ✅ Smart price display utilities (`src/utils/priceUtils.ts`)
 - ✅ Multi-variant price support (Poké Ball, Master Ball patterns)
 - ✅ Daily price fetching from TCGCSV API
@@ -73,6 +73,25 @@ These features deliver unique value that competitors don't have and form the fou
 - ❌ Update `getDashboardStats()` to show real estimated value from snapshots
 - ❌ Portfolio history data fetching in `src/lib/portfolio-server.ts`
 - ❌ TypeScript types for `PortfolioSnapshot` in `src/types/database.ts`
+
+**Code Migration TODO:**
+- ❌ Update `src/lib/pokemon-db-server.ts` to join with `pokemon_card_prices` instead of using removed `price_data` column
+  - `getSetWithCardsAndProductsServer()` - line 117
+  - `getTopCardsFromNewestSetsServer()` - line 299, 379
+  - `getCardWithSetServer()` - line 411
+  - `matchCardByXimilarMetadata()` - multiple strategy queries
+- ❌ Update components that use `price_data` from cards:
+  - `src/components/widgets/NewlyReleasedTopCardsWidget.tsx`
+  - `src/components/widgets/TopMoversWidget.tsx`
+  - `src/app/browse/pokemon/[setId]/SetDetailClient.tsx`
+  - `src/components/browse/CardQuickViewContent.tsx`
+  - `src/components/collection/CollectionQuickViewContent.tsx`
+  - `src/components/pokemon/CardListItem.tsx`
+- ❌ Update utility files:
+  - `src/utils/collectionCardUtils.ts`
+  - `src/utils/collectionPriceUtils.ts`
+- ❌ Update Python scripts to use `pokemon_card_prices` table:
+  - `scripts/update_pokemon_prices.py`
 
 **Database Implementation Details:**
 

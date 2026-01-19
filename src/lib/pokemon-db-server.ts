@@ -96,8 +96,9 @@ export async function getPokemonBrowseDataServer(): Promise<PokemonBrowseData> {
 export async function getSetWithCardsAndProductsServer(setId: string): Promise<PokemonSetWithCardsAndProducts> {
   try {
     const supabase = getServerSupabaseClient()
-    
+
     // Fetch set with optimized card/series data (only fields we need)
+    // Note: price_data is fetched separately from pokemon_card_prices table
     const { data: setWithCards, error: setError } = await supabase
       .from('pokemon_sets')
       .select(`
@@ -114,7 +115,12 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
           image,
           tcgplayer_image_url,
           tcgplayer_product_id,
-          price_data
+          variant_normal,
+          variant_holo,
+          variant_reverse,
+          variant_first_edition,
+          variant_poke_ball,
+          variant_master_ball
         )
       `)
       .eq('id', setId)
@@ -128,7 +134,54 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
     if (!setWithCards) {
       throw new Error('Set not found')
     }
-    
+
+    // Fetch prices from pokemon_card_prices table for all cards in this set
+    const cardIds = setWithCards.cards.map((c: { id: string }) => c.id)
+
+    let pricesByCardId: Map<string, Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }>> = new Map()
+
+    if (cardIds.length > 0) {
+      const { data: prices, error: pricesError } = await supabase
+        .from('pokemon_card_prices')
+        .select('pokemon_card_id, current_market_price, current_market_price_condition, variant_pattern')
+        .in('pokemon_card_id', cardIds)
+
+      if (pricesError) {
+        console.error('Error fetching card prices (server):', pricesError)
+        // Don't throw - continue without prices
+      } else if (prices) {
+        // Group prices by card ID and transform to legacy format
+        for (const price of prices) {
+          const cardId = price.pokemon_card_id
+          if (!pricesByCardId.has(cardId)) {
+            pricesByCardId.set(cardId, [])
+          }
+
+          if (price.current_market_price && price.current_market_price > 0) {
+            // Map variant_pattern to user-friendly subTypeName
+            let subTypeName = price.current_market_price_condition || 'Near Mint'
+            if (price.variant_pattern === 'poke_ball') {
+              subTypeName = `${subTypeName} (Poké Ball)`
+            } else if (price.variant_pattern === 'master_ball') {
+              subTypeName = `${subTypeName} (Master Ball)`
+            }
+
+            pricesByCardId.get(cardId)!.push({
+              subTypeName,
+              marketPrice: price.current_market_price,
+              variant_pattern: price.variant_pattern || undefined
+            })
+          }
+        }
+      }
+    }
+
+    // Merge prices into cards as price_data
+    const cardsWithPrices = setWithCards.cards.map((card: { id: string }) => ({
+      ...card,
+      price_data: pricesByCardId.get(card.id) || null
+    }))
+
     // Fetch products with joined price data from pokemon_product_prices table
     const { data: products, error: productsError } = await supabase
       .from('pokemon_products')
@@ -148,9 +201,10 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
       console.error('Error fetching products (server):', productsError)
       throw new Error('Failed to fetch Pokemon products')
     }
-    
+
     return {
       ...setWithCards,
+      cards: cardsWithPrices,
       products: products || []
     } as PokemonSetWithCardsAndProducts
   } catch (error) {
@@ -281,8 +335,6 @@ export async function getTopCardsFromNewestSetsServer(
     const setIds = recentSets.map(s => s.id)
 
     // Fetch cards from these sets with their set info
-    // Note: We fetch more than needed and then filter/sort in JS
-    // because Supabase doesn't support complex ordering on JSONB fields
     const { data: cards, error: cardsError } = await supabase
       .from('pokemon_cards')
       .select(`
@@ -296,7 +348,6 @@ export async function getTopCardsFromNewestSetsServer(
         )
       `)
       .in('set_id', setIds)
-      .not('price_data', 'is', null)
 
     if (cardsError) {
       console.error('Error fetching cards from recent sets (server):', cardsError)
@@ -307,60 +358,64 @@ export async function getTopCardsFromNewestSetsServer(
       return []
     }
 
-    // Helper to extract the highest market price from price_data JSONB
-    // price_data may come as a JSON string or already-parsed array
-    const getHighestPrice = (priceData: unknown): number => {
-      if (!priceData) return 0
+    // Fetch prices from pokemon_card_prices table for all cards
+    const cardIds = cards.map(c => c.id)
+    const { data: prices, error: pricesError } = await supabase
+      .from('pokemon_card_prices')
+      .select('pokemon_card_id, current_market_price, current_market_price_condition, variant_pattern')
+      .in('pokemon_card_id', cardIds)
 
-      // Parse JSON string if needed (Supabase sometimes returns JSONB as string)
-      let parsedData = priceData
-      if (typeof priceData === 'string') {
-        try {
-          parsedData = JSON.parse(priceData)
-        } catch {
-          return 0
-        }
-      }
-
-      // Handle array format (standard format from TCGCSV)
-      if (Array.isArray(parsedData)) {
-        let maxPrice = 0
-        for (const variant of parsedData) {
-          if (variant && typeof variant === 'object') {
-            const v = variant as Record<string, unknown>
-            if (typeof v.marketPrice === 'number' && v.marketPrice > maxPrice) {
-              maxPrice = v.marketPrice
-            }
-          }
-        }
-        return maxPrice
-      }
-
-      // Fallback for object format (legacy or alternative structure)
-      if (typeof parsedData === 'object' && parsedData !== null) {
-        const data = parsedData as Record<string, unknown>
-        let maxPrice = 0
-        for (const key of Object.keys(data)) {
-          const variant = data[key]
-          if (variant && typeof variant === 'object') {
-            const v = variant as Record<string, unknown>
-            if (typeof v.market === 'number' && v.market > maxPrice) {
-              maxPrice = v.market
-            }
-            if (typeof v.marketPrice === 'number' && v.marketPrice > maxPrice) {
-              maxPrice = v.marketPrice
-            }
-          }
-        }
-        return maxPrice
-      }
-
-      return 0
+    if (pricesError) {
+      console.error('Error fetching card prices (server):', pricesError)
+      // Don't throw - continue without prices
     }
 
-    // Group cards by set, sort by price, take top N from each
-    const cardsBySet: Record<string, typeof cards> = {}
-    for (const card of cards) {
+    // Build a map of card ID -> highest price and price_data array
+    const priceDataByCardId: Map<string, { highestPrice: number; priceData: Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }> }> = new Map()
+
+    if (prices) {
+      for (const price of prices) {
+        const cardId = price.pokemon_card_id
+        if (!priceDataByCardId.has(cardId)) {
+          priceDataByCardId.set(cardId, { highestPrice: 0, priceData: [] })
+        }
+
+        const entry = priceDataByCardId.get(cardId)!
+        const marketPrice = price.current_market_price || 0
+
+        if (marketPrice > 0) {
+          // Track highest price for sorting
+          if (marketPrice > entry.highestPrice) {
+            entry.highestPrice = marketPrice
+          }
+
+          // Build price_data array in legacy format
+          let subTypeName = price.current_market_price_condition || 'Near Mint'
+          if (price.variant_pattern === 'poke_ball') {
+            subTypeName = `${subTypeName} (Poké Ball)`
+          } else if (price.variant_pattern === 'master_ball') {
+            subTypeName = `${subTypeName} (Master Ball)`
+          }
+
+          entry.priceData.push({
+            subTypeName,
+            marketPrice,
+            variant_pattern: price.variant_pattern || undefined
+          })
+        }
+      }
+    }
+
+    // Helper to get the highest price for a card
+    const getHighestPrice = (cardId: string): number => {
+      return priceDataByCardId.get(cardId)?.highestPrice || 0
+    }
+
+    // Filter to only cards with prices, group by set, sort by price, take top N from each
+    const cardsWithPrices = cards.filter(card => getHighestPrice(card.id) > 0)
+
+    const cardsBySet: Record<string, typeof cardsWithPrices> = {}
+    for (const card of cardsWithPrices) {
       const setId = card.set_id
       if (setId && !cardsBySet[setId]) {
         cardsBySet[setId] = []
@@ -376,8 +431,12 @@ export async function getTopCardsFromNewestSetsServer(
       const setCards = cardsBySet[setId] || []
       // Sort by price descending and take top N
       const topCards = setCards
-        .sort((a, b) => getHighestPrice(b.price_data) - getHighestPrice(a.price_data))
+        .sort((a, b) => getHighestPrice(b.id) - getHighestPrice(a.id))
         .slice(0, cardsPerSet)
+        .map(card => ({
+          ...card,
+          price_data: priceDataByCardId.get(card.id)?.priceData || null
+        }))
 
       result.push(...topCards as Array<PokemonCard & { set: PokemonSetWithSeries }>)
     }
@@ -392,8 +451,9 @@ export async function getTopCardsFromNewestSetsServer(
 export async function getCardWithSetServer(cardId: string): Promise<{ card: CardFull; set: SetWithCards }> {
   try {
     const supabase = getServerSupabaseClient()
-    
+
     // Fetch card with set and series information
+    // Note: price_data is fetched separately from pokemon_card_prices
     const { data: card, error: cardError } = await supabase
       .from('pokemon_cards')
       .select(`
@@ -407,8 +467,7 @@ export async function getCardWithSetServer(cardId: string): Promise<{ card: Card
             local_id,
             rarity,
             image,
-            tcgplayer_image_url,
-            price_data
+            tcgplayer_image_url
           )
         )
       `)
@@ -424,11 +483,53 @@ export async function getCardWithSetServer(cardId: string): Promise<{ card: Card
       throw new Error('Card not found')
     }
 
+    // Fetch prices from pokemon_card_prices for the main card
+    const { data: prices, error: pricesError } = await supabase
+      .from('pokemon_card_prices')
+      .select('current_market_price, current_market_price_condition, variant_pattern')
+      .eq('pokemon_card_id', cardId)
+
+    if (pricesError) {
+      console.error('Error fetching card prices (server):', pricesError)
+      // Don't throw - continue without prices
+    }
+
+    // Transform prices to legacy format
+    let priceData: Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }> | null = null
+    if (prices && prices.length > 0) {
+      priceData = []
+      for (const price of prices) {
+        if (price.current_market_price && price.current_market_price > 0) {
+          let subTypeName = price.current_market_price_condition || 'Near Mint'
+          if (price.variant_pattern === 'poke_ball') {
+            subTypeName = `${subTypeName} (Poké Ball)`
+          } else if (price.variant_pattern === 'master_ball') {
+            subTypeName = `${subTypeName} (Master Ball)`
+          }
+
+          priceData.push({
+            subTypeName,
+            marketPrice: price.current_market_price,
+            variant_pattern: price.variant_pattern || undefined
+          })
+        }
+      }
+      if (priceData.length === 0) {
+        priceData = null
+      }
+    }
+
     // Extract set data for navigation
     const set = card.set as SetWithCards
-    
+
+    // Add price_data to the card
+    const cardWithPrices = {
+      ...card,
+      price_data: priceData
+    }
+
     return {
-      card: card as CardFull,
+      card: cardWithPrices as CardFull,
       set
     }
   } catch (error) {
@@ -487,6 +588,7 @@ export async function matchCardByXimilarMetadata(
   }
 
   // Helper to transform result - handles both array and object formats from Supabase
+  // Note: price_data is not included - caller can fetch from pokemon_card_prices if needed
   const toDbMatch = (card: unknown): DatabaseCardMatch => {
     const c = card as Record<string, unknown>
     const sets = c.pokemon_sets
@@ -503,7 +605,7 @@ export async function matchCardByXimilarMetadata(
       rarity: c.rarity as string | null,
       set_name: setName,
       set_id: c.set_id as string,
-      price_data: c.price_data,
+      price_data: null, // Price data fetched separately from pokemon_card_prices
       card_type: 'pokemon'
     }
   }
@@ -575,7 +677,6 @@ export async function matchCardByXimilarMetadata(
         tcgplayer_image_url,
         rarity,
         set_id,
-        price_data,
         pokemon_sets!inner(name, id)
       `)
       .eq('tcgplayer_product_id', parseInt(tcgplayerProductId))
@@ -603,7 +704,6 @@ export async function matchCardByXimilarMetadata(
         tcgplayer_image_url,
         rarity,
         set_id,
-        price_data,
         pokemon_sets!inner(name, id)
       `)
       .eq('local_id', match.card_number)
@@ -633,7 +733,6 @@ export async function matchCardByXimilarMetadata(
         tcgplayer_image_url,
         rarity,
         set_id,
-        price_data,
         pokemon_sets!inner(name, id)
       `)
       .ilike('name', `%${baseName}%`)
@@ -670,7 +769,6 @@ export async function matchCardByXimilarMetadata(
         tcgplayer_image_url,
         rarity,
         set_id,
-        price_data,
         pokemon_sets!inner(name, id)
       `)
       .ilike('name', `%${baseName}%`)
@@ -697,7 +795,6 @@ export async function matchCardByXimilarMetadata(
         tcgplayer_image_url,
         rarity,
         set_id,
-        price_data,
         pokemon_sets!inner(name, id)
       `)
       .eq('local_id', match.card_number)
@@ -731,7 +828,6 @@ export async function matchCardByXimilarMetadata(
           tcgplayer_image_url,
           rarity,
           set_id,
-          price_data,
           pokemon_sets!inner(name, id)
         `)
         .eq('local_id', match.card_number)
