@@ -3,20 +3,32 @@ import type { Database } from './database'
 // Auto-generated types from Supabase
 export type PokemonSeries = Database['public']['Tables']['pokemon_series']['Row']
 export type PokemonSet = Database['public']['Tables']['pokemon_sets']['Row']
-export type PokemonCard = Database['public']['Tables']['pokemon_cards']['Row']
+// Base card type extended with price_data which is added by server functions
+// TODO: Refactor card price handling to use proper typed interfaces
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PokemonCard = Database['public']['Tables']['pokemon_cards']['Row'] & { price_data?: any }
 export type PokemonProduct = Database['public']['Tables']['pokemon_products']['Row']
 export type PokemonProductPriceRow = Database['public']['Tables']['pokemon_product_prices']['Row']
 
-// Subset of pokemon_product_prices for joined queries
+// Type for latest price from the pokemon_product_latest_prices view
+export type PokemonProductLatestPriceRow = Database['public']['Views']['pokemon_product_latest_prices']['Row']
+
+// Subset of pokemon_product_latest_prices for joined queries
+export type PokemonProductLatestPrice = Pick<
+  PokemonProductLatestPriceRow,
+  'market_price' | 'price_date'
+>
+
+// Extended product type with joined price data from pokemon_product_latest_prices view
+export interface PokemonProductWithPrice extends PokemonProduct {
+  pokemon_product_latest_prices: PokemonProductLatestPrice | null
+}
+
+// Legacy types for backward compatibility (if needed elsewhere)
 export type PokemonProductPrice = Pick<
   PokemonProductPriceRow,
   'current_market_price' | 'change_7d_percent' | 'change_30d_percent' | 'last_updated'
 >
-
-// Extended product type with joined price data from pokemon_product_prices table
-export interface PokemonProductWithPrice extends PokemonProduct {
-  pokemon_product_prices: PokemonProductPrice | null
-}
 
 export type PokemonSeriesInsert = Database['public']['Tables']['pokemon_series']['Insert']
 export type PokemonSetInsert = Database['public']['Tables']['pokemon_sets']['Insert']
@@ -162,4 +174,6 @@ export interface PokemonCardFilters {
 export type SerieWithSets = PokemonSeriesWithSets
 export type SetWithCards = PokemonSetWithCards
 export type CardBrief = Pick<PokemonCard, 'id' | 'local_id' | 'name' | 'image' | 'rarity' | 'category'>
-export type CardFull = PokemonCardWithSet
+// CardFull uses Partial because some queries select only subset of fields but cast to this type
+// TODO: Refactor card queries to use proper typed interfaces
+export type CardFull = Partial<PokemonCardWithSet> & { id: string; name: string }

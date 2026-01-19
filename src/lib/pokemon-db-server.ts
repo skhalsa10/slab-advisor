@@ -138,7 +138,7 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
     // Fetch prices from pokemon_card_prices table for all cards in this set
     const cardIds = setWithCards.cards.map((c: { id: string }) => c.id)
 
-    let pricesByCardId: Map<string, Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }>> = new Map()
+    const pricesByCardId: Map<string, Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }>> = new Map()
 
     if (cardIds.length > 0) {
       const { data: prices, error: pricesError } = await supabase
@@ -182,18 +182,10 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
       price_data: pricesByCardId.get(card.id) || null
     }))
 
-    // Fetch products with joined price data from pokemon_product_prices table
+    // Fetch products for this set
     const { data: products, error: productsError } = await supabase
       .from('pokemon_products')
-      .select(`
-        *,
-        pokemon_product_prices(
-          current_market_price,
-          change_7d_percent,
-          change_30d_percent,
-          last_updated
-        )
-      `)
+      .select('*')
       .eq('pokemon_set_id', setId)
       .order('name')
 
@@ -202,10 +194,42 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
       throw new Error('Failed to fetch Pokemon products')
     }
 
+    // Fetch latest prices from the view (Supabase can't auto-join views, so we do it manually)
+    const productIds = (products || []).map((p: { id: number }) => p.id)
+
+    const pricesByProductId: Map<number, { market_price: number | null; price_date: string | null }> = new Map()
+
+    if (productIds.length > 0) {
+      const { data: latestPrices, error: pricesError } = await supabase
+        .from('pokemon_product_latest_prices')
+        .select('pokemon_product_id, market_price, price_date')
+        .in('pokemon_product_id', productIds)
+
+      if (pricesError) {
+        console.error('Error fetching product prices (server):', pricesError)
+        // Continue without prices - graceful degradation
+      } else if (latestPrices) {
+        for (const price of latestPrices) {
+          if (price.pokemon_product_id) {
+            pricesByProductId.set(price.pokemon_product_id, {
+              market_price: price.market_price,
+              price_date: price.price_date
+            })
+          }
+        }
+      }
+    }
+
+    // Merge prices into products
+    const productsWithPrices = (products || []).map((product: { id: number }) => ({
+      ...product,
+      pokemon_product_latest_prices: pricesByProductId.get(product.id) || null
+    }))
+
     return {
       ...setWithCards,
       cards: cardsWithPrices,
-      products: products || []
+      products: productsWithPrices
     } as PokemonSetWithCardsAndProducts
   } catch (error) {
     console.error('Error in getSetWithCardsAndProductsServer:', error)

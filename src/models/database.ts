@@ -725,7 +725,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      pokemon_product_latest_prices: {
+        Row: {
+          created_at: string | null
+          high_price: number | null
+          id: string | null
+          low_price: number | null
+          market_price: number | null
+          mid_price: number | null
+          pokemon_product_id: number | null
+          price_date: string | null
+          tcgplayer_product_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_product_price_history_pokemon_product_id_fkey"
+            columns: ["pokemon_product_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       add_purchased_credits: {
