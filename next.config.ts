@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Exclude scripts and sql folders from file watching (contains large archives and data files)
+  // Note: Turbopack automatically ignores non-src folders, webpack config is for production builds
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/scripts/**', '**/sql/**', '**/node_modules/**'],
+    };
+    return config;
+  },
   images: {
     remotePatterns: [
       {

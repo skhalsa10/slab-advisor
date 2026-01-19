@@ -1,45 +1,60 @@
-[21:49:08] Supplemental Data Sync Started at 2025-09-29T21:49:08.726249
-[21:49:08] ============================================================
-[21:49:08] ✓ Connected to Supabase
-[21:49:08] ✓ PokemonTCG.io API key loaded
-[21:49:08] ✓ Loaded 194 existing set mappings
-[21:49:09] ✓ Mapping file is up to date with database
-[21:49:45] ✓ Fetched 169 sets from PokemonTCG.io
-[21:49:45] 
+[22:33:51] Supplemental Data Sync Started at 2026-01-17T22:33:51.718983
+[22:33:51] ============================================================
+[22:33:51] ✓ Connected to Supabase
+[22:33:51] ✓ PokemonTCG.io API key loaded
+[22:33:51] ✓ PokemonPriceTracker API key loaded
+[22:33:51] ✓ Loaded 198 existing set mappings
+[22:33:53] ✓ Mapping file is up to date with database
+[22:34:09] ✓ Fetched 170 sets from PokemonTCG.io
+[22:34:09] 
 --- Mapping PokemonTCG.io Sets ---
-[21:50:00]   Ambiguous matches for 'McDonald's Collection 2022':
-[21:50:00]     2012bw: Macdonald's Collection 2012 (0.94)
-[21:50:00]     2021swsh: Macdonald's Collection 2021 (0.94)
-[21:50:00]     2011bw: Macdonald's Collection 2011 (0.91)
-[21:50:02] ✓ Saved 10 unmapped sets to unmapped_ptcgio_sets.json
-[21:50:02] ✓ Mapped 0 new sets
-[21:50:02] Found 10 unmapped sets
-[21:50:02] 
+[22:34:26]   Ambiguous matches for 'McDonald's Collection 2022':
+[22:34:26]     2012bw: Macdonald's Collection 2012 (0.94)
+[22:34:26]     2021swsh: Macdonald's Collection 2021 (0.94)
+[22:34:26]     2011bw: Macdonald's Collection 2011 (0.91)
+[22:34:28] ✓ Saved 10 unmapped sets to unmapped_ptcgio_sets.json
+[22:34:28] ✓ Mapped 0 new sets
+[22:34:28] Found 10 unmapped sets
+[22:34:28] 
 --- Updating Database with Supplemental Data ---
-[21:50:17] ✓ Updated 0 sets in database
-[21:50:17] ✓ Fetched 209 groups from TCGCSV
-[21:50:17] 
+[22:34:44] ✓ Updated 0 sets in database
+[22:34:44] ✓ Fetched 214 groups from TCGCSV
+[22:34:44] 
 --- Mapping TCGCSV Groups ---
-[21:50:25] ✓ Saved 40 unmapped TCGCSV groups to unmapped_tcgcsv_groups.json
-[21:50:25] ✓ Mapped 0 new TCGCSV groups
-[21:50:25] Skipped 169 already-mapped groups
-[21:50:25] Found 40 unmapped groups
-[21:50:25] 
+[22:34:54] ✓ Saved 40 unmapped TCGCSV groups to unmapped_tcgcsv_groups.json
+[22:34:54] ✓ Mapped 0 new TCGCSV groups
+[22:34:54] Skipped 174 already-mapped groups
+[22:34:54] Found 40 unmapped groups
+[22:34:54] 
 --- Updating Database with TCGPlayer Data ---
-[21:50:41] ✓ Updated 0 sets with TCGPlayer data
-[21:50:41] 
+[22:35:04]   ✓ Updated sm115 with TCGPlayer group ID: 2480
+[22:35:08]   ✓ Updated swsh12.5 with TCGPlayer group ID: 17688
+[22:35:08]   ✓ Updated swsh4.5 with TCGPlayer group ID: 2754
+[22:35:12] ✓ Updated 3 sets with TCGPlayer data
+[22:35:12] 
+--- Syncing PokemonPriceTracker Set IDs ---
+[22:35:12] Found 20 sets missing tcgplayer_set_id
+[22:35:13] ✓ Saved 7 unmapped sets to unmapped_ppt_sets.json
+[22:35:13] ✓ Updated 0 sets with tcgplayer_set_id
+[22:35:13] Skipped 13 Pokemon TCG Pocket sets
+[22:35:13] Unmapped 7 sets
+[22:35:13] 
 ============================================================
-[21:50:41] SUPPLEMENTAL SYNC COMPLETED
-[21:50:41] PokemonTCG.io sets mapped: 0
-[21:50:41] PokemonTCG.io sets updated: 0
-[21:50:41] PokemonTCG.io sets skipped: 158
-[21:50:41] PokemonTCG.io sets unmapped: 10
-[21:50:41] TCGCSV groups mapped: 0
-[21:50:41] TCGCSV groups updated: 0
-[21:50:41] TCGCSV groups skipped: 169
-[21:50:41] TCGCSV groups unmapped: 40
-[21:50:41] Errors: 0
-[21:50:41] Completed at 2025-09-29T21:50:41.392333
-[21:50:41] 
+[22:35:13] SUPPLEMENTAL SYNC COMPLETED
+[22:35:13] PokemonTCG.io sets mapped: 0
+[22:35:13] PokemonTCG.io sets updated: 0
+[22:35:13] PokemonTCG.io sets skipped: 159
+[22:35:13] PokemonTCG.io sets unmapped: 10
+[22:35:13] TCGCSV groups mapped: 0
+[22:35:13] TCGCSV groups updated: 3
+[22:35:13] TCGCSV groups skipped: 174
+[22:35:13] TCGCSV groups unmapped: 40
+[22:35:13] PokemonPriceTracker sets updated: 0
+[22:35:13] PokemonPriceTracker sets skipped: 13
+[22:35:13] PokemonPriceTracker sets unmapped: 7
+[22:35:13] Errors: 0
+[22:35:13] Completed at 2026-01-17T22:35:13.845391
+[22:35:13] 
 Check unmapped_ptcgio_sets.json for PokemonTCG.io sets that couldn't be mapped
-[21:50:41] Check unmapped_tcgcsv_groups.json for TCGCSV groups that couldn't be mapped
+[22:35:13] Check unmapped_tcgcsv_groups.json for TCGCSV groups that couldn't be mapped
+[22:35:13] Check unmapped_ppt_sets.json for PokemonPriceTracker sets that couldn't be mapped

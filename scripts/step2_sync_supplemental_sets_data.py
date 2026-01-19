@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
 """
-Supplemental Pokemon Sets Data Sync Script
+Step 2: Supplemental Pokemon Sets Data Sync Script
 
 This script syncs supplemental data for Pokemon sets from multiple APIs:
-- PokemonTCG.io API for logos/symbols
+- PokemonTCG.io API for logos/symbols and ptcgio_id
 - TCGCSV API for TCGPlayer group IDs (generates URLs from group IDs)
 
-Usage:
-    python sync_supplemental_sets_data.py
+Must run AFTER step1_sync_tcg_data.py (needs sets to exist in database).
 
-Features:
-- Smart ID mapping using fuzzy name matching
-- Tracks unmapped sets from both sources
-- Updates secondary_logo, secondary_symbol, tcgplayer_group_id, tcgplayer_url fields
-- Skips sets marked as "n/a" or null (confirmed not in source)
-- Idempotent - safe to run multiple times
+Usage:
+    python step2_sync_supplemental_sets_data.py
+    python step2_sync_supplemental_sets_data.py --force   # Force update all
+    python step2_sync_supplemental_sets_data.py --dry-run # Preview changes
+
+Tables affected:
+    - pokemon_sets (updates tcgplayer_group_id, tcgplayer_groups, tcgplayer_url,
+                    tcgplayer_set_id, ptcgio_id, secondary_logo, secondary_symbol)
+
+Output files:
+    - pokemon_sets_ids.json - Master mapping file
+    - unmapped_ptcgio_sets.json - Sets not matched to PokemonTCG.io
+    - unmapped_tcgcsv_groups.json - Groups not matched to our sets
+    - unmapped_ppt_sets.json - Sets not matched to PokemonPriceTracker
 """
 
 import os
@@ -33,6 +40,7 @@ load_dotenv('../.env.local')
 # API configuration
 POKEMONTCG_IO_API_BASE = "https://api.pokemontcg.io/v2"
 TCGCSV_API_BASE = "https://tcgcsv.com"
+POKEMON_PRICE_TRACKER_API_BASE = "https://www.pokemonpricetracker.com/api/v2"
 TCGPLAYER_URL_BASE = "https://www.tcgplayer.com/product/organizedplay/pokemon/{group_id}"
 
 # Helper functions for rich group object handling
@@ -70,7 +78,11 @@ def build_group_object(group_id, tcgcsv_group_data=None):
 MAPPING_FILE = "pokemon_sets_ids.json"
 UNMAPPED_PTCGIO_FILE = "unmapped_ptcgio_sets.json"
 UNMAPPED_TCGCSV_FILE = "unmapped_tcgcsv_groups.json"
+UNMAPPED_PPT_FILE = "unmapped_ppt_sets.json"
 LOG_FILE = "supplemental_sync_log.txt"
+
+# Series IDs to skip for PokemonPriceTracker (not in TCGPlayer ecosystem)
+SKIP_PPT_SERIES = {'tcgp'}  # Pokemon TCG Pocket
 
 class SupplementalDataSync:
     def __init__(self, force_update: bool = False, dry_run: bool = False):
@@ -105,6 +117,13 @@ class SupplementalDataSync:
 
         self.log("✓ PokemonTCG.io API key loaded")
 
+        # Get PokemonPriceTracker API key
+        self.ppt_api_key = os.getenv('POKEMON_PRICE_TRACKER_API_KEY')
+        if not self.ppt_api_key:
+            self.log("WARNING: Missing POKEMON_PRICE_TRACKER_API_KEY - tcgplayer_set_id sync will be skipped")
+        else:
+            self.log("✓ PokemonPriceTracker API key loaded")
+
         # Initialize counters
         self.stats = {
             'ptcgio_sets_updated': 0,
@@ -115,6 +134,9 @@ class SupplementalDataSync:
             'tcgcsv_groups_updated': 0,
             'tcgcsv_groups_unmapped': 0,
             'tcgcsv_groups_skipped': 0,
+            'ppt_sets_updated': 0,
+            'ppt_sets_skipped': 0,
+            'ppt_sets_unmapped': 0,
             'errors': 0
         }
 
@@ -769,6 +791,176 @@ class SupplementalDataSync:
 
         self.log(f"✓ Updated {self.stats['tcgcsv_groups_updated']} sets with TCGPlayer data")
 
+    def search_pokemon_price_tracker(self, set_name: str) -> List[Dict]:
+        """Search PokemonPriceTracker API for sets matching the name"""
+        if not self.ppt_api_key:
+            return []
+
+        try:
+            import urllib.parse
+            encoded_name = urllib.parse.quote(set_name)
+            url = f"{POKEMON_PRICE_TRACKER_API_BASE}/sets?language=english&search={encoded_name}&limit=10"
+
+            headers = {'Authorization': f'Bearer {self.ppt_api_key}'}
+            response = requests.get(url, headers=headers, timeout=30)
+            response.raise_for_status()
+
+            data = response.json()
+            return data.get('data', [])
+        except Exception as e:
+            self.log(f"  ERROR searching PokemonPriceTracker for '{set_name}': {e}")
+            self.stats['errors'] += 1
+            return []
+
+    def find_best_ppt_match(self, our_set_name: str, ppt_results: List[Dict]) -> Optional[Dict]:
+        """Find the best matching PPT set using fuzzy matching"""
+        if not ppt_results:
+            return None
+
+        best_match = None
+        best_similarity = 0.0
+
+        for ppt_set in ppt_results:
+            ppt_name = ppt_set.get('name', '')
+
+            # Calculate similarity using simple normalization
+            norm1 = our_set_name.lower().replace("&", "and").replace("-", " ").replace(":", "").strip()
+            norm2 = ppt_name.lower().replace("&", "and").replace("-", " ").replace(":", "").strip()
+            similarity = SequenceMatcher(None, norm1, norm2).ratio()
+
+            if similarity > best_similarity:
+                best_similarity = similarity
+                best_match = ppt_set
+
+        # Require at least 70% similarity for a match
+        if best_similarity >= 0.70:
+            return best_match
+
+        return None
+
+    def sync_pokemon_price_tracker_set_ids(self):
+        """Sync tcgplayer_set_id from PokemonPriceTracker API"""
+        if not self.ppt_api_key:
+            self.log("\n--- Skipping PokemonPriceTracker Sync (no API key) ---")
+            return
+
+        self.log("\n--- Syncing PokemonPriceTracker Set IDs ---")
+
+        unmapped_sets = []
+        mapping_updated = False
+
+        # Fetch all sets from database that are missing tcgplayer_set_id
+        try:
+            result = self.supabase.table('pokemon_sets')\
+                .select('id, name, series_id, tcgplayer_set_id')\
+                .is_('tcgplayer_set_id', 'null')\
+                .execute()
+
+            sets_to_process = result.data if result.data else []
+            self.log(f"Found {len(sets_to_process)} sets missing tcgplayer_set_id")
+
+        except Exception as e:
+            self.log(f"ERROR fetching sets from database: {e}")
+            self.stats['errors'] += 1
+            return
+
+        for db_set in sets_to_process:
+            set_id = db_set['id']
+            set_name = db_set['name']
+            series_id = db_set.get('series_id')
+
+            # Skip Pokemon TCG Pocket sets
+            if series_id in SKIP_PPT_SERIES:
+                self.stats['ppt_sets_skipped'] += 1
+                continue
+
+            # Search PokemonPriceTracker
+            ppt_results = self.search_pokemon_price_tracker(set_name)
+
+            if not ppt_results:
+                unmapped_sets.append({
+                    'set_id': set_id,
+                    'name': set_name,
+                    'series_id': series_id,
+                    'reason': 'No search results'
+                })
+                self.stats['ppt_sets_unmapped'] += 1
+                continue
+
+            # Find best match
+            best_match = self.find_best_ppt_match(set_name, ppt_results)
+
+            if best_match:
+                tcgplayer_set_id = best_match.get('tcgPlayerId')
+
+                if tcgplayer_set_id:
+                    if self.dry_run:
+                        self.log(f"  [DRY RUN] Would update {set_id}: tcgplayer_set_id = {tcgplayer_set_id}")
+                        self.stats['ppt_sets_updated'] += 1
+                    else:
+                        # Update database
+                        try:
+                            update_result = self.supabase.table('pokemon_sets')\
+                                .update({
+                                    'tcgplayer_set_id': tcgplayer_set_id,
+                                    'updated_at': datetime.now().isoformat()
+                                })\
+                                .eq('id', set_id)\
+                                .execute()
+
+                            if update_result.data:
+                                self.stats['ppt_sets_updated'] += 1
+                                self.log(f"  ✓ {set_id} ({set_name}) → {tcgplayer_set_id}")
+
+                                # Also save to mappings file
+                                if set_id in self.mappings:
+                                    self.mappings[set_id]['tcgplayer_set_id'] = tcgplayer_set_id
+                                    mapping_updated = True
+                            else:
+                                self.log(f"  Warning: No rows updated for {set_id}")
+                        except Exception as e:
+                            self.log(f"  ERROR updating {set_id}: {e}")
+                            self.stats['errors'] += 1
+            else:
+                unmapped_sets.append({
+                    'set_id': set_id,
+                    'name': set_name,
+                    'series_id': series_id,
+                    'reason': 'No matching set found',
+                    'search_results': [{'name': r.get('name'), 'tcgPlayerId': r.get('tcgPlayerId')}
+                                       for r in ppt_results[:5]]
+                })
+                self.stats['ppt_sets_unmapped'] += 1
+
+        # Save updated mappings if changed
+        if mapping_updated:
+            self.save_mappings()
+
+        # Save unmapped sets
+        if unmapped_sets:
+            self.save_unmapped_ppt_sets(unmapped_sets)
+
+        self.log(f"✓ Updated {self.stats['ppt_sets_updated']} sets with tcgplayer_set_id")
+        self.log(f"Skipped {self.stats['ppt_sets_skipped']} Pokemon TCG Pocket sets")
+        self.log(f"Unmapped {self.stats['ppt_sets_unmapped']} sets")
+
+    def save_unmapped_ppt_sets(self, unmapped_sets: List[Dict]):
+        """Save unmapped PPT sets to JSON file"""
+        try:
+            unmapped_data = {
+                'unmapped_sets': unmapped_sets,
+                'last_updated': datetime.now().isoformat(),
+                'total_count': len(unmapped_sets)
+            }
+
+            with open(UNMAPPED_PPT_FILE, 'w') as f:
+                json.dump(unmapped_data, f, indent=2)
+
+            self.log(f"✓ Saved {len(unmapped_sets)} unmapped sets to {UNMAPPED_PPT_FILE}")
+        except Exception as e:
+            self.log(f"ERROR saving unmapped PPT sets: {e}")
+            self.stats['errors'] += 1
+
     def run(self):
         """Main sync process"""
         try:
@@ -795,6 +987,9 @@ class SupplementalDataSync:
                 # 6. Update database with TCGPlayer data
                 self.update_database_with_tcgplayer_data()
 
+            # 7. Sync tcgplayer_set_id from PokemonPriceTracker
+            self.sync_pokemon_price_tracker_set_ids()
+
             # Print summary
             self.log("\n" + "=" * 60)
             self.log("SUPPLEMENTAL SYNC COMPLETED")
@@ -806,6 +1001,9 @@ class SupplementalDataSync:
             self.log(f"TCGCSV groups updated: {self.stats['tcgcsv_groups_updated']}")
             self.log(f"TCGCSV groups skipped: {self.stats['tcgcsv_groups_skipped']}")
             self.log(f"TCGCSV groups unmapped: {self.stats['tcgcsv_groups_unmapped']}")
+            self.log(f"PokemonPriceTracker sets updated: {self.stats['ppt_sets_updated']}")
+            self.log(f"PokemonPriceTracker sets skipped: {self.stats['ppt_sets_skipped']}")
+            self.log(f"PokemonPriceTracker sets unmapped: {self.stats['ppt_sets_unmapped']}")
             self.log(f"Errors: {self.stats['errors']}")
             self.log(f"Completed at {datetime.now().isoformat()}")
 
@@ -814,6 +1012,9 @@ class SupplementalDataSync:
 
             if self.stats['tcgcsv_groups_unmapped'] > 0:
                 self.log(f"Check {UNMAPPED_TCGCSV_FILE} for TCGCSV groups that couldn't be mapped")
+
+            if self.stats['ppt_sets_unmapped'] > 0:
+                self.log(f"Check {UNMAPPED_PPT_FILE} for PokemonPriceTracker sets that couldn't be mapped")
 
             if self.stats['ptcgio_sets_mapped'] > 0 or self.stats['tcgcsv_groups_mapped'] > 0:
                 self.log(f"Check {MAPPING_FILE} for new mappings")

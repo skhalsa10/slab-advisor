@@ -373,6 +373,50 @@ export type Database = {
           },
         ]
       }
+      pokemon_product_price_history: {
+        Row: {
+          created_at: string | null
+          high_price: number | null
+          id: string
+          low_price: number | null
+          market_price: number | null
+          mid_price: number | null
+          pokemon_product_id: number | null
+          price_date: string
+          tcgplayer_product_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          high_price?: number | null
+          id?: string
+          low_price?: number | null
+          market_price?: number | null
+          mid_price?: number | null
+          pokemon_product_id?: number | null
+          price_date: string
+          tcgplayer_product_id: number
+        }
+        Update: {
+          created_at?: string | null
+          high_price?: number | null
+          id?: string
+          low_price?: number | null
+          market_price?: number | null
+          mid_price?: number | null
+          pokemon_product_id?: number | null
+          price_date?: string
+          tcgplayer_product_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_product_price_history_pokemon_product_id_fkey"
+            columns: ["pokemon_product_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pokemon_product_prices: {
         Row: {
           change_180d_percent: number | null

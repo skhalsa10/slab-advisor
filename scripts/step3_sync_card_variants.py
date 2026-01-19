@@ -441,30 +441,115 @@ class EnhancedVariantSync:
         if not product_name or not card_name:
             return 0.0
 
-        # Clean product name by removing card number pattern (e.g., "Bulbasaur - 001/132" -> "Bulbasaur")
         import re
-        cleaned_product_name = re.sub(r'\s*-\s*\d+/\d+\s*$', '', product_name)
+
+        # Remove all parenthetical suffixes like (Full Art), (Secret), (Team Plasma), (Supporter), etc.
+        cleaned_product_name = re.sub(r'\s*\([^)]*\)\s*', ' ', product_name).strip()
+
+        # Remove square bracket suffixes like [Winner], [Staff], [Top 32], [Champion], etc.
+        cleaned_product_name = re.sub(r'\s*\[[^\]]*\]\s*', ' ', cleaned_product_name).strip()
+
+        # Remove card number patterns with hyphen:
+        #   "Axew - BW16" -> "Axew"
+        #   "Audino - 074/086" -> "Audino"
+        #   "Dark Ivysaur - 6" -> "Dark Ivysaur"
+        cleaned_product_name = re.sub(r'\s*-\s*[A-Z]*\d+(?:/\d+)?\s*$', '', cleaned_product_name, flags=re.IGNORECASE)
+
+        # Remove LV.X suffix: "Giratina LV.X" -> "Giratina"
+        cleaned_product_name = re.sub(r'\s+LV\.X\s*$', '', cleaned_product_name, flags=re.IGNORECASE)
+
+        # Clean up any double spaces
+        cleaned_product_name = re.sub(r'\s+', ' ', cleaned_product_name).strip()
 
         # Normalize names for comparison
         product_normalized = cleaned_product_name.lower().strip()
         card_normalized = card_name.lower().strip()
 
+        # Normalize Prism Star: "Victini Prism Star" <-> "Victini ◇"
+        product_normalized = re.sub(r'\s+prism star$', ' ◇', product_normalized)
+        card_normalized = re.sub(r'\s+prism star$', ' ◇', card_normalized)
+
+        # Clean up any remaining double spaces
+        product_normalized = re.sub(r'\s+', ' ', product_normalized).strip()
+        card_normalized = re.sub(r'\s+', ' ', card_normalized).strip()
+
         # Calculate similarity ratio
         return SequenceMatcher(None, product_normalized, card_normalized).ratio()
 
-    def validate_product_name_match(self, product: Dict, card_name: str, threshold: float = 0.7) -> Tuple[bool, float]:
+    def extract_product_card_number(self, product: Dict) -> Optional[str]:
+        """
+        Extract the normalized card number from a product's extendedData.
+        Returns just the number part before any slash (e.g., "057" from "057/131")
+        """
+        extended_data = product.get('extendedData', [])
+        for item in extended_data:
+            if item.get('name') == 'Number':
+                value = item.get('value', '')
+                # Extract number before slash if present
+                if '/' in value:
+                    return value.split('/')[0]
+                return value
+        return None
+
+    def normalize_card_number(self, card_number: str) -> str:
+        """
+        Normalize a card number for comparison by stripping leading zeros
+        but preserving letter prefixes (e.g., "057" -> "57", "BW16" -> "BW16")
+        """
+        if not card_number:
+            return ''
+
+        import re
+
+        # Check if it has a letter prefix (e.g., BW16, TG05)
+        letter_match = re.match(r'^([A-Za-z]+)(\d+)$', card_number)
+        if letter_match:
+            prefix = letter_match.group(1)
+            number = letter_match.group(2).lstrip('0') or '0'
+            return f"{prefix}{number}"
+
+        # Pure numeric - strip leading zeros
+        return card_number.lstrip('0') or '0'
+
+    def validate_card_number_match(self, product: Dict, card_local_id: str) -> bool:
+        """
+        Validate that a product's card number matches the target card's local_id.
+        This is an extra safety net to prevent mismatches.
+        """
+        product_number = self.extract_product_card_number(product)
+        if not product_number or not card_local_id:
+            # If we can't extract numbers, skip this validation (don't block)
+            return True
+
+        # Normalize both for comparison
+        normalized_product = self.normalize_card_number(product_number)
+        normalized_card = self.normalize_card_number(card_local_id)
+
+        return normalized_product == normalized_card
+
+    def validate_product_name_match(self, product: Dict, card_name: str, card_local_id: str = '', threshold: float = 0.7) -> Tuple[bool, float, bool]:
         """
         Validate that a TCGPlayer product name reasonably matches the card name
-        Returns (is_valid, similarity_score)
+        and optionally validates card number as an extra safety net.
+        Returns (is_valid, similarity_score, number_matched)
         """
         product_name = product.get('name', '')
         similarity = self.calculate_name_similarity(product_name, card_name)
+
+        # Check card number match as safety net
+        number_matched = self.validate_card_number_match(product, card_local_id) if card_local_id else True
 
         # Log similarity for debugging
         if similarity < threshold:
             console.print(f"[yellow]Name mismatch: '{product_name}' vs '{card_name}' (similarity: {similarity:.2f})[/yellow]")
 
-        return similarity >= threshold, similarity
+        if not number_matched:
+            product_number = self.extract_product_card_number(product)
+            console.print(f"[yellow]Card number mismatch: product '{product_number}' vs card '{card_local_id}'[/yellow]")
+
+        # Both name similarity AND card number must pass
+        is_valid = similarity >= threshold and number_matched
+        return is_valid, similarity, number_matched
 
     def clear_card_products(self, card_id: str) -> bool:
         """Clear existing tcgplayer_products array for a card"""
@@ -881,29 +966,34 @@ class EnhancedVariantSync:
             })
             return False
 
-        # Get card name for validation
+        # Get card name and local_id for validation
         try:
             result = self.supabase.table('pokemon_cards')\
-                .select('name')\
+                .select('name, local_id')\
                 .eq('id', card_id)\
                 .execute()
 
             card_name = result.data[0]['name'] if result.data else ''
+            card_local_id = result.data[0].get('local_id', '') if result.data else ''
         except Exception:
             card_name = ''
+            card_local_id = ''
 
-        # Validate product name matches card name (70% similarity threshold)
-        is_valid, similarity = self.validate_product_name_match(product, card_name, threshold=0.7)
+        # Validate product name matches card name (70% similarity threshold) and card number
+        is_valid, similarity, number_matched = self.validate_product_name_match(product, card_name, card_local_id, threshold=0.7)
         if not is_valid:
-            console.print(f"[yellow]Skipping product {product['productId']} due to name mismatch (similarity: {similarity:.2f})[/yellow]")
+            reason = 'Name validation failed' if similarity < 0.7 else 'Card number mismatch'
+            console.print(f"[yellow]Skipping product {product['productId']} due to validation failure (similarity: {similarity:.2f}, number_matched: {number_matched})[/yellow]")
             self.stats['unmapped_cards'].append({
                 'set_id': set_id,
                 'card_number': card_number,
                 'product_name': product.get('name'),
                 'product_id': product.get('productId'),
                 'card_name': card_name,
+                'card_local_id': card_local_id,
                 'similarity': similarity,
-                'reason': 'Name validation failed',
+                'number_matched': number_matched,
+                'reason': reason,
                 'action': 'review',
                 'tcg_product': product
             })
@@ -977,33 +1067,38 @@ class EnhancedVariantSync:
             })
             return False
 
-        # Get card name for validation
+        # Get card name and local_id for validation
         try:
             result = self.supabase.table('pokemon_cards')\
-                .select('name')\
+                .select('name, local_id')\
                 .eq('id', card_id)\
                 .execute()
 
             card_name = result.data[0]['name'] if result.data else ''
+            card_local_id = result.data[0].get('local_id', '') if result.data else ''
         except Exception:
             card_name = ''
+            card_local_id = ''
 
-        # Validate product names against card name
+        # Validate product names against card name and card number
         validated_products = []
         for product in unprocessed_products:
-            is_valid, similarity = self.validate_product_name_match(product, card_name, threshold=0.7)
+            is_valid, similarity, number_matched = self.validate_product_name_match(product, card_name, card_local_id, threshold=0.7)
             if is_valid:
                 validated_products.append(product)
             else:
-                console.print(f"[yellow]Skipping product {product['productId']} due to name mismatch (similarity: {similarity:.2f})[/yellow]")
+                reason = 'Name validation failed' if similarity < 0.7 else 'Card number mismatch'
+                console.print(f"[yellow]Skipping product {product['productId']} due to validation failure (similarity: {similarity:.2f}, number_matched: {number_matched})[/yellow]")
                 self.stats['unmapped_cards'].append({
                     'set_id': set_id,
                     'card_number': card_number,
                     'product_name': product.get('name'),
                     'product_id': product.get('productId'),
                     'card_name': card_name,
+                    'card_local_id': card_local_id,
                     'similarity': similarity,
-                    'reason': 'Name validation failed',
+                    'number_matched': number_matched,
+                    'reason': reason,
                     'action': 'review',
                     'tcg_product': product
                 })

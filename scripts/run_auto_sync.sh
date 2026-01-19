@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Complete Pokemon TCG Data Pipeline Runner
-# Runs all sync scripts in proper sequence: auto_sync → supplemental → variants → prices
+# Runs all sync scripts in proper sequence: tcg_data → supplemental → variants → prices → price_history
 # Designed for both manual execution and cron job automation
 
 # Record start time
@@ -73,16 +73,19 @@ run_script_step() {
 }
 
 # STEP 1: Foundation Data Sync
-run_script_step "Foundation Data Sync (TCGdx)" "python3 auto_sync_tcg_data.py" 1
+run_script_step "Foundation Data Sync (TCGdex)" "python3 step1_sync_tcg_data.py" 1
 
 # STEP 2: Supplemental Metadata and TCGPlayer Group Mapping
-run_script_step "Supplemental Metadata Sync" "python3 sync_supplemental_sets_data.py" 2
+run_script_step "Supplemental Metadata Sync" "python3 step2_sync_supplemental_sets_data.py" 2
 
 # STEP 3: Complex Card Variant Mapping
-run_script_step "Card Variant Mapping" "python3 sync_card_variants_v2.py --all-sets" 3
+run_script_step "Card Variant Mapping" "python3 step3_sync_card_variants.py --all-sets" 3
 
 # STEP 4: Price Updates
-run_script_step "Price Updates" "python3 update_pokemon_prices.py --all" 4
+run_script_step "Price Updates" "python3 step4_sync_pokemon_price_tracker.py --both" 4
+
+# STEP 5: Historical Price Snapshots (TCGCSV)
+run_script_step "Historical Price Snapshots" "python3 step5_backfill_product_price_history.py --daily" 5
 
 # Calculate total pipeline duration
 pipeline_end_time=$(date +%s)

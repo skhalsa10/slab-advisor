@@ -2654,5 +2654,35 @@
       }
     ],
     "ptcgio_id": "me1"
+  },
+  "mep": {
+    "name": "MEP Black Star Promos",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "B1": {
+    "name": "Mega Rising",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
+  },
+  "me02": {
+    "name": "Phantasmal Flames",
+    "tcgplayer_group_id": [
+      {
+        "groupId": 24448,
+        "name": "ME02: Phantasmal Flames",
+        "abbreviation": "PFL",
+        "isSupplemental": false,
+        "publishedOn": "2025-11-14T00:00:00",
+        "modifiedOn": "2026-01-16T15:20:14.697",
+        "categoryId": 3
+      }
+    ],
+    "ptcgio_id": "me2"
+  },
+  "B1a": {
+    "name": "Crimson Blaze",
+    "tcgplayer_group_id": null,
+    "ptcgio_id": null
   }
 }

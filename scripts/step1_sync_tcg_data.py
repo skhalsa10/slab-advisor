@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """
-Automated TCGdex Data Sync Script
+Step 1: TCGdex Data Sync Script
 
 This script automatically syncs all Pokemon TCG data from TCGdex API to Supabase.
-Designed to run daily on a Raspberry Pi server without user interaction.
+Designed to run daily on a server without user interaction.
 Overwrites log file each run to save storage space.
 
-Usage:
-    python auto_sync_tcg_data.py
+This is the FOUNDATION script - must run before all other sync scripts.
 
-For cron job (daily at 2 AM):
-    0 2 * * * cd /path/to/project && python scripts/auto_sync_tcg_data.py
+Usage:
+    python step1_sync_tcg_data.py
+
+Tables affected:
+    - pokemon_series (adds new series)
+    - pokemon_sets (adds new sets)
+    - pokemon_cards (adds new cards with basic info)
 """
 
 import os
