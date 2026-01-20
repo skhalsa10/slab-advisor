@@ -16,6 +16,7 @@ Usage:
     python step5_backfill_product_price_history.py --daily                 # Process yesterday + today
     python step5_backfill_product_price_history.py --daily --dry-run       # Preview without download/insert
     python step5_backfill_product_price_history.py --daily --date 2026-01-18  # Specific date only
+    python step5_backfill_product_price_history.py --daily --start-date 2024-08-30  # Backfill from date to today
 """
 
 import os
@@ -45,9 +46,10 @@ POKEMON_CATEGORY_ID = "3"
 
 
 class ProductPriceHistoryBackfill:
-    def __init__(self, dry_run: bool = False):
+    def __init__(self, dry_run: bool = False, verbose: bool = False):
         """Initialize the backfill script"""
         self.dry_run = dry_run
+        self.verbose = verbose
 
         # Initialize Supabase
         supabase_url = os.getenv('NEXT_PUBLIC_SUPABASE_URL')
@@ -74,23 +76,45 @@ class ProductPriceHistoryBackfill:
         self.products_by_group: Dict[int, Dict[int, int]] = {}  # group_id -> {tcgplayer_product_id -> pokemon_product_id}
 
     def load_products(self, group_id: Optional[int] = None) -> None:
-        """Load products from database, optionally filtered by group_id"""
+        """Load products from database, optionally filtered by group_id
+
+        Uses pagination to fetch ALL products (Supabase has a default 1000 row limit)
+        """
         console.print("[blue]Loading products from database...[/blue]")
 
         try:
-            query = self.supabase.table('pokemon_products').select('id, tcgplayer_product_id, tcgplayer_group_id')
+            all_products = []
+            page_size = 1000
+            offset = 0
 
-            if group_id:
-                query = query.eq('tcgplayer_group_id', group_id)
+            # Paginate through all products
+            while True:
+                query = self.supabase.table('pokemon_products')\
+                    .select('id, tcgplayer_product_id, tcgplayer_group_id')\
+                    .range(offset, offset + page_size - 1)
 
-            result = query.execute()
+                if group_id:
+                    query = query.eq('tcgplayer_group_id', group_id)
 
-            if not result.data:
+                result = query.execute()
+
+                if not result.data:
+                    break
+
+                all_products.extend(result.data)
+                console.print(f"[dim]  Fetched {len(all_products)} products so far...[/dim]")
+
+                if len(result.data) < page_size:
+                    break  # Last page
+
+                offset += page_size
+
+            if not all_products:
                 console.print("[yellow]No products found in database[/yellow]")
                 return
 
             # Group products by tcgplayer_group_id
-            for product in result.data:
+            for product in all_products:
                 gid = product['tcgplayer_group_id']
                 if gid not in self.products_by_group:
                     self.products_by_group[gid] = {}
@@ -164,23 +188,32 @@ class ProductPriceHistoryBackfill:
         """Process all groups for a specific date"""
         groups_to_process = [target_group_id] if target_group_id else list(self.products_by_group.keys())
 
+        if self.verbose:
+            console.print(f"[dim]Processing {len(groups_to_process)} groups for {date_str}[/dim]")
+
         for group_id in groups_to_process:
             if group_id not in self.products_by_group:
+                if self.verbose:
+                    console.print(f"[dim]  Skipping group {group_id} - not in products_by_group[/dim]")
                 continue
 
             products_in_group = self.products_by_group[group_id]
             prices_data = self.load_prices_file(date_str, group_id)
 
             if not prices_data:
+                if self.verbose:
+                    console.print(f"[dim]  Group {group_id}: No prices file found[/dim]")
                 continue
 
             self.stats['groups_processed'] += 1
 
             # Build price records for products we care about
             records_to_insert = []
+            products_in_file = set()
 
             for price_entry in prices_data:
                 tcgplayer_product_id = price_entry.get('productId')
+                products_in_file.add(tcgplayer_product_id)
 
                 if tcgplayer_product_id not in products_in_group:
                     continue
@@ -199,6 +232,12 @@ class ProductPriceHistoryBackfill:
                 }
 
                 records_to_insert.append(record)
+
+            if self.verbose:
+                matched = len(records_to_insert)
+                in_db = len(products_in_group)
+                in_file = len(products_in_file)
+                console.print(f"[dim]  Group {group_id}: {matched}/{in_db} DB products matched ({in_file} in file)[/dim]")
 
             # Batch insert
             if records_to_insert:
@@ -328,19 +367,27 @@ class ProductPriceHistoryBackfill:
 
     def process_extracted_date(self, extracted_path: Path, date_str: str) -> None:
         """Process all groups from an extracted archive folder"""
+        if self.verbose:
+            console.print(f"[dim]Processing {len(self.products_by_group)} groups for {date_str}[/dim]")
+
         for group_id in self.products_by_group.keys():
             products_in_group = self.products_by_group[group_id]
             prices_data = self.load_prices_from_extracted(extracted_path, group_id)
 
             if not prices_data:
+                if self.verbose:
+                    console.print(f"[dim]  Group {group_id}: No prices file found[/dim]")
                 continue
 
             self.stats['groups_processed'] += 1
 
             # Build price records (same logic as existing process_date)
             records_to_insert = []
+            products_in_file = set()
+
             for price_entry in prices_data:
                 tcgplayer_product_id = price_entry.get('productId')
+                products_in_file.add(tcgplayer_product_id)
 
                 if tcgplayer_product_id not in products_in_group:
                     continue
@@ -358,6 +405,12 @@ class ProductPriceHistoryBackfill:
                     'price_date': date_str
                 }
                 records_to_insert.append(record)
+
+            if self.verbose:
+                matched = len(records_to_insert)
+                in_db = len(products_in_group)
+                in_file = len(products_in_file)
+                console.print(f"[dim]  Group {group_id}: {matched}/{in_db} DB products matched ({in_file} in file)[/dim]")
 
             if records_to_insert:
                 inserted = self.insert_price_records(records_to_insert)
@@ -411,8 +464,13 @@ class ProductPriceHistoryBackfill:
             if not self.dry_run:
                 self.cleanup_daily_files(archive_path, extracted_path)
 
-    def run_daily(self, target_date: Optional[str] = None) -> None:
-        """Run daily price update - process today and yesterday (or specific date if provided)"""
+    def run_daily(self, target_date: Optional[str] = None, start_date: Optional[str] = None) -> None:
+        """Run daily price update - process today and yesterday (or specific date/range if provided)
+
+        Args:
+            target_date: Process only this specific date (YYYY-MM-DD)
+            start_date: Start date for backfill range (processes from start_date to today)
+        """
         console.print(f"\n[bold blue]Starting Daily Price Update[/bold blue]")
 
         if self.dry_run:
@@ -426,7 +484,27 @@ class ProductPriceHistoryBackfill:
             return
 
         # Determine which dates to process
-        if target_date:
+        if start_date:
+            # Generate date range from start_date to today
+            try:
+                start = datetime.strptime(start_date, '%Y-%m-%d')
+            except ValueError:
+                console.print(f"[red]Invalid start date format: {start_date}. Use YYYY-MM-DD[/red]")
+                return
+
+            end = datetime.now()
+            if start > end:
+                console.print(f"[red]Start date {start_date} is in the future[/red]")
+                return
+
+            dates_to_process = []
+            current = start
+            while current <= end:
+                dates_to_process.append(current.strftime('%Y-%m-%d'))
+                current += timedelta(days=1)
+
+            console.print(f"[blue]Backfilling {len(dates_to_process)} dates from {start_date} to {end.strftime('%Y-%m-%d')}[/blue]")
+        elif target_date:
             # User specified a single date
             dates_to_process = [target_date]
         else:
@@ -438,16 +516,21 @@ class ProductPriceHistoryBackfill:
                 today.strftime('%Y-%m-%d')
             ]
 
-        console.print(f"[blue]Will process dates: {', '.join(dates_to_process)}[/blue]")
+        console.print(f"[blue]Will process dates: {dates_to_process[0]} to {dates_to_process[-1]} ({len(dates_to_process)} total)[/blue]")
 
         # Process each date
         successful_dates = []
+        failed_dates = []
         for date_str in dates_to_process:
             if self.process_single_daily_date(date_str):
                 successful_dates.append(date_str)
+            else:
+                failed_dates.append(date_str)
 
         # Summary
-        console.print(f"\n[bold]Successfully processed: {', '.join(successful_dates) if successful_dates else 'None'}[/bold]")
+        console.print(f"\n[bold]Successfully processed: {len(successful_dates)} dates[/bold]")
+        if failed_dates:
+            console.print(f"[yellow]Failed/skipped: {len(failed_dates)} dates[/yellow]")
         self.print_summary()
 
 
@@ -459,6 +542,10 @@ def main():
     parser.add_argument('--dry-run', action='store_true', help='Preview changes without inserting')
     parser.add_argument('--group-id', type=int, help='Process only a specific TCGPlayer group ID (backfill only)')
     parser.add_argument('--date', type=str, help='Process only a specific date (YYYY-MM-DD)')
+    parser.add_argument('--start-date', type=str,
+        help='Start date for daily backfill (YYYY-MM-DD). Downloads and processes all dates from start to today.')
+    parser.add_argument('--verbose', '-v', action='store_true',
+        help='Enable verbose output for debugging')
 
     args = parser.parse_args()
 
@@ -467,11 +554,20 @@ def main():
         console.print("\n[yellow]Use --backfill or --daily to run the script[/yellow]")
         return
 
-    script = ProductPriceHistoryBackfill(dry_run=args.dry_run)
+    # Validate conflicting args
+    if args.start_date and args.date:
+        console.print("[red]Error: Cannot use both --date and --start-date. Use --date for single date or --start-date for range.[/red]")
+        return
+
+    if args.start_date and args.backfill:
+        console.print("[red]Error: --start-date is only for --daily mode. Use --date with --backfill for single date backfill.[/red]")
+        return
+
+    script = ProductPriceHistoryBackfill(dry_run=args.dry_run, verbose=args.verbose)
 
     try:
         if args.daily:
-            script.run_daily(target_date=args.date)
+            script.run_daily(target_date=args.date, start_date=args.start_date)
         elif args.backfill:
             script.run_backfill(target_group_id=args.group_id, target_date=args.date)
     except KeyboardInterrupt:
