@@ -93,6 +93,31 @@ These features deliver unique value that competitors don't have and form the fou
 - ❌ Update Python scripts to use `pokemon_card_prices` table:
   - `scripts/update_pokemon_prices.py`
 
+**Type System Refactor TODO (Post-Price Migration):**
+- ❌ Refactor TypeScript types after migrating to `pokemon_card_prices` and `pokemon_product_price_history` tables
+  - Review and update `src/models/pokemon.ts`:
+    - Clean up `PokemonCard` type (remove `any` type for `price_data`)
+    - Create proper typed interface for card price data from `pokemon_card_prices`
+    - Update `PokemonProductWithPrice` to use `pokemon_product_latest_prices` view types
+    - Remove or deprecate legacy `PokemonProductPrice` type
+    - Fix `CardFull` type (currently uses `Partial` with TODO comment)
+  - Review and update `src/models/database.ts`:
+    - Ensure `pokemon_card_prices` table types are properly defined
+    - Ensure `pokemon_product_price_history` table types are properly defined
+    - Verify `pokemon_product_latest_prices` view types are complete
+  - Create dedicated price type interfaces:
+    - `CardPriceData` - structured type for card prices (replaces JSONB `price_data`)
+    - `ProductPriceData` - structured type for product prices
+    - `PriceHistoryEntry` - type for historical price records
+  - Fix all TypeScript errors and remove `eslint-disable` comments:
+    - `src/models/pokemon.ts` - remove `@typescript-eslint/no-explicit-any`
+    - Search codebase for other `any` types related to price data
+  - Update functions that return price data to use new types:
+    - `getSetWithCardsAndProductsServer()` in `pokemon-db-server.ts`
+    - `getCardWithSetServer()` in `pokemon-db-server.ts`
+    - Price utility functions in `src/utils/priceUtils.ts`
+  - Run `npm run build` to verify no type errors remain
+
 **Database Implementation Details:**
 
 The `portfolio_snapshots` table stores daily portfolio values:
