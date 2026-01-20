@@ -23,6 +23,7 @@ import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import QuickView from '@/components/ui/QuickView'
 import Toast from '@/components/ui/Toast'
 import CardQuickViewContent from '@/components/browse/CardQuickViewContent'
+import ProductQuickViewContent from '@/components/browse/ProductQuickViewContent'
 import PokemonSetHeader from '@/components/browse/pokemon/PokemonSetHeader'
 import TabNavigation from '@/components/ui/TabNavigation'
 import BrowseFilterAndSort from '@/components/browse/BrowseFilterAndSort'
@@ -36,6 +37,7 @@ import TCGProductListItem from '@/components/cards/TCGProductListItem'
 import CardListItem from '@/components/pokemon/CardListItem'
 import QuickAddModal from '@/components/collection/QuickAddModal'
 import QuickAddForm from '@/components/collection/QuickAddForm'
+import ProductQuickAddForm from '@/components/collection/ProductQuickAddForm'
 
 interface SetDetailClientProps {
   initialData: PokemonSetWithCardsAndProducts
@@ -72,10 +74,20 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
   const [productViewMode, setProductViewMode] = useState<ViewMode>('grid')
 
-  // Quick Add state
+  // Product QuickView state
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
+  const [isProductQuickViewOpen, setIsProductQuickViewOpen] = useState(false)
+
+  // Quick Add state (Cards)
   const [quickAddCardId, setQuickAddCardId] = useState<string | null>(null)
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false)
   const [quickAddAnchorRect, setQuickAddAnchorRect] = useState<DOMRect | null>(null)
+
+  // Quick Add state (Products)
+  const [quickAddProductId, setQuickAddProductId] = useState<string | null>(null)
+  const [isProductQuickAddOpen, setIsProductQuickAddOpen] = useState(false)
+  const [productQuickAddAnchorRect, setProductQuickAddAnchorRect] = useState<DOMRect | null>(null)
+
   const [toastState, setToastState] = useState<{
     type: 'success' | 'error'
     message: string
@@ -152,6 +164,23 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
     // Keep the quickview open
   }
 
+  // Product QuickView handlers
+  const handleProductClick = useCallback((e: React.MouseEvent, productId: string) => {
+    e.preventDefault()
+    setSelectedProductId(productId)
+    setIsProductQuickViewOpen(true)
+  }, [])
+
+  const handleProductQuickViewClose = useCallback(() => {
+    setIsProductQuickViewOpen(false)
+    setSelectedProductId(null)
+  }, [])
+
+  const handleNavigateToProduct = useCallback((productId: string) => {
+    setSelectedProductId(productId)
+    // Keep the quickview open
+  }, [])
+
   // Quick Add handlers
   const handleQuickAdd = useCallback((e: React.MouseEvent, cardId: string) => {
     e.preventDefault()
@@ -185,6 +214,41 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
     setIsQuickAddOpen(false)
     setQuickAddCardId(null)
     setQuickAddAnchorRect(null)
+  }, [])
+
+  // Product Quick Add handlers
+  const handleProductQuickAdd = useCallback((e: React.MouseEvent, productId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    // Store the button's position for popover anchoring
+    const target = e.currentTarget as HTMLElement
+    const rect = target.getBoundingClientRect()
+    setProductQuickAddAnchorRect(rect)
+
+    setQuickAddProductId(productId)
+    setIsProductQuickAddOpen(true)
+  }, [])
+
+  const handleProductQuickAddSuccess = useCallback((message: string) => {
+    setToastState({ type: 'success', message })
+    setIsProductQuickAddOpen(false)
+    setQuickAddProductId(null)
+    setProductQuickAddAnchorRect(null)
+
+    // Refresh ownership widget
+    handleCollectionUpdate()
+  }, [handleCollectionUpdate])
+
+  const handleProductQuickAddError = useCallback((message: string) => {
+    setToastState({ type: 'error', message })
+    // Keep modal open for retry
+  }, [])
+
+  const handleProductQuickAddClose = useCallback(() => {
+    setIsProductQuickAddOpen(false)
+    setQuickAddProductId(null)
+    setProductQuickAddAnchorRect(null)
   }, [])
 
   const handleToastClose = useCallback(() => {
@@ -272,6 +336,9 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         tcgplayer_image_url: product.tcgplayer_image_url || undefined,
         current_market_price: product.pokemon_product_latest_prices?.market_price ?? null
       }}
+      onClick={handleProductClick}
+      showQuickAdd={!!user}
+      onQuickAdd={handleProductQuickAdd}
     />
   )
 
@@ -397,6 +464,11 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             items={initialData.products}
             renderHeader={() => (
               <tr>
+                {user && (
+                  <th scope="col" className="px-4 py-3 w-16">
+                    <span className="sr-only">Quick Add</span>
+                  </th>
+                )}
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
                   Product
                 </th>
@@ -418,6 +490,9 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
                   tcgplayer_image_url: product.tcgplayer_image_url || undefined,
                   current_market_price: product.pokemon_product_latest_prices?.market_price ?? null
                 }}
+                onClick={handleProductClick}
+                showQuickAdd={!!user}
+                onQuickAdd={handleProductQuickAdd}
               />
             )}
             emptyStateComponent={productsEmptyState}
@@ -439,6 +514,27 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             cardId={selectedCardId}
             setId={setId}
             onClose={handleQuickViewClose}
+            onCollectionUpdate={handleCollectionUpdate}
+            onSuccess={showSuccessToast}
+            onError={showErrorToast}
+          />
+        </QuickView>
+      )}
+
+      {/* Product Quickview - Responsive: automatically adapts to screen size */}
+      {selectedProductId && (
+        <QuickView
+          isOpen={isProductQuickViewOpen}
+          onClose={handleProductQuickViewClose}
+          onNavigateToCard={handleNavigateToProduct}
+          cardList={initialData.products.map(p => ({ id: p.id.toString(), name: p.name }))}
+          currentCardId={selectedProductId}
+          showTitle={false}
+        >
+          <ProductQuickViewContent
+            productId={selectedProductId}
+            setId={setId}
+            onClose={handleProductQuickViewClose}
             onCollectionUpdate={handleCollectionUpdate}
             onSuccess={showSuccessToast}
             onError={showErrorToast}
@@ -468,6 +564,25 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
             onSuccess={handleQuickAddSuccess}
             onError={handleQuickAddError}
             onClose={handleQuickAddClose}
+          />
+        </QuickAddModal>
+      )}
+
+      {/* Product Quick Add Modal - Responsive: popover (desktop), modal (tablet), bottom sheet (mobile) */}
+      {quickAddProductId && (
+        <QuickAddModal
+          isOpen={isProductQuickAddOpen}
+          onClose={handleProductQuickAddClose}
+          anchorRect={productQuickAddAnchorRect}
+          title="Quick Add to Collection"
+        >
+          <ProductQuickAddForm
+            productId={quickAddProductId}
+            productName={initialData.products.find(p => p.id.toString() === quickAddProductId)?.name || ''}
+            productImage={initialData.products.find(p => p.id.toString() === quickAddProductId)?.tcgplayer_image_url || undefined}
+            onSuccess={handleProductQuickAddSuccess}
+            onError={handleProductQuickAddError}
+            onClose={handleProductQuickAddClose}
           />
         </QuickAddModal>
       )}

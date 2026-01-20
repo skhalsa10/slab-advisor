@@ -174,6 +174,53 @@ export type Database = {
           },
         ]
       }
+      collection_products: {
+        Row: {
+          condition: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          pokemon_product_id: number
+          purchase_price: number | null
+          purchased_at: string | null
+          quantity: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          pokemon_product_id: number
+          purchase_price?: number | null
+          purchased_at?: string | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          condition?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          pokemon_product_id?: number
+          purchase_price?: number | null
+          purchased_at?: string | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_products_pokemon_product_id_fkey"
+            columns: ["pokemon_product_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pokemon_card_prices: {
         Row: {
           change_180d_percent: number | null

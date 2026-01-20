@@ -1,5 +1,8 @@
+'use client'
+
 import Image from 'next/image'
 import SimplePriceDisplay from '@/components/ui/SimplePriceDisplay'
+import QuickAddButton from '@/components/collection/QuickAddButton'
 
 interface TCGProductProps {
   product: {
@@ -15,6 +18,11 @@ interface TCGProductProps {
   className?: string
   target?: '_blank' | '_self'
   rel?: string
+  // Click handler - when provided, clicking opens quickview instead of navigating
+  onClick?: (e: React.MouseEvent, productId: string) => void
+  // Quick Add props
+  showQuickAdd?: boolean
+  onQuickAdd?: (e: React.MouseEvent, productId: string) => void
 }
 
 export default function TCGProduct({
@@ -23,23 +31,34 @@ export default function TCGProduct({
   shopLinkText = 'Shop on TCGPlayer',
   className = '',
   target = '_blank',
-  rel = 'noopener noreferrer'
+  rel = 'noopener noreferrer',
+  onClick,
+  showQuickAdd = false,
+  onQuickAdd
 }: TCGProductProps) {
-  
-  // Determine the link URL
-  const productHref = href || 
+
+  // Determine the link URL (used only when no onClick handler)
+  const productHref = href ||
     (product.tcgplayer_product_id ? `https://www.tcgplayer.com/product/${product.tcgplayer_product_id}` : '#')
 
   const imageUrl = product.tcgplayer_image_url || product.image
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.preventDefault()
+      onClick(e, product.id)
+    }
+  }
 
-  return (
-    <a
-      href={productHref}
-      target={target}
-      rel={rel}
-      className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
-    >
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    if (onQuickAdd) {
+      onQuickAdd(e, product.id)
+    }
+  }
+
+  // Common content for both link and interactive modes
+  const content = (
+    <>
       <div className="aspect-[2.5/3.5] relative bg-grey-100">
         {imageUrl ? (
           <Image
@@ -63,6 +82,12 @@ export default function TCGProduct({
             </svg>
           </div>
         )}
+        {/* Quick Add Button - always visible on touch devices, hover-reveal on devices with mouse */}
+        {showQuickAdd && (
+          <div className="absolute bottom-2 right-2 z-10 touch:flex can-hover:hidden can-hover:group-hover:flex">
+            <QuickAddButton onClick={handleQuickAdd} />
+          </div>
+        )}
       </div>
       <div className="p-3">
         <h3 className="text-sm font-medium text-grey-900 line-clamp-2">
@@ -74,13 +99,40 @@ export default function TCGProduct({
             showMarketLabel={false}
           />
         </div>
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xs text-grey-600">{shopLinkText}</span>
-          <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        </div>
+        {/* Only show shop link text when not using onClick handler */}
+        {!onClick && (
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-xs text-grey-600">{shopLinkText}</span>
+            <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </div>
+        )}
       </div>
+    </>
+  )
+
+  // When onClick is provided, render as a clickable div (for quickview)
+  if (onClick) {
+    return (
+      <div
+        onClick={handleClick}
+        className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
+      >
+        {content}
+      </div>
+    )
+  }
+
+  // Default: render as an anchor tag linking to TCGPlayer
+  return (
+    <a
+      href={productHref}
+      target={target}
+      rel={rel}
+      className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
+    >
+      {content}
     </a>
   )
 }
