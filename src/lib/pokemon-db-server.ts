@@ -277,6 +277,9 @@ export async function getNewestSetsServer(limit = 8): Promise<PokemonSetWithSeri
   try {
     const supabase = getServerSupabaseClient()
 
+    // Exclude digital-only series (e.g., Pokémon TCG Pocket)
+    const EXCLUDED_SERIES = ['tcgp']
+
     const { data, error } = await supabase
       .from('pokemon_sets')
       .select(`
@@ -286,6 +289,7 @@ export async function getNewestSetsServer(limit = 8): Promise<PokemonSetWithSeri
           name
         )
       `)
+      .not('series_id', 'in', `(${EXCLUDED_SERIES.join(',')})`)
       .order('release_date', { ascending: false })
       .limit(limit)
 

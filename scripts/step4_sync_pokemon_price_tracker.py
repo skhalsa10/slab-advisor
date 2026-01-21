@@ -285,23 +285,74 @@ class PokemonPriceTrackerSync:
 
         return round(((newest_price - oldest_price) / oldest_price) * 100, 2)
 
-    def get_primary_history(self, raw_history_365d: Dict) -> List[Dict]:
+    def get_primary_variant_from_prices(self, prices: Dict, market_price: Optional[float], condition: Optional[str]) -> Optional[str]:
+        """
+        Determine which variant the current_market_price comes from by matching prices.
+
+        Args:
+            prices: The prices object from the API (contains variants with condition prices)
+            market_price: The current market price to match
+            condition: The condition to look up (e.g., "Near Mint")
+
+        Returns:
+            The variant name (e.g., "Normal", "Holofoil", "Reverse Holofoil") or None if not found
+        """
+        if not prices or not market_price or not condition:
+            return None
+
+        variants = prices.get('variants', {})
+        if not variants:
+            return None
+
+        # Check each variant to find one where the condition price matches market_price
+        for variant_name, conditions in variants.items():
+            if not isinstance(conditions, dict):
+                continue
+            condition_data = conditions.get(condition, {})
+            if isinstance(condition_data, dict):
+                variant_price = condition_data.get('price')
+                # Use approximate match to handle floating point issues
+                if variant_price is not None and abs(float(variant_price) - float(market_price)) < 0.01:
+                    return variant_name
+
+        return None
+
+    def get_primary_history(self, raw_history_365d: Dict, primary_variant: Optional[str] = None, primary_condition: Optional[str] = None) -> List[Dict]:
         """
         Get the primary history for percent change calculations.
-        Prefers Normal > first variant, then Near Mint > first condition.
+
+        When primary_variant and primary_condition are provided (known from current_market_price),
+        we ONLY use that exact variant+condition combo - no fallbacks. This ensures percent changes
+        are calculated from the same variant/condition as the displayed price.
+
+        When not provided, falls back to: Normal > first variant, then Near Mint > first condition.
+
+        Args:
+            raw_history_365d: The sliced 365-day history data
+            primary_variant: The variant that current_market_price came from (e.g., "Reverse Holofoil")
+            primary_condition: The condition of current_market_price (e.g., "Near Mint")
         """
         if not raw_history_365d:
             return []
 
-        # Try Normal first, then fall back to first variant
+        # If we know the exact variant+condition, ONLY use that - no fallbacks
+        # This ensures percent changes match the displayed price
+        if primary_variant and primary_condition:
+            variant_data = raw_history_365d.get(primary_variant, {})
+            return variant_data.get(primary_condition, [])
+
+        # Fallback logic for when we don't know the primary variant/condition
+        # Try Normal first, then first variant
         variant_name = 'Normal' if 'Normal' in raw_history_365d else next(iter(raw_history_365d), None)
+
         if not variant_name:
             return []
 
         conditions = raw_history_365d.get(variant_name, {})
 
-        # Try Near Mint first, then fall back to first condition
+        # Try Near Mint first, then first condition
         condition_name = 'Near Mint' if 'Near Mint' in conditions else next(iter(conditions), None)
+
         if not condition_name:
             return []
 
@@ -486,20 +537,23 @@ class PokemonPriceTrackerSync:
             for cond in variant_data.keys()
         )) if raw_history_365d else []
 
-        # Calculate percent changes using primary history
-        primary_history = self.get_primary_history(raw_history_365d)
+        # Determine which variant the current_market_price comes from
+        # This ensures percent changes use the same variant/condition as the displayed price
+        primary_variant = self.get_primary_variant_from_prices(prices, market_price, condition)
 
-        # For percent changes, we need to get history slices based on primary variant/condition
-        primary_7d = primary_history[-7:] if len(primary_history) >= 7 else primary_history
-        primary_30d = primary_history[-30:] if len(primary_history) >= 30 else primary_history
-        primary_90d = primary_history[-90:] if len(primary_history) >= 90 else primary_history
-        primary_180d = primary_history[-180:] if len(primary_history) >= 180 else primary_history
+        # Calculate percent changes using the correct variant+condition from each pre-sliced time window
+        # Each raw_history_Xd already contains only data points within that time range
+        primary_7d = self.get_primary_history(raw_history_7d, primary_variant, condition)
+        primary_30d = self.get_primary_history(raw_history_30d, primary_variant, condition)
+        primary_90d = self.get_primary_history(raw_history_90d, primary_variant, condition)
+        primary_180d = self.get_primary_history(raw_history_180d, primary_variant, condition)
+        primary_365d = self.get_primary_history(raw_history_365d, primary_variant, condition)
 
         change_7d = self.calc_percent_change(primary_7d)
         change_30d = self.calc_percent_change(primary_30d)
         change_90d = self.calc_percent_change(primary_90d)
         change_180d = self.calc_percent_change(primary_180d)
-        change_365d = self.calc_percent_change(primary_history)
+        change_365d = self.calc_percent_change(primary_365d)
 
         # Calculate grading ROI potential
         grading_potential = self.calculate_grading_potential(market_price, psa9, psa10)
@@ -511,6 +565,7 @@ class PokemonPriceTrackerSync:
             'tcgplayer_product_id': tcgplayer_product_id,
             'current_market_price': market_price,
             'current_market_price_condition': condition,
+            'current_market_price_variant': primary_variant,  # e.g., "Normal", "Holofoil", "Reverse Holofoil"
             'psa10': psa10,
             'psa9': psa9,
             'psa8': psa8,

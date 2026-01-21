@@ -14,6 +14,7 @@ interface TCGCardProps {
     fallbackImageUrl?: string
     metadata?: Array<{ label?: string; value: string }>
     priceData?: Json | null // JSONB price data from database
+    price?: number | null // Simple price value (alternative to priceData)
   }
   href?: string
   onClick?: (e: React.MouseEvent, cardId: string) => void
@@ -92,11 +93,17 @@ export default function TCGCard({
             ))}
           </p>
         )}
-        <PriceDisplay
-          priceData={card.priceData}
-          showMarketLabel={false}
-          className="mt-1"
-        />
+        {card.priceData ? (
+          <PriceDisplay
+            priceData={card.priceData}
+            showMarketLabel={false}
+            className="mt-1"
+          />
+        ) : card.price != null ? (
+          <p className="text-base font-semibold text-gray-900 mt-1">
+            ${card.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+        ) : null}
       </div>
     </Link>
   )

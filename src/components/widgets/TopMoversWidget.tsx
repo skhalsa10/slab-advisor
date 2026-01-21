@@ -49,9 +49,10 @@ export default async function TopMoversWidget({
                   id: card.id,
                   name: card.name,
                   image: imageUrl,
-                  priceData: card.price_data,
-                  // Show the percentage change as green metadata
+                  // Show the percentage change as metadata
                   metadata: [{ value: `+${changePercent}%` }],
+                  // Pass the price directly
+                  price: card.current_market_price,
                 }}
                 href={`/browse/pokemon/${card.set.id}/${card.id}`}
               />
