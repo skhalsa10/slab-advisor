@@ -59,7 +59,7 @@ export default function TCGCard({
     <Link
       href={href}
       onClick={handleClick}
-      className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
+      className={`group relative bg-white rounded-lg overflow-hidden border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
     >
       <div className="aspect-[2.5/3.5] relative">
         <Image
