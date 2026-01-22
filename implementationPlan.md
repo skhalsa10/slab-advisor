@@ -2,32 +2,38 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 14, 2026
+**Last Updated:** January 19, 2026
 
-### Project Completion: ~87%
+### Project Completion: ~92%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
 - **Phase 2**: Core Upload & Grading Framework (100%)
-- **Database Schema**: Pokemon cards, collections, pricing infrastructure, portfolio snapshots (90%)
-- **Pricing Pipeline**: Python scripts for daily price updates (90%)
-- **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (90%)
-- **Collection Management**: CRUD operations, grid/list views (70%)
-- **Browse Experience**: Card browsing, set viewing, filtering (80%)
+- **Database Schema**: Pokemon cards, collections, pricing infrastructure, portfolio snapshots (100%)
+- **Pricing Pipeline**: Python scripts for daily price updates (100%)
+- **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (100%)
+- **Collection Management**: CRUD operations, grid/list views, products (90%)
+- **Browse Experience**: Card browsing, set viewing, filtering (90%)
 - **Explore Page**: Game selection hub + widgets (100%)
 - **Ximilar Card Identification**: Camera scan, image upload, card matching (100%)
 
 #### 🟡 Partially Completed
-- **Phase 3**: Dashboard & Navigation (60%)
-- **Phase 4**: Collection Features (70%)
+- **Phase 3**: Dashboard & Navigation (85%)
+- **Phase 4**: Collection Features (90%)
 - **Phase 5**: Add Card Flow (95%)
-- **Pricing Display**: Smart price formatting implemented, historical tracking missing
+- **Pricing Display**: Smart price formatting implemented, historical tracking complete (95%)
 - **Ximilar Integration**: Card ID complete (100%), Grading complete (100%)
 - **Camera Configuration**: Use-case specific camera settings (100%)
-- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (85%)
+- **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
+
+#### ✅ Recently Completed
+- **Historical Portfolio Tracking**: Portfolio value chart with live KPIs ✅ (January 17, 2026)
+- **Price Migration**: Migrated from price_data column to pokemon_card_prices table ✅ (January 16, 2026)
+- **Product Collection**: Quick-add sealed products to collection ✅ (January 18, 2026)
+- **Product Prices**: Sealed product pricing with pokemon_product_price_history ✅ (January 15, 2026)
+- **Pipeline Scripts**: Reorganized into numbered step-based pipeline (step1-step5) ✅ (January 16, 2026)
 
 #### ❌ Not Started
-- **Historical Portfolio Tracking (Frontend)**: Portfolio value chart component (database complete, waiting for data)
 - **Social Features**: Username, followers, shareable collections (0%)
 - **Gamma/Preprod Pipeline**: Staging environment setup (0%)
 - **Store/Marketplace**: Internal product purchasing (0%)
@@ -40,10 +46,10 @@
 
 These features deliver unique value that competitors don't have and form the foundation of the product's value proposition.
 
-#### 1. Historical Pricing ⚠️ IN PROGRESS
-**Status:** 🟡 95% Complete (Database done, frontend pending)
+#### 1. Historical Pricing ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🔴 Critical
-**Estimated Effort:** 2-3 days remaining (frontend only)
+**Completed:** January 17, 2026
 
 **What's Done:**
 - ✅ Python price update script (`scripts/update_pokemon_prices.py`)
@@ -67,31 +73,19 @@ These features deliver unique value that competitors don't have and form the fou
 - ✅ **`snapshot_all_portfolios()` function** - Efficient bulk INSERT with variant/condition mapping
 - ✅ **pg_cron job** - Daily midnight UTC snapshots scheduled
 - ✅ **Initial snapshot created** - Verified working (1 user, 91 cards, $2,430.14)
+- ✅ **`PortfolioHistoryChart.tsx` component** - Recharts AreaChart with time ranges (7D, 30D, 90D, 1Y)
+- ✅ **Live portfolio KPIs** - Real-time card count, product count, total value
+- ✅ **Dashboard integration** - Portfolio chart prominently displayed on dashboard
+- ✅ **UTC to local timezone conversion** - Chart displays dates in user's local timezone
 
-**What's Missing (Frontend - After Data Accumulates):**
-- ❌ `PortfolioHistoryChart.tsx` component (Recharts AreaChart with time ranges)
-- ❌ Update `getDashboardStats()` to show real estimated value from snapshots
-- ❌ Portfolio history data fetching in `src/lib/portfolio-server.ts`
-- ❌ TypeScript types for `PortfolioSnapshot` in `src/types/database.ts`
+**Code Migration COMPLETED:**
+- ✅ Updated `src/lib/pokemon-db-server.ts` to join with `pokemon_card_prices` instead of using removed `price_data` column
+- ✅ Updated all components that use `price_data` from cards
+- ✅ Updated utility files for new price structure
+- ✅ Python scripts reorganized into step-based pipeline (step1-step5)
+- ✅ `update_pokemon_prices.py` marked as deprecated - replaced by step4_sync_pokemon_price_tracker.py
 
-**Code Migration TODO:**
-- ❌ Update `src/lib/pokemon-db-server.ts` to join with `pokemon_card_prices` instead of using removed `price_data` column
-  - `getSetWithCardsAndProductsServer()` - line 117
-  - `getTopCardsFromNewestSetsServer()` - line 299, 379
-  - `getCardWithSetServer()` - line 411
-  - `matchCardByXimilarMetadata()` - multiple strategy queries
-- ❌ Update components that use `price_data` from cards:
-  - `src/components/widgets/NewlyReleasedTopCardsWidget.tsx`
-  - `src/components/widgets/TopMoversWidget.tsx`
-  - `src/app/browse/pokemon/[setId]/SetDetailClient.tsx`
-  - `src/components/browse/CardQuickViewContent.tsx`
-  - `src/components/collection/CollectionQuickViewContent.tsx`
-  - `src/components/pokemon/CardListItem.tsx`
-- ❌ Update utility files:
-  - `src/utils/collectionCardUtils.ts`
-  - `src/utils/collectionPriceUtils.ts`
-- ❌ Update Python scripts to use `pokemon_card_prices` table:
-  - `scripts/update_pokemon_prices.py`
+**Note:** Type System Refactor TODO remains - see dedicated section below for cleaning up TypeScript types after migration
 
 **Type System Refactor TODO (Post-Price Migration):**
 - ❌ Refactor TypeScript types after migrating to `pokemon_card_prices` and `pokemon_product_price_history` tables
@@ -717,10 +711,10 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 
 ---
 
-#### 7. Dashboard Completion ⚠️ IN PROGRESS
-**Status:** 🟡 75% Complete
+#### 7. Dashboard Completion ✅ MOSTLY COMPLETE
+**Status:** 🟡 90% Complete
 **Priority:** 🟠 High
-**Estimated Effort:** 1-2 days remaining
+**Completed:** January 17, 2026 (core features)
 
 **What's Done:**
 - ✅ Dashboard page exists (`src/app/(authenticated)/dashboard/page.tsx`)
@@ -731,26 +725,24 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 - ✅ **Grading Opportunities widget** - Shows profitable cards to grade with profit potential
 - ✅ **Recent Scans widget** - Horizontal carousel of AI grading history (replaced RecentActivity)
 - ✅ Real data integration for card counts and grading opportunities
+- ✅ **Portfolio Value Chart** - Interactive chart with 7D/30D/90D/1Y time ranges
+- ✅ **Live KPIs** - Card count, product count, total estimated value
+- ✅ **Sealed Products in Portfolio** - Products now included in daily snapshot calculations
 
 **What's Missing:**
-- ❌ Estimated collection value calculation
 - ❌ Cards by category breakdown (Pokemon, One Piece, Sports, Other TCG)
-- ❌ Portfolio value chart (requires historical tracking)
 - ❌ Followers/following counts (requires social features)
 
 **Implementation Tasks:**
 1. ~~Create dashboard data API~~ ✅ COMPLETED (via getDashboardStats in collection-server.ts)
-2. Implement collection value calculator:
-   - Sum all card prices from collection_cards
-   - Use variant-specific pricing
-   - Handle cards without prices
+2. ~~Implement collection value calculator~~ ✅ COMPLETED (live portfolio tracking)
 3. Create category breakdown query:
    - Count cards per category
    - Calculate value per category
 4. ~~Build recent activity query~~ ✅ REPLACED with Recent Scans widget
 5. ~~Update DashboardStats component to fetch real data~~ ✅ COMPLETED
-6. Add loading states and error handling
-7. Create mini sparkline charts for trends
+6. ~~Add loading states and error handling~~ ✅ COMPLETED
+7. ~~Create portfolio value chart~~ ✅ COMPLETED (PortfolioHistoryChart.tsx)
 
 **Files Modified:**
 - `/src/app/(authenticated)/dashboard/page.tsx` - Integrated new widgets
@@ -1129,6 +1121,404 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 ---
 
+### Tier 4: Critical Pre-Launch Infrastructure
+
+These features MUST be implemented before beta launch. They enable monetization, protect against abuse, and ensure quality.
+
+#### 12. PostHog Analytics & A/B Testing ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 2-3 days
+
+**What's Missing:**
+- ❌ PostHog account setup and project creation
+- ❌ PostHog SDK integration in Next.js
+- ❌ Event tracking for key user actions
+- ❌ Feature flags setup for A/B testing
+- ❌ User identification and properties
+- ❌ Funnel analysis setup
+- ❌ Session recording (optional)
+
+**Key Events to Track:**
+- User signup/login
+- Card added to collection
+- Card graded (AI grading)
+- Card identified (camera scan)
+- Credit purchase
+- Subscription purchase
+- Store purchase
+- Page views and navigation
+
+**Implementation Tasks:**
+1. Create PostHog project
+2. Install `posthog-js` and `posthog-node` packages
+3. Create PostHog provider component
+4. Add event tracking to critical user flows
+5. Set up feature flags for A/B tests
+6. Configure user identification on auth
+7. Create analytics dashboard
+
+**Files to Create:**
+- `/src/lib/posthog.ts` - PostHog client configuration
+- `/src/providers/PostHogProvider.tsx` - React context provider
+- `/src/hooks/usePostHog.ts` - Custom hook for tracking
+
+**Files to Modify:**
+- `/src/app/layout.tsx` - Add PostHog provider
+- Various components - Add event tracking
+
+---
+
+#### 13. Payment System (Stripe) ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 1-2 weeks
+
+**What's Missing:**
+
+**Subscriptions:**
+- ❌ Stripe account setup and configuration
+- ❌ Subscription product/price creation in Stripe
+- ❌ Stripe Customer Portal integration
+- ❌ Subscription checkout flow
+- ❌ Webhook handling for subscription events
+- ❌ `subscriptions` database table
+- ❌ Subscription status checking middleware
+- ❌ Free tier limits enforcement
+
+**Credit Packs:**
+- ❌ Credit pack products in Stripe
+- ❌ One-time purchase checkout flow
+- ❌ Credit delivery on successful payment
+- ❌ Purchase history tracking
+
+**Subscription Tiers:**
+| Tier | Price | Features |
+|------|-------|----------|
+| Free | $0 | 5 AI gradings/month, basic collection |
+| Premium | $9.99/mo | Unlimited gradings, priority support, advanced analytics |
+| Pro | $19.99/mo | Everything + API access, bulk operations |
+
+**Credit Packs:**
+| Pack | Price | Credits |
+|------|-------|---------|
+| Starter | $4.99 | 10 credits |
+| Value | $9.99 | 25 credits |
+| Pro | $19.99 | 60 credits |
+
+**Database Schema:**
+```sql
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  stripe_customer_id TEXT NOT NULL,
+  stripe_subscription_id TEXT,
+  status TEXT NOT NULL, -- 'active', 'canceled', 'past_due', 'trialing'
+  tier TEXT NOT NULL DEFAULT 'free', -- 'free', 'premium', 'pro'
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE credit_purchases (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  stripe_payment_intent_id TEXT NOT NULL,
+  credits_purchased INTEGER NOT NULL,
+  amount_paid INTEGER NOT NULL, -- in cents
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Implementation Tasks:**
+1. Set up Stripe account and API keys
+2. Create products and prices in Stripe Dashboard
+3. Install `@stripe/stripe-js` and `stripe` packages
+4. Create subscription checkout API endpoint
+5. Create credit pack checkout API endpoint
+6. Implement Stripe webhook handler
+7. Create Customer Portal redirect endpoint
+8. Build subscription management UI
+9. Build credit pack purchase UI
+10. Add subscription status to user context
+
+**Files to Create:**
+- `/src/lib/stripe.ts` - Stripe client configuration
+- `/src/app/api/stripe/checkout/route.ts` - Checkout session creation
+- `/src/app/api/stripe/webhook/route.ts` - Webhook handler
+- `/src/app/api/stripe/portal/route.ts` - Customer portal redirect
+- `/src/app/(authenticated)/settings/subscription/page.tsx` - Subscription management
+- `/src/app/(authenticated)/settings/credits/page.tsx` - Credit purchase page
+- `/src/components/billing/SubscriptionCard.tsx`
+- `/src/components/billing/CreditPackCard.tsx`
+- `/src/components/billing/PricingTable.tsx`
+
+---
+
+#### 14. Basic Store System ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 1.5-2 weeks
+
+**What's Missing:**
+- ❌ Store page with product listings
+- ❌ Product detail pages
+- ❌ Shopping cart (client-side state)
+- ❌ Checkout flow with Stripe
+- ❌ Inventory management
+- ❌ Order creation and tracking
+- ❌ Order confirmation emails
+- ❌ Admin order management
+
+**Database Schema:**
+```sql
+CREATE TABLE store_products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pokemon_product_id INTEGER REFERENCES pokemon_products(id),
+  name TEXT NOT NULL,
+  description TEXT,
+  price INTEGER NOT NULL, -- in cents
+  compare_at_price INTEGER, -- for showing discounts
+  inventory_count INTEGER NOT NULL DEFAULT 0,
+  max_per_customer INTEGER DEFAULT 1, -- anti-scalper
+  is_active BOOLEAN DEFAULT TRUE,
+  is_featured BOOLEAN DEFAULT FALSE,
+  image_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  stripe_payment_intent_id TEXT,
+  status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'paid', 'shipped', 'delivered', 'canceled'
+  subtotal INTEGER NOT NULL,
+  shipping INTEGER NOT NULL DEFAULT 0,
+  tax INTEGER NOT NULL DEFAULT 0,
+  total INTEGER NOT NULL,
+  shipping_address JSONB,
+  tracking_number TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE order_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
+  store_product_id UUID REFERENCES store_products(id),
+  quantity INTEGER NOT NULL,
+  price_at_purchase INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE user_purchase_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  store_product_id UUID REFERENCES store_products(id) NOT NULL,
+  quantity_purchased INTEGER NOT NULL,
+  purchased_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, store_product_id) -- for tracking limits
+);
+```
+
+**Implementation Tasks:**
+1. Create database tables and RLS policies
+2. Build store listing page with filters
+3. Create product detail page
+4. Implement shopping cart with React context
+5. Build checkout flow
+6. Create order confirmation page
+7. Build order history page for users
+8. Create admin order management (basic)
+9. Implement inventory decrement on purchase
+10. Add purchase limit enforcement
+
+**Files to Create:**
+- `/src/app/(authenticated)/store/page.tsx` - Store listing
+- `/src/app/(authenticated)/store/[productId]/page.tsx` - Product detail
+- `/src/app/(authenticated)/store/cart/page.tsx` - Shopping cart
+- `/src/app/(authenticated)/store/checkout/page.tsx` - Checkout
+- `/src/app/(authenticated)/store/orders/page.tsx` - Order history
+- `/src/app/api/store/checkout/route.ts` - Store checkout API
+- `/src/contexts/CartContext.tsx` - Shopping cart state
+- `/src/components/store/ProductCard.tsx`
+- `/src/components/store/CartItem.tsx`
+- `/src/components/store/CheckoutForm.tsx`
+- `/src/lib/store-server.ts` - Store data fetching
+
+---
+
+#### 15. Anti-Scalper Systems ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 1 week
+
+**What's Missing:**
+
+**Easter Egg Hunt System:**
+- ❌ Hidden product placement logic
+- ❌ Random page selection for hiding products
+- ❌ "Found it!" interaction and claim flow
+- ❌ Limited quantity per hunt
+- ❌ Hunt scheduling system
+- ❌ Hunt history tracking
+
+**Lucky User System (Random Offer on Login):**
+- ❌ Random selection algorithm (weighted by activity?)
+- ❌ Offer modal on dashboard load
+- ❌ Time-limited offers (e.g., 15 minutes to claim)
+- ❌ Offer tracking and redemption
+- ❌ One offer per user per day/week
+
+**Database Schema:**
+```sql
+CREATE TABLE easter_egg_hunts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  store_product_id UUID REFERENCES store_products(id),
+  page_path TEXT NOT NULL, -- e.g., '/browse/pokemon/sv08'
+  position_hint TEXT, -- CSS selector or description
+  quantity_available INTEGER NOT NULL,
+  quantity_claimed INTEGER DEFAULT 0,
+  starts_at TIMESTAMPTZ NOT NULL,
+  ends_at TIMESTAMPTZ NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE easter_egg_claims (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  hunt_id UUID REFERENCES easter_egg_hunts(id),
+  user_id UUID REFERENCES auth.users(id),
+  claimed_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(hunt_id, user_id) -- one claim per user per hunt
+);
+
+CREATE TABLE lucky_offers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  store_product_id UUID REFERENCES store_products(id),
+  discount_percent INTEGER, -- e.g., 20 for 20% off
+  expires_at TIMESTAMPTZ NOT NULL,
+  redeemed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Implementation Tasks:**
+1. Create database tables and RLS policies
+2. Build Easter Egg component (hidden, revealable)
+3. Create hunt management admin UI
+4. Implement lucky offer selection algorithm
+5. Build offer modal component
+6. Create offer redemption flow
+7. Add bot detection (honeypot fields, timing analysis)
+8. Implement CAPTCHA for purchases (hCaptcha or Turnstile)
+
+**Files to Create:**
+- `/src/components/store/EasterEgg.tsx` - Hidden product component
+- `/src/components/store/LuckyOfferModal.tsx` - Random offer modal
+- `/src/app/api/store/easter-egg/claim/route.ts` - Claim API
+- `/src/app/api/store/lucky-offer/route.ts` - Get/redeem offer API
+- `/src/lib/anti-scalper-service.ts` - Selection algorithms
+
+---
+
+#### 16. Testing Infrastructure ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** 1 week
+
+**What's Missing:**
+
+**Unit Tests:**
+- ❌ Price calculation utilities
+- ❌ Variant parsing utilities
+- ❌ Credit system functions
+- ❌ ROI calculations
+- ❌ Data transformation functions
+
+**Integration Tests:**
+- ❌ API route tests (collection CRUD)
+- ❌ API route tests (grading endpoints)
+- ❌ API route tests (payment webhooks)
+- ❌ Database query tests
+
+**E2E Tests:**
+- ❌ User signup/login flow
+- ❌ Add card to collection flow
+- ❌ AI grading flow
+- ❌ Store purchase flow
+- ❌ Subscription flow
+
+**Pipeline Tests:**
+- ❌ Data sync script validation
+- ❌ Price update verification
+- ❌ Snapshot function testing
+
+**Testing Stack:**
+- Vitest (already configured)
+- React Testing Library
+- Playwright for E2E
+- MSW for API mocking
+
+**Implementation Tasks:**
+1. Set up test database/mocking strategy
+2. Write unit tests for utility functions
+3. Write integration tests for API routes
+4. Set up Playwright for E2E tests
+5. Write E2E tests for critical flows
+6. Create pipeline test scripts
+7. Add test commands to CI/CD
+8. Set up coverage reporting
+
+**Files to Create:**
+- `/src/utils/__tests__/*.test.ts` - Utility tests
+- `/src/app/api/**/__tests__/*.test.ts` - API tests
+- `/e2e/*.spec.ts` - Playwright E2E tests
+- `/scripts/__tests__/*.test.py` - Pipeline tests
+- `/playwright.config.ts` - Playwright configuration
+
+---
+
+#### 17. Legal & Business Requirements ❌ NOT STARTED
+**Status:** ❌ 0% Complete
+**Priority:** 🔴 Critical
+**Estimated Effort:** Varies (external dependencies)
+
+**Business Licenses:**
+- ❌ Business license (LLC or similar)
+- ❌ Reseller license for Pokemon products
+- ❌ Sales tax registration (if applicable)
+
+**Legal Documents:**
+- ❌ Terms of Service
+- ❌ Privacy Policy
+- ❌ Cookie Policy
+- ❌ Refund Policy
+- ❌ Shipping Policy
+
+**Implementation Tasks:**
+1. Register business entity
+2. Apply for reseller license
+3. Draft Terms of Service (use template + lawyer review)
+4. Draft Privacy Policy (GDPR/CCPA compliant)
+5. Create legal pages in app
+6. Add consent checkboxes where required
+7. Implement cookie consent banner
+
+**Files to Create:**
+- `/src/app/legal/terms/page.tsx`
+- `/src/app/legal/privacy/page.tsx`
+- `/src/app/legal/cookies/page.tsx`
+- `/src/app/legal/refunds/page.tsx`
+- `/src/components/legal/CookieConsent.tsx`
+
+---
+
 ## 🗄️ Database Schema Status
 
 ### ✅ Implemented Tables
@@ -1473,17 +1863,25 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 | Feature | Status | Priority | Effort | Dependencies |
 |---------|--------|----------|--------|--------------|
-| Historical Pricing | 🟡 95% | 🔴 Critical | 2-3 days (frontend) | ~~DB/cron~~ ✅ |
+| Historical Pricing | ✅ 100% | 🔴 Critical | ~~2-3 days~~ Done | ~~DB/cron~~ ✅ |
 | Grading (Ximilar) | ✅ 100% | 🔴 Critical | ~~2 weeks~~ Done | ~~Ximilar API~~ ✅ |
 | Card Identification | ✅ 100% | 🔴 Critical | ~~1.5 weeks~~ Done | ~~Ximilar API~~ ✅ |
 | Pre-grading Recs | ✅ 100% | 🟠 High | ~~3-5 days~~ Done | ~~Price data~~ ✅ |
-| AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | ~~Grading~~✅, Historical Pricing, Claude API |
+| AI Collection Advisor | ❌ 0% | 🟠 High (Premium) | 2-3 weeks | ~~Grading~~✅, ~~Historical Pricing~~✅, Claude API |
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
-| Dashboard Completion | 🟡 75% | 🟠 High | 1-2 days | Collection data ✅ |
-| Card Detail Polish | 🟡 95% | 🟡 Medium | 1-2 days | Historical pricing |
+| Dashboard Completion | ✅ 90% | 🟠 High | ~~1-2 days~~ Done | ~~Collection data~~ ✅ |
+| Card Detail Polish | 🟡 95% | 🟡 Medium | 1-2 days | ~~Historical pricing~~ ✅ |
 | Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
-| **Explore/Browse Polish** | 🟡 85% | 🟡 Medium | 3-5 days | None |
+| **Explore/Browse Polish** | 🟡 90% | 🟡 Medium | 2-3 days | None |
+| **Product Collection** | ✅ 100% | 🟠 High | ~~1 week~~ Done | ~~Product prices~~ ✅ |
+| **Price Migration** | ✅ 100% | 🔴 Critical | ~~1 week~~ Done | None |
+| **PostHog Analytics** | ❌ 0% | 🔴 Critical* | 2-3 days | None |
+| **Payment System (Stripe)** | ❌ 0% | 🔴 Critical* | 1-2 weeks | None |
+| **Basic Store** | ❌ 0% | 🔴 Critical* | 1.5-2 weeks | Stripe |
+| **Anti-Scalper Systems** | ❌ 0% | 🔴 Critical* | 1 week | Store |
+| **Testing Infrastructure** | ❌ 0% | 🔴 Critical* | 1 week | None |
+| **Legal & Business** | ❌ 0% | 🔴 Critical* | Varies | External |
 
 *Critical before production launch, not for development
 
@@ -1492,15 +1890,199 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 ## 🏁 Launch Readiness Checklist
 
 ### Before Beta Launch
+
+#### ✅ Completed Features
 - [x] Historical pricing database (Tier 1, Item 1) ✅ January 14, 2026 (pg_cron + snapshots)
-- [ ] Historical pricing frontend (Tier 1, Item 1) - Portfolio chart component (after data accumulates)
+- [x] Historical pricing frontend (Tier 1, Item 1) ✅ January 17, 2026 (Portfolio chart + KPIs)
 - [x] Grading implemented (Tier 1, Item 2) ✅ January 10, 2026
 - [x] Card identification implemented (Tier 1, Item 3) ✅ December 21, 2025
 - [x] Pre-grading recommendations (Tier 1, Item 4) ✅ January 10, 2026
-- [ ] Dashboard with real data (Tier 2, Item 6) - 75% complete
+- [x] Dashboard with real data (Tier 2, Item 6) ✅ January 17, 2026 - 90% complete
+- [x] Price migration to pokemon_card_prices table ✅ January 16, 2026
+- [x] Product collection feature ✅ January 18, 2026
+- [x] Sealed product pricing ✅ January 15, 2026
+
+#### 🔴 Critical Pre-Launch (Must Have)
+
+**Analytics & Monitoring:**
+- [ ] PostHog integration for analytics and A/B testing
+- [ ] Error tracking and monitoring setup
+- [ ] User behavior analytics
+- [ ] Revenue/conversion tracking dashboards
+
+**Payment Systems:**
+- [ ] Stripe integration for subscriptions
+- [ ] Credit pack purchase system (for grading credits)
+- [ ] Subscription tiers implementation (Free, Premium, etc.)
+- [ ] Payment webhook handling
+- [ ] Receipt/invoice generation
+
+**Store System:**
+- [ ] Basic product store page
+- [ ] Product inventory management
+- [ ] Shopping cart functionality
+- [ ] Checkout flow with Stripe
+- [ ] Order management system
+- [ ] Shipping address collection and validation
+- [ ] Order confirmation emails
+- [ ] Inventory low-stock alerts
+
+**Anti-Scalper Measures:**
+- [ ] Easter Egg Hunt system (hidden products on pages)
+- [ ] Random product offer on login (lucky user system)
+- [ ] Purchase limits per user
+- [ ] Bot detection/CAPTCHA for purchases
+
+**Testing & Quality:**
+- [ ] Unit tests for critical functions
+- [ ] Integration tests for API routes
+- [ ] E2E tests for critical user flows
+- [ ] Pipeline/data sync tests
+- [ ] Comprehensive QA pass
+
+**Infrastructure:**
+- [ ] Preprod/Gamma pipeline (Tier 3, Item 8)
+- [ ] CI/CD pipeline with test gates
+
+**Legal & Business:**
+- [ ] Business license obtained
+- [ ] Reseller license for Pokemon products
+- [ ] Terms of service
+- [ ] Privacy policy
+
+**Security & Code Quality:**
+- [ ] Manual code review (security-focused) - Owner review
+- [ ] Dependency audit (`npm audit`, check for vulnerabilities)
+- [ ] Environment variables audit (no secrets in code/repo)
+- [ ] RLS policy review (all tables protected)
+- [ ] API rate limiting on all public endpoints
+- [ ] Input validation/sanitization audit
+- [ ] OWASP Top 10 vulnerability check
+- [ ] Supabase security advisors - resolve all warnings
+- [ ] Supabase performance advisors - resolve all warnings
+
+**Infrastructure & Operations:**
+- [ ] Production database backups configured (Supabase PITR)
+- [ ] Database connection pooling verified
+- [ ] CDN/image optimization configured
+- [ ] Uptime monitoring setup (BetterStack, Pingdom, or similar)
+- [ ] Error alerting configured (Sentry or PostHog)
+- [ ] Log retention strategy defined
+- [ ] Cron job monitoring (ensure daily pipeline runs successfully)
+- [ ] Disk space monitoring on droplet (for pipeline scripts)
+- [ ] Database size monitoring (approaching limits?)
+
+**User Experience & Support:**
+- [ ] Loading states on all async operations
+- [ ] Error messages are user-friendly (no raw errors exposed)
+- [ ] Empty states for all lists/collections
+- [ ] 404 and error pages styled
+- [ ] Support email configured and tested
+- [ ] Feedback mechanism in-app
+- [ ] Onboarding flow for new users (tooltips, welcome modal, etc.)
+- [ ] Help/FAQ page
+- [ ] Contact form or support ticket system
+
+**SEO & Marketing:**
+- [ ] Meta tags on all public pages
+- [ ] Open Graph images for social sharing
+- [ ] Sitemap.xml generated
+- [ ] robots.txt configured
+- [ ] Landing page ready (if separate from app)
+
+**Launch Operations:**
+- [ ] Beta user invite list prepared
+- [ ] Launch announcement draft ready
+- [ ] Social media accounts created (Twitter/X, Instagram, TikTok)
+- [ ] Domain DNS configured and verified
+- [ ] SSL certificate active and verified
+- [ ] Transactional emails tested (signup, password reset, order confirmation)
+- [ ] Rollback plan documented (if launch goes wrong)
+- [ ] On-call schedule for launch week
+- [ ] Customer support response templates ready
+- [ ] Known issues/limitations documented
+
+**Data & Content:**
+- [ ] All Pokemon sets synced and verified
+- [ ] Price data is current (pipeline running successfully)
+- [ ] Product images loading correctly
+- [ ] No broken links or missing assets
+- [ ] Test accounts cleaned up from production
+
+**Compliance & Trust:**
+- [ ] GDPR compliance (EU users) - data deletion capability
+- [ ] CCPA compliance (CA users) - data export capability
+- [ ] Age verification or terms acceptance (if selling products)
+- [ ] PCI compliance handled by Stripe (no card data stored)
+- [ ] Trust badges/security seals on checkout
+
+**Account & Authentication:**
+- [ ] Password reset flow tested end-to-end
+- [ ] Email verification flow working
+- [ ] Account deletion flow (GDPR "right to be forgotten")
+- [ ] Session timeout/refresh handling
+- [ ] OAuth providers tested (Google, Apple, etc. if enabled)
+- [ ] Login rate limiting (prevent brute force)
+
+**Mobile & Cross-Browser:**
+- [ ] Tested on iOS Safari
+- [ ] Tested on Android Chrome
+- [ ] Tested on desktop Chrome, Firefox, Safari, Edge
+- [ ] Camera functionality works on all target devices
+- [ ] Touch interactions work properly (no hover-only features)
+
+**Performance & Scalability:**
+- [ ] Lighthouse score acceptable (Performance, A11y, Best Practices, SEO)
+- [ ] Core Web Vitals passing (LCP, FID, CLS)
+- [ ] Large collection performance tested (100+ cards)
+- [ ] Image lazy loading working
+- [ ] API response times acceptable (<500ms for critical paths)
+
+**Ximilar & External APIs:**
+- [ ] Ximilar API key rotated/secured for production
+- [ ] Ximilar rate limits understood and handled
+- [ ] Ximilar error handling graceful (API down scenarios)
+- [ ] Fallback behavior when external APIs fail
+- [ ] TCGPlayer/price API fallback handling
+
+**Credit System:**
+- [ ] Credit deduction working correctly
+- [ ] Credit refund on failed operations working
+- [ ] Free credits granted on signup
+- [ ] Credit balance displayed correctly everywhere
+- [ ] Negative credit balance prevented
+
+**Notifications & Communication:**
+- [ ] Email provider configured (Resend, SendGrid, etc.)
+- [ ] Email templates branded and tested
+- [ ] Unsubscribe links in marketing emails (if applicable)
+- [ ] In-app toast notifications working
+
+**Edge Cases & Error Recovery:**
+- [ ] Graceful handling if user loses internet mid-operation
+- [ ] Payment failure mid-checkout handled
+- [ ] Image upload failure handled gracefully
+- [ ] Duplicate submission prevention (double-click protection)
+- [ ] Concurrent edit handling (two tabs same user)
+- [ ] Browser back button doesn't break app state
+
+**Financial & Tax:**
+- [ ] Tax calculation for store purchases (if applicable)
+- [ ] Stripe tax reporting configured
+- [ ] Refund process documented and tested
+- [ ] Accounting/bookkeeping system ready
+
+**Business & Legal (Investigate):**
+- [ ] Business liability insurance (selling physical products)
+- [ ] Trademark "Slab Advisor" name (if not already)
+- [ ] Pokemon Company IP compliance (no official logos, fan content guidelines)
+- [ ] TCGPlayer affiliate/partnership terms (if displaying their data)
+- [ ] Ximilar terms of service compliance (usage restrictions)
+- [ ] Copyright for original content (site design, images, copy)
+
+#### 🟡 Important Pre-Launch (Should Have)
 - [ ] Username system (Tier 2, Item 5)
-- [ ] Preprod pipeline (Tier 3, Item 8)
-- [ ] Mobile responsive (Tier 3, Item 9)
+- [ ] Mobile responsive polish (Tier 3, Item 9)
 - [ ] Error handling comprehensive (Tier 3, Item 9)
 - [ ] Performance optimized (Tier 3, Item 9)
 
@@ -1511,8 +2093,6 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - [ ] Bulk operations (Tier 3, Item 9)
 - [ ] Accessibility audit complete (Tier 3, Item 9)
 - [ ] PWA features (Tier 3, Item 9)
-- [ ] Terms of service
-- [ ] Privacy policy
 - [ ] User documentation
 - [ ] Support system
 
@@ -1590,45 +2170,36 @@ This section outlines the next wave of features to transform the dashboard into 
 
 ### Phase 1: The "Fintech" Layer (Money & Value)
 
-#### Portfolio Value Graph (Hero Component) ⚠️ IN PROGRESS
-**Status:** 🟡 50% Complete (Backend done, frontend pending)
+#### Portfolio Value Graph (Hero Component) ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🔴 Critical
-**Estimated Effort:** 2-3 days remaining (frontend only)
+**Completed:** January 17, 2026
 
 **Description:**
 A beautiful, interactive portfolio value chart that shows the user's collection value over time. This is the "hero" component that makes users feel like they're managing real investments.
 
 **Location:** Dashboard Top (Main Hero Section)
 
-**Technical Requirements:**
-- `Recharts` (AreaChart with gradient fill)
-- Time-series data (7D, 30D, 90D, 1Y)
-- Hover-to-reveal exact value at point
-- Percentage growth indicator (e.g., "+12% this month")
-- Smooth animations on load
-
-**What's Done (Database Layer):**
-- ✅ `portfolio_snapshots` table created with RLS policies
+**What Was Implemented:**
+- ✅ `Recharts` AreaChart with gradient fill
+- ✅ Time-series data with selectable ranges (7D, 30D, 90D, 1Y)
+- ✅ Hover-to-reveal exact value at point with custom tooltip
+- ✅ Percentage growth indicator
+- ✅ Smooth animations on load
+- ✅ `portfolio_snapshots` table with RLS policies
 - ✅ `snapshot_all_portfolios()` function with efficient bulk UPSERT
 - ✅ pg_cron job scheduled (midnight UTC daily)
-- ✅ Initial snapshot verified working ($2,430.14 for test user)
-- ✅ Extensible schema for future sealed products (product_value, product_count columns)
+- ✅ Sealed products now included in portfolio calculations
+- ✅ UTC to local timezone conversion for chart display
+- ✅ Live KPIs showing card count, product count, total value
 
-**What's Missing (Frontend - After ~7 days of data):**
-- ❌ `PortfolioHistoryChart.tsx` component
-- ❌ `portfolio-server.ts` data fetching functions
-- ❌ TypeScript types for PortfolioSnapshot
-- ❌ Integration into dashboard page
-- ❌ Update getDashboardStats() to show real estimated value
+**Files Created:**
+- ✅ `/src/components/dashboard/PortfolioHistoryChart.tsx`
+- ✅ `/src/lib/portfolio-server.ts`
 
-**Files to Create:**
-- `/src/components/dashboard/PortfolioHistoryChart.tsx`
-- `/src/lib/portfolio-server.ts`
-
-**Files to Modify:**
-- `/src/types/database.ts` - Add PortfolioSnapshot type
-- `/src/lib/collection-server.ts` - Update getDashboardStats
-- `/src/app/(authenticated)/dashboard/page.tsx` - Add chart component
+**Files Modified:**
+- ✅ `/src/app/(authenticated)/dashboard/page.tsx` - Added chart component
+- ✅ `/src/lib/collection-server.ts` - Updated getDashboardStats
 
 ---
 
@@ -1892,10 +2463,10 @@ CREATE TABLE activity_feed (
 
 | Priority | Widget | Effort | Dependencies |
 |----------|--------|--------|--------------|
-| 1 | Portfolio Value Graph | 2-3 days | ~~Snapshots~~ ✅ (waiting for data to accumulate) |
-| 2 | Top 3 Gems | 2-3 days | Price data |
+| 1 | Portfolio Value Graph | ~~2-3 days~~ ✅ Done | ~~Snapshots~~ ✅ |
+| 2 | Top 3 Gems | 2-3 days | ~~Price data~~ ✅ |
 | 3 | Set Completion | 1 week | Set metadata |
-| 4 | Market Movers | 3-4 days | 24h price history |
+| 4 | Market Movers | 3-4 days | ~~24h price history~~ ✅ |
 | 5 | Digital Binders | 1 week | New DB tables |
 | 6 | Trophy Case | 1-2 weeks | Badge system |
 | 7 | Social Stats | 2 weeks | Follow system |
@@ -1934,5 +2505,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 14, 2026
-**Document Version:** 3.0 (Portfolio Snapshots Database Implemented)
+**Last Updated:** January 19, 2026
+**Document Version:** 5.0 (Added Critical Pre-Launch: PostHog, Stripe, Store, Anti-Scalper, Testing, Legal)
