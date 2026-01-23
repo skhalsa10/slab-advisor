@@ -6,15 +6,17 @@ interface BrowseFilterAndSortProps {
   searchQuery: string
   onSearchChange: (query: string) => void
   searchPlaceholder?: string
-  
+
   selectedFilterId?: string
   onFilterChange?: (id: string) => void
   filterOptions?: Array<{ value: string; label: string }>
-  
+
   sortOrder: string
   onSortChange: (order: string) => void
   sortOptions: Array<{ value: string; label: string }>
-  
+
+  /** Content to display between search and sort controls (e.g., segmented filter) */
+  middleContent?: ReactNode
   rightContent?: ReactNode
 }
 
@@ -28,6 +30,7 @@ export default function BrowseFilterAndSort({
   sortOrder,
   onSortChange,
   sortOptions,
+  middleContent,
   rightContent
 }: BrowseFilterAndSortProps) {
   // Show filter dropdown only if filter props are provided
@@ -46,6 +49,7 @@ export default function BrowseFilterAndSort({
       {/* Spacer to push controls to the right on desktop */}
       <div className="hidden xl:block xl:flex-1" />
       <div className="flex items-center gap-2">
+        {middleContent}
         {showFilter && (
           <SortDropdown
             options={filterOptions}

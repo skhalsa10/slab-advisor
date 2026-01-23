@@ -45,12 +45,16 @@ export const SET_PARAM_CARD_VIEW = 'cv'
 /** Active tab (cards/products) */
 export const SET_PARAM_CARD_TAB = 'ct'
 
+/** Ownership filter (all/owned/missing) */
+export const SET_PARAM_OWNERSHIP = 'co'
+
 /** All set-detail-level URL parameter keys */
 export const SET_FILTER_KEYS = [
   SET_PARAM_CARD_SEARCH,
   SET_PARAM_CARD_SORT,
   SET_PARAM_CARD_VIEW,
   SET_PARAM_CARD_TAB,
+  SET_PARAM_OWNERSHIP,
 ] as const
 
 // =============================================================================
@@ -70,6 +74,19 @@ export const TAB_CARDS = 'cards'
 export const TAB_PRODUCTS = 'products'
 
 export type SetDetailTabValue = typeof TAB_CARDS | typeof TAB_PRODUCTS
+
+// =============================================================================
+// Ownership Filter Options
+// =============================================================================
+
+export const OWNERSHIP_ALL = 'all'
+export const OWNERSHIP_OWNED = 'owned'
+export const OWNERSHIP_MISSING = 'missing'
+
+export type OwnershipFilterValue =
+  | typeof OWNERSHIP_ALL
+  | typeof OWNERSHIP_OWNED
+  | typeof OWNERSHIP_MISSING
 
 // =============================================================================
 // Browse Sort Options
@@ -111,4 +128,5 @@ export const SET_DEFAULTS = {
   cardSort: CARD_SORT_NUM_ASC,
   cardView: VIEW_MODE_GRID,
   cardTab: TAB_CARDS,
+  cardOwnership: OWNERSHIP_ALL,
 } as const

@@ -6,18 +6,24 @@ import { extractMarketPrices, getBestPrice } from '@/utils/priceUtils'
 import { buildAvailableVariants } from '@/utils/variantUtils'
 import { useURLFilters, usePreserveFilters } from '@/hooks/useURLFilters'
 import { useAuth } from '@/hooks/useAuth'
+import { useSetOwnedCards } from '@/hooks/useSetOwnedCards'
 import {
   SET_PARAM_CARD_SEARCH,
   SET_PARAM_CARD_SORT,
   SET_PARAM_CARD_VIEW,
   SET_PARAM_CARD_TAB,
+  SET_PARAM_OWNERSHIP,
   SET_FILTER_KEYS,
   SET_DEFAULTS,
   TAB_CARDS,
   TAB_PRODUCTS,
   VIEW_MODE_GRID,
+  OWNERSHIP_ALL,
+  OWNERSHIP_OWNED,
+  OWNERSHIP_MISSING,
   type SetDetailTabValue,
   type ViewModeValue,
+  type OwnershipFilterValue,
 } from '@/constants/url-filters'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
 import QuickView from '@/components/ui/QuickView'
@@ -38,6 +44,7 @@ import CardListItem from '@/components/pokemon/CardListItem'
 import QuickAddModal from '@/components/collection/QuickAddModal'
 import QuickAddForm from '@/components/collection/QuickAddForm'
 import ProductQuickAddForm from '@/components/collection/ProductQuickAddForm'
+import SegmentedControl from '@/components/ui/SegmentedControl'
 
 interface SetDetailClientProps {
   initialData: PokemonSetWithCardsAndProducts
@@ -47,6 +54,9 @@ interface SetDetailClientProps {
 export default function SetDetailClient({ initialData, setId }: SetDetailClientProps) {
   const { user } = useAuth()
 
+  // Fetch owned card IDs for ownership filtering
+  const { ownedCardIds, isLoading: ownershipLoading, refetch: refetchOwnedCards } = useSetOwnedCards(setId)
+
   // URL-synced filters for persistence across card detail navigation
   const { values: setFilters, setters: setSetters } = useURLFilters(
     `/browse/pokemon/${setId}`,
@@ -54,7 +64,8 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
       cardSearch: { key: SET_PARAM_CARD_SEARCH, defaultValue: SET_DEFAULTS.cardSearch },
       cardSort: { key: SET_PARAM_CARD_SORT, defaultValue: SET_DEFAULTS.cardSort },
       cardView: { key: SET_PARAM_CARD_VIEW, defaultValue: SET_DEFAULTS.cardView },
-      cardTab: { key: SET_PARAM_CARD_TAB, defaultValue: SET_DEFAULTS.cardTab }
+      cardTab: { key: SET_PARAM_CARD_TAB, defaultValue: SET_DEFAULTS.cardTab },
+      cardOwnership: { key: SET_PARAM_OWNERSHIP, defaultValue: SET_DEFAULTS.cardOwnership }
     }
   )
 
@@ -68,6 +79,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
   const sortOrder = setFilters.cardSort
   const viewMode = setFilters.cardView as ViewModeValue
   const activeTab = setFilters.cardTab as SetDetailTabValue
+  const ownershipFilter = setFilters.cardOwnership as OwnershipFilterValue
 
   // Local state (doesn't need URL persistence)
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
@@ -103,23 +115,34 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
 
   // Handler to refresh ownership stats after collection update
   const handleCollectionUpdate = useCallback(() => {
+    // Refresh ownership summary widget
     if (ownershipRefetchRef.current) {
       ownershipRefetchRef.current()
     }
-  }, [])
+    // Refresh owned card IDs for filter
+    refetchOwnedCards()
+  }, [refetchOwnedCards])
 
-  // Filter and sort cards based on search query and sort order
+  // Filter and sort cards based on search query, ownership, and sort order
   const filteredCards = useMemo(() => {
     let cards = initialData.cards || []
-    
+
+    // Filter by ownership (only if authenticated and ownership data loaded)
+    if (user && !ownershipLoading && ownershipFilter !== OWNERSHIP_ALL) {
+      cards = cards.filter(card => {
+        const isOwned = ownedCardIds.has(card.id)
+        return ownershipFilter === OWNERSHIP_OWNED ? isOwned : !isOwned
+      })
+    }
+
     // Filter by search query
     if (searchQuery) {
-      cards = cards.filter(card => 
+      cards = cards.filter(card =>
         card.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (card.local_id && card.local_id.toString().toLowerCase().includes(searchQuery.toLowerCase()))
       )
     }
-    
+
     // Sort cards based on selected option
     return cards.sort((a, b) => {
       if (sortOrder.startsWith('num_')) {
@@ -131,22 +154,22 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
         // Sort by price
         const aPrices = extractMarketPrices(a.price_data)
         const bPrices = extractMarketPrices(b.price_data)
-        
+
         // Get the best (lowest) price for each card, or use Infinity if no price
         const aPrice = getBestPrice(aPrices) ?? Infinity
         const bPrice = getBestPrice(bPrices) ?? Infinity
-        
+
         // For ascending, cards without prices go to the end
         // For descending, cards without prices go to the end
         if (aPrice === Infinity && bPrice === Infinity) return 0
         if (aPrice === Infinity) return 1
         if (bPrice === Infinity) return -1
-        
+
         return sortOrder === 'price_asc' ? aPrice - bPrice : bPrice - aPrice
       }
       return 0
     })
-  }, [initialData.cards, searchQuery, sortOrder])
+  }, [initialData.cards, searchQuery, sortOrder, ownershipFilter, ownedCardIds, ownershipLoading, user])
 
   const handleCardClick = (e: React.MouseEvent, cardId: string) => {
     e.preventDefault()
@@ -374,6 +397,19 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
           sortOrder={sortOrder}
           onSortChange={setSetters.cardSort}
           sortOptions={sortOptions}
+          middleContent={user && (
+            <SegmentedControl
+              options={[
+                { value: OWNERSHIP_ALL, label: 'All' },
+                { value: OWNERSHIP_OWNED, label: 'Owned' },
+                { value: OWNERSHIP_MISSING, label: 'Missing' }
+              ]}
+              value={ownershipFilter}
+              onChange={(value) => setSetters.cardOwnership(value)}
+              size="sm"
+              ariaLabel="Filter by ownership"
+            />
+          )}
           rightContent={
             <ViewToggle
               viewMode={viewMode}

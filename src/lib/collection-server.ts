@@ -128,6 +128,59 @@ export async function getSetOwnershipStats(setId: string): Promise<{ ownedCount:
 }
 
 /**
+ * Gets the IDs of cards the user owns from a specific set
+ *
+ * Returns an array of unique pokemon_card_ids that the authenticated user owns
+ * from a given set. This is used for client-side filtering (owned/missing cards).
+ *
+ * @param setId - The ID of the Pokemon set to check ownership for
+ * @returns Promise containing array of owned card IDs
+ *
+ * @example
+ * ```typescript
+ * const ownedIds = await getSetOwnedCardIds('sv8pt5')
+ * const ownedSet = new Set(ownedIds)
+ * const isMissing = !ownedSet.has(cardId)
+ * ```
+ */
+export async function getSetOwnedCardIds(setId: string): Promise<string[]> {
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    // Return empty array for unauthenticated users (graceful handling)
+    if (authError || !user) {
+      return []
+    }
+
+    // Query collection_cards joined with pokemon_cards to filter by set_id
+    const { data, error } = await supabase
+      .from('collection_cards')
+      .select(`
+        pokemon_card_id,
+        pokemon_card:pokemon_cards!inner(set_id)
+      `)
+      .eq('user_id', user.id)
+      .eq('pokemon_card.set_id', setId)
+
+    if (error) {
+      console.error('Error fetching set owned card IDs:', error)
+      return []
+    }
+
+    // Return unique pokemon_card_ids (user may own multiple variants of same card)
+    const uniqueCardIds = [...new Set(data?.map(item => item.pokemon_card_id).filter(Boolean) || [])]
+
+    return uniqueCardIds as string[]
+
+  } catch (error) {
+    console.error('Error in getSetOwnedCardIds:', error)
+    return []
+  }
+}
+
+/**
  * Gets dashboard statistics for the authenticated user
  *
  * Returns aggregated stats including total cards, estimated value,
