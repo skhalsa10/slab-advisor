@@ -290,35 +290,175 @@ class PokemonPriceTrackerSync:
 
         return round(((newest_price - oldest_price) / oldest_price) * 100, 2)
 
-    def get_primary_variant_from_prices(self, prices: Dict, market_price: Optional[float], condition: Optional[str]) -> Optional[str]:
+    def select_best_price_data(self, price_history: Dict) -> Dict:
         """
-        Determine which variant the current_market_price comes from by matching prices.
+        Select the best variant/condition combo from priceHistory using forward selection.
 
-        Args:
-            prices: The prices object from the API (contains variants with condition prices)
-            market_price: The current market price to match
-            condition: The condition to look up (e.g., "Near Mint")
+        Instead of trying to reverse-lookup which variant/condition matches prices.market,
+        we proactively select the best available data based on priority lists.
+        This ensures the displayed price, condition, variant, and percent changes all
+        come from the same data series.
 
         Returns:
-            The variant name (e.g., "Normal", "Holofoil", "Reverse Holofoil") or None if not found
+            {
+                'variant': str or None,
+                'condition': str or None,
+                'latest_price': float or None,
+                'history': List[Dict] or []
+            }
         """
-        if not prices or not market_price or not condition:
-            return None
+        empty_result = {'variant': None, 'condition': None, 'latest_price': None, 'history': []}
 
-        variants = prices.get('variants', {})
+        if not price_history:
+            return empty_result
+
+        variants = price_history.get('variants', {})
         if not variants:
+            return empty_result
+
+        # Step 1: Select best variant (priority order)
+        VARIANT_PRIORITY = ['Normal', 'Holofoil', 'Reverse Holofoil', '1st Edition Holofoil', '1st Edition']
+
+        selected_variant = None
+        for preferred in VARIANT_PRIORITY:
+            if preferred in variants:
+                selected_variant = preferred
+                break
+
+        # Fallback: first available variant
+        if not selected_variant:
+            selected_variant = next(iter(variants.keys()), None)
+
+        if not selected_variant:
+            return empty_result
+
+        conditions = variants.get(selected_variant, {})
+        if not conditions or not isinstance(conditions, dict):
+            return {'variant': selected_variant, 'condition': None, 'latest_price': None, 'history': []}
+
+        # Step 2: Select best condition (priority order)
+        CONDITION_PRIORITY = ['Near Mint', 'Lightly Played', 'Moderately Played', 'Heavily Played', 'Damaged']
+
+        selected_condition = None
+        for preferred in CONDITION_PRIORITY:
+            if preferred in conditions:
+                selected_condition = preferred
+                break
+
+        # Fallback: first available condition
+        if not selected_condition:
+            selected_condition = next(iter(conditions.keys()), None)
+
+        if not selected_condition:
+            return {'variant': selected_variant, 'condition': None, 'latest_price': None, 'history': []}
+
+        # Step 3: Extract data for selected variant/condition
+        condition_data = conditions.get(selected_condition, {})
+
+        return {
+            'variant': selected_variant,
+            'condition': selected_condition,
+            'latest_price': condition_data.get('latestPrice'),
+            'history': condition_data.get('history', [])
+        }
+
+    def calc_percent_change_from_history(self, history: List[Dict], days: int) -> Optional[float]:
+        """
+        Calculate percent change from a history array within the specified days.
+        History format: [{ date: str, market: float, ... }, ...]
+
+        This works directly with the history array from select_best_price_data(),
+        ensuring percent changes match the selected variant/condition.
+        """
+        if not history or len(history) < 2:
             return None
 
-        # Check each variant to find one where the condition price matches market_price
-        for variant_name, conditions in variants.items():
-            if not isinstance(conditions, dict):
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
+
+        # Filter to entries within time window
+        filtered = []
+        for entry in history:
+            try:
+                entry_date_str = entry.get('date', '')
+                if entry_date_str:
+                    entry_date = datetime.fromisoformat(entry_date_str.replace('Z', '+00:00'))
+                    if entry_date >= cutoff_date:
+                        filtered.append(entry)
+            except (ValueError, TypeError):
                 continue
-            condition_data = conditions.get(condition, {})
-            if isinstance(condition_data, dict):
-                variant_price = condition_data.get('price')
-                # Use approximate match to handle floating point issues
-                if variant_price is not None and abs(float(variant_price) - float(market_price)) < 0.01:
-                    return variant_name
+
+        if len(filtered) < 2:
+            return None
+
+        # Sort by date
+        sorted_history = sorted(filtered, key=lambda x: x.get('date', ''))
+
+        oldest_price = sorted_history[0].get('market')
+        newest_price = sorted_history[-1].get('market')
+
+        if oldest_price is None or newest_price is None or oldest_price == 0:
+            return None
+
+        return round(((newest_price - oldest_price) / oldest_price) * 100, 2)
+
+    # =========================================================================
+    # DEPRECATED: The following methods are kept for reference but replaced by
+    # select_best_price_data() and calc_percent_change_from_history()
+    # =========================================================================
+
+    def get_primary_variant_from_prices(self, prices: Dict, price_history: Dict,
+                                         market_price: Optional[float],
+                                         condition: Optional[str]) -> Optional[str]:
+        """
+        Determine which variant the current_market_price comes from.
+        Returns variant name or None if no match found.
+
+        Lookup order:
+        1. prices.primaryPrinting (future-proof: API schema documents this)
+        2. priceHistory.variants.latestPrice match (current API format)
+        3. prices.variants.price match (legacy format)
+        4. If no condition, try matching against ALL conditions in priceHistory.variants
+        """
+        if not market_price:
+            return None
+
+        # 1. First check prices.primaryPrinting (future-proof: API schema documents this field)
+        primary_printing = prices.get('primaryPrinting')
+        if primary_printing:
+            return primary_printing
+
+        # 2. Try priceHistory.variants for latestPrice match (requires condition)
+        if condition:
+            variants = price_history.get('variants', {}) if price_history else {}
+            for variant_name, conditions in variants.items():
+                if isinstance(conditions, dict):
+                    condition_data = conditions.get(condition, {})
+                    if isinstance(condition_data, dict):
+                        latest_price = condition_data.get('latestPrice')
+                        if latest_price is not None and abs(float(latest_price) - float(market_price)) < 0.01:
+                            return variant_name
+
+        # 3. Fallback: legacy prices.variants with 'price' field (requires condition)
+        if condition:
+            legacy_variants = prices.get('variants', {})
+            for variant_name, conditions in legacy_variants.items():
+                if isinstance(conditions, dict):
+                    condition_data = conditions.get(condition, {})
+                    if isinstance(condition_data, dict):
+                        variant_price = condition_data.get('price')
+                        if variant_price is not None and abs(float(variant_price) - float(market_price)) < 0.01:
+                            return variant_name
+
+        # 4. If no condition provided, try matching against ALL conditions in priceHistory.variants
+        if not condition:
+            variants = price_history.get('variants', {}) if price_history else {}
+            for variant_name, conditions in variants.items():
+                if isinstance(conditions, dict):
+                    for cond_name, condition_data in conditions.items():
+                        if isinstance(condition_data, dict):
+                            latest_price = condition_data.get('latestPrice')
+                            if latest_price is not None and abs(float(latest_price) - float(market_price)) < 0.01:
+                                return variant_name
 
         return None
 
@@ -485,24 +625,54 @@ class PokemonPriceTrackerSync:
             'grading_safety_tier': grading_safety_tier
         }
 
-    def get_market_price_condition(self, prices: Dict) -> tuple[Optional[float], Optional[str]]:
+    def get_market_price_condition(self, prices: Dict, price_history: Dict) -> tuple[Optional[float], Optional[str]]:
         """
-        Extract the market price and condition from the prices object.
-        Returns (market_price, condition_name)
+        DEPRECATED: This method uses "reverse lookup" which fails ~63% of the time
+        due to float mismatches between prices.market and priceHistory.latestPrice.
+
+        Use select_best_price_data() instead, which uses "forward selection" to
+        proactively choose the best variant/condition from priceHistory.
+
+        This method is kept for reference but is no longer used by transform_card_to_price_record().
         """
         market_price = prices.get('market')
 
-        # Find the first condition with a market price
-        conditions = prices.get('conditions', {})
-        for condition_name, condition_data in conditions.items():
-            if isinstance(condition_data, dict) and condition_data.get('market'):
-                return (market_price, condition_name)
+        if not market_price:
+            return (None, None)
 
-        return (market_price, 'Near Mint')  # Default to Near Mint if no condition found
+        # 1. First check prices.primaryCondition (future-proof: API schema documents this field)
+        primary_condition = prices.get('primaryCondition')
+        if primary_condition:
+            return (market_price, primary_condition)
+
+        # 2. Try priceHistory.conditions for latestPrice match
+        conditions = price_history.get('conditions', {}) if price_history else {}
+        for condition_name, condition_data in conditions.items():
+            if isinstance(condition_data, dict):
+                latest_price = condition_data.get('latestPrice')
+                if latest_price is not None and abs(float(latest_price) - float(market_price)) < 0.01:
+                    return (market_price, condition_name)
+
+        # 3. Fallback: legacy prices.conditions with 'price' field
+        legacy_conditions = prices.get('conditions', {})
+        for condition_name, condition_data in legacy_conditions.items():
+            if isinstance(condition_data, dict):
+                condition_price = condition_data.get('price')
+                if condition_price is not None and abs(float(condition_price) - float(market_price)) < 0.01:
+                    return (market_price, condition_name)
+
+        # 4. No match found - return None for condition (safer than defaulting to wrong value)
+        # This prevents calculating percent changes against wrong condition's history
+        return (market_price, None)
 
     def transform_card_to_price_record(self, card: Dict, our_card_id: str, variant_pattern: Optional[str] = None) -> Dict:
         """
         Transform a PokemonPriceTracker API card response to a pokemon_card_prices record.
+
+        Uses "Forward Selection" strategy: Instead of trying to match prices.market to
+        priceHistory (which often fails due to float differences), we proactively SELECT
+        the best variant/condition from priceHistory and use that data for everything.
+        This ensures displayed price, condition, variant, and percent changes all match.
         """
         # Extract tcgplayer_product_id
         tcgplayer_product_id = card.get('tcgPlayerId')
@@ -512,9 +682,26 @@ class PokemonPriceTrackerSync:
             except (ValueError, TypeError):
                 tcgplayer_product_id = None
 
-        # Extract prices
+        # Extract prices and price history
         prices = card.get('prices', {})
-        market_price, condition = self.get_market_price_condition(prices)
+        price_history = card.get('priceHistory', {})
+
+        # Use forward selection to get best available variant/condition data
+        # This ensures price, condition, variant, and history all come from the same source
+        best_data = self.select_best_price_data(price_history)
+
+        # Determine current price:
+        # - Use latestPrice from selected variant/condition (ensures graph matches)
+        # - Fallback to prices.market only if priceHistory is empty
+        if best_data['latest_price'] is not None:
+            market_price = best_data['latest_price']
+            condition = best_data['condition']
+            primary_variant = best_data['variant']
+        else:
+            # Fallback: use API's market price, but we can't determine condition/variant
+            market_price = prices.get('market')
+            condition = None
+            primary_variant = None
 
         # Extract PSA graded data
         ebay = card.get('ebay', {})
@@ -527,38 +714,35 @@ class PokemonPriceTrackerSync:
         # Extract eBay price history (for PSA grades)
         ebay_price_history = ebay.get('priceHistory')
 
-        # Slice raw price history into time windows
-        price_history = card.get('priceHistory', {})
+        # Slice raw price history into time windows (for storage/display purposes)
         raw_history_7d = self.slice_history(price_history, 7)
         raw_history_30d = self.slice_history(price_history, 30)
         raw_history_90d = self.slice_history(price_history, 90)
         raw_history_180d = self.slice_history(price_history, 180)
         raw_history_365d = self.slice_history(price_history, 365)
 
-        # Track variants and conditions
+        # Track variants and conditions available
         variants_tracked = list(raw_history_365d.keys()) if raw_history_365d else []
         conditions_tracked = list(set(
             cond for variant_data in raw_history_365d.values()
             for cond in variant_data.keys()
         )) if raw_history_365d else []
 
-        # Determine which variant the current_market_price comes from
-        # This ensures percent changes use the same variant/condition as the displayed price
-        primary_variant = self.get_primary_variant_from_prices(prices, market_price, condition)
-
-        # Calculate percent changes using the correct variant+condition from each pre-sliced time window
-        # Each raw_history_Xd already contains only data points within that time range
-        primary_7d = self.get_primary_history(raw_history_7d, primary_variant, condition)
-        primary_30d = self.get_primary_history(raw_history_30d, primary_variant, condition)
-        primary_90d = self.get_primary_history(raw_history_90d, primary_variant, condition)
-        primary_180d = self.get_primary_history(raw_history_180d, primary_variant, condition)
-        primary_365d = self.get_primary_history(raw_history_365d, primary_variant, condition)
-
-        change_7d = self.calc_percent_change(primary_7d)
-        change_30d = self.calc_percent_change(primary_30d)
-        change_90d = self.calc_percent_change(primary_90d)
-        change_180d = self.calc_percent_change(primary_180d)
-        change_365d = self.calc_percent_change(primary_365d)
+        # Calculate percent changes using the selected variant/condition's history
+        # The history comes directly from select_best_price_data, ensuring consistency
+        if best_data['history'] and len(best_data['history']) >= 2:
+            change_7d = self.calc_percent_change_from_history(best_data['history'], 7)
+            change_30d = self.calc_percent_change_from_history(best_data['history'], 30)
+            change_90d = self.calc_percent_change_from_history(best_data['history'], 90)
+            change_180d = self.calc_percent_change_from_history(best_data['history'], 180)
+            change_365d = self.calc_percent_change_from_history(best_data['history'], 365)
+        else:
+            # No history available - can't calculate percent changes
+            change_7d = None
+            change_30d = None
+            change_90d = None
+            change_180d = None
+            change_365d = None
 
         # Calculate grading ROI potential
         grading_potential = self.calculate_grading_potential(market_price, psa9, psa10)

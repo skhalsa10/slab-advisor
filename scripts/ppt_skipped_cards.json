@@ -1,81 +1,17 @@
 {
-  "last_updated": "2026-01-19 21:20:47",
-  "total_skipped": 9,
+  "last_updated": "2026-01-23 23:22:47",
+  "total_skipped": 1,
   "sets": {
-    "me02-phantasmal-flames": {
-      "set_name": "Phantasmal Flames",
-      "set_id": "me02",
+    "black-and-white": {
+      "set_name": "Black & White",
+      "set_id": "bw1",
       "cards": [
         {
-          "name": "Dawn - 087/094",
-          "tcgPlayerId": "662148",
-          "number": null,
-          "rarity": "Uncommon",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Toxtricity - 068/094",
-          "tcgPlayerId": "662234",
-          "number": null,
-          "rarity": "Rare",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Haunter",
-          "tcgPlayerId": "662168",
-          "number": null,
-          "rarity": "Uncommon",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Ghastly",
-          "tcgPlayerId": "660410",
-          "number": null,
-          "rarity": "Common",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Charcadet - 022",
-          "tcgPlayerId": "664093",
-          "number": null,
-          "rarity": "Promo",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Code Card - Phantasmal Flames Booster Pack",
-          "tcgPlayerId": "664060",
+          "name": "Code Card - Victini Box",
+          "tcgPlayerId": "280525",
           "number": null,
           "rarity": "Code Card",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Code Card - Phantasmal Flames Build & Battle Box",
-          "tcgPlayerId": "664059",
-          "number": null,
-          "rarity": "Code Card",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Code Card - Phantasmal Flames Elite Trainer Box Digital Bundle",
-          "tcgPlayerId": "666911",
-          "number": null,
-          "rarity": "Code Card",
-          "setName": "ME02: Phantasmal Flames",
-          "pptId": null
-        },
-        {
-          "name": "Code Card -  Phantasmal Flames Pokemon Center Elite Trainer Box Digital Bundle",
-          "tcgPlayerId": "670144",
-          "number": null,
-          "rarity": "Code Card",
-          "setName": "ME02: Phantasmal Flames",
+          "setName": "Black and White",
           "pptId": null
         }
       ]
