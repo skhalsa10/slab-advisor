@@ -145,11 +145,16 @@ class PokemonPriceTrackerSync:
         console.print("[green]✓ Connected to Supabase[/green]")
         console.print("[green]✓ PokemonPriceTracker API key loaded[/green]")
 
-    def fetch_cards_for_set(self, tcgplayer_set_id: str) -> List[Dict]:
+    def fetch_cards_for_set(self, set_identifier: str) -> List[Dict]:
         """
         Fetch all cards for a set from PokemonPriceTracker API.
         Uses fetchAllInSet=true to get all cards. For sets with 200+ cards,
         pagination is handled via offset (only added after first request if hasMore=true).
+
+        Args:
+            set_identifier: Either tcgplayer_set_id (string like "black-and-white-promos")
+                           or tcgplayer_group_id (numeric string like "1400")
+                           Both are passed via the 'setId' parameter.
         """
         all_cards = []
         offset = 0
@@ -165,7 +170,7 @@ class PokemonPriceTrackerSync:
             # Adding offset triggers pagination mode and limits to 50 cards per request
             params = {
                 'language': 'english',
-                'setId': tcgplayer_set_id,
+                'setId': set_identifier,
                 'includeHistory': 'true',
                 'includeEbay': 'true',
                 'includeBoth': 'true',
@@ -180,7 +185,7 @@ class PokemonPriceTrackerSync:
             try:
                 url = f"{PPT_API_BASE}/cards"
                 if is_first_request:
-                    console.print(f"[dim]Fetching all cards for set {tcgplayer_set_id}...[/dim]")
+                    console.print(f"[dim]Fetching all cards for setId={set_identifier}...[/dim]")
                 else:
                     console.print(f"[dim]Fetching more cards (offset={offset})...[/dim]")
 
@@ -210,7 +215,7 @@ class PokemonPriceTrackerSync:
                 time.sleep(0.5)  # Small delay between pages
 
             except requests.exceptions.Timeout:
-                console.print(f"[red]Timeout fetching cards for set {tcgplayer_set_id}[/red]")
+                console.print(f"[red]Timeout fetching cards for setId={set_identifier}[/red]")
                 break
             except requests.exceptions.RequestException as e:
                 console.print(f"[red]Error fetching cards: {e}[/red]")
@@ -702,12 +707,19 @@ class PokemonPriceTrackerSync:
         set_id = set_info['id']
         set_name = set_info['name']
         tcgplayer_set_id = set_info['tcgplayer_set_id']
+        tcgplayer_group_id = set_info.get('tcgplayer_group_id')
 
         console.print(f"\n[blue]Processing: {set_name}[/blue]")
-        console.print(f"[dim]  Set ID: {set_id}, TCGPlayer Set ID: {tcgplayer_set_id}[/dim]")
+        console.print(f"[dim]  Set ID: {set_id}, TCGPlayer Set ID: {tcgplayer_set_id}, Group ID: {tcgplayer_group_id}[/dim]")
 
         # Fetch cards from PokemonPriceTracker API
+        # First try with tcgplayer_set_id, fallback to tcgplayer_group_id if 0 cards returned
         ppt_cards = self.fetch_cards_for_set(tcgplayer_set_id)
+
+        if not ppt_cards and tcgplayer_group_id:
+            console.print(f"[yellow]No cards found using setId={tcgplayer_set_id}, trying setId={tcgplayer_group_id} (group_id)...[/yellow]")
+            ppt_cards = self.fetch_cards_for_set(str(tcgplayer_group_id))
+
         stats['cards_fetched'] = len(ppt_cards)
 
         if not ppt_cards:
@@ -786,7 +798,7 @@ class PokemonPriceTrackerSync:
         # Find the set in our database
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .eq('tcgplayer_set_id', tcgplayer_set_id)\
                 .execute()
 
@@ -824,7 +836,7 @@ class PokemonPriceTrackerSync:
         # Get all sets with tcgplayer_set_id
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .not_.is_('tcgplayer_set_id', 'null')\
                 .order('name')\
                 .execute()
@@ -1040,10 +1052,15 @@ class PokemonPriceTrackerSync:
     # SEALED PRODUCT PRICE SYNC METHODS
     # =========================================================================
 
-    def fetch_sealed_products_for_set(self, tcgplayer_set_id: str) -> List[Dict]:
+    def fetch_sealed_products_for_set(self, set_identifier: str) -> List[Dict]:
         """
         Fetch all sealed products for a set from PokemonPriceTracker API.
         Uses the /sealed-products endpoint with fetchAllInSet=true.
+
+        Args:
+            set_identifier: Either tcgplayer_set_id (string like "black-and-white-promos")
+                           or tcgplayer_group_id (numeric string like "1400")
+                           Both are passed via the 'setId' parameter.
         """
         headers = {
             'Authorization': f'Bearer {self.api_key}',
@@ -1051,7 +1068,7 @@ class PokemonPriceTrackerSync:
         }
 
         params = {
-            'setId': tcgplayer_set_id,
+            'setId': set_identifier,
             'includeHistory': 'true',
             'days': 365,
             'fetchAllInSet': 'true'
@@ -1059,7 +1076,7 @@ class PokemonPriceTrackerSync:
 
         try:
             url = f"{PPT_API_BASE}/sealed-products"
-            console.print(f"[dim]Fetching sealed products for set {tcgplayer_set_id}...[/dim]")
+            console.print(f"[dim]Fetching sealed products for setId={set_identifier}...[/dim]")
 
             response = requests.get(url, headers=headers, params=params, timeout=120)
             response.raise_for_status()
@@ -1071,7 +1088,7 @@ class PokemonPriceTrackerSync:
             return products
 
         except requests.exceptions.Timeout:
-            console.print(f"[red]Timeout fetching sealed products for set {tcgplayer_set_id}[/red]")
+            console.print(f"[red]Timeout fetching sealed products for setId={set_identifier}[/red]")
             return []
         except requests.exceptions.RequestException as e:
             console.print(f"[red]Error fetching sealed products: {e}[/red]")
@@ -1222,12 +1239,19 @@ class PokemonPriceTrackerSync:
         set_id = set_info['id']
         set_name = set_info['name']
         tcgplayer_set_id = set_info['tcgplayer_set_id']
+        tcgplayer_group_id = set_info.get('tcgplayer_group_id')
 
         console.print(f"\n[blue]Processing sealed products: {set_name}[/blue]")
-        console.print(f"[dim]  Set ID: {set_id}, TCGPlayer Set ID: {tcgplayer_set_id}[/dim]")
+        console.print(f"[dim]  Set ID: {set_id}, TCGPlayer Set ID: {tcgplayer_set_id}, Group ID: {tcgplayer_group_id}[/dim]")
 
         # Fetch products from PokemonPriceTracker API
+        # First try with tcgplayer_set_id, fallback to tcgplayer_group_id if 0 products returned
         api_products = self.fetch_sealed_products_for_set(tcgplayer_set_id)
+
+        if not api_products and tcgplayer_group_id:
+            console.print(f"[yellow]No products found using setId={tcgplayer_set_id}, trying setId={tcgplayer_group_id} (group_id)...[/yellow]")
+            api_products = self.fetch_sealed_products_for_set(str(tcgplayer_group_id))
+
         stats['products_fetched'] = len(api_products)
 
         if not api_products:
@@ -1294,7 +1318,7 @@ class PokemonPriceTrackerSync:
         """Sync sealed product prices for a specific set by TCGPlayer set ID."""
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .eq('tcgplayer_set_id', tcgplayer_set_id)\
                 .execute()
 
@@ -1328,7 +1352,7 @@ class PokemonPriceTrackerSync:
         # Get all sets with tcgplayer_set_id
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .not_.is_('tcgplayer_set_id', 'null')\
                 .order('name')\
                 .execute()
@@ -1392,7 +1416,7 @@ class PokemonPriceTrackerSync:
         # Get all sets with tcgplayer_set_id
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .not_.is_('tcgplayer_set_id', 'null')\
                 .order('name')\
                 .execute()
@@ -1495,7 +1519,7 @@ class PokemonPriceTrackerSync:
         # Look up set info
         try:
             result = self.supabase.table('pokemon_sets')\
-                .select('id, name, tcgplayer_set_id')\
+                .select('id, name, tcgplayer_set_id, tcgplayer_group_id')\
                 .eq('tcgplayer_set_id', tcgplayer_set_id)\
                 .single()\
                 .execute()
