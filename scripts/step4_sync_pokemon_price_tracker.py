@@ -572,19 +572,15 @@ class PokemonPriceTrackerSync:
         # Extract eBay price history (for PSA grades)
         ebay_price_history = ebay.get('priceHistory')
 
-        # Slice raw price history into time windows (for storage/display purposes)
-        raw_history_7d = self.slice_history(price_history, 7)
-        raw_history_30d = self.slice_history(price_history, 30)
-        raw_history_90d = self.slice_history(price_history, 90)
-        raw_history_180d = self.slice_history(price_history, 180)
-        raw_history_365d = self.slice_history(price_history, 365)
+        # Slice raw price history to 365 days (filtered client-side for shorter ranges)
+        raw_price_history = self.slice_history(price_history, 365)
 
         # Track variants and conditions available
-        variants_tracked = list(raw_history_365d.keys()) if raw_history_365d else []
+        variants_tracked = list(raw_price_history.keys()) if raw_price_history else []
         conditions_tracked = list(set(
-            cond for variant_data in raw_history_365d.values()
+            cond for variant_data in raw_price_history.values()
             for cond in variant_data.keys()
-        )) if raw_history_365d else []
+        )) if raw_price_history else []
 
         # Calculate percent changes using the selected variant/condition's history
         # The history comes directly from select_best_price_data, ensuring consistency
@@ -623,11 +619,7 @@ class PokemonPriceTrackerSync:
             'change_365d_percent': change_365d,
             'prices_raw': prices,
             'ebay_price_history': ebay_price_history,
-            'raw_history_7d': raw_history_7d,
-            'raw_history_30d': raw_history_30d,
-            'raw_history_90d': raw_history_90d,
-            'raw_history_180d': raw_history_180d,
-            'raw_history_365d': raw_history_365d,
+            'raw_price_history': raw_price_history,
             'raw_history_variants_tracked': variants_tracked,
             'raw_history_conditions_tracked': conditions_tracked,
             'last_updated': datetime.now(timezone.utc).isoformat(),
@@ -1000,7 +992,7 @@ class PokemonPriceTrackerSync:
             # Price records with history
             with_history_result = self.supabase.table('pokemon_card_prices')\
                 .select('id', count='exact')\
-                .not_.is_('raw_history_365d', 'null')\
+                .not_.is_('raw_price_history', 'null')\
                 .execute()
             with_history = with_history_result.count
 

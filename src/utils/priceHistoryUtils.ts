@@ -36,42 +36,38 @@ function safeParseJson<T>(value: T | string | null): T | null {
 
 /**
  * Gets the raw history for a specific time range from price data.
+ * Filters the full history (raw_price_history) by date client-side.
  *
  * @param priceData - The full price data object
  * @param timeRange - The time range to get history for
- * @returns The variant/condition history for that time range, or null
+ * @returns The variant/condition history filtered to the time range, or null
  */
 export function getRawHistoryForTimeRange(
   priceData: PokemonCardPrices,
   timeRange: TimeRange
 ): VariantConditionHistory | null {
-  const historyMap: Record<TimeRange, VariantConditionHistory | null> = {
-    '7d': safeParseJson(priceData.raw_history_7d),
-    '30d': safeParseJson(priceData.raw_history_30d),
-    '90d': safeParseJson(priceData.raw_history_90d),
-    '365d': safeParseJson(priceData.raw_history_365d),
-  };
-  return historyMap[timeRange];
-}
+  const history = safeParseJson<VariantConditionHistory>(priceData.raw_price_history);
+  if (!history) return null;
 
-/**
- * Gets the percent change for a specific time range.
- *
- * @param priceData - The full price data object
- * @param timeRange - The time range to get change for
- * @returns The percent change, or null if not available
- */
-export function getChangeForTimeRange(
-  priceData: PokemonCardPrices,
-  timeRange: TimeRange
-): number | null {
-  const changeMap: Record<TimeRange, number | null> = {
-    '7d': priceData.change_7d_percent,
-    '30d': priceData.change_30d_percent,
-    '90d': priceData.change_90d_percent,
-    '365d': priceData.change_365d_percent,
-  };
-  return changeMap[timeRange];
+  const days = timeRangeToDays(timeRange);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+
+  // Filter each variant's condition history entries by date
+  const filtered: VariantConditionHistory = {};
+  for (const [variant, conditions] of Object.entries(history)) {
+    filtered[variant] = {};
+    for (const [condition, entries] of Object.entries(conditions)) {
+      const filteredEntries = entries.filter((entry) => {
+        const entryDate = new Date(entry.date);
+        return entryDate >= cutoff;
+      });
+      if (filteredEntries.length > 0) {
+        filtered[variant][condition] = filteredEntries;
+      }
+    }
+  }
+  return filtered;
 }
 
 // =============================================================================
@@ -261,12 +257,7 @@ export function formatTooltipDate(dateStr: string): string {
  * @returns True if any history exists
  */
 export function hasRawHistory(priceData: PokemonCardPrices): boolean {
-  return !!(
-    priceData.raw_history_7d ||
-    priceData.raw_history_30d ||
-    priceData.raw_history_90d ||
-    priceData.raw_history_365d
-  );
+  return !!priceData.raw_price_history;
 }
 
 /**
@@ -314,7 +305,7 @@ export function getDefaultVariant(priceData: PokemonCardPrices): string {
 
 /**
  * Gets the list of conditions available for a specific variant by inspecting
- * the raw_history_365d data (which is a superset of all shorter ranges).
+ * the raw_price_history data.
  *
  * Falls back to raw_history_conditions_tracked if variant not found or history is null.
  *
@@ -326,7 +317,7 @@ export function getConditionsForVariant(
   priceData: PokemonCardPrices,
   variantKey: string
 ): string[] {
-  const history = safeParseJson<VariantConditionHistory>(priceData.raw_history_365d);
+  const history = safeParseJson<VariantConditionHistory>(priceData.raw_price_history);
   if (history && history[variantKey]) {
     const conditions = Object.keys(history[variantKey]);
     if (conditions.length > 0) {

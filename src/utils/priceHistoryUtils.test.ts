@@ -25,11 +25,7 @@ function makePriceData(
     change_365d_percent: null,
     prices_raw: null,
     ebay_price_history: null,
-    raw_history_7d: null,
-    raw_history_30d: null,
-    raw_history_90d: null,
-    raw_history_180d: null,
-    raw_history_365d: null,
+    raw_price_history: null,
     raw_history_variants_tracked: null,
     raw_history_conditions_tracked: null,
     last_updated: null,
@@ -39,9 +35,9 @@ function makePriceData(
 }
 
 describe('getConditionsForVariant', () => {
-  it('returns conditions for a specific variant from raw_history_365d', () => {
+  it('returns conditions for a specific variant from raw_price_history', () => {
     const priceData = makePriceData({
-      raw_history_365d: {
+      raw_price_history: {
         'Normal': {
           'Near Mint': [{ date: '2025-01-01', market: 1.0, low: 0.8, mid: 0.9, high: 1.1 }],
           'Lightly Played': [{ date: '2025-01-01', market: 0.8, low: 0.6, mid: 0.7, high: 0.9 }],
@@ -64,7 +60,7 @@ describe('getConditionsForVariant', () => {
 
   it('falls back to raw_history_conditions_tracked when variant is not in 365d', () => {
     const priceData = makePriceData({
-      raw_history_365d: {
+      raw_price_history: {
         'Normal': {
           'Near Mint': [{ date: '2025-01-01', market: 1.0, low: 0.8, mid: 0.9, high: 1.1 }],
         },
@@ -80,7 +76,7 @@ describe('getConditionsForVariant', () => {
 
   it('falls back to raw_history_conditions_tracked when 365d is null', () => {
     const priceData = makePriceData({
-      raw_history_365d: null,
+      raw_price_history: null,
       raw_history_conditions_tracked: ['Near Mint', 'Moderately Played'],
     })
 
@@ -92,14 +88,14 @@ describe('getConditionsForVariant', () => {
 
   it('returns empty array when no data exists', () => {
     const priceData = makePriceData({
-      raw_history_365d: null,
+      raw_price_history: null,
       raw_history_conditions_tracked: null,
     })
 
     expect(getConditionsForVariant(priceData, 'Normal')).toEqual([])
   })
 
-  it('handles raw_history_365d stored as JSON string', () => {
+  it('handles raw_price_history stored as JSON string', () => {
     const historyObj = {
       'Holofoil': {
         'Near Mint': [{ date: '2025-01-01', market: 5.0, low: 4.0, mid: 4.5, high: 5.5 }],
@@ -108,7 +104,7 @@ describe('getConditionsForVariant', () => {
     }
     const priceData = makePriceData({
       // Simulate JSONB stored as string
-      raw_history_365d: JSON.stringify(historyObj) as unknown as null,
+      raw_price_history: JSON.stringify(historyObj) as unknown as null,
       raw_history_conditions_tracked: ['Near Mint'],
     })
 
@@ -120,7 +116,7 @@ describe('getConditionsForVariant', () => {
 
   it('falls back when variant has empty conditions in 365d', () => {
     const priceData = makePriceData({
-      raw_history_365d: {
+      raw_price_history: {
         'Normal': {},
       },
       raw_history_conditions_tracked: ['Near Mint'],
@@ -133,7 +129,7 @@ describe('getConditionsForVariant', () => {
 describe('getDefaultCondition', () => {
   it('returns Near Mint when available for variant', () => {
     const priceData = makePriceData({
-      raw_history_365d: {
+      raw_price_history: {
         'Normal': {
           'Near Mint': [{ date: '2025-01-01', market: 1.0, low: 0.8, mid: 0.9, high: 1.1 }],
           'Lightly Played': [{ date: '2025-01-01', market: 0.8, low: 0.6, mid: 0.7, high: 0.9 }],
@@ -146,7 +142,7 @@ describe('getDefaultCondition', () => {
 
   it('returns first condition when Near Mint is not available for variant', () => {
     const priceData = makePriceData({
-      raw_history_365d: {
+      raw_price_history: {
         'Reverse Holofoil': {
           'Lightly Played': [{ date: '2025-01-01', market: 0.5, low: 0.4, mid: 0.45, high: 0.6 }],
           'Moderately Played': [{ date: '2025-01-01', market: 0.3, low: 0.2, mid: 0.25, high: 0.35 }],

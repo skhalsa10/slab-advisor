@@ -231,6 +231,7 @@ export type Database = {
           created_at: string | null
           current_market_price: number | null
           current_market_price_condition: string | null
+          current_market_price_variant: string | null
           ebay_price_history: Json | null
           grading_cost_basis_entry: number | null
           grading_fee_entry: number | null
@@ -246,13 +247,9 @@ export type Database = {
           psa10: Json | null
           psa8: Json | null
           psa9: Json | null
-          raw_history_180d: Json | null
-          raw_history_30d: Json | null
-          raw_history_365d: Json | null
-          raw_history_7d: Json | null
-          raw_history_90d: Json | null
           raw_history_conditions_tracked: string[] | null
           raw_history_variants_tracked: string[] | null
+          raw_price_history: Json | null
           roi_psa10: number | null
           tcgplayer_product_id: number | null
           upcharge_potential: boolean | null
@@ -267,6 +264,7 @@ export type Database = {
           created_at?: string | null
           current_market_price?: number | null
           current_market_price_condition?: string | null
+          current_market_price_variant?: string | null
           ebay_price_history?: Json | null
           grading_cost_basis_entry?: number | null
           grading_fee_entry?: number | null
@@ -282,13 +280,9 @@ export type Database = {
           psa10?: Json | null
           psa8?: Json | null
           psa9?: Json | null
-          raw_history_180d?: Json | null
-          raw_history_30d?: Json | null
-          raw_history_365d?: Json | null
-          raw_history_7d?: Json | null
-          raw_history_90d?: Json | null
           raw_history_conditions_tracked?: string[] | null
           raw_history_variants_tracked?: string[] | null
+          raw_price_history?: Json | null
           roi_psa10?: number | null
           tcgplayer_product_id?: number | null
           upcharge_potential?: boolean | null
@@ -303,6 +297,7 @@ export type Database = {
           created_at?: string | null
           current_market_price?: number | null
           current_market_price_condition?: string | null
+          current_market_price_variant?: string | null
           ebay_price_history?: Json | null
           grading_cost_basis_entry?: number | null
           grading_fee_entry?: number | null
@@ -318,13 +313,9 @@ export type Database = {
           psa10?: Json | null
           psa8?: Json | null
           psa9?: Json | null
-          raw_history_180d?: Json | null
-          raw_history_30d?: Json | null
-          raw_history_365d?: Json | null
-          raw_history_7d?: Json | null
-          raw_history_90d?: Json | null
           raw_history_conditions_tracked?: string[] | null
           raw_history_variants_tracked?: string[] | null
+          raw_price_history?: Json | null
           roi_psa10?: number | null
           tcgplayer_product_id?: number | null
           upcharge_potential?: boolean | null

@@ -111,12 +111,8 @@ export interface PokemonCardPrices {
   prices_raw: unknown | null;
   ebay_price_history: EbayPriceHistory | null;
 
-  // Pre-sliced raw history by time window - typed JSONB
-  raw_history_7d: VariantConditionHistory | null;
-  raw_history_30d: VariantConditionHistory | null;
-  raw_history_90d: VariantConditionHistory | null;
-  raw_history_180d: VariantConditionHistory | null;
-  raw_history_365d: VariantConditionHistory | null;
+  // Full raw price history (365 days, filtered client-side by time range)
+  raw_price_history: VariantConditionHistory | null;
 
   // Tracked variants and conditions
   raw_history_variants_tracked: string[] | null;
