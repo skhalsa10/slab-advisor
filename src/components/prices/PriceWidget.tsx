@@ -30,6 +30,7 @@ import {
   getDefaultVariant,
   getDefaultCondition,
   getDefaultGrade,
+  getConditionsForVariant,
   gradeKeyToLabel,
 } from '@/utils/priceHistoryUtils';
 import { usePriceWidgetContext } from './PriceWidgetContext';
@@ -106,7 +107,7 @@ export function PriceWidget({
 
   // Get available options
   const availableVariants = context?.availableVariants ?? priceData?.raw_history_variants_tracked ?? [];
-  const availableConditions = context?.availableConditions ?? priceData?.raw_history_conditions_tracked ?? [];
+  const availableConditions = context?.availableConditions ?? (priceData ? getConditionsForVariant(priceData, variant) : []);
   const availableGrades = PSA_GRADES.filter(
     (g) => priceData?.[g.value] !== null
   );

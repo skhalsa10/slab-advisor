@@ -313,13 +313,46 @@ export function getDefaultVariant(priceData: PokemonCardPrices): string {
 }
 
 /**
+ * Gets the list of conditions available for a specific variant by inspecting
+ * the raw_history_365d data (which is a superset of all shorter ranges).
+ *
+ * Falls back to raw_history_conditions_tracked if variant not found or history is null.
+ *
+ * @param priceData - The price data record
+ * @param variantKey - The variant key to look up (e.g., "Normal", "Reverse Holofoil")
+ * @returns Array of condition strings available for that variant
+ */
+export function getConditionsForVariant(
+  priceData: PokemonCardPrices,
+  variantKey: string
+): string[] {
+  const history = safeParseJson<VariantConditionHistory>(priceData.raw_history_365d);
+  if (history && history[variantKey]) {
+    const conditions = Object.keys(history[variantKey]);
+    if (conditions.length > 0) {
+      return conditions;
+    }
+  }
+
+  // Fallback: use the flat conditions_tracked array
+  return priceData.raw_history_conditions_tracked || [];
+}
+
+/**
  * Gets the first available condition from the history.
+ * If variantKey is provided, scopes conditions to that variant.
  *
  * @param priceData - The full price data object
+ * @param variantKey - Optional variant to scope conditions to
  * @returns The first condition name, or "Near Mint" as default
  */
-export function getDefaultCondition(priceData: PokemonCardPrices): string {
-  const conditions = priceData.raw_history_conditions_tracked;
+export function getDefaultCondition(
+  priceData: PokemonCardPrices,
+  variantKey?: string
+): string {
+  const conditions = variantKey
+    ? getConditionsForVariant(priceData, variantKey)
+    : priceData.raw_history_conditions_tracked;
   if (!conditions || conditions.length === 0) return 'Near Mint';
 
   // Prefer "Near Mint" if available

@@ -23,6 +23,7 @@ import {
   hasGradedData,
   getDefaultCondition,
   getDefaultGrade,
+  getConditionsForVariant,
   getRawHistoryForTimeRange,
   transformRawHistoryToChartData,
   getPsaHistoryForPeriod,
@@ -123,7 +124,7 @@ export function PriceWidgetProvider({
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const [selectedVariant, setSelectedVariant] = useState<VariantOption>(defaultVariant);
   const [condition, setCondition] = useState(() =>
-    getDefaultCondition(initialRecord)
+    getDefaultCondition(initialRecord, defaultVariant.variantKey)
   );
   const [grade, setGrade] = useState<PsaGradeKey>(() =>
     getDefaultGrade(initialRecord)
@@ -145,22 +146,22 @@ export function PriceWidgetProvider({
     [combinedPrices.allVariants]
   );
 
-  // Available conditions from active record
+  // Available conditions for the selected variant (not the flat list across all variants)
   const availableConditions = useMemo(
-    () => activePriceRecord.raw_history_conditions_tracked || [],
-    [activePriceRecord]
+    () => getConditionsForVariant(activePriceRecord, selectedVariant.variantKey),
+    [activePriceRecord, selectedVariant.variantKey]
   );
 
-  // Reset condition when active record changes (to ensure valid condition for new record)
-  // This handles switching between pattern variants that may have different conditions
+  // Reset condition when variant changes (to ensure valid condition for new variant)
+  // This handles switching between variants that may have different conditions
   useEffect(() => {
-    const newConditions = activePriceRecord.raw_history_conditions_tracked || [];
+    const newConditions = getConditionsForVariant(activePriceRecord, selectedVariant.variantKey);
     if (newConditions.length > 0 && !newConditions.includes(condition)) {
-      // Current condition not available in new record, reset to default
+      // Current condition not available for this variant, reset to default
       const newCondition = newConditions.includes('Near Mint') ? 'Near Mint' : newConditions[0];
       setCondition(newCondition);
     }
-  }, [activePriceRecord, condition]);
+  }, [activePriceRecord, selectedVariant.variantKey, condition]);
 
   // Available grades from active record
   const availableGrades = useMemo(
