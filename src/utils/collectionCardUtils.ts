@@ -117,17 +117,16 @@ export function getCardNumber(card: CollectionCard): string {
  * Gets the primary image URL for the card with complete fallback chain
  * 
  * Priority order:
- * 1. User's uploaded front image (highest priority)
- * 2. Linked Pokemon database image (fallback)
+ * 1. Linked Pokemon database image
+ * 2. TCGPlayer image (fallback)
  * 3. Placeholder image (final fallback)
+ *
+ * NOTE: User uploaded images (front_image_url) are private storage paths and
+ * cannot be used directly with next/image. Re-enable once signed URL or
+ * public bucket support is added.
  */
 export function getCardImageUrl(card: CollectionCard, quality: 'low' | 'high' = 'low'): string {
-  // User's uploaded image takes priority
-  if (card.front_image_url) {
-    return card.front_image_url
-  }
-  
-  // Fall back to Pokemon database image with proper formatting
+  // Pokemon database image with proper formatting
   if (hasJoinedPokemonData(card) && card.pokemon_card?.image) {
     return `${card.pokemon_card.image}/${quality}.jpg`
   }
