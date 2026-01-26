@@ -1,64 +1,148 @@
 /**
  * Utility functions for handling price data in collection cards
+ *
+ * Reads prices from the pokemon_card_prices table (joined via pokemon_card)
+ * and resolves the correct price based on card variant, condition, and pattern.
  */
 
 import { type CollectionCard } from '@/types/database'
-import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
-import { extractMarketPrices } from './priceUtils'
+import { type CollectionCardWithPokemon, type PokemonCardPriceRecord } from '@/utils/collectionCardUtils'
 
 /**
- * Maps collection card variant values to TCG price variant names
- * 
- * Collection variants: "normal", "holo", "reverse_holo", "first_edition"
- * TCG price variants: "Normal", "Holofoil", "Reverse Holofoil", "1st Edition Normal", "1st Edition Holofoil"
+ * Maps collection card variant values to TCG price variant keys
+ * (matches the mapping in portfolio-server.ts snapshot_all_portfolios function)
  */
-const VARIANT_TO_PRICE_MAP: Record<string, string[]> = {
-  'normal': ['Normal'],
-  'holo': ['Holofoil', 'Holo'],
-  'reverse_holo': ['Reverse Holofoil', 'Reverse'],
-  'first_edition': ['1st Edition Normal', '1st Edition Holofoil', '1st Edition']
+const VARIANT_TO_PRICE_KEY: Record<string, string> = {
+  normal: 'Normal',
+  holo: 'Holofoil',
+  reverse_holo: 'Reverse Holofoil',
+  first_edition: '1st Edition Holofoil',
+  illustration_rare: 'Holofoil',
+  alt_art: 'Holofoil',
+  full_art: 'Holofoil',
+  secret_rare: 'Holofoil',
+}
+
+/**
+ * Maps collection card condition values to TCG price condition keys
+ * (matches the mapping in portfolio-server.ts snapshot_all_portfolios function)
+ */
+const CONDITION_TO_PRICE_KEY: Record<string, string> = {
+  mint: 'Near Mint',
+  near_mint: 'Near Mint',
+  lightly_played: 'Lightly Played',
+  moderately_played: 'Moderately Played',
+  heavily_played: 'Heavily Played',
+  damaged: 'Damaged',
+}
+
+/**
+ * Finds the matching price record for a collection card
+ * Respects variant_pattern matching (null === null for base variants)
+ */
+function findMatchingPriceRecord(
+  priceRecords: PokemonCardPriceRecord[] | undefined,
+  cardVariantPattern: string | null
+): PokemonCardPriceRecord | null {
+  if (!priceRecords || priceRecords.length === 0) {
+    return null
+  }
+
+  // Find price record matching the card's variant_pattern
+  const matchingRecord = priceRecords.find(
+    (p) =>
+      (cardVariantPattern === null && p.variant_pattern === null) ||
+      cardVariantPattern === p.variant_pattern
+  )
+
+  return matchingRecord || null
+}
+
+/**
+ * Extracts the exact price for a variant/condition combo from prices_raw
+ */
+function extractPriceFromRaw(
+  pricesRaw: unknown,
+  variantKey: string,
+  conditionKey: string
+): number | null {
+  if (!pricesRaw || typeof pricesRaw !== 'object') {
+    return null
+  }
+
+  const rawData = pricesRaw as Record<string, unknown>
+
+  if (!rawData.variants || typeof rawData.variants !== 'object') {
+    return null
+  }
+
+  const variants = rawData.variants as Record<string, Record<string, { price?: number }>>
+  const variantPrices = variants[variantKey]
+
+  if (!variantPrices) {
+    return null
+  }
+
+  const conditionPrice = variantPrices[conditionKey]?.price
+
+  if (conditionPrice !== undefined && conditionPrice !== null && conditionPrice > 0) {
+    return conditionPrice
+  }
+
+  return null
 }
 
 /**
  * Gets the price for a specific collection card variant
- * @param card - The collection card (must include pokemon_card with price_data)
+ *
+ * Priority order:
+ * 1. Exact variant/condition price from prices_raw
+ * 2. current_market_price from price record
+ * 3. Market average from prices_raw
+ * 4. null if no price found
+ *
+ * @param card - The collection card (must include pokemon_card with pokemon_card_prices)
  * @returns The price for the card's variant or null if not found
  */
 export function getCollectionCardPrice(card: CollectionCardWithPokemon): number | null {
-  if (!card.pokemon_card?.price_data) return null
+  const priceRecords = card.pokemon_card?.pokemon_card_prices
 
-  const prices = extractMarketPrices(card.pokemon_card.price_data)
-  if (!prices) return null
+  if (!priceRecords || priceRecords.length === 0) {
+    return null
+  }
 
-  // Determine the pattern to look for (default to base if no pattern)
-  const targetPattern = card.variant_pattern || 'base'
+  // Find the matching price record for this card's variant_pattern
+  const priceRecord = findMatchingPriceRecord(priceRecords, card.variant_pattern ?? null)
 
-  // Get the variant price mappings for this card's variant
-  const priceVariantNames = VARIANT_TO_PRICE_MAP[card.variant] || []
+  if (!priceRecord) {
+    return null
+  }
 
-  // For pattern variants, look for exact match on both subTypeName and pattern
-  // The extractMarketPrices function creates keys like "Holofoil (Poké Ball)" or "Holofoil (Master Ball)"
-  for (const variantName of priceVariantNames) {
-    // Try to find price with pattern suffix
-    if (targetPattern !== 'base') {
-      // Look for variant with pattern suffix (e.g., "Holofoil (Poké Ball)")
-      const patternSuffix = targetPattern === 'poke_ball' ? '(Poké Ball)' : '(Master Ball)'
-      const keyWithPattern = `${variantName} ${patternSuffix}`
+  // Priority 1: Extract exact variant/condition price from prices_raw
+  const variantKey = VARIANT_TO_PRICE_KEY[card.variant] ?? 'Normal'
+  const conditionKey = CONDITION_TO_PRICE_KEY[card.condition ?? ''] ??
+    (priceRecord.current_market_price_condition || 'Near Mint')
 
-      if (prices[keyWithPattern] && prices[keyWithPattern] > 0) {
-        return prices[keyWithPattern]
-      }
-    }
+  const exactPrice = extractPriceFromRaw(priceRecord.prices_raw, variantKey, conditionKey)
+  if (exactPrice !== null) {
+    return exactPrice
+  }
 
-    // Try base variant name (without pattern)
-    if (prices[variantName] && prices[variantName] > 0) {
-      return prices[variantName]
+  // Priority 2: current_market_price
+  if (priceRecord.current_market_price && priceRecord.current_market_price > 0) {
+    return priceRecord.current_market_price
+  }
+
+  // Priority 3: Market average from prices_raw
+  const rawData = priceRecord.prices_raw as Record<string, unknown> | null
+  if (rawData?.market) {
+    const marketPrice = Number(rawData.market)
+    if (marketPrice > 0) {
+      return marketPrice
     }
   }
 
-  // If no exact match, fall back to the lowest available price
-  const allPrices = Object.values(prices).filter(price => price > 0)
-  return allPrices.length > 0 ? Math.min(...allPrices) : null
+  return null
 }
 
 /**
@@ -79,7 +163,7 @@ export function formatPrice(price: number | null): string {
 export function getCardTotalValue(card: CollectionCardWithPokemon): number | null {
   const price = getCollectionCardPrice(card)
   if (price === null) return null
-  
+
   const quantity = card.quantity || 1
   return price * quantity
 }
@@ -113,19 +197,19 @@ export function calculateCollectionValue(cards: CollectionCardWithPokemon[]): nu
  * @returns Price display text
  */
 export function getCollectionPriceDisplay(
-  card: CollectionCardWithPokemon, 
+  card: CollectionCardWithPokemon,
   showTotal: boolean = false
 ): string {
   const price = getCollectionCardPrice(card)
   if (price === null) return 'Price unavailable'
-  
+
   const quantity = card.quantity || 1
-  
+
   if (showTotal && quantity > 1) {
     const total = price * quantity
     return `$${total.toFixed(2)}`
   }
-  
+
   return `$${price.toFixed(2)}`
 }
 

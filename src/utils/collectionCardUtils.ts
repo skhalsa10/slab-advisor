@@ -6,7 +6,17 @@
  */
 
 import type { CollectionCard } from '@/types/database'
-import type { Json } from '@/models/database'
+
+/**
+ * Price record from pokemon_card_prices table
+ */
+export interface PokemonCardPriceRecord {
+  current_market_price: number | null
+  current_market_price_condition: string | null
+  current_market_price_variant: string | null
+  variant_pattern: string | null
+  prices_raw: unknown
+}
 
 /**
  * Extended collection card type that includes joined Pokemon card data
@@ -22,8 +32,7 @@ export interface CollectionCardWithPokemon extends CollectionCard {
     category: string | null
     illustrator: string | null
     tcgplayer_image_url: string | null
-    price_data: Json | null
-    price_last_updated: string | null
+    pokemon_card_prices?: PokemonCardPriceRecord[]
     set?: {
       id: string
       name: string

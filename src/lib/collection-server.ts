@@ -45,13 +45,20 @@ export async function getUserCollectionCards(): Promise<CollectionCard[]> {
       throw new Error('User not authenticated')
     }
     
-    // Fetch user's collection cards with full Pokemon data
+    // Fetch user's collection cards with full Pokemon data and prices
     const { data: cardsData, error: cardsError } = await supabase
       .from('collection_cards')
       .select(`
         *,
         pokemon_card:pokemon_cards(
           *,
+          pokemon_card_prices(
+            current_market_price,
+            current_market_price_condition,
+            current_market_price_variant,
+            variant_pattern,
+            prices_raw
+          ),
           set:pokemon_sets(
             *,
             series:pokemon_series(*)
