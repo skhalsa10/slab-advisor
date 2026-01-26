@@ -52,6 +52,16 @@ export type CollectionCardGradingInsert = Database['public']['Tables']['collecti
 export type CollectionCardGradingUpdate = Database['public']['Tables']['collection_card_gradings']['Update']
 
 /**
+ * Collection Products - User's sealed product collection
+ *
+ * References the auto-generated database type.
+ * Each row represents a sealed product (booster box, theme deck, etc.) in a user's collection.
+ */
+export type CollectionProduct = Database['public']['Tables']['collection_products']['Row']
+export type CollectionProductInsert = Database['public']['Tables']['collection_products']['Insert']
+export type CollectionProductUpdate = Database['public']['Tables']['collection_products']['Update']
+
+/**
  * Dashboard Statistics
  *
  * Aggregated stats for the user dashboard, computed server-side.

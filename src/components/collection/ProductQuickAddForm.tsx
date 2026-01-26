@@ -3,13 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
-
-// Product condition options (simpler than cards)
-const PRODUCT_CONDITION_OPTIONS = [
-  { value: 'sealed', label: 'Sealed' },
-  { value: 'opened', label: 'Opened' },
-  { value: 'damaged', label: 'Damaged' }
-]
+import { PRODUCT_CONDITION_OPTIONS } from '@/constants/products'
 
 interface ProductQuickAddFormProps {
   productId: string

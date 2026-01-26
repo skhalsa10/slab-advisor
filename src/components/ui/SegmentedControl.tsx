@@ -12,6 +12,11 @@ interface SegmentedControlProps<T extends string> {
   size?: 'sm' | 'md'
   className?: string
   ariaLabel?: string
+  /**
+   * When true, stretches to full width on mobile and auto-width on desktop.
+   * Use for primary navigation controls like Cards/Sealed switcher.
+   */
+  fullWidthMobile?: boolean
 }
 
 /**
@@ -40,7 +45,8 @@ export default function SegmentedControl<T extends string>({
   onChange,
   size = 'md',
   className = '',
-  ariaLabel = 'Filter options'
+  ariaLabel = 'Filter options',
+  fullWidthMobile = false
 }: SegmentedControlProps<T>) {
   const sizeClasses = {
     sm: 'px-2.5 py-1 text-xs',
@@ -52,9 +58,13 @@ export default function SegmentedControl<T extends string>({
     md: 'p-1'
   }
 
+  const widthClasses = fullWidthMobile
+    ? 'flex w-full md:w-auto md:inline-flex'
+    : 'inline-flex'
+
   return (
     <div
-      className={`inline-flex bg-grey-100 rounded-lg ${containerPadding[size]} ${className}`}
+      className={`${widthClasses} bg-grey-100 rounded-lg ${containerPadding[size]} ${className}`}
       role="radiogroup"
       aria-label={ariaLabel}
     >
@@ -67,6 +77,7 @@ export default function SegmentedControl<T extends string>({
             onClick={() => onChange(option.value)}
             className={`
               ${sizeClasses[size]}
+              ${fullWidthMobile ? 'flex-1 text-center' : ''}
               rounded-md font-medium transition-all duration-150
               ${isActive
                 ? 'bg-white text-grey-900 shadow-sm'

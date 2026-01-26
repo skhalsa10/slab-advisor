@@ -9,6 +9,7 @@
 
 import { getAuthenticatedSupabaseClient } from './supabase-server'
 import { type CollectionCard, type DashboardStats } from '@/types/database'
+import { type CollectionProductWithDetails } from '@/utils/collectionProductUtils'
 
 /**
  * Gets the authenticated user's collection cards from server-side context
@@ -233,5 +234,116 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   } catch (error) {
     console.error('Error in getDashboardStats:', error)
     throw error instanceof Error ? error : new Error('Failed to load dashboard stats')
+  }
+}
+
+/**
+ * Gets the authenticated user's collection products (sealed products) from server-side context
+ *
+ * Fetches all collection products for the current user with full Pokemon product data,
+ * set information, and latest prices. This function validates authentication
+ * server-side and ensures secure data access.
+ *
+ * @returns Promise containing user's collection products or throws error
+ *
+ * @throws {Error} When user is not authenticated or query fails
+ *
+ * @example
+ * ```typescript
+ * export default async function CollectionPage() {
+ *   try {
+ *     const products = await getUserCollectionProducts()
+ *     return <CollectionClient products={products} />
+ *   } catch (error) {
+ *     throw error // Handled by error.tsx
+ *   }
+ * }
+ * ```
+ */
+export async function getUserCollectionProducts(): Promise<CollectionProductWithDetails[]> {
+  try {
+    // Create authenticated Supabase client that respects RLS policies
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    // Validate user authentication
+    const {
+      data: { user },
+      error: authError
+    } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      throw new Error('User not authenticated')
+    }
+
+    // Step 1: Fetch user's collection products with Pokemon product data (no view join)
+    // Supabase can't auto-join views, so we fetch prices separately
+    const { data: productsData, error: productsError } = await supabase
+      .from('collection_products')
+      .select(
+        `
+        *,
+        pokemon_product:pokemon_products(
+          id,
+          name,
+          tcgplayer_image_url,
+          tcgplayer_product_id,
+          pokemon_set:pokemon_sets(
+            id,
+            name,
+            logo
+          )
+        )
+      `
+      )
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (productsError) {
+      console.error('Error fetching collection products:', productsError)
+      throw new Error('Failed to load collection products')
+    }
+
+    if (!productsData || productsData.length === 0) {
+      return []
+    }
+
+    // Step 2: Get product IDs for price lookup
+    const productIds = productsData
+      .map((p) => p.pokemon_product?.id)
+      .filter((id): id is number => id !== null && id !== undefined)
+
+    // Step 3: Fetch prices from view separately (Supabase can't auto-join views)
+    const priceMap = new Map<number, number | null>()
+
+    if (productIds.length > 0) {
+      const { data: pricesData, error: pricesError } = await supabase
+        .from('pokemon_product_latest_prices')
+        .select('pokemon_product_id, market_price')
+        .in('pokemon_product_id', productIds)
+
+      if (pricesError) {
+        console.error('Error fetching product prices:', pricesError)
+        // Continue without prices - graceful degradation
+      } else if (pricesData) {
+        for (const price of pricesData) {
+          if (price.pokemon_product_id !== null) {
+            priceMap.set(price.pokemon_product_id, price.market_price)
+          }
+        }
+      }
+    }
+
+    // Step 4: Merge prices into products
+    const productsWithPrices = productsData.map((product) => ({
+      ...product,
+      latest_price: product.pokemon_product?.id
+        ? [{ market_price: priceMap.get(product.pokemon_product.id) ?? null }]
+        : null
+    }))
+
+    return productsWithPrices as CollectionProductWithDetails[]
+  } catch (error) {
+    console.error('Error in getUserCollectionProducts:', error)
+    throw error instanceof Error ? error : new Error('Failed to load collection products')
   }
 }

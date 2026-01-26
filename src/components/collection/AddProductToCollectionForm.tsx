@@ -2,15 +2,7 @@
 
 import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-
-/**
- * Sealed product condition options
- */
-const PRODUCT_CONDITION_OPTIONS = [
-  { value: 'sealed', label: 'Sealed' },
-  { value: 'opened', label: 'Opened' },
-  { value: 'damaged', label: 'Damaged' }
-] as const
+import { PRODUCT_CONDITION_OPTIONS } from '@/constants/products'
 
 interface AddProductToCollectionFormProps {
   productId: number
