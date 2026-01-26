@@ -29,17 +29,15 @@ export default function ItemList<T>({
   }
 
   return (
-    <div className={`bg-white shadow-md rounded-lg overflow-hidden ${className}`}>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-grey-200">
-          <thead className="bg-grey-50 sticky top-0">
-            {renderHeader()}
-          </thead>
-          <tbody className="bg-white divide-y divide-grey-200">
-            {items.map((item, index) => renderRow(item, index))}
-          </tbody>
-        </table>
-      </div>
+    <div className={`bg-white shadow-md rounded-lg overflow-x-auto ${className}`}>
+      <table className="min-w-full divide-y divide-grey-200">
+        <thead className="bg-grey-50 sticky top-0">
+          {renderHeader()}
+        </thead>
+        <tbody className="bg-white divide-y divide-grey-200">
+          {items.map((item, index) => renderRow(item, index))}
+        </tbody>
+      </table>
     </div>
   )
 }

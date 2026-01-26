@@ -133,16 +133,8 @@ export default function CollectionClient({
     return <EmptyCollectionState />
   }
 
-  const showListLayout = viewMode === 'list'
-
   return (
-    <div
-      className={
-        showListLayout
-          ? 'h-[calc(100vh-1.5rem)] flex flex-col overflow-hidden'
-          : ''
-      }
-    >
+    <div>
       <CollectionHeader
         cardCount={cardList.length}
         productCount={productList.length}
@@ -178,77 +170,75 @@ export default function CollectionClient({
               }}
             />
           ) : (
-            <div className="flex-1 min-h-0">
-              <ItemList
-                items={cardList}
-                renderHeader={() => (
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Card
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Variant
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Condition
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-center text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Qty
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Grade
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Price
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Total
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Added
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                )}
-                renderRow={(card) => (
-                  <CollectionCardListItem
-                    key={card.id}
-                    card={card}
-                    onViewCard={() => handleViewCard(card)}
-                  />
-                )}
-                emptyStateComponent={<EmptyCollectionState />}
-              />
-            </div>
+            <ItemList
+              items={cardList}
+              renderHeader={() => (
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Card
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Variant
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Condition
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-center text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Qty
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Grade
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Price
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Total
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Added
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              )}
+              renderRow={(card) => (
+                <CollectionCardListItem
+                  key={card.id}
+                  card={card}
+                  onViewCard={() => handleViewCard(card)}
+                />
+              )}
+              emptyStateComponent={<EmptyCollectionState />}
+            />
           )}
         </>
       )}
@@ -262,12 +252,10 @@ export default function CollectionClient({
               onViewProduct={handleViewProduct}
             />
           ) : (
-            <div className="flex-1 min-h-0">
-              <SealedCollectionList
-                products={productList}
-                onViewProduct={handleViewProduct}
-              />
-            </div>
+            <SealedCollectionList
+              products={productList}
+              onViewProduct={handleViewProduct}
+            />
           )}
         </>
       )}
