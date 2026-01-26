@@ -6,7 +6,7 @@ import EditProductForm from '@/components/collection/EditProductForm'
 import DeleteProductDialog from '@/components/collection/DeleteProductDialog'
 import type { CollectionProduct } from '@/types/database'
 import {
-  type CollectionProductWithDetails,
+  type CollectionProductWithPriceChanges,
   getProductDisplayName,
   getProductImageUrl,
   getProductSetName,
@@ -16,8 +16,8 @@ import {
 } from '@/utils/collectionProductUtils'
 
 interface CollectionProductQuickViewContentProps {
-  product: CollectionProductWithDetails
-  onUpdate?: (updatedProduct: CollectionProductWithDetails) => void
+  product: CollectionProductWithPriceChanges
+  onUpdate?: (updatedProduct: CollectionProductWithPriceChanges) => void
   onDelete?: () => void
   onClose?: () => void
 }
@@ -92,7 +92,7 @@ export default function CollectionProductQuickViewContent({
       }
 
       const result = await response.json()
-      const updatedProduct = result.data as CollectionProductWithDetails
+      const updatedProduct = result.data as CollectionProductWithPriceChanges
 
       onUpdate?.(updatedProduct)
       setIsEditing(false)

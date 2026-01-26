@@ -67,10 +67,7 @@ export default function CollectionHeader({
             ariaLabel="Collection type"
           />
 
-          {/* Only show view toggle for cards */}
-          {collectionType === 'cards' && (
-            <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
-          )}
+          <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
         </div>
 
         {/* Right side: Quick Add Button */}

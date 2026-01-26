@@ -2,18 +2,21 @@
 
 import Image from 'next/image'
 import {
-  type CollectionProductWithDetails,
+  type CollectionProductWithPriceChanges,
   getProductDisplayName,
   getProductImageUrl,
   getProductTotalValue,
   getProductMarketPrice,
   formatProductCondition,
-  getConditionBadgeColor
+  getConditionBadgeColor,
+  getMarketTrend7d,
+  formatMarketTrend,
+  getGainLossColor
 } from '@/utils/collectionProductUtils'
 import { getBadgeBaseClasses } from '@/utils/collectionMetadata'
 
 interface SealedProductGridItemProps {
-  product: CollectionProductWithDetails
+  product: CollectionProductWithPriceChanges
   onViewProduct: () => void
   priority?: boolean
 }
@@ -91,6 +94,16 @@ export default function SealedProductGridItem({
             (${marketPrice.toFixed(2)} / ea)
           </p>
         )}
+        {/* 7-day market trend */}
+        {(() => {
+          const trend = getMarketTrend7d(marketPrice, product.price_7d_ago ?? null)
+          if (trend === null) return null
+          return (
+            <p className={`text-xs ${getGainLossColor(trend)}`}>
+              {formatMarketTrend(trend)}
+            </p>
+          )
+        })()}
       </div>
     </div>
   )

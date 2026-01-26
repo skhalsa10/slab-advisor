@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { type CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import {
-  type CollectionProductWithDetails,
+  type CollectionProductWithPriceChanges,
   calculateProductsValue,
   getProductDisplayName
 } from '@/utils/collectionProductUtils'
@@ -17,6 +17,7 @@ import ItemList from '@/components/ui/ItemList'
 import CollectionCardGridItem from '@/components/collection/CollectionCardGridItem'
 import CollectionCardListItem from '@/components/collection/CollectionCardListItem'
 import SealedCollectionGrid from '@/components/collection/SealedCollectionGrid'
+import SealedCollectionList from '@/components/collection/SealedCollectionList'
 import EmptyCollectionState from '@/components/collection/EmptyCollectionState'
 import QuickView from '@/components/ui/QuickView'
 import CollectionQuickViewContent from '@/components/collection/CollectionQuickViewContent'
@@ -25,7 +26,7 @@ import { type ViewMode } from '@/components/collection/ViewToggle'
 
 interface CollectionClientProps {
   cards: CollectionCard[]
-  products: CollectionProductWithDetails[]
+  products: CollectionProductWithPriceChanges[]
 }
 
 /**
@@ -52,7 +53,7 @@ export default function CollectionClient({
 
   // Products state
   const [selectedProduct, setSelectedProduct] =
-    useState<CollectionProductWithDetails | null>(null)
+    useState<CollectionProductWithPriceChanges | null>(null)
   const [productList, setProductList] = useState(products)
 
   // Sync cardList with props when server data changes (after router.refresh)
@@ -102,11 +103,11 @@ export default function CollectionClient({
   }
 
   // Product handlers
-  const handleViewProduct = (product: CollectionProductWithDetails) => {
+  const handleViewProduct = (product: CollectionProductWithPriceChanges) => {
     setSelectedProduct(product)
   }
 
-  const handleUpdateProduct = (updatedProduct: CollectionProductWithDetails) => {
+  const handleUpdateProduct = (updatedProduct: CollectionProductWithPriceChanges) => {
     setProductList((prev) =>
       prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
     )
@@ -132,8 +133,7 @@ export default function CollectionClient({
     return <EmptyCollectionState />
   }
 
-  const showListLayout =
-    collectionType === 'cards' && viewMode === 'list'
+  const showListLayout = viewMode === 'list'
 
   return (
     <div
@@ -255,10 +255,21 @@ export default function CollectionClient({
 
       {/* Sealed Products View */}
       {collectionType === 'sealed' && (
-        <SealedCollectionGrid
-          products={productList}
-          onViewProduct={handleViewProduct}
-        />
+        <>
+          {viewMode === 'grid' ? (
+            <SealedCollectionGrid
+              products={productList}
+              onViewProduct={handleViewProduct}
+            />
+          ) : (
+            <div className="flex-1 min-h-0">
+              <SealedCollectionList
+                products={productList}
+                onViewProduct={handleViewProduct}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Card Quickview */}

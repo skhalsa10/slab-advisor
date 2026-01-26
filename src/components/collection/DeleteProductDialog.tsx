@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import {
-  type CollectionProductWithDetails,
+  type CollectionProductWithPriceChanges,
   getProductDisplayName,
   getProductImageUrl
 } from '@/utils/collectionProductUtils'
 
 interface DeleteProductDialogProps {
-  product: CollectionProductWithDetails
+  product: CollectionProductWithPriceChanges
   isOpen: boolean
   onConfirm: () => Promise<void>
   onCancel: () => void

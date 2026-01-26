@@ -9,7 +9,7 @@
 
 import { getAuthenticatedSupabaseClient } from './supabase-server'
 import { type CollectionCard, type DashboardStats } from '@/types/database'
-import { type CollectionProductWithDetails } from '@/utils/collectionProductUtils'
+import { type CollectionProductWithPriceChanges } from '@/utils/collectionProductUtils'
 
 /**
  * Gets the authenticated user's collection cards from server-side context
@@ -260,7 +260,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
  * }
  * ```
  */
-export async function getUserCollectionProducts(): Promise<CollectionProductWithDetails[]> {
+export async function getUserCollectionProducts(): Promise<CollectionProductWithPriceChanges[]> {
   try {
     // Create authenticated Supabase client that respects RLS policies
     const supabase = await getAuthenticatedSupabaseClient()
@@ -341,7 +341,47 @@ export async function getUserCollectionProducts(): Promise<CollectionProductWith
         : null
     }))
 
-    return productsWithPrices as CollectionProductWithDetails[]
+    // Step 5: Fetch 7-day-ago prices for market trend calculation
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0]
+
+    const price7dAgoMap = new Map<number, number>()
+
+    if (productIds.length > 0) {
+      const { data: historyData, error: historyError } = await supabase
+        .from('pokemon_product_price_history')
+        .select('pokemon_product_id, price_date, market_price')
+        .in('pokemon_product_id', productIds)
+        .lte('price_date', sevenDaysAgoStr)
+        .order('price_date', { ascending: false })
+
+      if (historyError) {
+        console.error('Error fetching price history:', historyError)
+        // Continue without history - graceful degradation
+      } else if (historyData) {
+        // Build map of most recent price <= 7 days ago per product
+        for (const entry of historyData) {
+          if (
+            entry.pokemon_product_id &&
+            entry.market_price &&
+            !price7dAgoMap.has(entry.pokemon_product_id)
+          ) {
+            price7dAgoMap.set(entry.pokemon_product_id, entry.market_price)
+          }
+        }
+      }
+    }
+
+    // Step 6: Merge 7-day prices into products
+    const productsWithTrend = productsWithPrices.map((product) => ({
+      ...product,
+      price_7d_ago: product.pokemon_product?.id
+        ? price7dAgoMap.get(product.pokemon_product.id) ?? null
+        : null
+    }))
+
+    return productsWithTrend as CollectionProductWithPriceChanges[]
   } catch (error) {
     console.error('Error in getUserCollectionProducts:', error)
     throw error instanceof Error ? error : new Error('Failed to load collection products')

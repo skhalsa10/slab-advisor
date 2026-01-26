@@ -3,11 +3,11 @@
 import ItemGrid from '@/components/ui/ItemGrid'
 import SealedProductGridItem from './SealedProductGridItem'
 import EmptySealedState from './EmptySealedState'
-import { type CollectionProductWithDetails } from '@/utils/collectionProductUtils'
+import { type CollectionProductWithPriceChanges } from '@/utils/collectionProductUtils'
 
 interface SealedCollectionGridProps {
-  products: CollectionProductWithDetails[]
-  onViewProduct: (product: CollectionProductWithDetails) => void
+  products: CollectionProductWithPriceChanges[]
+  onViewProduct: (product: CollectionProductWithPriceChanges) => void
 }
 
 /**

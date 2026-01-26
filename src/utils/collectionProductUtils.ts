@@ -148,3 +148,89 @@ export function getConditionBadgeColor(condition: string | null): string {
       return 'bg-grey-100 text-grey-800'
   }
 }
+
+/**
+ * Extended type with 7-day price history for market trend calculations
+ */
+export interface CollectionProductWithPriceChanges
+  extends CollectionProductWithDetails {
+  price_7d_ago?: number | null
+}
+
+/**
+ * Calculates 7-day market trend percentage
+ * @returns Percentage change (positive = gain, negative = loss), or null if data unavailable
+ */
+export function getMarketTrend7d(
+  currentPrice: number | null,
+  price7dAgo: number | null
+): number | null {
+  if (currentPrice === null || price7dAgo === null || price7dAgo === 0) {
+    return null
+  }
+  return ((currentPrice - price7dAgo) / price7dAgo) * 100
+}
+
+/**
+ * Calculates total gain/loss in dollars based on purchase price
+ * @returns Dollar gain/loss (positive = gain, negative = loss), or null if purchase_price unavailable
+ */
+export function getGainLossDollars(
+  product: CollectionProductWithDetails
+): number | null {
+  const marketPrice = getProductMarketPrice(product)
+  const purchasePrice = product.purchase_price
+  if (marketPrice === null || purchasePrice === null) return null
+
+  const quantity = product.quantity || 1
+  return marketPrice * quantity - purchasePrice * quantity
+}
+
+/**
+ * Calculates gain/loss as percentage based on purchase price
+ * @returns Percentage gain/loss, or null if purchase_price unavailable
+ */
+export function getGainLossPercent(
+  product: CollectionProductWithDetails
+): number | null {
+  const marketPrice = getProductMarketPrice(product)
+  const purchasePrice = product.purchase_price
+  if (marketPrice === null || purchasePrice === null || purchasePrice === 0) {
+    return null
+  }
+
+  return ((marketPrice - purchasePrice) / purchasePrice) * 100
+}
+
+/**
+ * Formats market trend with directional arrow
+ * @returns Formatted string like "↗ 12%" or "↘ 4%", or "-" if no data
+ */
+export function formatMarketTrend(change: number | null): string {
+  if (change === null) return '-'
+  const arrow = change >= 0 ? '↗' : '↘'
+  return `${arrow} ${Math.abs(change).toFixed(0)}%`
+}
+
+/**
+ * Formats gain/loss with dollar amount and percentage
+ * @returns Formatted string like "+$240.00 (+45%)" or "-$50.00 (-12%)", or empty string if no data
+ */
+export function formatGainLoss(
+  dollars: number | null,
+  percent: number | null
+): string {
+  if (dollars === null || percent === null) return ''
+  const sign = dollars >= 0 ? '+' : '-'
+  const percentSign = percent >= 0 ? '+' : '-'
+  return `${sign}$${Math.abs(dollars).toFixed(2)} (${percentSign}${Math.abs(percent).toFixed(0)}%)`
+}
+
+/**
+ * Gets the appropriate color class for gain/loss values
+ * @returns Tailwind color class for positive (green), negative (red), or neutral (grey)
+ */
+export function getGainLossColor(value: number | null): string {
+  if (value === null) return 'text-grey-400'
+  return value >= 0 ? 'text-green-600' : 'text-red-600'
+}
