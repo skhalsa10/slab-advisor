@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "types:generate": "supabase gen types --project-id syoxdgxffdvvpguzvcxo --schema public > src/models/database.ts"
+    "types:generate": "supabase gen types --project-id syoxdgxffdvvpguzvcxo --schema public > src/models/database.ts",
+    "types:generate:gamma": "supabase gen types --project-id oeqgpubjdeomnfunezot --schema public > src/models/database.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
