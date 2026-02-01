@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 19, 2026
+**Last Updated:** January 31, 2026
 
 ### Project Completion: ~92%
 
@@ -27,6 +27,7 @@
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
 
 #### ✅ Recently Completed
+- **Gamma/Preprod Pipeline**: Full staging environment with dual-database workflow, environment badge, DB change management ✅ (January 31, 2026)
 - **Historical Portfolio Tracking**: Portfolio value chart with live KPIs ✅ (January 17, 2026)
 - **Price Migration**: Migrated from price_data column to pokemon_card_prices table ✅ (January 16, 2026)
 - **Product Collection**: Quick-add sealed products to collection ✅ (January 18, 2026)
@@ -35,7 +36,6 @@
 
 #### ❌ Not Started
 - **Social Features**: Username, followers, shareable collections (0%)
-- **Gamma/Preprod Pipeline**: Staging environment setup (0%)
 - **Store/Marketplace**: Internal product purchasing (0%)
 
 ---
@@ -837,55 +837,35 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 
 These features ensure production readiness, prevent disasters, and polish the user experience.
 
-#### 9. Gamma/Preprod Pipeline Setup ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### 9. Gamma/Preprod Pipeline Setup ✅ COMPLETED
+**Status:** ✅ 100% Complete (January 31, 2026)
 **Priority:** 🔴 Critical (before production launch)
-**Estimated Effort:** 3-5 days
 
-**What's Missing:**
-- ❌ Preprod Supabase project
-- ❌ Preprod database schema
-- ❌ Database migration scripts
-- ❌ Preprod Vercel deployment
-- ❌ Environment-specific configuration
-- ❌ Data seeding for testing
-- ❌ Migration testing workflow
+**What Was Delivered:**
+- ✅ Gamma Supabase project (`oeqgpubjdeomnfunezot`) - cloned from production via "Restore to new project"
+- ✅ Full database schema, data, indexes, RLS policies, storage buckets transferred
+- ✅ Gamma branch (`gamma`) in git with Vercel Preview deployments
+- ✅ Vercel environment variable scoping (Production keys → Production, Gamma keys → Preview)
+- ✅ Environment-aware `next.config.ts` (dynamic Supabase hostname from env var)
+- ✅ `.env.local` points to gamma, `.env.production` and `.env.gamma` reference files created
+- ✅ Database change management workflow established (gamma first → test → production)
+- ✅ Baseline schema snapshot (`supabase/migrations/00000000000000_baseline_schema.sql`)
+- ✅ Migration log tracking all 44 existing migrations (`supabase/MIGRATION_LOG.md`)
+- ✅ CLAUDE.md updated with dual-environment workflow documentation
+- ✅ Environment indicator badge (amber "GAMMA" pill in lower-right corner for non-production)
+- ✅ Verification: local dev + Vercel preview both write to gamma, production untouched
 
-**Implementation Tasks:**
-1. Create preprod Supabase project:
-   - Separate project from production
-   - Same schema as production
-   - Test data seeded
-2. Set up preprod Vercel deployment:
-   - Create `preview` branch for preprod
-   - Configure Vercel to deploy preview branch to preprod URL
-   - Set up environment variables for preprod
-3. Create database migration workflow:
-   ```bash
-   # scripts/migrate-to-preprod.sh
-   # Test migrations on preprod before production
-   ```
-4. Set up data seeding scripts:
-   - Sample users
-   - Sample collections
-   - Sample cards
-5. Create preprod testing checklist:
-   - Database migrations work
-   - New features work
-   - No regressions
-   - Performance acceptable
-6. Document preprod workflow for team
+**Key Files:**
+- `supabase/migrations/00000000000000_baseline_schema.sql` - Full schema reference
+- `supabase/MIGRATION_LOG.md` - Migration promotion tracking
+- `src/components/ui/EnvironmentBadge.tsx` - Visual environment indicator
+- `.env.gamma` / `.env.production` - Reference environment files
 
-**Files to Create:**
-- `/scripts/migrate-to-preprod.sh`
-- `/scripts/seed-preprod-data.sh`
-- `/docs/preprod-workflow.md`
-- `.env.preprod` (environment variables)
-
-**Configuration Changes:**
-- Create new Vercel project for preprod
-- Configure Supabase preprod project
-- Set up separate API keys for preprod
+**Environments:**
+| Environment | Project ID | Branch | Vercel |
+|---|---|---|---|
+| Gamma (staging) | `oeqgpubjdeomnfunezot` | `gamma` | Preview |
+| Production | `syoxdgxffdvvpguzvcxo` | `main` | Production |
 
 **Dependencies:**
 - None (infrastructure setup)
@@ -1839,13 +1819,13 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Build similar cards section
 - Add set completion widget
 
-### Week 12: Gamma/Preprod Pipeline
+### Week 12: Gamma/Preprod Pipeline ✅ COMPLETED
 **Goal:** Safe production deployment
-**Tasks:**
-- Set up preprod Supabase project
-- Configure preprod Vercel deployment
-- Create migration scripts
-- Document workflow
+**Completed:** January 31, 2026
+- ✅ Set up gamma Supabase project (cloned from production)
+- ✅ Configured Vercel Preview deployments with gamma env vars
+- ✅ Established migration workflow (gamma → test → production)
+- ✅ Documented workflow in CLAUDE.md and MIGRATION_LOG.md
 
 ### Week 13+: Polish & Launch Prep
 **Goal:** Production-ready
@@ -1871,7 +1851,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | Username/Sharing | ❌ 0% | 🟠 High | 1.5 weeks | None |
 | Dashboard Completion | ✅ 90% | 🟠 High | ~~1-2 days~~ Done | ~~Collection data~~ ✅ |
 | Card Detail Polish | 🟡 95% | 🟡 Medium | 1-2 days | ~~Historical pricing~~ ✅ |
-| Gamma Pipeline | ❌ 0% | 🔴 Critical* | 3-5 days | None |
+| Gamma Pipeline | ✅ 100% | 🔴 Critical* | ~~3-5 days~~ Done | None |
 | App Polish | 🔄 Ongoing | 🟡 Medium | Ongoing | None |
 | **Explore/Browse Polish** | 🟡 90% | 🟡 Medium | 2-3 days | None |
 | **Product Collection** | ✅ 100% | 🟠 High | ~~1 week~~ Done | ~~Product prices~~ ✅ |
@@ -1941,7 +1921,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - [ ] Comprehensive QA pass
 
 **Infrastructure:**
-- [ ] Preprod/Gamma pipeline (Tier 3, Item 8)
+- [x] Preprod/Gamma pipeline (Tier 3, Item 9) ✅
 - [ ] CI/CD pipeline with test gates
 
 **Legal & Business:**
@@ -2505,5 +2485,5 @@ Services Layer
 
 ---
 
-**Last Updated:** January 19, 2026
+**Last Updated:** January 31, 2026
 **Document Version:** 5.0 (Added Critical Pre-Launch: PostHog, Stripe, Store, Anti-Scalper, Testing, Legal)
