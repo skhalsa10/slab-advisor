@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
+import EnvironmentBadge from "@/components/ui/EnvironmentBadge";
 import "./globals.css";
 
 // Font configurations for the application
@@ -102,7 +103,7 @@ export default function RootLayout({
         <ConditionalQuickAddProvider>
           {children}
         </ConditionalQuickAddProvider>
-        {/* Vercel Speed Insights for performance monitoring */}
+        <EnvironmentBadge />
         <SpeedInsights />
       </body>
     </html>
