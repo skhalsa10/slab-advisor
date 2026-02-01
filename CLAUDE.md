@@ -261,6 +261,66 @@ Before considering code complete, ensure:
 - Use proper data types
 - Implement audit fields (created_at, updated_at)
 
+## Database Change Management
+
+### Dual-Environment Setup
+
+This project uses two Supabase environments:
+
+| Environment | Project ID | Purpose |
+|---|---|---|
+| **Gamma** (staging) | `oeqgpubjdeomnfunezot` | Development and testing. `.env.local` points here. |
+| **Production** | `syoxdgxffdvvpguzvcxo` | Live user data. Vercel Production deployment uses this. |
+
+- Local development (`npm run dev`) always targets **gamma**
+- Vercel Preview deployments (from `gamma` branch) target **gamma**
+- Vercel Production deployments (from `main` branch) target **production**
+
+### Migration Workflow
+
+All database schema changes MUST follow this workflow:
+
+1. **Write the migration SQL** and review it
+2. **Apply to gamma first** using the Supabase MCP `apply_migration` tool:
+   ```
+   apply_migration(project_id="oeqgpubjdeomnfunezot", name="descriptive_snake_case_name", query="SQL here")
+   ```
+3. **Test thoroughly** in gamma (local dev + Vercel preview)
+4. **Apply the SAME SQL to production** when verified:
+   ```
+   apply_migration(project_id="syoxdgxffdvvpguzvcxo", name="same_name", query="same SQL")
+   ```
+5. **Update the migration log** at `supabase/MIGRATION_LOG.md`
+6. **Commit** the migration file and log update to git
+
+For emergencies (hotfix directly to production), apply the same SQL to gamma afterward to keep them in sync, and note the reverse order in the log.
+
+### Important Notes About Migrations
+
+- The `supabase/migrations/` folder is **passive** - it does NOT automatically trigger anything in Supabase. Unlike edge functions, migrations only run when explicitly called via `apply_migration` through the MCP tool. The folder is purely a git-tracked history of schema changes.
+- The `apply_migration` MCP tool both executes the SQL AND creates a timestamped file in `supabase/migrations/`
+- The baseline schema is documented in `supabase/migrations/00000000000000_baseline_schema.sql` (reference only, not re-runnable)
+- The `supabase/MIGRATION_LOG.md` tracks which migrations have been applied where
+
+### Checking Migration Sync
+
+To verify both environments have the same migrations:
+```sql
+-- Run on both gamma and production via execute_sql MCP tool
+SELECT version, name FROM supabase_migrations.schema_migrations ORDER BY version;
+```
+
+Compare the results to identify any drift between environments.
+
+### Type Generation
+
+After schema changes, regenerate TypeScript types:
+
+```bash
+npm run types:generate        # From production
+npm run types:generate:gamma  # From gamma (use during development)
+```
+
 ## Visual Development
 
 ### Design Principles
