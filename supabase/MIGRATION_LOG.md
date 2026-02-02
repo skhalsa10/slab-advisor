@@ -67,4 +67,4 @@ Follow the workflow: apply to gamma first, test, then apply to production.
 
 | Version | Name | Gamma | Production | Notes |
 |---|---|---|---|---|
-| | | | | |
+| 20260202051137 | create_waitlist_signups_table | 2026-02-02 | pending | Pre-launch waitlist email collection with RLS |

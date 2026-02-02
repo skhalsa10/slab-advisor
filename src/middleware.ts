@@ -1,14 +1,63 @@
 /**
  * Next.js Middleware
  *
- * Security: Server-side authentication and profile enforcement
- * Runs on all requests to protected routes
+ * Security: Server-side authentication, profile enforcement, and waitlist gating
+ * Runs on all requests to non-static, non-API routes
+ *
+ * Waitlist mode (NEXT_PUBLIC_LAUNCH_MODE === 'waitlist'):
+ * - Blocks all routes except '/' for public visitors
+ * - Allows full access for users with a valid bypass cookie
+ * - Bypass cookie is set via secret URL parameter, validated with HMAC
  */
 
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import {
+  isWaitlistMode,
+  generateBypassToken,
+  validateBypassToken,
+  BYPASS_COOKIE_NAME,
+  BYPASS_COOKIE_MAX_AGE,
+} from '@/lib/waitlist'
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+
+  // ========== WAITLIST GATING (runs before Supabase auth for performance) ==========
+  if (isWaitlistMode()) {
+    // Step 1: Check for bypass token in URL query parameter
+    const bypassParam = request.nextUrl.searchParams.get('bypass')
+    if (bypassParam && bypassParam === process.env.WAITLIST_BYPASS_SECRET) {
+      // Valid bypass secret: set HMAC-signed cookie and redirect to /auth
+      const token = await generateBypassToken()
+      const response = NextResponse.redirect(new URL('/auth', request.url))
+      response.cookies.set(BYPASS_COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: BYPASS_COOKIE_MAX_AGE,
+        path: '/',
+      })
+      return response
+    }
+
+    // Step 2: Check for existing bypass cookie
+    const bypassCookie = request.cookies.get(BYPASS_COOKIE_NAME)
+    const hasBypass = bypassCookie ? await validateBypassToken(bypassCookie.value) : false
+
+    // Step 3: If no valid bypass, lock down everything except root
+    if (!hasBypass) {
+      if (pathname !== '/') {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+      // Allow root to render (WaitlistPage component will be shown)
+      return NextResponse.next({ request })
+    }
+
+    // Has valid bypass: fall through to normal auth logic below
+  }
+
+  // ========== STANDARD AUTH LOGIC ==========
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -22,7 +71,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -45,7 +94,7 @@ export async function middleware(request: NextRequest) {
   // Define protected paths that require authentication
   const protectedPaths = ['/dashboard', '/collection', '/account', '/explore']
   const isProtectedPath = protectedPaths.some(path =>
-    request.nextUrl.pathname.startsWith(path)
+    pathname.startsWith(path)
   )
 
   // Security: Check authentication for protected paths
@@ -53,13 +102,13 @@ export async function middleware(request: NextRequest) {
     if (!user) {
       // Not authenticated, redirect to login with return URL
       const redirectUrl = new URL('/auth', request.url)
-      redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
+      redirectUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(redirectUrl)
     }
 
     // Security: Server-side profile check (prevents client-side bypass)
     // Exception: Don't check profile for complete-profile page itself
-    if (request.nextUrl.pathname !== '/auth/complete-profile') {
+    if (pathname !== '/auth/complete-profile') {
       const { data: profile } = await supabase
         .from('profiles')
         .select('username')
@@ -74,7 +123,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // If user has profile but trying to access complete-profile, redirect to dashboard
-  if (user && request.nextUrl.pathname === '/auth/complete-profile') {
+  if (user && pathname === '/auth/complete-profile') {
     const { data: profile } = await supabase
       .from('profiles')
       .select('username')

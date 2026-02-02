@@ -14,6 +14,7 @@
     "types:generate:gamma": "supabase gen types --project-id oeqgpubjdeomnfunezot --schema public > src/models/database.ts"
   },
   "dependencies": {
+    "@react-email/components": "^1.0.6",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.2",
     "@tcgdex/sdk": "^2.7.0",
@@ -24,7 +25,8 @@
     "react-device-detect": "^2.2.3",
     "react-dom": "^19.0.0",
     "react-qr-code": "^2.0.18",
-    "recharts": "^3.6.0"
+    "recharts": "^3.6.0",
+    "resend": "^6.9.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
