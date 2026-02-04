@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     siteName: "Slab Advisor",
     images: [{
       url: "/logo-icon.svg",
-      width: 40,
-      height: 40,
+      width: 512,
+      height: 512,
       alt: "Slab Advisor Logo"
     }]
   },

@@ -1,15 +1,46 @@
-<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Simplified icon version -->
-  <!-- Back card (grey) -->
-  <rect x="2" y="10" width="20" height="26" rx="2" fill="#6b7280" opacity="0.5"/>
-  
-  <!-- Middle card (grey) -->
-  <rect x="6" y="6" width="20" height="26" rx="2" fill="#9ca3af" opacity="0.6"/>
-  
-  <!-- Front card (orange) -->
-  <rect x="10" y="2" width="20" height="26" rx="2" fill="#f25733"/>
-  
-  <!-- Grade badge -->
-  <circle cx="20" cy="15" r="6" fill="white" opacity="0.9"/>
-  <text x="20" y="18.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#f25733">A</text>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dark slate outer frame gradient -->
+    <linearGradient id="darkSlateFrame" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#64748B"/>
+      <stop offset="1" stop-color="#334155"/>
+    </linearGradient>
+
+    <!-- Ember vault glow gradient -->
+    <linearGradient id="emberGlowNarrow" x1="256" y1="180" x2="256" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF9F43"/>
+      <stop offset="1" stop-color="#D64512"/>
+    </linearGradient>
+
+    <!-- Label header tone -->
+    <linearGradient id="labelToneNarrow" x1="256" y1="70" x2="256" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB070"/>
+      <stop offset="1" stop-color="#FF8C42"/>
+    </linearGradient>
+
+    <!-- Layer shadow filter -->
+    <filter id="layerShadowNarrow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
+      <feOffset dx="0" dy="6" result="offsetblur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.3"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark slate slab frame (sharper corners) -->
+  <rect x="76" y="32" width="360" height="448" rx="48" fill="url(#darkSlateFrame)" stroke="#475569" stroke-width="2"/>
+
+  <!-- Inner sections with shadow -->
+  <g filter="url(#layerShadowNarrow)">
+    <rect x="116" y="72" width="280" height="96" rx="20" fill="url(#labelToneNarrow)"/>
+    <rect x="116" y="184" width="280" height="256" rx="28" fill="url(#emberGlowNarrow)"/>
+  </g>
+
+  <!-- Subtle white glass strokes -->
+  <rect x="118" y="74" width="276" height="92" rx="19" stroke="white" stroke-opacity="0.4" stroke-width="2" fill="none"/>
+  <rect x="118" y="186" width="276" height="252" rx="27" stroke="white" stroke-opacity="0.4" stroke-width="2" fill="none"/>
 </svg>

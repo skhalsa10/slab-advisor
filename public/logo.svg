@@ -1,22 +1,38 @@
-<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Card Stack Icon -->
+<svg width="220" height="50" viewBox="0 0 220 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Dark slate frame gradient -->
+    <linearGradient id="darkSlateFrame" x1="0" y1="0" x2="44" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#64748B"/>
+      <stop offset="1" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="emberGlow" x1="22" y1="14" x2="22" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF9F43"/>
+      <stop offset="1" stop-color="#D64512"/>
+    </linearGradient>
+    <linearGradient id="labelTone" x1="22" y1="6" x2="22" y2="13" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB070"/>
+      <stop offset="1" stop-color="#FF8C42"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Slab Icon (scaled down) -->
   <g>
-    <!-- Back card (grey) -->
-    <rect x="4" y="12" width="24" height="32" rx="2" fill="#6b7280" opacity="0.6"/>
-    
-    <!-- Middle card (grey) -->
-    <rect x="8" y="8" width="24" height="32" rx="2" fill="#9ca3af" opacity="0.7"/>
-    
-    <!-- Front card (orange) -->
-    <rect x="12" y="4" width="24" height="32" rx="2" fill="#f25733"/>
-    
-    <!-- Grade badge on front card -->
-    <circle cx="24" cy="20" r="8" fill="white" opacity="0.9"/>
-    <text x="24" y="24" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#f25733">A+</text>
+    <!-- Dark slate frame (sharper corners) -->
+    <rect x="7" y="3" width="30" height="44" rx="5" fill="url(#darkSlateFrame)" stroke="#475569" stroke-width="0.5"/>
+
+    <!-- Label header -->
+    <rect x="11" y="7" width="22" height="8" rx="2" fill="url(#labelTone)"/>
+
+    <!-- Vault window -->
+    <rect x="11" y="17" width="22" height="26" rx="3" fill="url(#emberGlow)"/>
+
+    <!-- Glass strokes -->
+    <rect x="11.5" y="7.5" width="21" height="7" rx="1.5" stroke="white" stroke-opacity="0.4" stroke-width="1" fill="none"/>
+    <rect x="11.5" y="17.5" width="21" height="25" rx="2.5" stroke="white" stroke-opacity="0.4" stroke-width="1" fill="none"/>
   </g>
-  
+
   <!-- Text -->
-  <text x="48" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2937">
-    Slab<tspan fill="#f25733">Advisor</tspan>
+  <text x="48" y="33" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#1f2937">
+    Slab<tspan fill="#D64512">Advisor</tspan>
   </text>
 </svg>
