@@ -83,7 +83,7 @@ export default function WaitlistPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDF8F6]">
+    <div className="min-h-screen flex flex-col bg-[#FDF8F6] overflow-x-hidden">
       <WaitlistNavbar />
 
       {/* Hero Section - Radial gradient atmosphere */}
@@ -110,10 +110,34 @@ export default function WaitlistPage() {
                   <span className="font-medium text-grey-700">The era of the scalper is over.</span>
                 </p>
 
-                {/* Email Form - Fused Command Bar Style */}
+                {/* Email Form - Stacked on mobile, fused on larger screens */}
                 <form onSubmit={handleSubmit} className="mt-10 max-w-md mx-auto lg:mx-0">
-                  {/* Unified Command Bar Container */}
-                  <div className="bg-white p-1.5 rounded-full shadow-lg border border-gray-100 flex items-center">
+                  {/* Stacked layout for small screens */}
+                  <div className="flex flex-col gap-3 sm:hidden">
+                    <label htmlFor="waitlist-email-mobile" className="sr-only">
+                      Email address
+                    </label>
+                    <input
+                      id="waitlist-email-mobile"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      required
+                      disabled={status === 'submitting'}
+                      className="h-12 px-4 bg-white border border-gray-200 rounded-full text-grey-900 placeholder-grey-400 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 text-base shadow-sm"
+                    />
+                    <button
+                      type="submit"
+                      disabled={status === 'submitting'}
+                      className="h-12 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      {status === 'submitting' ? '...' : 'Join & Secure Status'}
+                    </button>
+                  </div>
+
+                  {/* Fused Command Bar for sm+ screens */}
+                  <div className="hidden sm:flex bg-white p-1.5 rounded-full shadow-lg border border-gray-100 items-center">
                     <label htmlFor="waitlist-email" className="sr-only">
                       Email address
                     </label>
