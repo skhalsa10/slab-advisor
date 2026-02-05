@@ -58,8 +58,8 @@ export async function getFeaturedCardData(): Promise<FeaturedCardData | null> {
     const gainAmount = psa10Price - rawPrice
     const gainPercent = rawPrice > 0 ? Math.round((gainAmount / rawPrice) * 100) : 0
 
-    // Extract card info
-    const cardInfo = data.pokemon_cards as {
+    // Extract card info - Supabase returns nested !inner joins as objects (not arrays) when using .single()
+    const cardInfo = data.pokemon_cards as unknown as {
       name: string
       rarity: string
       pokemon_sets: { id: string }
@@ -67,9 +67,9 @@ export async function getFeaturedCardData(): Promise<FeaturedCardData | null> {
 
     return {
       cardId: data.pokemon_card_id,
-      cardName: cardInfo.name,
-      setCode: cardInfo.pokemon_sets.id.toUpperCase(),
-      rarity: cardInfo.rarity || 'Unknown',
+      cardName: cardInfo?.name || 'Unknown',
+      setCode: cardInfo?.pokemon_sets?.id?.toUpperCase() || 'N/A',
+      rarity: cardInfo?.rarity || 'Unknown',
       rawPrice: Math.round(rawPrice),
       psa10Price: Math.round(psa10Price),
       gainAmount: Math.round(gainAmount),
