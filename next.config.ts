@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.scrydex.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   // Security: Add security headers for defense-in-depth
