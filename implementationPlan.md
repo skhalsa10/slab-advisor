@@ -2,7 +2,7 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** January 31, 2026
+**Last Updated:** February 6, 2026
 
 ### Project Completion: ~92%
 
@@ -27,6 +27,8 @@
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
 
 #### ✅ Recently Completed
+- **Waitlist Landing Page**: Pre-launch waitlist with email signup, Resend integration, mobile-responsive design, bypass system for internal access ✅ (February 6, 2026)
+- **App Icon Redesign**: Premium dark slate slab design with amber vault, PWA manifest, updated metadata ✅ (February 6, 2026)
 - **Gamma/Preprod Pipeline**: Full staging environment with dual-database workflow, environment badge, DB change management ✅ (January 31, 2026)
 - **Historical Portfolio Tracking**: Portfolio value chart with live KPIs ✅ (January 17, 2026)
 - **Price Migration**: Migrated from price_data column to pokemon_card_prices table ✅ (January 16, 2026)
@@ -1964,19 +1966,20 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - [ ] Contact form or support ticket system
 
 **SEO & Marketing:**
-- [ ] Meta tags on all public pages
-- [ ] Open Graph images for social sharing
+- [x] Meta tags on all public pages ✅
+- [x] Open Graph images for social sharing ✅
 - [ ] Sitemap.xml generated
 - [ ] robots.txt configured
-- [ ] Landing page ready (if separate from app)
+- [x] Landing page ready (waitlist mode with email capture) ✅
 
 **Launch Operations:**
+- [x] Waitlist email collection system ✅ (Resend integration)
 - [ ] Beta user invite list prepared
 - [ ] Launch announcement draft ready
 - [ ] Social media accounts created (Twitter/X, Instagram, TikTok)
-- [ ] Domain DNS configured and verified
-- [ ] SSL certificate active and verified
-- [ ] Transactional emails tested (signup, password reset, order confirmation)
+- [x] Domain DNS configured and verified ✅ (slabadvisor.com)
+- [x] SSL certificate active and verified ✅ (Vercel auto-provision)
+- [x] Transactional emails tested (waitlist welcome email) ✅
 - [ ] Rollback plan documented (if launch goes wrong)
 - [ ] On-call schedule for launch week
 - [ ] Customer support response templates ready
@@ -2006,7 +2009,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 **Mobile & Cross-Browser:**
 - [ ] Tested on iOS Safari
-- [ ] Tested on Android Chrome
+- [x] Tested on Android Chrome ✅ (waitlist page mobile fix)
 - [ ] Tested on desktop Chrome, Firefox, Safari, Edge
 - [ ] Camera functionality works on all target devices
 - [ ] Touch interactions work properly (no hover-only features)
