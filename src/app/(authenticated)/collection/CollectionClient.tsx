@@ -265,15 +265,11 @@ export default function CollectionClient({
         <QuickView
           isOpen={!!selectedCard}
           onClose={() => setSelectedCard(null)}
-          title={
-            selectedCard.pokemon_card?.name ||
-            selectedCard.manual_card_name ||
-            'Card Details'
-          }
+          title={selectedCard.pokemon_card?.name || 'Card Details'}
           onNavigateToCard={handleNavigateToCard}
           cardList={cardList.map((c) => ({
             id: c.id,
-            name: c.pokemon_card?.name || c.manual_card_name || 'Unknown'
+            name: c.pokemon_card?.name || 'Unknown'
           }))}
           currentCardId={selectedCard.id}
         >

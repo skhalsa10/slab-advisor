@@ -92,7 +92,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   // Define protected paths that require authentication
-  const protectedPaths = ['/dashboard', '/collection', '/account', '/explore']
+  const protectedPaths = ['/dashboard', '/collection', '/account']
   const isProtectedPath = protectedPaths.some(path =>
     pathname.startsWith(path)
   )

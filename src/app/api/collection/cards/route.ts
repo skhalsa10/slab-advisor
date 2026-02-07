@@ -25,8 +25,7 @@ function validateVariantPattern(pattern: string | null | undefined): string | nu
 }
 
 interface AddToCollectionRequest {
-  mode: 'known-card' | 'manual-entry'
-  pokemon_card_id?: string
+  pokemon_card_id: string
   variant: string
   variant_pattern?: string | null
   quantity: number
@@ -34,13 +33,6 @@ interface AddToCollectionRequest {
   acquisition_price?: number
   acquisition_date?: string
   notes?: string
-  // Manual card fields (only used when mode === 'manual-entry')
-  manual_card_name?: string
-  manual_set_name?: string
-  manual_card_number?: string
-  manual_rarity?: string
-  manual_series?: string
-  manual_year?: number
 }
 
 // CollectionCard interface removed - not needed for this API
@@ -70,179 +62,104 @@ export async function POST(request: Request) {
 
     const supabase = getServerSupabaseClient()
 
-    if (data.mode === 'known-card') {
-      if (!data.pokemon_card_id) {
-        return NextResponse.json(
-          { error: 'Pokemon card ID required for known cards' },
-          { status: 400 }
-        )
-      }
+    // Check if user already has this card + variant + pattern combination
+    let query = supabase
+      .from('collection_cards')
+      .select('id, quantity')
+      .eq('user_id', user.id)
+      .eq('pokemon_card_id', data.pokemon_card_id)
+      .eq('variant', data.variant)
 
-      // Check if user already has this card + variant + pattern combination
-      let query = supabase
+    // Match on variant_pattern too (null matches null)
+    if (data.variant_pattern) {
+      query = query.eq('variant_pattern', data.variant_pattern)
+    } else {
+      query = query.is('variant_pattern', null)
+    }
+
+    const { data: existing, error: checkError } = await query.single()
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('Error checking existing collection:', checkError)
+      return NextResponse.json(
+        { error: 'Failed to check existing collection' },
+        { status: 500 }
+      )
+    }
+
+    if (existing) {
+      // Update existing entry - add to quantity
+      const { data: updated, error: updateError } = await supabase
         .from('collection_cards')
-        .select('id, quantity')
-        .eq('user_id', user.id)
-        .eq('pokemon_card_id', data.pokemon_card_id)
-        .eq('variant', data.variant)
-
-      // Match on variant_pattern too (null matches null)
-      if (data.variant_pattern) {
-        query = query.eq('variant_pattern', data.variant_pattern)
-      } else {
-        query = query.is('variant_pattern', null)
-      }
-
-      const { data: existing, error: checkError } = await query.single()
-
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error('Error checking existing collection:', checkError)
-        return NextResponse.json(
-          { error: 'Failed to check existing collection' },
-          { status: 500 }
-        )
-      }
-
-      if (existing) {
-        // Update existing entry - add to quantity
-        const { data: updated, error: updateError } = await supabase
-          .from('collection_cards')
-          .update({
-            quantity: existing.quantity + data.quantity,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existing.id)
-          .select()
-          .single()
-
-        if (updateError) {
-          console.error('Error updating collection quantity:', updateError)
-          return NextResponse.json(
-            { error: 'Failed to update collection' },
-            { status: 500 }
-          )
-        }
-
-        return NextResponse.json({
-          success: true,
-          action: 'updated',
-          data: updated,
-          message: `Added ${data.quantity} more. Total: ${updated.quantity}`
+        .update({
+          quantity: existing.quantity + data.quantity,
+          updated_at: new Date().toISOString()
         })
-      } else {
-        // Validate variant_pattern before insertion
-        let validatedPattern: string | null
-        try {
-          validatedPattern = validateVariantPattern(data.variant_pattern)
-        } catch (error) {
-          return NextResponse.json(
-            { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
-            { status: 400 }
-          )
-        }
-
-        // Create new entry for known card (clean data - no manual fields)
-        const cleanData = {
-          user_id: user.id,
-          card_type: 'pokemon',
-          pokemon_card_id: data.pokemon_card_id,
-          variant: data.variant,
-          variant_pattern: validatedPattern,
-          quantity: data.quantity,
-          condition: data.condition || null,
-          acquisition_price: data.acquisition_price || null,
-          acquisition_date: data.acquisition_date || null,
-          notes: data.notes || null
-          // Explicitly NOT setting manual_* fields for known cards
-        }
-
-        const { data: created, error: createError } = await supabase
-          .from('collection_cards')
-          .insert(cleanData)
-          .select()
-          .single()
-
-        if (createError) {
-          console.error('Error creating collection entry:', createError)
-          return NextResponse.json(
-            { error: 'Failed to add to collection' },
-            { status: 500 }
-          )
-        }
-
-        return NextResponse.json({
-          success: true,
-          action: 'created',
-          data: created,
-          message: `Added ${data.quantity} card(s) to collection`
-        })
-      }
-    } else if (data.mode === 'manual-entry') {
-      // Manual entry mode - validate manual fields
-      if (!data.manual_card_name) {
-        return NextResponse.json(
-          { error: 'Card name required for manual entries' },
-          { status: 400 }
-        )
-      }
-
-      // Validate variant_pattern before insertion
-      let validatedPattern: string | null
-      try {
-        validatedPattern = validateVariantPattern(data.variant_pattern)
-      } catch (error) {
-        return NextResponse.json(
-          { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
-          { status: 400 }
-        )
-      }
-
-      // Create new manual entry (clean data - no pokemon_card_id)
-      const cleanData = {
-        user_id: user.id,
-        card_type: 'pokemon',
-        pokemon_card_id: null, // No reference for manual cards
-        variant: data.variant,
-        variant_pattern: validatedPattern,
-        quantity: data.quantity,
-        condition: data.condition || null,
-        acquisition_price: data.acquisition_price || null,
-        acquisition_date: data.acquisition_date || null,
-        notes: data.notes || null,
-        manual_card_name: data.manual_card_name,
-        manual_set_name: data.manual_set_name || null,
-        manual_card_number: data.manual_card_number || null,
-        manual_rarity: data.manual_rarity || null,
-        manual_series: data.manual_series || null,
-        manual_year: data.manual_year || null
-      }
-
-      const { data: created, error: createError } = await supabase
-        .from('collection_cards')
-        .insert(cleanData)
+        .eq('id', existing.id)
         .select()
         .single()
 
-      if (createError) {
-        console.error('Error creating manual collection entry:', createError)
+      if (updateError) {
+        console.error('Error updating collection quantity:', updateError)
         return NextResponse.json(
-          { error: 'Failed to add manual card to collection' },
+          { error: 'Failed to update collection' },
           { status: 500 }
         )
       }
 
       return NextResponse.json({
         success: true,
-        action: 'created',
-        data: created,
-        message: `Added manual card "${data.manual_card_name}" to collection`
+        action: 'updated',
+        data: updated,
+        message: `Added ${data.quantity} more. Total: ${updated.quantity}`
       })
     }
 
-    return NextResponse.json(
-      { error: 'Invalid mode specified' },
-      { status: 400 }
-    )
+    // Validate variant_pattern before insertion
+    let validatedPattern: string | null
+    try {
+      validatedPattern = validateVariantPattern(data.variant_pattern)
+    } catch (error) {
+      return NextResponse.json(
+        { error: error instanceof Error ? error.message : 'Invalid variant pattern' },
+        { status: 400 }
+      )
+    }
+
+    // Create new collection entry
+    const cleanData = {
+      user_id: user.id,
+      card_type: 'pokemon',
+      pokemon_card_id: data.pokemon_card_id,
+      variant: data.variant,
+      variant_pattern: validatedPattern,
+      quantity: data.quantity,
+      condition: data.condition || null,
+      acquisition_price: data.acquisition_price || null,
+      acquisition_date: data.acquisition_date || null,
+      notes: data.notes || null
+    }
+
+    const { data: created, error: createError } = await supabase
+      .from('collection_cards')
+      .insert(cleanData)
+      .select()
+      .single()
+
+    if (createError) {
+      console.error('Error creating collection entry:', createError)
+      return NextResponse.json(
+        { error: 'Failed to add to collection' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      success: true,
+      action: 'created',
+      data: created,
+      message: `Added ${data.quantity} card(s) to collection`
+    })
   } catch (error) {
     console.error('Collection API error:', error)
     return NextResponse.json(

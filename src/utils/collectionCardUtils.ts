@@ -57,23 +57,12 @@ function hasJoinedPokemonData(card: CollectionCard): card is CollectionCardWithP
 
 /**
  * Gets the display name for any card type
- * 
- * Priority order:
- * 1. Pokemon card name (if joined data exists)
- * 2. Manual card name (if unidentified)
- * 3. Fallback text
  */
 export function getCardDisplayName(card: CollectionCard): string {
-  // Check if pokemon_card data was joined (type-safe check)
   if (hasJoinedPokemonData(card) && card.pokemon_card?.name) {
     return card.pokemon_card.name
   }
-  
-  // Manual card name
-  if (card.manual_card_name) {
-    return card.manual_card_name
-  }
-  
+
   return 'Untitled Card'
 }
 
@@ -84,11 +73,7 @@ export function getCardSetName(card: CollectionCard): string {
   if (hasJoinedPokemonData(card) && card.pokemon_card?.set?.name) {
     return card.pokemon_card.set.name
   }
-  
-  if (card.manual_set_name) {
-    return card.manual_set_name
-  }
-  
+
   return 'Unknown Set'
 }
 
@@ -99,11 +84,7 @@ export function getCardSeriesName(card: CollectionCard): string {
   if (hasJoinedPokemonData(card) && card.pokemon_card?.set?.series?.name) {
     return card.pokemon_card.set.series.name
   }
-  
-  if (card.manual_series) {
-    return card.manual_series
-  }
-  
+
   return 'Unknown Series'
 }
 
@@ -114,11 +95,7 @@ export function getCardNumber(card: CollectionCard): string {
   if (hasJoinedPokemonData(card) && card.pokemon_card?.local_id) {
     return card.pokemon_card.local_id
   }
-  
-  if (card.manual_card_number) {
-    return card.manual_card_number
-  }
-  
+
   return '???'
 }
 

@@ -104,12 +104,6 @@ export type Database = {
           created_at: string | null
           front_image_url: string | null
           id: string
-          manual_card_name: string | null
-          manual_card_number: string | null
-          manual_rarity: string | null
-          manual_series: string | null
-          manual_set_name: string | null
-          manual_year: number | null
           notes: string | null
           pokemon_card_id: string | null
           quantity: number | null
@@ -127,12 +121,6 @@ export type Database = {
           created_at?: string | null
           front_image_url?: string | null
           id?: string
-          manual_card_name?: string | null
-          manual_card_number?: string | null
-          manual_rarity?: string | null
-          manual_series?: string | null
-          manual_set_name?: string | null
-          manual_year?: number | null
           notes?: string | null
           pokemon_card_id?: string | null
           quantity?: number | null
@@ -150,12 +138,6 @@ export type Database = {
           created_at?: string | null
           front_image_url?: string | null
           id?: string
-          manual_card_name?: string | null
-          manual_card_number?: string | null
-          manual_rarity?: string | null
-          manual_series?: string | null
-          manual_set_name?: string | null
-          manual_year?: number | null
           notes?: string | null
           pokemon_card_id?: string | null
           quantity?: number | null
