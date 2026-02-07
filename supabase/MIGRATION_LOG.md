@@ -68,4 +68,4 @@ Follow the workflow: apply to gamma first, test, then apply to production.
 | Version | Name | Gamma | Production | Notes |
 |---|---|---|---|---|
 | 20260202051137 | create_waitlist_signups_table | 2026-02-02 | 2026-02-02 | Pre-launch waitlist email collection with RLS |
-| 20260206000000 | drop_manual_card_columns | 2026-02-06 | - | Remove unused manual_* columns and index from collection_cards |
+| 20260206000000 | drop_manual_card_columns | 2026-02-06 | 2026-02-06 | Remove unused manual_* columns and index from collection_cards |
