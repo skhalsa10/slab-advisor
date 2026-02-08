@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
 import EnvironmentBadge from "@/components/ui/EnvironmentBadge";
+import CookieConsent from "@/components/consent/CookieConsent";
 import "./globals.css";
 
 // Font configurations for the application
@@ -104,6 +105,7 @@ export default function RootLayout({
           {children}
         </ConditionalQuickAddProvider>
         <EnvironmentBadge />
+        <CookieConsent />
         <SpeedInsights />
       </body>
     </html>
