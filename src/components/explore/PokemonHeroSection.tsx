@@ -67,6 +67,7 @@ export default async function PokemonHeroSection() {
                 fill
                 className="object-cover"
                 sizes="128px"
+                priority
               />
             </div>
           )

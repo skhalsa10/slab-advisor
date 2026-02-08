@@ -32,7 +32,7 @@ export default async function NewestSetsWidget({ limit = 8, viewAllHref }: Newes
   return (
     <WidgetSection title="Newest Sets" viewAllHref={viewAllHref}>
       <HorizontalScroll>
-        {sets.map((set) => {
+        {sets.map((set, index) => {
           const hasLogo = set.logo || set.secondary_logo
 
           return (
@@ -50,6 +50,8 @@ export default async function NewestSetsWidget({ limit = 8, viewAllHref }: Newes
                       width={120}
                       height={80}
                       className="object-contain w-auto h-full group-hover:scale-105 transition-transform duration-200"
+                      style={{ width: 'auto', height: 'auto' }}
+                      priority={index < 5}
                     />
                   </div>
                 ) : (
