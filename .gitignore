@@ -46,3 +46,6 @@ supabase/.temp/
 
 # sync script logs
 scripts/ppt_skipped_cards.json
+
+# Sentry Config File
+.env.sentry-build-plugin
