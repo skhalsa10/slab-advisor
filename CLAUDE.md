@@ -76,6 +76,7 @@ npm run test:coverage # Run tests with coverage report
 - **TCGDEX**: https://tcgdex.dev/
 - **PokemonPricePracker API**: https://www.pokemonpricetracker.com/docs
 - **Posthog**: https://posthog.com/docs
+- **Sentry**: https://docs.sentry.io/
 
 ## Development Process Requirements
 

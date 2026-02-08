@@ -66,7 +66,7 @@ Sentry.init({
 
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
-  sendDefaultPii: true,
+  sendDefaultPii: false,
 
   integrations: [
     // Performance tracing for page loads and navigation
@@ -80,7 +80,7 @@ Sentry.init({
 
     // Capture console.error as Sentry issues (only 'error' to avoid quota burn)
     Sentry.captureConsoleIntegration({
-      levels: ["error"],
+      levels: ["error", "warn"], // Capture both errors and warnings for better visibility
     }),
   ],
 

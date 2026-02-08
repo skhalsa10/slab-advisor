@@ -697,5 +697,136 @@ Same variables as above, potentially with different PostHog project for producti
   - [ ] Add `trackSearch` to search components
   - [ ] Add `trackCreditsPurchased/trackCreditsUsed` to credit flows
   - [ ] Add `trackError` to ErrorBoundary
-- [ ] **Phase 2: Sentry** - Not Started
+- [x] **Phase 2: Sentry - Infrastructure** - Complete
+  - [x] Package installation (@sentry/nextjs via wizard)
+  - [x] Environment variables configured (Vercel + .env.sentry-build-plugin)
+  - [x] `src/instrumentation-client.ts` - Client-side Sentry with integrations
+  - [x] `sentry.server.config.ts` - Server-side Sentry with enableLogs
+  - [x] `sentry.edge.config.ts` - Edge runtime Sentry
+  - [x] `src/instrumentation.ts` - Next.js instrumentation hook
+  - [x] `src/app/global-error.tsx` - Root error boundary
+  - [x] `next.config.ts` - Wrapped with withSentryConfig
+  - [x] User context tracking in AuthProvider (Sentry.setUser on login/logout)
+  - [x] Next.js upgraded to 15.5.12 for Turbopack compatibility
+  - [x] Tested: captureException, captureMessage, console.error, unhandled errors
+- [ ] **Phase 2: Sentry - Exception Catching & Tracing** - TODO (see section 2.11)
+  - [ ] Add Sentry.captureException to API route error handlers
+  - [ ] Add Sentry.captureException to existing try-catch blocks
+  - [ ] Add performance spans for external API calls (Ximilar, etc.)
+  - [ ] Add performance spans for key user actions
 - [ ] **Post-Implementation** - Not Started
+
+---
+
+## 2.11 Sentry Exception Catching & Tracing Implementation (TODO)
+
+The Sentry infrastructure is complete. Now we need to instrument the codebase with exception catching and performance tracing.
+
+### Exception Catching (Sentry.captureException)
+
+Add `Sentry.captureException(error)` to capture errors with context:
+
+#### API Routes - Error Handlers
+- [ ] `src/app/api/cards/identify/route.ts` - Card identification errors
+- [ ] `src/app/api/cards/grade/route.ts` - Card grading errors
+- [ ] `src/app/api/cards/upload-image/route.ts` - Image upload errors
+- [ ] `src/app/api/collection/cards/route.ts` - Collection card CRUD errors
+- [ ] `src/app/api/collection/cards/[id]/route.ts` - Single card operations errors
+- [ ] `src/app/api/collection/products/route.ts` - Products errors
+- [ ] `src/app/api/pokemon/search/route.ts` - Search errors
+- [ ] `src/app/api/profile/create/route.ts` - Profile creation errors
+- [ ] `src/app/api/profile/username-check/route.ts` - Username check errors
+
+#### Client-Side Error Boundaries
+- [ ] `src/components/error/ErrorBoundary.tsx` - Add Sentry.captureException in componentDidCatch
+- [ ] `src/components/error/CardErrorBoundary.tsx` - Add Sentry.captureException
+- [ ] `src/app/(authenticated)/collection/error.tsx` - Add Sentry.captureException
+
+#### Utility Functions with Try-Catch
+- [ ] `src/utils/credits.ts` - Credit operations (checkUserCredits, deductUserCredits, refundUserCredit)
+- [ ] `src/lib/auth.ts` - Auth-related errors
+
+### Performance Tracing (Sentry.startSpan)
+
+Add spans for meaningful actions to track performance:
+
+#### External API Calls (op: "http.client")
+- [ ] `src/app/api/cards/identify/route.ts` - Wrap Ximilar API call
+  ```typescript
+  Sentry.startSpan({ op: "http.client", name: "Ximilar Card Identification" }, async () => { ... })
+  ```
+- [ ] `src/app/api/cards/grade/route.ts` - Wrap Ximilar grading API call
+  ```typescript
+  Sentry.startSpan({ op: "http.client", name: "Ximilar Card Grading" }, async () => { ... })
+  ```
+- [ ] Any other external API calls (Pokemon TCG API, price APIs, etc.)
+
+#### Database Operations (op: "db.query")
+- [ ] Heavy database queries in collection fetching
+- [ ] Dashboard data aggregations
+
+#### Key User Actions (op: "ui.action")
+- [ ] `src/components/collection/AddToCollectionForm.tsx` - Card add submission
+  ```typescript
+  Sentry.startSpan({ op: "ui.action", name: "Add Card to Collection" }, async () => { ... })
+  ```
+- [ ] `src/components/search/QuickAddContent.tsx` - Quick add flow
+- [ ] `src/components/collection/DeleteCardDialog.tsx` - Card deletion
+
+### Example Implementation Patterns
+
+#### API Route Error Handling
+```typescript
+import * as Sentry from '@sentry/nextjs'
+
+export async function POST(request: Request) {
+  try {
+    // ... existing logic
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'cards/identify' },
+      extra: { requestBody: await request.clone().json() }
+    })
+    console.error('Card identification failed:', error)
+    return NextResponse.json({ error: 'Identification failed' }, { status: 500 })
+  }
+}
+```
+
+#### External API Call with Span
+```typescript
+import * as Sentry from '@sentry/nextjs'
+
+async function identifyCardWithXimilar(imageUrl: string) {
+  return Sentry.startSpan(
+    { op: "http.client", name: "Ximilar Card Identification" },
+    async (span) => {
+      const startTime = Date.now()
+      const result = await fetch(XIMILAR_API_URL, { ... })
+      span.setAttribute("response_status", result.status)
+      span.setAttribute("duration_ms", Date.now() - startTime)
+      return result.json()
+    }
+  )
+}
+```
+
+#### Error Boundary with Sentry
+```typescript
+import * as Sentry from '@sentry/nextjs'
+
+componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  Sentry.captureException(error, {
+    extra: {
+      componentStack: errorInfo.componentStack,
+    },
+  })
+}
+```
+
+### Testing Checklist for Instrumentation
+- [ ] API errors appear in Sentry with proper tags and context
+- [ ] External API spans show in Performance tab
+- [ ] Error boundaries capture component errors
+- [ ] User context appears on all errors
+- [ ] Source maps show readable stack traces
