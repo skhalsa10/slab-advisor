@@ -191,6 +191,7 @@ export default function ScanResultsView({
 
         {result.capturedImage && (
           <div className="mb-6 max-w-xs mx-auto">
+            {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
             <img
               src={result.capturedImage}
               alt="Captured card"

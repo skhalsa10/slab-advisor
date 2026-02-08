@@ -88,6 +88,7 @@ export default function AIAnalysisVisualization({
         <div className="relative flex gap-4 mb-8">
           {/* Front Card */}
           <div className="relative overflow-hidden rounded-lg shadow-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
             <img
               src={frontImageSrc}
               alt="Front of card"
@@ -102,6 +103,7 @@ export default function AIAnalysisVisualization({
           {/* Back Card (if provided) */}
           {backImageSrc && (
             <div className="relative overflow-hidden rounded-lg shadow-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
               <img
                 src={backImageSrc}
                 alt="Back of card"

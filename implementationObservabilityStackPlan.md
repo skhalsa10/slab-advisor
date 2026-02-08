@@ -715,6 +715,16 @@ Same variables as above, potentially with different PostHog project for producti
   - [ ] Add performance spans for external API calls (Ximilar, etc.)
   - [ ] Add performance spans for key user actions
 - [ ] **Post-Implementation** - Not Started
+- [ ] **Performance: Refactor Camera Capture to Use Blob URLs** - TODO
+  - [ ] Refactor camera capture flow to use `URL.createObjectURL(blob)` for display
+  - [ ] Convert to base64 only at API submission time
+  - [ ] Add `URL.revokeObjectURL()` cleanup on unmount
+  - [ ] Files to update:
+    - [ ] `src/components/dashboard/AIAnalysisVisualization.tsx`
+    - [ ] `src/components/dashboard/GradingConfirmation.tsx`
+    - [ ] `src/components/dashboard/ImagePreview.tsx`
+    - [ ] `src/components/search/ScanResultsView.tsx`
+    - [ ] Camera capture hooks/utilities (source of base64)
 
 ---
 

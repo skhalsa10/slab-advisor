@@ -32,6 +32,7 @@ export default function ImagePreview({
 
       {/* Image preview */}
       <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
         <img
           src={image}
           alt={`Preview of ${title}`}

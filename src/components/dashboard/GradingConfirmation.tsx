@@ -70,6 +70,7 @@ export default function GradingConfirmation({
       <div className="p-4 space-y-4 overflow-y-auto flex-1">
         {/* Card info header */}
         <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic URL, TODO: Use Next/Image */}
           <img
             src={cardImageUrl}
             alt={opportunity.cardName}
@@ -96,6 +97,7 @@ export default function GradingConfirmation({
           <div className="space-y-2">
             <p className="text-sm font-medium text-grey-700 text-center">Front</p>
             <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-grey-100 border border-grey-200">
+              {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
               <img
                 src={frontImage}
                 alt="Front of card"
@@ -114,6 +116,7 @@ export default function GradingConfirmation({
           <div className="space-y-2">
             <p className="text-sm font-medium text-grey-700 text-center">Back</p>
             <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-grey-100 border border-grey-200">
+              {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
               <img
                 src={backImage}
                 alt="Back of card"
