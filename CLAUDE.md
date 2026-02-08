@@ -74,8 +74,8 @@ npm run test:coverage # Run tests with coverage report
 - **Ximilar API**: https://docs.ximilar.com/
 - **Vitest**: https://vitest.dev/guide/
 - **TCGDEX**: https://tcgdex.dev/
-- **Card Hedger API**: https://api.cardhedger.com/docs
 - **PokemonPricePracker API**: https://www.pokemonpricetracker.com/docs
+- **Posthog**: https://posthog.com/docs
 
 ## Development Process Requirements
 
@@ -328,3 +328,89 @@ npm run types:generate:gamma  # From gamma (use during development)
 - Comprehensive design checklist in `/context/design-principles.md`
 - Brand style guide in `/context/style-guide.md` if available
 - When making visual (front-end, UI/UX) changes, always refer to these files for guidance
+
+## Sentry Error Tracking
+
+### Configuration Files
+
+In Next.js, Sentry initialization happens in specific files:
+- **Client-side**: `instrumentation-client.ts`
+- **Server-side**: `sentry.server.config.ts`
+- **Edge runtime**: `sentry.edge.config.ts`
+
+Initialization does not need to be repeated in other files. Use `import * as Sentry from "@sentry/nextjs"` to reference Sentry functionality.
+
+### Exception Catching
+
+Use `Sentry.captureException(error)` to capture exceptions in try-catch blocks or areas where exceptions are expected.
+
+### Tracing and Spans
+
+Spans should be created for meaningful actions: button clicks, API calls, and function calls.
+
+#### Component Actions
+
+```javascript
+function TestComponent() {
+  const handleTestButtonClick = () => {
+    Sentry.startSpan(
+      {
+        op: "ui.click",
+        name: "Test Button Click",
+      },
+      (span) => {
+        span.setAttribute("config", "some config");
+        span.setAttribute("metric", "some metric");
+        doSomething();
+      },
+    );
+  };
+
+  return <button onClick={handleTestButtonClick}>Test</button>;
+}
+```
+
+#### API Calls
+
+```javascript
+async function fetchUserData(userId) {
+  return Sentry.startSpan(
+    {
+      op: "http.client",
+      name: `GET /api/users/${userId}`,
+    },
+    async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      return response.json();
+    },
+  );
+}
+```
+
+### Logging
+
+Enable logging in Sentry init with `enableLogs: true`. Use the logger for structured logs:
+
+```javascript
+const { logger } = Sentry;
+
+logger.trace("Starting database connection", { database: "users" });
+logger.debug(logger.fmt`Cache miss for user: ${userId}`);
+logger.info("Updated profile", { profileId: 345 });
+logger.warn("Rate limit reached", { endpoint: "/api/results/" });
+logger.error("Failed to process payment", { orderId: "order_123" });
+logger.fatal("Database connection pool exhausted", { activeConnections: 100 });
+```
+
+Use `logger.fmt` template literal function to bring variables into structured logs.
+
+### Console Logging Integration (Optional)
+
+```javascript
+Sentry.init({
+  dsn: "...",
+  integrations: [
+    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+  ],
+});
+```
