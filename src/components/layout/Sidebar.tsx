@@ -8,6 +8,7 @@ import { signOut } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
 import { useQuickAddContext } from '@/contexts/QuickAddContext'
 import { trackSignOut } from '@/lib/posthog/events'
+import SidebarFooter from './SidebarFooter'
 
 interface SidebarProps {
   onSignOut: () => void
@@ -109,31 +110,13 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
               })}
             </nav>
 
-            {/* User Info */}
+            {/* User Footer */}
             {user && (
-              <div className="flex-shrink-0 border-t border-grey-200 p-4">
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-grey-900 truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-grey-600">Credits:</span>
-                    <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium font-mono">
-                      {credits}
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full text-left text-sm text-orange-600 hover:text-orange-500 py-2 border-t border-grey-200"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </div>
+              <SidebarFooter
+                email={user.email || ''}
+                credits={credits}
+                onSignOut={handleSignOut}
+              />
             )}
           </div>
         </div>
@@ -214,26 +197,12 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                 })}
               </div>
               {user && (
-                <div className="border-t border-grey-200 pt-4 pb-3">
-                  <div className="px-4 space-y-3">
-                    <p className="text-sm text-grey-600">Signed in as:</p>
-                    <p className="text-sm font-medium text-grey-900 truncate">
-                      {user.email}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-grey-600">Credits:</span>
-                      <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium font-mono">
-                        {credits}
-                      </span>
-                    </div>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left text-sm text-orange-600 hover:text-orange-500 py-2"
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                </div>
+                <SidebarFooter
+                  email={user.email || ''}
+                  credits={credits}
+                  onSignOut={handleSignOut}
+                  onNavigate={() => setMobileMenuOpen(false)}
+                />
               )}
             </div>
           )}
