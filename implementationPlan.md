@@ -27,6 +27,7 @@
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
 
 #### ✅ Recently Completed
+- **Observability Stack**: PostHog analytics with custom events + Sentry error tracking with performance spans, logs, and metrics ✅ (February 8, 2026)
 - **Waitlist Landing Page**: Pre-launch waitlist with email signup, Resend integration, mobile-responsive design, bypass system for internal access ✅ (February 6, 2026)
 - **App Icon Redesign**: Premium dark slate slab design with amber vault, PWA manifest, updated metadata ✅ (February 6, 2026)
 - **Gamma/Preprod Pipeline**: Full staging environment with dual-database workflow, environment badge, DB change management ✅ (January 31, 2026)
@@ -1098,47 +1099,65 @@ These features ensure production readiness, prevent disasters, and polish the us
 
 These features MUST be implemented before beta launch. They enable monetization, protect against abuse, and ensure quality.
 
-#### 12. PostHog Analytics & A/B Testing ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### 12. Observability Stack (PostHog + Sentry) ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🔴 Critical
-**Estimated Effort:** 2-3 days
+**Completed:** February 8, 2026
 
-**What's Missing:**
-- ❌ PostHog account setup and project creation
-- ❌ PostHog SDK integration in Next.js
-- ❌ Event tracking for key user actions
-- ❌ Feature flags setup for A/B testing
-- ❌ User identification and properties
-- ❌ Funnel analysis setup
-- ❌ Session recording (optional)
+**What's Done:**
 
-**Key Events to Track:**
-- User signup/login
-- Card added to collection
-- Card graded (AI grading)
-- Card identified (camera scan)
-- Credit purchase
-- Subscription purchase
-- Store purchase
-- Page views and navigation
+**PostHog Analytics:**
+- ✅ PostHog account setup and project creation
+- ✅ PostHog SDK integration via `instrumentation-client.ts`
+- ✅ GDPR-compliant consent with `cookieless_mode: 'on_reject'`
+- ✅ User identification on login/logout (AuthProvider)
+- ✅ Session recording with privacy masking
+- ✅ Custom event tracking across 12+ components
 
-**Implementation Tasks:**
-1. Create PostHog project
-2. Install `posthog-js` and `posthog-node` packages
-3. Create PostHog provider component
-4. Add event tracking to critical user flows
-5. Set up feature flags for A/B tests
-6. Configure user identification on auth
-7. Create analytics dashboard
+**PostHog Events Implemented:**
+- ✅ `user_signed_up` / `user_signed_in` / `user_signed_out`
+- ✅ `card_added` / `card_removed`
+- ✅ `card_graded` with grade, credits, duration
+- ✅ `card_details_viewed`
+- ✅ `collection_viewed` with view mode, card count
+- ✅ `search_performed` with query, results count
+- ✅ `credits_used`
+- ✅ `error_occurred` (ErrorBoundary)
 
-**Files to Create:**
-- `/src/lib/posthog.ts` - PostHog client configuration
-- `/src/providers/PostHogProvider.tsx` - React context provider
-- `/src/hooks/usePostHog.ts` - Custom hook for tracking
+**Sentry Error Tracking:**
+- ✅ Client/Server/Edge initialization
+- ✅ Exception catching in all 17 API routes
+- ✅ User context on login/logout
+- ✅ Source maps for readable stack traces
 
-**Files to Modify:**
-- `/src/app/layout.tsx` - Add PostHog provider
-- Various components - Add event tracking
+**Sentry Performance Tracing:**
+- ✅ Spans for Ximilar API calls (identify, grade)
+- ✅ Spans for Resend email API
+- ✅ Spans for database operations
+
+**Sentry Logs:**
+- ✅ `consoleLoggingIntegration` capturing warn/error
+
+**Sentry Metrics:**
+- ✅ `cards_graded`, `cards_identified` counts
+- ✅ `credits_consumed` count
+- ✅ `collection_cards_added` count
+- ✅ Latency distributions for grading, identification, search
+
+**Files Created:**
+- `/src/lib/posthog/events.ts` - Typed event tracking helpers
+- `/src/lib/posthog/utils.ts` - Consent and identity helpers
+- `/src/components/consent/CookieConsent.tsx` - GDPR banner
+
+**Files Modified:**
+- `/src/instrumentation-client.ts` - PostHog + Sentry client init
+- `/sentry.server.config.ts` - Server-side Sentry
+- `/sentry.edge.config.ts` - Edge runtime Sentry
+- `/src/components/providers/AuthProvider.tsx` - User identification
+- 17 API routes - Exception catching + metrics
+- 12+ components - Event tracking
+
+**Documentation:** See `implementationObservabilityStackPlan.md` for full details
 
 ---
 
@@ -1849,7 +1868,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 | **Explore/Browse Polish** | 🟡 90% | 🟡 Medium | 2-3 days | None |
 | **Product Collection** | ✅ 100% | 🟠 High | ~~1 week~~ Done | ~~Product prices~~ ✅ |
 | **Price Migration** | ✅ 100% | 🔴 Critical | ~~1 week~~ Done | None |
-| **PostHog Analytics** | ❌ 0% | 🔴 Critical* | 2-3 days | None |
+| **Observability (PostHog + Sentry)** | ✅ 100% | 🔴 Critical* | ~~2-3 days~~ Done | None |
 | **Payment System (Stripe)** | ❌ 0% | 🔴 Critical* | 1-2 weeks | None |
 | **Basic Store** | ❌ 0% | 🔴 Critical* | 1.5-2 weeks | Stripe |
 | **Anti-Scalper Systems** | ❌ 0% | 🔴 Critical* | 1 week | Store |
@@ -1877,11 +1896,11 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 #### 🔴 Critical Pre-Launch (Must Have)
 
-**Analytics & Monitoring:**
-- [ ] PostHog integration for analytics and A/B testing
-- [ ] Error tracking and monitoring setup
-- [ ] User behavior analytics
-- [ ] Revenue/conversion tracking dashboards
+**Analytics & Monitoring:** ✅ COMPLETE
+- [x] PostHog integration for analytics and A/B testing ✅ February 8, 2026
+- [x] Error tracking and monitoring setup (Sentry) ✅ February 8, 2026
+- [x] User behavior analytics (PostHog events + Sentry metrics) ✅ February 8, 2026
+- [ ] Revenue/conversion tracking dashboards (pending Stripe)
 
 **Payment Systems:**
 - [ ] Stripe integration for subscriptions

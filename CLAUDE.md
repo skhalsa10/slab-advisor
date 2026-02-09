@@ -408,13 +408,114 @@ logger.fatal("Database connection pool exhausted", { activeConnections: 100 });
 
 Use `logger.fmt` template literal function to bring variables into structured logs.
 
-### Console Logging Integration (Optional)
+### Console Logging Integration
+
+Console logs are automatically captured via `consoleLoggingIntegration`:
 
 ```javascript
 Sentry.init({
   dsn: "...",
   integrations: [
-    Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+    Sentry.consoleLoggingIntegration({ levels: ["warn", "error"] }),
   ],
 });
 ```
+
+### Metrics
+
+Use Sentry Metrics to track business metrics like operation counts and latencies:
+
+```javascript
+import * as Sentry from "@sentry/nextjs";
+
+// Count operations with attributes
+Sentry.metrics.count("cards_graded", 1, {
+  attributes: { status: "success" },
+});
+
+// Track latency distributions
+Sentry.metrics.distribution("card_grading_latency", Date.now() - startTime, {
+  unit: "millisecond",
+});
+```
+
+**Current Metrics:**
+
+- `cards_graded` / `cards_identified` - Operation counts with status
+- `credits_consumed` - Credit usage tracking
+- `collection_cards_added` - Collection activity
+- `pokemon_searches` - Search volume
+- `*_latency` distributions - Performance tracking
+
+## PostHog Event Tracking
+
+### Configuration
+
+PostHog is initialized in `instrumentation-client.ts` with GDPR-compliant consent handling via `cookieless_mode: 'on_reject'`.
+
+### Event Tracking Helpers
+
+Use the typed helpers from `src/lib/posthog/events.ts`:
+
+```typescript
+import {
+  trackSignIn,
+  trackCardAdded,
+  trackCardGraded,
+  trackSearch,
+  trackError,
+} from "@/lib/posthog/events";
+
+// Auth events
+trackSignIn({ method: "email" });
+trackSignUp({ method: "google" });
+trackSignOut();
+
+// Card events
+trackCardAdded({ source: "manual", category: "pokemon", cardId: "123" });
+trackCardRemoved({ cardId: "123" });
+trackCardGraded({
+  grade: 9.5,
+  creditsUsed: 1,
+  durationMs: 12000,
+  cardId: "123",
+});
+trackCardDetailsViewed({ cardId: "123", category: "pokemon" });
+
+// Collection events
+trackCollectionViewed({ viewMode: "grid", cardCount: 50 });
+
+// Search events
+trackSearch({ query: "pikachu", resultsCount: 25 });
+
+// Credit events
+trackCreditsUsed({ amount: 1, action: "grade" });
+
+// Error events
+trackError({
+  errorType: "ApiError",
+  message: "Failed to fetch",
+  componentStack: "...",
+});
+```
+
+### User Identification
+
+User identification happens automatically in `AuthProvider.tsx`:
+
+```typescript
+import { identifyUser, resetUser } from "@/lib/posthog/utils";
+
+// On login
+identifyUser(user.id, { email: user.email, created_at: user.created_at });
+
+// On logout
+resetUser();
+```
+
+### Adding New Events
+
+1. Add the event type to `src/lib/posthog/events.ts`
+2. Create a typed helper function
+3. Call the helper where the action occurs
+4. Never include PII beyond user ID and email
