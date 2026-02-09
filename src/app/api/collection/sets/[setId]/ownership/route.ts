@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getSetOwnedCardIds } from '@/lib/collection-server'
 
 interface RouteContext {
@@ -29,6 +30,9 @@ export async function GET(
 
     return NextResponse.json({ ownedCardIds })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/sets/[setId]/ownership', operation: 'get_owned_cards' }
+    })
     console.error('Set owned cards API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

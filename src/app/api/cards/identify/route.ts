@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getUser } from '@/lib/auth-server'
 import { identifyCard } from '@/lib/ximilar-service'
 import { HTTP_STATUS } from '@/constants/constants'
@@ -24,6 +25,7 @@ interface IdentifyCardRequest {
  * - error?: string (only present when success is false)
  */
 export async function POST(request: Request) {
+  const startTime = Date.now()
   try {
     // Authentication check
     const user = await getUser()
@@ -56,17 +58,41 @@ export async function POST(request: Request) {
     }
 
     // Call Ximilar identification service
-    const result = await identifyCard(body.image)
+    const result = await Sentry.startSpan(
+      {
+        op: 'http.client',
+        name: 'Ximilar Card Identification',
+        attributes: { 'ximilar.endpoint': 'identify' }
+      },
+      async () => identifyCard(body.image)
+    )
 
     // TODO: Charge credits only on successful identification
     // if (result.success && result.bestMatch) {
     //   await deductCredits(user.id, CREDIT_COSTS.CARD_ANALYSIS)
     // }
 
+    // Track identification metrics
+    Sentry.metrics.count('cards_identified', 1, {
+      attributes: { status: result.success ? 'success' : 'failed' }
+    })
+    Sentry.metrics.distribution('card_identification_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
+
     // Always return 200 with the result - the success field indicates outcome
     // This allows the client to display the error message properly
     return NextResponse.json(result)
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'cards/identify', operation: 'identify_card' }
+    })
+    Sentry.metrics.count('cards_identified', 1, {
+      attributes: { status: 'error' }
+    })
+    Sentry.metrics.distribution('card_identification_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
     console.error('Card identification API error:', error)
 
     // Return 200 with error in body so client can display it

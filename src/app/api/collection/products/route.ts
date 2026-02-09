@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 
@@ -155,6 +156,9 @@ export async function POST(request: Request) {
       message: `Added ${data.quantity} product(s) to collection`
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/products', operation: 'add_product' }
+    })
     console.error('Collection products API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -216,6 +220,9 @@ export async function GET(request: Request) {
       data: existing || null
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/products', operation: 'check_product' }
+    })
     console.error('Collection check API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

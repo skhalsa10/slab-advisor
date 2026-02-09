@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { trackCardAdded, trackSearch } from '@/lib/posthog/events'
 
 export interface SearchResult {
   id: string
@@ -131,9 +132,14 @@ export function useQuickAdd(debounceMs: number = 500): UseQuickAddReturn {
       }
 
       const data: SearchResponse = await response.json()
-      
+
       setResults(data.results || [])
-      
+
+      trackSearch({
+        query: searchQuery.trim(),
+        resultsCount: data.results?.length || 0
+      })
+
       if (data.message && data.results.length === 0) {
         setError(data.message)
       }
@@ -227,7 +233,13 @@ export function useQuickAdd(debounceMs: number = 500): UseQuickAddReturn {
       }
 
       const result = await response.json()
-      
+
+      trackCardAdded({
+        source: 'manual',
+        category: 'pokemon',
+        cardId: cardId
+      })
+
       // Success - could show toast notification here
       console.log('Added to collection:', result.message)
       return true

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getUser } from '@/lib/auth-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { uploadCardImage } from '@/lib/storage-service'
@@ -124,11 +125,18 @@ export async function POST(request: Request): Promise<NextResponse<UploadImageRe
     }
 
     // Upload the image
-    const { path, error: uploadError } = await uploadCardImage(
-      user.id,
-      body.collectionCardId,
-      body.side,
-      body.image
+    const { path, error: uploadError } = await Sentry.startSpan(
+      {
+        op: 'function',
+        name: 'Upload Card Image',
+        attributes: { 'card.id': body.collectionCardId, 'card.side': body.side }
+      },
+      async () => uploadCardImage(
+        user.id,
+        body.collectionCardId,
+        body.side,
+        body.image
+      )
     )
 
     if (uploadError) {
@@ -158,6 +166,9 @@ export async function POST(request: Request): Promise<NextResponse<UploadImageRe
       path,
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'cards/upload-image', operation: 'upload_image' }
+    })
     console.error('Upload image API error:', error)
 
     const errorMessage =

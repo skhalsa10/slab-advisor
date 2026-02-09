@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
+import { trackCardDetailsViewed } from '@/lib/posthog/events'
 import { usePreserveFilters } from '@/hooks/useURLFilters'
 import { getCardImageUrl } from '@/lib/pokemon-db'
 import { getEbaySearchUrl } from '@/utils/external-links'
@@ -26,6 +27,14 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
   const [showCollectionModal, setShowCollectionModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Track card detail view
+  useEffect(() => {
+    trackCardDetailsViewed({
+      cardId: card.id,
+      category: 'pokemon'
+    })
+  }, [card.id])
   
   // Find current card index for navigation
   const currentCardIndex = set.cards.findIndex(c => c.id === card.id) ?? -1

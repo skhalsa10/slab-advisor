@@ -82,6 +82,9 @@ Sentry.init({
     Sentry.captureConsoleIntegration({
       levels: ["error", "warn"], // Capture both errors and warnings for better visibility
     }),
+
+    // Capture console.warn/error as Sentry Logs (skip 'log' to avoid data bloat)
+    Sentry.consoleLoggingIntegration({ levels: ["warn", "error"] }),
   ],
 
   // Debug mode in development to verify events are sent

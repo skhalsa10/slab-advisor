@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getUser } from '@/lib/auth-server'
 import { searchPokemonCardsIntelligent, type PokemonSearchResult } from '@/lib/pokemon-search-server'
 
@@ -30,6 +31,7 @@ interface SearchResult extends PokemonSearchResult {
  * GET /api/pokemon/search?q=name:"charizard"%20set:"base%20set"
  */
 export async function GET(request: Request) {
+  const startTime = Date.now()
   try {
     // Require authentication
     const user = await getUser()
@@ -78,7 +80,14 @@ export async function GET(request: Request) {
     }
 
     // Perform intelligent search
-    const pokemonResults = await searchPokemonCardsIntelligent(trimmedQuery, limit)
+    const pokemonResults = await Sentry.startSpan(
+      {
+        op: 'db.query',
+        name: 'DB: Pokemon Search',
+        attributes: { 'db.system': 'supabase', 'db.operation': 'search' }
+      },
+      async () => searchPokemonCardsIntelligent(trimmedQuery, limit)
+    )
     
     // Add card_type field for frontend identification
     const results: SearchResult[] = pokemonResults.map(card => ({
@@ -89,6 +98,15 @@ export async function GET(request: Request) {
     // Sort results by name for consistency
     results.sort((a, b) => a.name.localeCompare(b.name))
 
+    // Track search metrics
+    Sentry.metrics.count('pokemon_searches', 1, {
+      attributes: { has_results: results.length > 0 ? 'true' : 'false' }
+    })
+    Sentry.metrics.distribution('pokemon_search_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
+    Sentry.metrics.distribution('pokemon_search_results', results.length)
+
     return NextResponse.json({
       results,
       total: results.length,
@@ -97,6 +115,15 @@ export async function GET(request: Request) {
     })
 
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'pokemon/search', operation: 'search_cards' }
+    })
+    Sentry.metrics.count('pokemon_searches', 1, {
+      attributes: { has_results: 'error' }
+    })
+    Sentry.metrics.distribution('pokemon_search_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
     console.error('Pokemon search API error:', error)
     return NextResponse.json(
       { error: 'Failed to search cards' },

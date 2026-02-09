@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getUser } from '@/lib/auth-server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getImageAsBase64, downloadAndStoreImage } from '@/lib/storage-service'
@@ -51,6 +52,7 @@ interface GradeCardResponse {
  * - error?: string (only present when success is false)
  */
 export async function POST(request: Request): Promise<NextResponse<GradeCardResponse>> {
+  const startTime = Date.now()
   try {
     // Authentication check
     const user = await getUser()
@@ -161,7 +163,14 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
     // Call Ximilar grading API
     let gradingResponse: XimilarGradingResponse
     try {
-      gradingResponse = await gradeCard(frontBase64, backBase64)
+      gradingResponse = await Sentry.startSpan(
+        {
+          op: 'http.client',
+          name: 'Ximilar Card Grading',
+          attributes: { 'ximilar.endpoint': 'grading' }
+        },
+        async () => gradeCard(frontBase64, backBase64)
+      )
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Grading service error'
       return refundAndReturnError(message, HTTP_STATUS.INTERNAL_SERVER_ERROR)
@@ -181,32 +190,39 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
 
     // Download and store Ximilar's annotated images (they're temporary)
     const [frontFullResult, frontExactResult, backFullResult, backExactResult] =
-      await Promise.all([
-        downloadAndStoreImage(
-          user.id,
-          body.collectionCardId,
-          extractedData.front_full_url_card,
-          'front_graded_full.webp'
-        ),
-        downloadAndStoreImage(
-          user.id,
-          body.collectionCardId,
-          extractedData.front_exact_url_card,
-          'front_graded_exact.webp'
-        ),
-        downloadAndStoreImage(
-          user.id,
-          body.collectionCardId,
-          extractedData.back_full_url_card,
-          'back_graded_full.webp'
-        ),
-        downloadAndStoreImage(
-          user.id,
-          body.collectionCardId,
-          extractedData.back_exact_url_card,
-          'back_graded_exact.webp'
-        ),
-      ])
+      await Sentry.startSpan(
+        {
+          op: 'function',
+          name: 'Download Annotated Images',
+          attributes: { 'card.id': body.collectionCardId }
+        },
+        async () => Promise.all([
+          downloadAndStoreImage(
+            user.id,
+            body.collectionCardId,
+            extractedData.front_full_url_card,
+            'front_graded_full.webp'
+          ),
+          downloadAndStoreImage(
+            user.id,
+            body.collectionCardId,
+            extractedData.front_exact_url_card,
+            'front_graded_exact.webp'
+          ),
+          downloadAndStoreImage(
+            user.id,
+            body.collectionCardId,
+            extractedData.back_full_url_card,
+            'back_graded_full.webp'
+          ),
+          downloadAndStoreImage(
+            user.id,
+            body.collectionCardId,
+            extractedData.back_exact_url_card,
+            'back_graded_exact.webp'
+          ),
+        ])
+      )
 
     // Log any image storage errors but don't fail the request
     if (frontFullResult.error) {
@@ -273,6 +289,17 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
     // Credit was already deducted at the start of the request
     // Grading completed successfully, no refund needed
 
+    // Track successful grading metrics
+    Sentry.metrics.count('cards_graded', 1, {
+      attributes: { status: 'success' }
+    })
+    Sentry.metrics.count('credits_consumed', 1, {
+      attributes: { operation: 'grading' }
+    })
+    Sentry.metrics.distribution('card_grading_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
+
     return NextResponse.json({
       success: true,
       grading: {
@@ -290,6 +317,16 @@ export async function POST(request: Request): Promise<NextResponse<GradeCardResp
       },
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'cards/grade', operation: 'grade_card' },
+      extra: { stage: 'unknown' }
+    })
+    Sentry.metrics.count('cards_graded', 1, {
+      attributes: { status: 'failed' }
+    })
+    Sentry.metrics.distribution('card_grading_latency', Date.now() - startTime, {
+      unit: 'millisecond'
+    })
     console.error('Grade card API error:', error)
 
     // Note: We can't refund here because we don't have supabase or user context

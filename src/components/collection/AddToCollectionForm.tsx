@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { CONDITION_OPTIONS } from '@/constants/cards'
 import { getVariantLabel, parseVariantSelection } from '@/utils/variantUtils'
+import { trackCardAdded } from '@/lib/posthog/events'
 
 interface AddToCollectionFormProps {
   cardId: string
@@ -105,6 +106,11 @@ export default function AddToCollectionForm({
         throw new Error(result.error || 'Failed to add card to collection')
       }
 
+      trackCardAdded({
+        source: 'manual',
+        category: 'pokemon',
+        cardId: cardId
+      })
       onSuccess(result.message || 'Card added to collection successfully')
       
       // Reset form

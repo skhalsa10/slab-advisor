@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { type CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
+import { trackCollectionViewed } from '@/lib/posthog/events'
 import {
   type CollectionProductWithPriceChanges,
   calculateProductsValue,
@@ -55,6 +56,18 @@ export default function CollectionClient({
   const [selectedProduct, setSelectedProduct] =
     useState<CollectionProductWithPriceChanges | null>(null)
   const [productList, setProductList] = useState(products)
+
+  // Track collection view on initial load
+  const hasTrackedView = useRef(false)
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      trackCollectionViewed({
+        viewMode,
+        cardCount: cards.length + products.length
+      })
+      hasTrackedView.current = true
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync cardList with props when server data changes (after router.refresh)
   useEffect(() => {

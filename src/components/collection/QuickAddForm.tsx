@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
 import { CONDITION_OPTIONS } from '@/constants/cards'
 import { getVariantLabel, parseVariantSelection } from '@/utils/variantUtils'
+import { trackCardAdded } from '@/lib/posthog/events'
 
 interface QuickAddFormProps {
   cardId: string
@@ -94,6 +95,11 @@ export default function QuickAddForm({
         throw new Error(result.error || 'Failed to add card to collection')
       }
 
+      trackCardAdded({
+        source: 'manual',
+        category: 'pokemon',
+        cardId: cardId
+      })
       onSuccess(result.message || `Added ${cardName} to collection`)
     } catch (error) {
       console.error('Error adding card to collection:', error)

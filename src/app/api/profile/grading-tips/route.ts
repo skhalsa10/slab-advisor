@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { checkRateLimit } from '@/middleware/rateLimit'
@@ -83,6 +84,9 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'profile/grading-tips', operation: 'update_grading_tips' }
+    })
     console.error('Grading tips preference update error:', error)
     return NextResponse.json(
       { success: false, error: 'Internal server error' },

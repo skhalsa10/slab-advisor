@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { signOut } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
+import { trackSignOut } from '@/lib/posthog/events'
 
 interface HeaderProps {
   onSignOut: () => void
@@ -14,6 +15,7 @@ export default function Header({ onSignOut }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
+    trackSignOut() // Track before signOut clears user context
     await signOut()
     await refreshCredits() // Refresh to clear user state
     onSignOut()

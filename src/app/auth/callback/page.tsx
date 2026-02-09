@@ -4,6 +4,7 @@ import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import { trackSignIn, trackSignUp } from '@/lib/posthog/events'
 
 /**
  * OAuth Authentication Callback Page
@@ -61,11 +62,13 @@ function AuthCallbackContent() {
 
           if (!profile) {
             // New OAuth user needs to set username
+            trackSignUp({ method: 'google' })
             router.push('/auth/complete-profile')
             return
           }
 
           // Existing user with profile, proceed to redirect
+          trackSignIn({ method: 'google' })
           router.push(redirectTo)
         } else {
           // OAuth succeeded but no session - this shouldn't happen

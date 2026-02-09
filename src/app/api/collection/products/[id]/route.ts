@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 import { ALLOWED_PRODUCT_CONDITIONS } from '@/constants/products'
@@ -98,6 +99,9 @@ export async function GET(
     // Step 3: Merge and return
     return NextResponse.json({ ...product, latest_price: latestPrice })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/products/[id]', operation: 'get_product' }
+    })
     console.error('Collection product GET error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -228,6 +232,9 @@ export async function PATCH(
       message: 'Collection product updated successfully'
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/products/[id]', operation: 'update_product' }
+    })
     console.error('Collection product PATCH error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -281,6 +288,9 @@ export async function DELETE(
       message: 'Product removed from collection'
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/products/[id]', operation: 'delete_product' }
+    })
     console.error('Collection product DELETE error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

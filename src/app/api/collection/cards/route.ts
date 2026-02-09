@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 
@@ -107,6 +108,11 @@ export async function POST(request: Request) {
         )
       }
 
+      // Track collection update metric
+      Sentry.metrics.count('collection_cards_added', data.quantity, {
+        attributes: { action: 'updated' }
+      })
+
       return NextResponse.json({
         success: true,
         action: 'updated',
@@ -154,6 +160,11 @@ export async function POST(request: Request) {
       )
     }
 
+    // Track collection creation metric
+    Sentry.metrics.count('collection_cards_added', data.quantity, {
+      attributes: { action: 'created' }
+    })
+
     return NextResponse.json({
       success: true,
       action: 'created',
@@ -161,6 +172,9 @@ export async function POST(request: Request) {
       message: `Added ${data.quantity} card(s) to collection`
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/cards', operation: 'add_card' }
+    })
     console.error('Collection API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -226,6 +240,9 @@ export async function GET(request: Request) {
       data: existing || null
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/cards', operation: 'check_card' }
+    })
     console.error('Collection check API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

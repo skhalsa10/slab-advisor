@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export async function GET(
@@ -82,6 +83,9 @@ export async function GET(
       price_data: priceData
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'pokemon/cards/[cardId]', operation: 'get_card' }
+    })
     console.error('API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

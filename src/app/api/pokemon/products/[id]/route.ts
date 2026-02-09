@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export async function GET(
@@ -62,6 +63,9 @@ export async function GET(
       price_history: priceHistory || []
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'pokemon/products/[id]', operation: 'get_product' }
+    })
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }

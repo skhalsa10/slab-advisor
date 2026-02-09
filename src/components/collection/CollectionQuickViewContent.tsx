@@ -9,6 +9,7 @@ import type { CardFull } from '@/models/pokemon'
 import type { CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
 import { extractMarketPrices } from '@/utils/priceUtils'
+import { trackCardRemoved } from '@/lib/posthog/events'
 
 interface CollectionQuickViewContentProps {
   card: CollectionCardWithPokemon
@@ -48,6 +49,7 @@ export default function CollectionQuickViewContent({
         throw new Error(errorMessage)
       }
 
+      trackCardRemoved({ cardId: card.id })
       setShowDeleteDialog(false)
       onDelete?.()
       onClose?.()

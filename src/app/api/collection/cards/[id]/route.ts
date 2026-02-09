@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { getUser } from '@/lib/auth-server'
 
@@ -107,6 +108,9 @@ export async function GET(
 
     return NextResponse.json(card)
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/cards/[id]', operation: 'get_card' }
+    })
     console.error('Collection card GET error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -246,6 +250,9 @@ export async function PATCH(
       message: 'Collection card updated successfully'
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/cards/[id]', operation: 'update_card' }
+    })
     console.error('Collection card PATCH error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -299,6 +306,9 @@ export async function DELETE(
       message: 'Card removed from collection'
     })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/cards/[id]', operation: 'delete_card' }
+    })
     console.error('Collection card DELETE error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

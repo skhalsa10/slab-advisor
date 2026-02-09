@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from '@/lib/auth'
 import { useCredits } from '@/contexts/CreditsContext'
 import { useQuickAddContext } from '@/contexts/QuickAddContext'
+import { trackSignOut } from '@/lib/posthog/events'
 
 interface SidebarProps {
   onSignOut: () => void
@@ -26,6 +27,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
   const pathname = usePathname()
 
   const handleSignOut = async () => {
+    trackSignOut() // Track before signOut clears user context
     await signOut()
     await refreshCredits() // Refresh to clear user state
     onSignOut()

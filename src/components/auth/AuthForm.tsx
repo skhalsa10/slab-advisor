@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn, signUp, signInWithProvider } from '@/lib/auth'
+import { trackSignIn, trackSignUp } from '@/lib/posthog/events'
 
 interface AuthFormProps {
   onSuccess: () => void
@@ -27,6 +28,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
     try {
       if (isLogin) {
         await signIn(email, password)
+        trackSignIn({ method: 'email' })
         onSuccess()
       } else {
         // Signup with email/password - redirect to complete-profile
@@ -46,6 +48,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
         }
 
         // Redirect to complete-profile page to set username
+        trackSignUp({ method: 'email' })
         router.push('/auth/complete-profile')
       }
     } catch (err: unknown) {

@@ -10,6 +10,7 @@
  * @module ximilar-service
  */
 
+import * as Sentry from '@sentry/nextjs'
 import { XIMILAR_API } from '@/constants/constants'
 import { matchCardByXimilarMetadata } from './pokemon-db-server'
 import type {
@@ -39,25 +40,32 @@ async function callXimilarIdentifyApi(
     ? base64Image.split(',')[1]
     : base64Image
 
-  const response = await fetch(XIMILAR_API.IDENTIFY_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Token ${apiKey}`,
-      'Content-Type': 'application/json'
+  const response = await Sentry.startSpan(
+    {
+      op: 'http.client',
+      name: 'Ximilar Identify API',
+      attributes: { 'ximilar.endpoint': 'identify' }
     },
-    body: JSON.stringify({
-      records: [
-        {
-          _base64: cleanBase64
-        }
-      ],
-      // Filter to only return English Pokemon cards
-      filter: "Subcategory = 'Pokemon'",
-      lang: 'en',
-      // Auto-rotate card if image is sideways or upside down
-      auto_rotate: true
+    async () => fetch(XIMILAR_API.IDENTIFY_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        records: [
+          {
+            _base64: cleanBase64
+          }
+        ],
+        // Filter to only return English Pokemon cards
+        filter: "Subcategory = 'Pokemon'",
+        lang: 'en',
+        // Auto-rotate card if image is sideways or upside down
+        auto_rotate: true
+      })
     })
-  })
+  )
 
   if (!response.ok) {
     const errorText = await response.text()

@@ -76,6 +76,7 @@ npm run test:coverage # Run tests with coverage report
 - **TCGDEX**: https://tcgdex.dev/
 - **PokemonPricePracker API**: https://www.pokemonpricetracker.com/docs
 - **Posthog**: https://posthog.com/docs
+- **Posthog MCP**: https://posthog.com/docs/model-context-protocol
 - **Sentry**: https://docs.sentry.io/
 
 ## Development Process Requirements
@@ -268,10 +269,10 @@ Before considering code complete, ensure:
 
 This project uses two Supabase environments:
 
-| Environment | Project ID | Purpose |
-|---|---|---|
-| **Gamma** (staging) | `oeqgpubjdeomnfunezot` | Development and testing. `.env.local` points here. |
-| **Production** | `syoxdgxffdvvpguzvcxo` | Live user data. Vercel Production deployment uses this. |
+| Environment         | Project ID             | Purpose                                                 |
+| ------------------- | ---------------------- | ------------------------------------------------------- |
+| **Gamma** (staging) | `oeqgpubjdeomnfunezot` | Development and testing. `.env.local` points here.      |
+| **Production**      | `syoxdgxffdvvpguzvcxo` | Live user data. Vercel Production deployment uses this. |
 
 - Local development (`npm run dev`) always targets **gamma**
 - Vercel Preview deployments (from `gamma` branch) target **gamma**
@@ -306,6 +307,7 @@ For emergencies (hotfix directly to production), apply the same SQL to gamma aft
 ### Checking Migration Sync
 
 To verify both environments have the same migrations:
+
 ```sql
 -- Run on both gamma and production via execute_sql MCP tool
 SELECT version, name FROM supabase_migrations.schema_migrations ORDER BY version;
@@ -335,6 +337,7 @@ npm run types:generate:gamma  # From gamma (use during development)
 ### Configuration Files
 
 In Next.js, Sentry initialization happens in specific files:
+
 - **Client-side**: `instrumentation-client.ts`
 - **Server-side**: `sentry.server.config.ts`
 - **Edge runtime**: `sentry.edge.config.ts`

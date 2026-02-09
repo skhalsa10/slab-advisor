@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getSetOwnershipStats } from '@/lib/collection-server'
 
 interface RouteContext {
@@ -29,6 +30,9 @@ export async function GET(
 
     return NextResponse.json(stats)
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'collection/sets/[setId]/stats', operation: 'get_stats' }
+    })
     console.error('Set ownership stats API error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

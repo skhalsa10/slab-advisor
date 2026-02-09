@@ -15,6 +15,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { Resend } from 'resend'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { checkRateLimit } from '@/middleware/rateLimit'
@@ -93,12 +94,19 @@ export async function POST(request: NextRequest) {
     if (resend) {
       // Send welcome email
       try {
-        const { error: emailError } = await resend.emails.send({
-          from: 'Slab Advisor <noreply@updates.slabadvisor.com>',
-          to: normalizedEmail,
-          subject: "You're on the list (and you're early)",
-          react: WelcomeEmail({ email: normalizedEmail }),
-        })
+        const { error: emailError } = await Sentry.startSpan(
+          {
+            op: 'http.client',
+            name: 'Resend Send Email',
+            attributes: { 'resend.type': 'welcome_email' }
+          },
+          async () => resend.emails.send({
+            from: 'Slab Advisor <noreply@updates.slabadvisor.com>',
+            to: normalizedEmail,
+            subject: "You're on the list (and you're early)",
+            react: WelcomeEmail({ email: normalizedEmail }),
+          })
+        )
         if (emailError) {
           console.error('Resend email error:', emailError)
         }
@@ -121,6 +129,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'waitlist/signup', operation: 'signup' }
+    })
     console.error('Waitlist signup error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },

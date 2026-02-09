@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { validateUsernameFormat } from '@/utils/usernameValidation'
@@ -99,6 +100,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ available: data })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'profile/username-check', operation: 'check_username' }
+    })
     console.error('Username check error:', error)
     return NextResponse.json(
       { available: false, error: 'Internal server error' },

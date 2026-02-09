@@ -1,6 +1,8 @@
 'use client'
 
 import React, { Component, ErrorInfo, ReactNode } from 'react'
+import * as Sentry from '@sentry/nextjs'
+import { trackError } from '@/lib/posthog/events'
 
 interface Props {
   children?: ReactNode
@@ -27,7 +29,20 @@ export class ErrorBoundary extends Component<Props, State> {
     if (process.env.NODE_ENV === 'development') {
       console.error('ErrorBoundary caught an error:', error, errorInfo)
     }
-    
+
+    // Track error in PostHog
+    trackError({
+      errorType: error.name,
+      message: error.message,
+      componentStack: errorInfo.componentStack || undefined
+    })
+
+    // Capture error in Sentry
+    Sentry.captureException(error, {
+      tags: { boundary: 'ErrorBoundary' },
+      extra: { componentStack: errorInfo.componentStack }
+    })
+
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo)
   }

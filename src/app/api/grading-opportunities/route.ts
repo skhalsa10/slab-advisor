@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { getGradingOpportunities } from '@/lib/grading-opportunities-server'
 
 export async function GET(request: NextRequest) {
@@ -16,10 +17,20 @@ export async function GET(request: NextRequest) {
     const limitParam = searchParams.get('limit')
     const limit = limitParam ? parseInt(limitParam, 10) : 100
 
-    const { opportunities, totalCount } = await getGradingOpportunities(limit)
+    const { opportunities, totalCount } = await Sentry.startSpan(
+      {
+        op: 'db.query',
+        name: 'DB: Fetch Grading Opportunities',
+        attributes: { 'db.system': 'supabase', 'db.operation': 'aggregation', limit }
+      },
+      async () => getGradingOpportunities(limit)
+    )
 
     return NextResponse.json({ opportunities, totalCount })
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'grading-opportunities', operation: 'fetch_opportunities' }
+    })
     console.error('Error fetching grading opportunities:', error)
     return NextResponse.json(
       { error: 'Failed to fetch grading opportunities' },

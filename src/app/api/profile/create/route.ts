@@ -9,6 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { validateUsernameFormat } from '@/utils/usernameValidation'
@@ -161,10 +162,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Create profile via database function
-    const { data, error } = await supabase.rpc('create_user_profile', {
-      p_user_id: user.id,
-      p_username: sanitizedUsername,
-    })
+    const { data, error } = await Sentry.startSpan(
+      {
+        op: 'db.query',
+        name: 'DB: Create Profile',
+        attributes: { 'db.system': 'supabase', 'db.operation': 'rpc' }
+      },
+      async () => supabase.rpc('create_user_profile', {
+        p_user_id: user.id,
+        p_username: sanitizedUsername,
+      })
+    )
 
     if (error) {
       console.error('Error creating profile:', error)
@@ -200,6 +208,9 @@ export async function POST(request: NextRequest) {
     // Success
     return NextResponse.json(result)
   } catch (error) {
+    Sentry.captureException(error, {
+      tags: { api: 'profile/create', operation: 'create_profile' }
+    })
     console.error('Profile creation error:', error)
     return NextResponse.json(
       {

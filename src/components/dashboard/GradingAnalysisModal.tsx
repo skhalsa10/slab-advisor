@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { useBreakpoint } from '@/hooks/useIsDesktop'
 import { isDesktop } from 'react-device-detect'
@@ -13,6 +13,7 @@ import GradingConfirmation from './GradingConfirmation'
 import GradingResultView from './GradingResultView'
 import GradingTutorialCarousel from './GradingTutorialCarousel'
 import AIAnalysisVisualization from './AIAnalysisVisualization'
+import { trackCardGraded, trackCreditsUsed } from '@/lib/posthog/events'
 
 /**
  * Capture step state for the grading flow
@@ -95,6 +96,7 @@ export default function GradingAnalysisModal({
   const [backImage, setBackImage] = useState<string | null>(null)
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const gradingStartTimeRef = useRef<number | null>(null)
 
   // Reset state when modal closes or opens with new initialIndex
   useEffect(() => {
@@ -264,6 +266,7 @@ export default function GradingAnalysisModal({
 
     setCaptureStep('processing')
     setError(null)
+    gradingStartTimeRef.current = Date.now()
 
     try {
       // Step 1: Upload front image
@@ -318,6 +321,18 @@ export default function GradingAnalysisModal({
       }
 
       // Success!
+      const durationMs = gradingStartTimeRef.current
+        ? Date.now() - gradingStartTimeRef.current
+        : undefined
+
+      trackCreditsUsed({ amount: 1, action: 'grade' })
+      trackCardGraded({
+        grade: gradeData.grading.grade_final,
+        creditsUsed: 1,
+        durationMs,
+        cardId: opportunity.collectionCardId
+      })
+
       setGradingResult(gradeData.grading)
       setCaptureStep('complete')
     } catch (err) {
