@@ -69,3 +69,6 @@ Follow the workflow: apply to gamma first, test, then apply to production.
 |---|---|---|---|---|
 | 20260202051137 | create_waitlist_signups_table | 2026-02-02 | 2026-02-02 | Pre-launch waitlist email collection with RLS |
 | 20260206000000 | drop_manual_card_columns | 2026-02-06 | 2026-02-06 | Remove unused manual_* columns and index from collection_cards |
+| 20260210000000 | create_user_settings_table | 2026-02-10 | 2026-02-10 | Private user settings table with RLS, migrates show_grading_tips from profiles |
+| 20260210000001 | drop_show_grading_tips_from_profiles | 2026-02-10 | 2026-02-10 | Remove show_grading_tips from profiles (moved to user_settings) |
+| 20260210000002 | add_user_settings_to_signup_trigger | 2026-02-10 | 2026-02-10 | Update signup trigger to create user_settings, backfill existing users |
