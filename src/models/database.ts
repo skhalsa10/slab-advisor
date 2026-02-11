@@ -670,7 +670,6 @@ export type Database = {
           display_name: string | null
           id: string
           is_public: boolean
-          show_grading_tips: boolean
           updated_at: string | null
           user_id: string
           username: string
@@ -682,7 +681,6 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_public?: boolean
-          show_grading_tips?: boolean
           updated_at?: string | null
           user_id: string
           username: string
@@ -694,7 +692,6 @@ export type Database = {
           display_name?: string | null
           id?: string
           is_public?: boolean
-          show_grading_tips?: boolean
           updated_at?: string | null
           user_id?: string
           username?: string
@@ -738,6 +735,36 @@ export type Database = {
           total_credits_purchased?: number
           total_free_credits_used?: number
           total_purchased_credits_used?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          show_grading_tips: boolean
+          stripe_customer_id: string | null
+          subscription_tier: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          show_grading_tips?: boolean
+          stripe_customer_id?: string | null
+          subscription_tier?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          show_grading_tips?: boolean
+          stripe_customer_id?: string | null
+          subscription_tier?: string
           updated_at?: string | null
           user_id?: string
         }

@@ -68,9 +68,9 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    // Update the profile preference
+    // Update the user settings preference
     const { error: updateError } = await supabase
-      .from('profiles')
+      .from('user_settings')
       .update({ show_grading_tips: showGradingTips })
       .eq('user_id', user.id)
 

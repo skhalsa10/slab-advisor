@@ -1,6 +1,18 @@
 import { Settings } from 'lucide-react'
+import { getAuthenticatedSupabaseClient } from '@/lib/supabase-server'
+import { getUserSettings } from '@/lib/profile-service'
+import GradingTipsToggle from '@/components/settings/GradingTipsToggle'
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  // Fetch current user and their settings
+  const supabase = await getAuthenticatedSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // User is guaranteed to exist in authenticated route
+  const userSettings = await getUserSettings(user!.id)
+
   return (
     <div className="p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
@@ -13,9 +25,23 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="bg-grey-50 rounded-lg p-8 text-center border border-grey-200">
-        <p className="text-grey-600">
-          Account settings and billing options coming soon.
+      {/* Preferences Section */}
+      <div className="bg-white rounded-lg border border-grey-200 mb-6">
+        <div className="px-4 py-3 border-b border-grey-200">
+          <h2 className="text-sm font-semibold text-grey-900">Preferences</h2>
+        </div>
+        <div className="px-4 divide-y divide-grey-100">
+          <GradingTipsToggle initialValue={userSettings.show_grading_tips} />
+        </div>
+      </div>
+
+      {/* Account Section - Coming Soon */}
+      <div className="bg-grey-50 rounded-lg p-6 text-center border border-grey-200">
+        <p className="text-grey-600 text-sm">
+          Subscription management and billing options coming soon.
+        </p>
+        <p className="text-grey-500 text-xs mt-2">
+          Current plan: <span className="font-medium capitalize">{userSettings.subscription_tier}</span>
         </p>
       </div>
     </div>
