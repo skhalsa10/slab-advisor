@@ -1,4 +1,5 @@
 import { Settings } from 'lucide-react'
+import { redirect } from 'next/navigation'
 import { getAuthenticatedSupabaseClient } from '@/lib/supabase-server'
 import { getUserSettings } from '@/lib/profile-service'
 import GradingTipsToggle from '@/components/settings/GradingTipsToggle'
@@ -10,8 +11,12 @@ export default async function SettingsPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // User is guaranteed to exist in authenticated route
-  const userSettings = await getUserSettings(user!.id)
+  // Defensive check - redirect if no user (shouldn't happen with middleware)
+  if (!user) {
+    redirect('/auth')
+  }
+
+  const userSettings = await getUserSettings(user.id)
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
