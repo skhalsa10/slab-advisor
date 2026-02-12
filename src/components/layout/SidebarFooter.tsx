@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, Settings, LogOut, Sparkles } from 'lucide-react'
+import { MoreHorizontal, User, LogOut, Sparkles } from 'lucide-react'
 
 interface SidebarFooterProps {
   email: string
@@ -66,15 +66,15 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
 
           <DropdownMenuSeparator />
 
-          {/* Settings */}
+          {/* Account */}
           <DropdownMenuItem asChild>
             <Link
-              href="/settings"
+              href="/account"
               className="flex items-center gap-2 cursor-pointer"
               onClick={onNavigate}
             >
-              <Settings className="h-4 w-4" />
-              Settings
+              <User className="h-4 w-4" />
+              Account
             </Link>
           </DropdownMenuItem>
 

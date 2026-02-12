@@ -40,6 +40,9 @@ export const EVENTS = {
   // Collection events
   COLLECTION_VIEWED: 'collection_viewed',
 
+  // Account events
+  ACCOUNT_VIEWED: 'account_viewed',
+
   // Search events
   SEARCH_PERFORMED: 'search_performed',
 
@@ -187,6 +190,13 @@ export function trackCardDetailsViewed(properties: CardDetailsViewedProperties):
  */
 export function trackCollectionViewed(properties: CollectionViewedProperties): void {
   posthog.capture(EVENTS.COLLECTION_VIEWED, properties)
+}
+
+/**
+ * Track account page view
+ */
+export function trackAccountViewed(): void {
+  posthog.capture(EVENTS.ACCOUNT_VIEWED)
 }
 
 /**

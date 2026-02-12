@@ -164,6 +164,46 @@ export async function getUserSettings(userId: string): Promise<UserSettings> {
 }
 
 /**
+ * Credit details for account display
+ */
+export interface CreditDetails {
+  credits_remaining: number
+  purchased_credits: number
+  subscription_credits: number // Will be 0 until Phase 4 adds this column
+}
+
+/**
+ * Gets credit details for a user
+ *
+ * @param userId - The user's unique identifier
+ * @returns Credit details with subscription and purchased breakdown
+ */
+export async function getCreditDetails(userId: string): Promise<CreditDetails> {
+  const supabase = getServerSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('user_credits')
+    .select('credits_remaining, purchased_credits')
+    .eq('user_id', userId)
+    .single()
+
+  if (error) {
+    // User has no credits yet - return zeros
+    if (error.code === 'PGRST116') {
+      return { credits_remaining: 0, purchased_credits: 0, subscription_credits: 0 }
+    }
+    console.error('Error fetching credit details:', error)
+    return { credits_remaining: 0, purchased_credits: 0, subscription_credits: 0 }
+  }
+
+  return {
+    credits_remaining: data?.credits_remaining ?? 0,
+    purchased_credits: data?.purchased_credits ?? 0,
+    subscription_credits: 0, // Phase 4: will read from subscription_credits column
+  }
+}
+
+/**
  * Gets the show_grading_tips preference for a user
  *
  * @param userId - The user's unique identifier
