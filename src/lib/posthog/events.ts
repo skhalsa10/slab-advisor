@@ -52,6 +52,9 @@ export const EVENTS = {
 
   // Error events
   ERROR_OCCURRED: 'error_occurred',
+
+  // Account events
+  USER_DATA_DELETED: 'user_data_deleted',
 } as const
 
 // ============================================
@@ -123,6 +126,13 @@ interface ErrorOccurredProperties {
   message: string
   page?: string
   componentStack?: string
+}
+
+interface UserDataDeletedProperties {
+  cardsDeleted: number
+  gradingsDeleted: number
+  productsDeleted: number
+  snapshotsDeleted: number
 }
 
 // ============================================
@@ -225,6 +235,13 @@ export function trackCreditsUsed(properties: CreditsUsedProperties): void {
  */
 export function trackError(properties: ErrorOccurredProperties): void {
   posthog.capture(EVENTS.ERROR_OCCURRED, properties)
+}
+
+/**
+ * Track user data deletion (GDPR)
+ */
+export function trackUserDataDeleted(properties: UserDataDeletedProperties): void {
+  posthog.capture(EVENTS.USER_DATA_DELETED, properties)
 }
 
 /**
