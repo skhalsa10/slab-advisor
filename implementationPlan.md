@@ -2196,29 +2196,50 @@ A beautiful, interactive portfolio value chart that shows the user's collection 
 
 ---
 
-#### "Top 3 Gems" Leaderboard ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### "Top 3 Gems" Leaderboard ✅ COMPLETE
+**Status:** ✅ 100% Complete
 **Priority:** 🟠 High
-**Estimated Effort:** 2-3 days
+**Completed:** 2026-02-14
 
 **Description:**
-Displays the user's 3 most valuable cards with a "podium" style layout, making them feel special about their collection highlights.
+Displays the user's 3 most valuable cards with a trophy-case style layout in a bento-box dashboard grid, making them feel special about their collection highlights.
 
-**Location:** Dashboard Sidebar or Main Grid
+**Location:** Dashboard Main Grid — left side (2/3 width), paired side-by-side with Top Opportunities widget (1/3 width)
 
-**Design:**
-- Gold/Silver/Bronze borders for 1st/2nd/3rd
-- Card thumbnail + name + current value
-- Optional: Price change indicator (up/down arrows)
+**Design (Implemented):**
+- Gold/Silver/Bronze gradient backgrounds and border accents for 1st/2nd/3rd rank
+- Rank badge (numbered circle) on each card
+- Card thumbnail (aspect-[2.5/3.5]) + name + set + current value
+- Compact currency formatting ($1.2K for large values)
+- Responsive: 3-column grid on desktop, stacks on mobile
+- Placeholder slots with "Add Card" CTA when user has fewer than 3 cards
+- Widget hidden entirely when user has no cards with price data
+- Click navigates to card details page
 
-**Technical Requirements:**
-- Query collection_cards JOIN pokemon_card_prices
-- Sort by current market value DESC
-- Limit 3
+**Technical Implementation:**
+- Server-side data fetching with `getAuthenticatedSupabaseClient()` and RLS protection
+- Joins collection_cards → pokemon_cards → pokemon_sets → pokemon_card_prices
+- Price calculation priority: exact variant/condition price → current_market_price → market average
+- All database access server-side only; client components are display-only
+- Uses WidgetSection wrapper for consistent bento-box styling
 
-**Files to Create:**
-- `/src/components/dashboard/TopGemsWidget.tsx`
-- `/src/lib/collection-insights-server.ts`
+**Files Created:**
+- `/src/types/top-gem.ts` — TypeScript interfaces (TopGem, TopGemsResponse)
+- `/src/lib/top-gems-server.ts` — Server-side data fetching and price calculation
+- `/src/components/dashboard/top-gems/styles.ts` — Gold/silver/bronze rank styling constants
+- `/src/components/dashboard/top-gems/TopGemCard.tsx` — Individual gem card (client, display-only)
+- `/src/components/dashboard/top-gems/TopGemsList.tsx` — Grid wrapper with placeholders (client)
+- `/src/components/dashboard/top-gems/TopGemsWidget.tsx` — Main widget (server component)
+- `/src/components/dashboard/top-gems/TopGemsWidgetSkeleton.tsx` — Loading skeleton
+- `/src/components/dashboard/top-gems/index.ts` — Re-exports
+
+**Files Modified:**
+- `/src/app/(authenticated)/dashboard/page.tsx` — Added bento-box grid layout with TopGemsWidget + GradingOpportunitiesWidget side-by-side
+
+**Decisions Made:**
+- No grade badges shown (AI pre-grades in collection_card_gradings are predictions, not actual grades)
+- Raw/market pricing only (no PSA pricing until "mark as graded" feature is built)
+- No price change indicators — widget focuses purely on current value
 
 ---
 
@@ -2457,7 +2478,7 @@ CREATE TABLE activity_feed (
 | Priority | Widget | Effort | Dependencies |
 |----------|--------|--------|--------------|
 | 1 | Portfolio Value Graph | ~~2-3 days~~ ✅ Done | ~~Snapshots~~ ✅ |
-| 2 | Top 3 Gems | 2-3 days | ~~Price data~~ ✅ |
+| 2 | Top 3 Gems | ~~2-3 days~~ ✅ Done | ~~Price data~~ ✅ |
 | 3 | Set Completion | 1 week | Set metadata |
 | 4 | Market Movers | 3-4 days | ~~24h price history~~ ✅ |
 | 5 | Digital Binders | 1 week | New DB tables |
