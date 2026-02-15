@@ -2,6 +2,9 @@ import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Prevents trailing slash redirects that break PostHog API calls
+  skipTrailingSlashRedirect: true,
+
   // Exclude scripts folder from file watching (contains large archives and data files)
   // Note: Turbopack automatically ignores non-src folders, webpack config is for production builds
   webpack: (config) => {
@@ -82,6 +85,20 @@ const nextConfig: NextConfig = {
         ],
       },
     ]
+  },
+  // PostHog reverse proxy to bypass ad blockers
+  // See: https://posthog.com/docs/advanced/proxy/nextjs
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://us-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://us.i.posthog.com/:path*",
+      },
+    ];
   },
 };
 
