@@ -1,8 +1,10 @@
+import { Suspense } from 'react'
 import PageHeader from '@/components/ui/PageHeader'
 import RecentScansWidget from '@/components/dashboard/RecentScansWidget'
 import GradingOpportunitiesWidget from '@/components/dashboard/GradingOpportunitiesWidget'
 import PortfolioSection from '@/components/dashboard/PortfolioSection'
 import TopGemsWidget from '@/components/dashboard/top-gems'
+import MarketMoversWidget, { MarketMoversWidgetSkeleton } from '@/components/dashboard/market-movers'
 import { getPortfolioSnapshots, getLivePortfolioData } from '@/lib/portfolio-server'
 
 export const dynamic = 'force-dynamic'
@@ -38,6 +40,11 @@ export default async function DashboardPage() {
         </div>
 
         <RecentScansWidget />
+
+        {/* Market Movers: user's collection cards with biggest price movements */}
+        <Suspense fallback={<MarketMoversWidgetSkeleton />}>
+          <MarketMoversWidget />
+        </Suspense>
       </div>
     )
   } catch (error) {

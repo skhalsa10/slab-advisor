@@ -50,6 +50,9 @@ export const EVENTS = {
   CREDITS_PURCHASED: 'credits_purchased',
   CREDITS_USED: 'credits_used',
 
+  // Dashboard events
+  MARKET_MOVERS_PERIOD_CHANGED: 'market_movers_period_changed',
+
   // Error events
   ERROR_OCCURRED: 'error_occurred',
 
@@ -126,6 +129,10 @@ interface ErrorOccurredProperties {
   message: string
   page?: string
   componentStack?: string
+}
+
+interface MarketMoversPeriodChangedProperties {
+  period: '24h' | '7d' | '30d'
 }
 
 interface UserDataDeletedProperties {
@@ -235,6 +242,13 @@ export function trackCreditsUsed(properties: CreditsUsedProperties): void {
  */
 export function trackError(properties: ErrorOccurredProperties): void {
   posthog.capture(EVENTS.ERROR_OCCURRED, properties)
+}
+
+/**
+ * Track market movers time period change
+ */
+export function trackMarketMoversPeriodChanged(properties: MarketMoversPeriodChangedProperties): void {
+  posthog.capture(EVENTS.MARKET_MOVERS_PERIOD_CHANGED, properties)
 }
 
 /**

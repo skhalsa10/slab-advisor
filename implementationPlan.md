@@ -18,7 +18,7 @@
 - **Ximilar Card Identification**: Camera scan, image upload, card matching (100%)
 
 #### 🟡 Partially Completed
-- **Phase 3**: Dashboard & Navigation (85%)
+- **Phase 3**: Dashboard & Navigation (90%)
 - **Phase 4**: Collection Features (90%)
 - **Phase 5**: Add Card Flow (95%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking complete (95%)
@@ -27,6 +27,8 @@
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
 
 #### ✅ Recently Completed
+- **Market Movers Widget**: Dashboard widget showing collection cards with biggest price movements, 24H/7D/30D period toggle, noise filtering ✅ (February 15, 2026)
+- **Top Gems Widget**: Dashboard trophy-case showing top 3 most valuable collection cards ✅ (February 13, 2026)
 - **Observability Stack**: PostHog analytics with custom events + Sentry error tracking with performance spans, logs, and metrics ✅ (February 8, 2026)
 - **Waitlist Landing Page**: Pre-launch waitlist with email signup, Resend integration, mobile-responsive design, bypass system for internal access ✅ (February 6, 2026)
 - **App Icon Redesign**: Premium dark slate slab design with amber vault, PWA manifest, updated metadata ✅ (February 6, 2026)
@@ -2243,30 +2245,38 @@ Displays the user's 3 most valuable cards with a trophy-case style layout in a b
 
 ---
 
-#### Market Movers (Price Alerts) ❌ NOT STARTED
-**Status:** ❌ 0% Complete
+#### Market Movers (Price Alerts) ✅ COMPLETED
+**Status:** ✅ 100% Complete
 **Priority:** 🟡 Medium
-**Estimated Effort:** 3-4 days
+**Completed:** February 15, 2026
 
 **Description:**
-A "stock ticker" style widget that highlights cards in the user's collection with the biggest price swings in the last 24 hours.
+A horizontal scroll widget on the dashboard showing the user's collection cards with the biggest price movements, with a selectable time period (24H, 7D, 30D).
 
-**Location:** Small Ticker or "Stock" Widget
+**Location:** Dashboard, full-width below Recent Scans
 
-**Features:**
-- Show cards with >5% price change
-- Green for gains, red for losses
-- Percentage and absolute change display
-- Tap to view card details
+**What's Done:**
+- ✅ Server-side data fetching with `getMarketMovers()` (all queries server-side only)
+- ✅ 24h change computed from `raw_price_history` JSONB (last 2 daily entries)
+- ✅ 7d/30d changes from pre-computed database columns
+- ✅ Time period toggle (24H / 7D / 30D) — client-side sorting, single fetch
+- ✅ Green badges for gainers, red badges for losers, sorted by absolute % change
+- ✅ Top 10 cards displayed per period in horizontal scroll carousel
+- ✅ Noise filter: cards under $1.00 excluded (`MIN_PRICE_THRESHOLD`)
+- ✅ Empty state when no significant movement detected
+- ✅ Loading skeleton with Suspense
+- ✅ PostHog event tracking for period changes
+- ✅ 13 unit tests for `compute24hChange()` — all passing
+- ✅ Links to card detail page (`/collection/cards/[id]`)
 
-**Technical Requirements:**
-- Price comparison: current vs 24h ago
-- Requires historical price data per card
-- Sorting by absolute % change
-
-**Files to Create:**
-- `/src/components/dashboard/MarketMoversWidget.tsx`
-- `/src/lib/price-alerts-server.ts`
+**Files Created:**
+- `/src/types/market-mover.ts`
+- `/src/lib/market-movers-server.ts`
+- `/src/components/dashboard/market-movers/MarketMoversWidget.tsx`
+- `/src/components/dashboard/market-movers/MarketMoversClient.tsx`
+- `/src/components/dashboard/market-movers/MarketMoversWidgetSkeleton.tsx`
+- `/src/components/dashboard/market-movers/index.ts`
+- `/src/lib/market-movers-server.test.ts`
 
 ---
 
@@ -2480,7 +2490,7 @@ CREATE TABLE activity_feed (
 | 1 | Portfolio Value Graph | ~~2-3 days~~ ✅ Done | ~~Snapshots~~ ✅ |
 | 2 | Top 3 Gems | ~~2-3 days~~ ✅ Done | ~~Price data~~ ✅ |
 | 3 | Set Completion | 1 week | Set metadata |
-| 4 | Market Movers | 3-4 days | ~~24h price history~~ ✅ |
+| 4 | ~~Market Movers~~ ✅ | ~~3-4 days~~ Done | ~~24h price history~~ ✅ |
 | 5 | Digital Binders | 1 week | New DB tables |
 | 6 | Trophy Case | 1-2 weeks | Badge system |
 | 7 | Social Stats | 2 weeks | Follow system |
