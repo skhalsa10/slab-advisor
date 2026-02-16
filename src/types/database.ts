@@ -42,6 +42,25 @@ export type UserCreditsInsert = Database['public']['Tables']['user_credits']['In
 export type UserCreditsUpdate = Database['public']['Tables']['user_credits']['Update']
 
 /**
+ * Binders - Groups for organizing collection cards
+ *
+ * References the auto-generated database type.
+ * Each user has a default "All Cards" binder plus custom binders.
+ */
+export type Binder = Database['public']['Tables']['binders']['Row']
+export type BinderInsert = Database['public']['Tables']['binders']['Insert']
+export type BinderUpdate = Database['public']['Tables']['binders']['Update']
+
+/**
+ * Binder Cards - Junction table linking binders to collection cards
+ *
+ * References the auto-generated database type.
+ * Only used for custom binders (default "All Cards" binder is virtual).
+ */
+export type BinderCard = Database['public']['Tables']['binder_cards']['Row']
+export type BinderCardInsert = Database['public']['Tables']['binder_cards']['Insert']
+
+/**
  * Collection Card Gradings - Card grading results from Ximilar API
  *
  * References the auto-generated database type.

@@ -22,6 +22,7 @@ import {
 const CONFIRMATION_STRING = 'DELETE ALL MY DATA'
 
 interface DeletionCounts {
+  binders: number
   gradings: number
   cards: number
   products: number
@@ -81,6 +82,7 @@ export async function DELETE(request: NextRequest) {
         span.setAttribute('user_id', user.id)
 
         const counts: DeletionCounts = {
+          binders: 0,
           gradings: 0,
           cards: 0,
           products: 0,
@@ -89,6 +91,19 @@ export async function DELETE(request: NextRequest) {
         }
 
         try {
+          // Step 0: Delete binders (CASCADE deletes binder_cards automatically)
+          const { data: bindersData, error: bindersError } = await supabaseAdmin
+            .from('binders')
+            .delete()
+            .eq('user_id', user.id)
+            .select('id')
+
+          if (bindersError) {
+            throw new Error(`Failed to delete binders: ${bindersError.message}`)
+          }
+          counts.binders = bindersData?.length || 0
+          span.setAttribute('binders_deleted', counts.binders)
+
           // Step 1: Delete collection_card_gradings (FK to collection_cards - must delete first)
           const { data: gradingsData, error: gradingsError } = await supabaseAdmin
             .from('collection_card_gradings')
@@ -218,6 +233,7 @@ export async function DELETE(request: NextRequest) {
             success: true,
             message: 'All user data has been deleted',
             counts: {
+              bindersDeleted: counts.binders,
               cardsDeleted: counts.cards,
               gradingsDeleted: counts.gradings,
               productsDeleted: counts.products,

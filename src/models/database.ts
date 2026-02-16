@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      binder_cards: {
+        Row: {
+          added_at: string | null
+          binder_id: string
+          collection_card_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string | null
+          binder_id: string
+          collection_card_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string | null
+          binder_id?: string
+          collection_card_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "binder_cards_binder_id_fkey"
+            columns: ["binder_id"]
+            isOneToOne: false
+            referencedRelation: "binders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "binder_cards_collection_card_id_fkey"
+            columns: ["collection_card_id"]
+            isOneToOne: false
+            referencedRelation: "collection_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      binders: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_default: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       collection_card_gradings: {
         Row: {
           back_annotated_exact_url: string | null
@@ -831,6 +900,7 @@ export type Database = {
         Returns: Json
       }
       deduct_user_credit: { Args: { p_user_id: string }; Returns: Json }
+      generate_binder_slug: { Args: { p_name: string }; Returns: string }
       get_set_tcgplayer_groups: { Args: { set_id: string }; Returns: Json }
       get_user_credit_details: { Args: { p_user_id: string }; Returns: Json }
       get_user_total_cards: { Args: { p_user_id: string }; Returns: number }
