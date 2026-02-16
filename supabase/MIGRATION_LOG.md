@@ -72,7 +72,7 @@ Follow the workflow: apply to gamma first, test, then apply to production.
 | 20260210000000 | create_user_settings_table | 2026-02-10 | 2026-02-10 | Private user settings table with RLS, migrates show_grading_tips from profiles |
 | 20260210000001 | drop_show_grading_tips_from_profiles | 2026-02-10 | 2026-02-10 | Remove show_grading_tips from profiles (moved to user_settings) |
 | 20260210000002 | add_user_settings_to_signup_trigger | 2026-02-10 | 2026-02-10 | Update signup trigger to create user_settings, backfill existing users |
-| 20260215000000 | create_binders_table | 2026-02-15 | pending | Binders table with RLS, indexes, updated_at trigger |
-| 20260215000001 | create_binder_cards_table | 2026-02-15 | pending | Junction table linking binders to collection cards with RLS |
-| 20260215000002 | add_binder_protection_trigger | 2026-02-15 | pending | Slug generation function + default binder protection trigger |
-| 20260215000003 | add_binders_to_signup_and_backfill | 2026-02-15 | pending | Update signup trigger for binders, backfill existing users |
+| 20260215000000 | create_binders_table | 2026-02-15 | 2026-02-15 | Binders table with RLS, indexes, updated_at trigger |
+| 20260215000001 | create_binder_cards_table | 2026-02-15 | 2026-02-15 | Junction table linking binders to collection cards with RLS |
+| 20260215000002 | add_binder_protection_trigger | 2026-02-15 | 2026-02-15 | Slug generation function + default binder protection trigger |
+| 20260215000003 | add_binders_to_signup_and_backfill | 2026-02-15 | 2026-02-15 | Update signup trigger for binders, backfill existing users |
