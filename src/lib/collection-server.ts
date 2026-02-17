@@ -8,7 +8,7 @@
  */
 
 import { getAuthenticatedSupabaseClient } from './supabase-server'
-import { type CollectionCard, type DashboardStats } from '@/types/database'
+import { type CollectionCard, type DashboardStats, type Binder, type BinderCard } from '@/types/database'
 import { type CollectionProductWithPriceChanges } from '@/utils/collectionProductUtils'
 
 /**
@@ -385,5 +385,78 @@ export async function getUserCollectionProducts(): Promise<CollectionProductWith
   } catch (error) {
     console.error('Error in getUserCollectionProducts:', error)
     throw error instanceof Error ? error : new Error('Failed to load collection products')
+  }
+}
+
+/**
+ * Gets the authenticated user's binders
+ *
+ * Fetches all binders for the current user ordered by sort_order.
+ * The default "All Cards" binder will appear first (sort_order = 0).
+ *
+ * @returns Promise containing user's binders
+ * @throws {Error} When user is not authenticated or query fails
+ */
+export async function getUserBinders(): Promise<Binder[]> {
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      throw new Error('User not authenticated')
+    }
+
+    const { data, error } = await supabase
+      .from('binders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('sort_order', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching binders:', error)
+      throw new Error('Failed to load binders')
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in getUserBinders:', error)
+    throw error instanceof Error ? error : new Error('Failed to load binders')
+  }
+}
+
+/**
+ * Gets the authenticated user's binder-card mappings
+ *
+ * Fetches all binder_cards junction rows for the user's binders.
+ * RLS policies ensure only the user's own binder cards are returned.
+ * Used for client-side filtering when a specific binder is selected.
+ *
+ * @returns Promise containing binder card mappings
+ * @throws {Error} When user is not authenticated or query fails
+ */
+export async function getUserBinderCards(): Promise<BinderCard[]> {
+  try {
+    const supabase = await getAuthenticatedSupabaseClient()
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      throw new Error('User not authenticated')
+    }
+
+    const { data, error } = await supabase
+      .from('binder_cards')
+      .select('id, binder_id, collection_card_id, added_at')
+
+    if (error) {
+      console.error('Error fetching binder cards:', error)
+      throw new Error('Failed to load binder card mappings')
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in getUserBinderCards:', error)
+    throw error instanceof Error ? error : new Error('Failed to load binder card mappings')
   }
 }

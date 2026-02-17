@@ -4,6 +4,8 @@ import ViewToggle, { type ViewMode } from './ViewToggle'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { formatPrice } from '@/utils/collectionPriceUtils'
 import { useQuickAddContext } from '@/contexts/QuickAddContext'
+import BinderSwitcher from './BinderSwitcher'
+import type { Binder } from '@/types/database'
 
 export type CollectionType = 'cards' | 'sealed'
 
@@ -15,6 +17,12 @@ interface CollectionHeaderProps {
   onCollectionTypeChange: (type: CollectionType) => void
   viewMode: ViewMode
   onViewModeChange: (mode: ViewMode) => void
+  binders: Binder[]
+  activeBinder: Binder
+  onBinderChange: (binder: Binder) => void
+  onCreateBinder: () => void
+  onRenameBinder: () => void
+  onDeleteBinder: () => void
 }
 
 export default function CollectionHeader({
@@ -24,7 +32,13 @@ export default function CollectionHeader({
   collectionType,
   onCollectionTypeChange,
   viewMode,
-  onViewModeChange
+  onViewModeChange,
+  binders,
+  activeBinder,
+  onBinderChange,
+  onCreateBinder,
+  onRenameBinder,
+  onDeleteBinder
 }: CollectionHeaderProps) {
   const { openQuickAdd } = useQuickAddContext()
 
@@ -35,9 +49,16 @@ export default function CollectionHeader({
 
   return (
     <div className="sticky top-0 z-10 bg-grey-50 pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
-      {/* Header with title and count */}
+      {/* Header with binder switcher and count */}
       <div className="mb-4">
-        <h1 className="text-2xl font-bold text-grey-900">Your Collection</h1>
+        <BinderSwitcher
+          binders={binders}
+          activeBinder={activeBinder}
+          onBinderChange={onBinderChange}
+          onCreateBinder={onCreateBinder}
+          onRenameBinder={onRenameBinder}
+          onDeleteBinder={onDeleteBinder}
+        />
         <p className="mt-1 text-sm text-grey-600">
           {cardCount} {cardCount === 1 ? 'card' : 'cards'}
           {productCount > 0 && (

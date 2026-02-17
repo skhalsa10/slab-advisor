@@ -1,6 +1,8 @@
 import {
   getUserCollectionCards,
-  getUserCollectionProducts
+  getUserCollectionProducts,
+  getUserBinders,
+  getUserBinderCards
 } from '@/lib/collection-server'
 import CollectionClient from './CollectionClient'
 import CollectionRefreshProvider from './CollectionRefreshProvider'
@@ -10,22 +12,28 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Collection Page - Server Component
- * Fetches user collection data (cards and sealed products) server-side for security and performance
+ * Fetches user collection data (cards, sealed products, binders) server-side for security and performance
  */
 export default async function CollectionPage() {
   try {
-    // Fetch collection data server-side with authentication
-    // Fetch cards and products in parallel for better performance
-    const [cards, products] = await Promise.all([
+    // Fetch all collection data server-side with authentication in parallel
+    const [cards, products, binders, binderCards] = await Promise.all([
       getUserCollectionCards(),
-      getUserCollectionProducts()
+      getUserCollectionProducts(),
+      getUserBinders(),
+      getUserBinderCards()
     ])
 
     // Pass server-fetched data to client component for interactivity
     // Wrap with refresh provider to enable QuickAdd to trigger re-renders
     return (
       <CollectionRefreshProvider>
-        <CollectionClient cards={cards} products={products} />
+        <CollectionClient
+          cards={cards}
+          products={products}
+          binders={binders}
+          binderCards={binderCards}
+        />
       </CollectionRefreshProvider>
     )
   } catch (error) {
