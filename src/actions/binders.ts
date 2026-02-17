@@ -71,9 +71,8 @@ export async function createBinder(name: string): Promise<{
 
     return { data: binder, error: null }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('[createBinder] Unexpected error:', message)
-    return { data: null, error: message }
+    console.error('[createBinder] Unexpected error:', err instanceof Error ? err.message : err)
+    return { data: null, error: 'An unexpected error occurred. Please try again.' }
   }
 }
 
@@ -130,9 +129,8 @@ export async function renameBinder(binderId: string, name: string): Promise<{
 
     return { data: binder, error: null }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('[renameBinder] Unexpected error:', message)
-    return { data: null, error: message }
+    console.error('[renameBinder] Unexpected error:', err instanceof Error ? err.message : err)
+    return { data: null, error: 'An unexpected error occurred. Please try again.' }
   }
 }
 
@@ -169,8 +167,7 @@ export async function deleteBinder(binderId: string): Promise<{
 
     return { success: true, error: null }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error'
-    console.error('[deleteBinder] Unexpected error:', message)
-    return { success: false, error: message }
+    console.error('[deleteBinder] Unexpected error:', err instanceof Error ? err.message : err)
+    return { success: false, error: 'An unexpected error occurred. Please try again.' }
   }
 }

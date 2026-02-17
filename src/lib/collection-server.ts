@@ -429,7 +429,7 @@ export async function getUserBinders(): Promise<Binder[]> {
  * Gets the authenticated user's binder-card mappings
  *
  * Fetches all binder_cards junction rows for the user's binders.
- * RLS policies ensure only the user's own binder cards are returned.
+ * Uses explicit user-scoped filtering (via binder IDs) alongside RLS for defense-in-depth.
  * Used for client-side filtering when a specific binder is selected.
  *
  * @returns Promise containing binder card mappings
@@ -445,9 +445,27 @@ export async function getUserBinderCards(): Promise<BinderCard[]> {
       throw new Error('User not authenticated')
     }
 
+    // Fetch user's binder IDs first for defense-in-depth (alongside RLS)
+    const { data: userBinders, error: binderError } = await supabase
+      .from('binders')
+      .select('id')
+      .eq('user_id', user.id)
+
+    if (binderError) {
+      console.error('Error fetching user binders for card filtering:', binderError)
+      throw new Error('Failed to load binder card mappings')
+    }
+
+    const binderIds = (userBinders || []).map((b) => b.id)
+
+    if (binderIds.length === 0) {
+      return []
+    }
+
     const { data, error } = await supabase
       .from('binder_cards')
       .select('id, binder_id, collection_card_id, added_at')
+      .in('binder_id', binderIds)
 
     if (error) {
       console.error('Error fetching binder cards:', error)
