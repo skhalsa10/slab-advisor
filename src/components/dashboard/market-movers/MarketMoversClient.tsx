@@ -52,20 +52,6 @@ function formatChange(change: number): {
   return { text, colorClass: 'text-grey-500', bgClass: 'bg-grey-50' }
 }
 
-/**
- * Returns a human-readable label for a period.
- */
-function getPeriodLabel(period: MarketMoverPeriod): string {
-  switch (period) {
-    case '24h':
-      return '24 hours'
-    case '7d':
-      return '7 days'
-    case '30d':
-      return '30 days'
-  }
-}
-
 interface MarketMoversClientProps {
   cards: MarketMoverCard[]
 }
