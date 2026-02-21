@@ -216,6 +216,22 @@ export async function addCardsToBinder(binderId: string, cardIds: string[]): Pro
       return { data: [], error: 'Cannot add cards to the default binder' }
     }
 
+    // Verify all cards belong to this user (defense-in-depth alongside RLS)
+    const { data: ownedCards, error: verifyError } = await supabase
+      .from('collection_cards')
+      .select('id')
+      .in('id', cardIds)
+      .eq('user_id', user.id)
+
+    if (verifyError) {
+      console.error('Error verifying card ownership:', verifyError)
+      return { data: [], error: 'Failed to verify card ownership' }
+    }
+
+    if (!ownedCards || ownedCards.length !== cardIds.length) {
+      return { data: [], error: 'One or more cards not found in your collection' }
+    }
+
     // Build the rows to upsert
     const rows = cardIds.map((cardId) => ({
       binder_id: binderId,
