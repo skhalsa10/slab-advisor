@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Check } from 'lucide-react'
 import {
   type CollectionProductWithPriceChanges,
   getProductDisplayName,
@@ -19,6 +20,9 @@ interface SealedProductGridItemProps {
   product: CollectionProductWithPriceChanges
   onViewProduct: () => void
   priority?: boolean
+  isSelectionMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: () => void
 }
 
 /**
@@ -34,7 +38,10 @@ interface SealedProductGridItemProps {
 export default function SealedProductGridItem({
   product,
   onViewProduct,
-  priority = false
+  priority = false,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect
 }: SealedProductGridItemProps) {
   const quantity = product.quantity || 1
   const totalValue = getProductTotalValue(product)
@@ -45,10 +52,22 @@ export default function SealedProductGridItem({
   const showConditionBadge =
     product.condition && product.condition !== 'sealed'
 
+  const handleClick = () => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect()
+    } else {
+      onViewProduct()
+    }
+  }
+
   return (
     <div
-      className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
-      onClick={onViewProduct}
+      className={`group relative bg-white rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
+        isSelected
+          ? 'border-orange-500 ring-2 ring-orange-500 ring-offset-1'
+          : 'border-grey-200 hover:border-orange-300 hover:shadow-lg'
+      }`}
+      onClick={handleClick}
     >
       <div className="aspect-[2.5/3.5] relative bg-grey-100">
         <Image
@@ -60,9 +79,24 @@ export default function SealedProductGridItem({
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
         />
 
-        {/* Top-left: Quantity badge (only if > 1) */}
+        {/* Selection checkbox overlay */}
+        {isSelectionMode && (
+          <div className="absolute top-2 left-2 z-10">
+            <div
+              className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors ${
+                isSelected
+                  ? 'bg-orange-500 border-2 border-orange-500'
+                  : 'border-2 border-white/80 bg-black/20 backdrop-blur-sm'
+              }`}
+            >
+              {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+            </div>
+          </div>
+        )}
+
+        {/* Top-left: Quantity badge (only if > 1) — shifts right when checkbox visible */}
         {quantity > 1 && (
-          <div className="absolute top-2 left-2">
+          <div className={`absolute top-2 ${isSelectionMode ? 'left-10' : 'left-2'} transition-all`}>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-900 text-white shadow-sm">
               x{quantity}
             </span>

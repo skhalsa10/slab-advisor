@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
@@ -20,6 +20,11 @@ const jetBrainsMono = JetBrains_Mono({
   display: "swap",
   variable: "--font-mono", // CSS custom property for use in globals.css
 });
+
+// Viewport configuration — viewport-fit=cover enables safe area insets on notched devices
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 // Application metadata for SEO and browser display
 export const metadata: Metadata = {

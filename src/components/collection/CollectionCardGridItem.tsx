@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Check } from 'lucide-react'
 import type { CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
@@ -16,11 +17,14 @@ interface CollectionCardGridItemProps {
   card: CollectionCard
   onViewCard: () => void
   priority?: boolean
+  isSelectionMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: () => void
 }
 
 /**
  * Collection Card Grid Item Component
- * 
+ *
  * Displays a single collection card in grid format with collection-specific features:
  * - Variant badge (top-left)
  * - Grade badge (top-right)
@@ -29,11 +33,15 @@ interface CollectionCardGridItemProps {
  * - User uploaded image priority
  * - Card aspect ratio optimized for trading cards
  * - Hover effects and click interactions
+ * - Selection mode: checkbox overlay and orange ring
  */
-export default function CollectionCardGridItem({ 
-  card, 
-  onViewCard, 
-  priority = false 
+export default function CollectionCardGridItem({
+  card,
+  onViewCard,
+  priority = false,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect
 }: CollectionCardGridItemProps) {
   const variant = formatVariant(card.variant, true, false, card.variant_pattern)
   const condition = formatCondition(card.condition, true)
@@ -41,10 +49,22 @@ export default function CollectionCardGridItem({
   // Note: Grade badge removed - grading data now lives in collection_card_gradings table
   const badgeClasses = getBadgeBaseClasses()
 
+  const handleClick = () => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect()
+    } else {
+      onViewCard()
+    }
+  }
+
   return (
-    <div 
-      className="group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer"
-      onClick={onViewCard}
+    <div
+      className={`group relative bg-white rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
+        isSelected
+          ? 'border-orange-500 ring-2 ring-orange-500 ring-offset-1'
+          : 'border-grey-200 hover:border-orange-300 hover:shadow-lg'
+      }`}
+      onClick={handleClick}
     >
       <div className="aspect-[2.5/3.5] relative">
         <Image
@@ -55,18 +75,33 @@ export default function CollectionCardGridItem({
           priority={priority}
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
         />
-        
-        {/* Top-left: Variant badge */}
+
+        {/* Selection checkbox overlay */}
+        {isSelectionMode && (
+          <div className="absolute top-2 left-2 z-10">
+            <div
+              className={`w-6 h-6 rounded-md flex items-center justify-center transition-colors ${
+                isSelected
+                  ? 'bg-orange-500 border-2 border-orange-500'
+                  : 'border-2 border-white/80 bg-black/20 backdrop-blur-sm'
+              }`}
+            >
+              {isSelected && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+            </div>
+          </div>
+        )}
+
+        {/* Top-left: Variant badge — shifts right when checkbox visible */}
         {variant && (
-          <div className="absolute top-2 left-2">
+          <div className={`absolute top-2 ${isSelectionMode ? 'left-10' : 'left-2'} transition-all`}>
             <span className={`${badgeClasses} ${variant.colorClass} ${variant.textColor}`}>
               {variant.text}
             </span>
           </div>
         )}
-        
+
         {/* Top-right: Grade badge - TODO: Integrate with collection_card_gradings table */}
-        
+
         {/* Bottom-left: Quantity badge (only if > 1) */}
         {quantity.showBadge && (
           <div className="absolute bottom-2 left-2">
@@ -75,7 +110,7 @@ export default function CollectionCardGridItem({
             </span>
           </div>
         )}
-        
+
         {/* Bottom-right: Condition badge */}
         {condition && (
           <div className="absolute bottom-2 right-2">
@@ -85,7 +120,7 @@ export default function CollectionCardGridItem({
           </div>
         )}
       </div>
-      
+
       <div className="p-2">
         <h3 className="text-xs font-medium text-grey-900 truncate">
           {getCardDisplayName(card)}

@@ -8,6 +8,9 @@ import EmptyCollectionState from './EmptyCollectionState'
 interface SealedCollectionListProps {
   products: CollectionProductWithPriceChanges[]
   onViewProduct: (product: CollectionProductWithPriceChanges) => void
+  isSelectionMode?: boolean
+  selectedIds?: Set<string>
+  onToggleSelect?: (productId: string) => void
 }
 
 /**
@@ -18,13 +21,22 @@ interface SealedCollectionListProps {
  */
 export default function SealedCollectionList({
   products,
-  onViewProduct
+  onViewProduct,
+  isSelectionMode = false,
+  selectedIds,
+  onToggleSelect
 }: SealedCollectionListProps) {
   return (
     <ItemList
       items={products}
       renderHeader={() => (
         <tr>
+          {isSelectionMode && (
+            <th
+              scope="col"
+              className="px-4 py-3 w-12"
+            />
+          )}
           <th
             scope="col"
             className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
@@ -73,12 +85,14 @@ export default function SealedCollectionList({
           >
             Gain/Loss
           </th>
-          <th
-            scope="col"
-            className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-          >
-            Actions
-          </th>
+          {!isSelectionMode && (
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
+            >
+              Actions
+            </th>
+          )}
         </tr>
       )}
       renderRow={(product) => (
@@ -86,6 +100,9 @@ export default function SealedCollectionList({
           key={product.id}
           product={product}
           onViewProduct={() => onViewProduct(product)}
+          isSelectionMode={isSelectionMode}
+          isSelected={selectedIds?.has(product.id) ?? false}
+          onToggleSelect={() => onToggleSelect?.(product.id)}
         />
       )}
       emptyStateComponent={<EmptyCollectionState />}

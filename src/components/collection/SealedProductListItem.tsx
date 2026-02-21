@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Check } from 'lucide-react'
 import {
   type CollectionProductWithPriceChanges,
   getProductDisplayName,
@@ -22,6 +23,9 @@ import { getListBadgeClasses } from '@/utils/collectionMetadata'
 interface SealedProductListItemProps {
   product: CollectionProductWithPriceChanges
   onViewProduct: () => void
+  isSelectionMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: () => void
 }
 
 /**
@@ -40,7 +44,10 @@ interface SealedProductListItemProps {
  */
 export default function SealedProductListItem({
   product,
-  onViewProduct
+  onViewProduct,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect
 }: SealedProductListItemProps) {
   const quantity = product.quantity || 1
   const marketPrice = getProductMarketPrice(product)
@@ -59,11 +66,38 @@ export default function SealedProductListItem({
     return `$${value.toFixed(2)}`
   }
 
+  const handleClick = () => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect()
+    } else {
+      onViewProduct()
+    }
+  }
+
   return (
     <tr
-      className="hover:bg-grey-50 cursor-pointer transition-colors"
-      onClick={onViewProduct}
+      className={`cursor-pointer transition-colors ${
+        isSelected
+          ? 'bg-orange-50 hover:bg-orange-100'
+          : 'hover:bg-grey-50'
+      }`}
+      onClick={handleClick}
     >
+      {/* Checkbox column — only in selection mode */}
+      {isSelectionMode && (
+        <td className="px-4 py-4 whitespace-nowrap w-12">
+          <div
+            className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+              isSelected
+                ? 'bg-orange-500 border-2 border-orange-500'
+                : 'border-2 border-grey-300 bg-white'
+            }`}
+          >
+            {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+          </div>
+        </td>
+      )}
+
       {/* Product column - Thumbnail + Name + Set */}
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
@@ -168,18 +202,20 @@ export default function SealedProductListItem({
         )}
       </td>
 
-      {/* Actions column */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onViewProduct()
-          }}
-          className="text-orange-600 hover:text-orange-900 transition-colors"
-        >
-          View details
-        </button>
-      </td>
+      {/* Actions column — hidden in selection mode */}
+      {!isSelectionMode && (
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onViewProduct()
+            }}
+            className="text-orange-600 hover:text-orange-900 transition-colors"
+          >
+            View details
+          </button>
+        </td>
+      )}
     </tr>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Check } from 'lucide-react'
 import type { CollectionCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
@@ -15,25 +16,31 @@ import { getCollectionCardPrice, formatPrice, getCardTotalValue } from '@/utils/
 interface CollectionCardListItemProps {
   card: CollectionCard
   onViewCard: () => void
+  isSelectionMode?: boolean
+  isSelected?: boolean
+  onToggleSelect?: () => void
 }
 
 /**
  * Collection Card List Item Component
- * 
+ *
  * Displays a single collection card as a table row with collection-specific information:
  * - Card thumbnail and name
  * - Variant with color coding
  * - Condition with appropriate styling
  * - Quantity
- * - Grade with color coding
  * - Date added to collection
  * - Action buttons
+ * - Selection mode: checkbox column and orange highlight
  */
-export default function CollectionCardListItem({ 
-  card, 
-  onViewCard 
+export default function CollectionCardListItem({
+  card,
+  onViewCard,
+  isSelectionMode = false,
+  isSelected = false,
+  onToggleSelect
 }: CollectionCardListItemProps) {
-  
+
   const variant = formatVariant(card.variant, false, true, card.variant_pattern)
   const condition = formatCondition(card.condition, false, true)
   const quantity = formatQuantity(card.quantity)
@@ -44,11 +51,38 @@ export default function CollectionCardListItem({
     return new Date(dateString).toLocaleDateString()
   }
 
+  const handleClick = () => {
+    if (isSelectionMode && onToggleSelect) {
+      onToggleSelect()
+    } else {
+      onViewCard()
+    }
+  }
+
   return (
-    <tr 
-      className="hover:bg-grey-50 cursor-pointer transition-colors"
-      onClick={onViewCard}
+    <tr
+      className={`cursor-pointer transition-colors ${
+        isSelected
+          ? 'bg-orange-50 hover:bg-orange-100'
+          : 'hover:bg-grey-50'
+      }`}
+      onClick={handleClick}
     >
+      {/* Checkbox column — only in selection mode */}
+      {isSelectionMode && (
+        <td className="px-4 py-4 whitespace-nowrap w-12">
+          <div
+            className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
+              isSelected
+                ? 'bg-orange-500 border-2 border-orange-500'
+                : 'border-2 border-grey-300 bg-white'
+            }`}
+          >
+            {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+          </div>
+        </td>
+      )}
+
       {/* Card column */}
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
@@ -124,18 +158,20 @@ export default function CollectionCardListItem({
         {formatDate(card.created_at)}
       </td>
 
-      {/* Actions column */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onViewCard()
-          }}
-          className="text-orange-600 hover:text-orange-900 transition-colors"
-        >
-          View details
-        </button>
-      </td>
+      {/* Actions column — hidden in selection mode */}
+      {!isSelectionMode && (
+        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onViewCard()
+            }}
+            className="text-orange-600 hover:text-orange-900 transition-colors"
+          >
+            View details
+          </button>
+        </td>
+      )}
     </tr>
   )
 }

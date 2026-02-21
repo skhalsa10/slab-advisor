@@ -1,5 +1,6 @@
 'use client'
 
+import { CheckSquare, X } from 'lucide-react'
 import ViewToggle, { type ViewMode } from './ViewToggle'
 import SegmentedControl from '@/components/ui/SegmentedControl'
 import { formatPrice } from '@/utils/collectionPriceUtils'
@@ -23,6 +24,8 @@ interface CollectionHeaderProps {
   onCreateBinder: () => void
   onRenameBinder: () => void
   onDeleteBinder: () => void
+  isSelectionMode: boolean
+  onToggleSelectionMode: () => void
 }
 
 export default function CollectionHeader({
@@ -38,7 +41,9 @@ export default function CollectionHeader({
   onBinderChange,
   onCreateBinder,
   onRenameBinder,
-  onDeleteBinder
+  onDeleteBinder,
+  isSelectionMode,
+  onToggleSelectionMode
 }: CollectionHeaderProps) {
   const { openQuickAdd } = useQuickAddContext()
 
@@ -48,7 +53,7 @@ export default function CollectionHeader({
   ]
 
   return (
-    <div className="sticky top-0 z-10 bg-grey-50 pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+    <div className="sticky top-0 z-20 bg-grey-50 pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
       {/* Header with binder switcher and count */}
       <div className="mb-4">
         <BinderSwitcher
@@ -91,27 +96,52 @@ export default function CollectionHeader({
           <ViewToggle viewMode={viewMode} onViewModeChange={onViewModeChange} />
         </div>
 
-        {/* Right side: Quick Add Button */}
-        <div className="flex items-center">
+        {/* Right side: Select toggle + Quick Add Button */}
+        <div className="flex items-center gap-2">
+          {/* Select / Cancel toggle */}
           <button
-            onClick={openQuickAdd}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            onClick={onToggleSelectionMode}
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+              isSelectionMode
+                ? 'text-grey-700 border border-grey-300 hover:bg-grey-50'
+                : 'text-grey-700 border border-grey-300 hover:bg-grey-50'
+            }`}
           >
-            <svg
-              className="h-4 w-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-            Quick Add
+            {isSelectionMode ? (
+              <>
+                <X className="h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <CheckSquare className="h-4 w-4" />
+                Select
+              </>
+            )}
           </button>
+
+          {/* Quick Add Button — hidden in selection mode */}
+          {!isSelectionMode && (
+            <button
+              onClick={openQuickAdd}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+            >
+              <svg
+                className="h-4 w-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Quick Add
+            </button>
+          )}
         </div>
       </div>
     </div>

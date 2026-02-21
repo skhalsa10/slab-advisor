@@ -8,6 +8,9 @@ import { type CollectionProductWithPriceChanges } from '@/utils/collectionProduc
 interface SealedCollectionGridProps {
   products: CollectionProductWithPriceChanges[]
   onViewProduct: (product: CollectionProductWithPriceChanges) => void
+  isSelectionMode?: boolean
+  selectedIds?: Set<string>
+  onToggleSelect?: (productId: string) => void
 }
 
 /**
@@ -18,7 +21,10 @@ interface SealedCollectionGridProps {
  */
 export default function SealedCollectionGrid({
   products,
-  onViewProduct
+  onViewProduct,
+  isSelectionMode = false,
+  selectedIds,
+  onToggleSelect
 }: SealedCollectionGridProps) {
   if (products.length === 0) {
     return <EmptySealedState />
@@ -33,6 +39,9 @@ export default function SealedCollectionGrid({
           product={product}
           onViewProduct={() => onViewProduct(product)}
           priority={index < 8}
+          isSelectionMode={isSelectionMode}
+          isSelected={selectedIds?.has(product.id) ?? false}
+          onToggleSelect={() => onToggleSelect?.(product.id)}
         />
       )}
       emptyStateComponent={<EmptySealedState />}

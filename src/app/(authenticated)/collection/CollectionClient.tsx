@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { type CollectionCard, type Binder, type BinderCard } from '@/types/database'
 import { type CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { trackCollectionViewed } from '@/lib/posthog/events'
@@ -26,7 +26,11 @@ import CollectionProductQuickViewContent from '@/components/collection/Collectio
 import CreateBinderDialog from '@/components/collection/CreateBinderDialog'
 import RenameBinderDialog from '@/components/collection/RenameBinderDialog'
 import DeleteBinderDialog from '@/components/collection/DeleteBinderDialog'
-import { createBinder, renameBinder, deleteBinder } from '@/actions/binders'
+import SelectionActionBar from '@/components/collection/SelectionActionBar'
+import AddToBinderDialog from '@/components/collection/AddToBinderDialog'
+import Toast from '@/components/ui/Toast'
+import { createBinder, renameBinder, deleteBinder, addCardsToBinder, removeCardsFromBinder } from '@/actions/binders'
+import { bulkDeleteCollectionCards, bulkDeleteCollectionProducts } from '@/actions/collection'
 import { type ViewMode } from '@/components/collection/ViewToggle'
 
 interface CollectionClientProps {
@@ -40,9 +44,9 @@ interface CollectionClientProps {
  * CollectionClient Component
  *
  * Client-side component for managing collection view interactions and state.
- * Handles view mode switching, binder filtering, and card/product interactions
+ * Handles view mode switching, binder filtering, selection mode, and card/product interactions
  * without any database queries. All data is passed down from the server-side
- * parent component.
+ * parent component. All mutations go through server actions.
  *
  * @param props - Contains server-fetched collection cards, products, binders, and binder card mappings
  */
@@ -75,6 +79,19 @@ export default function CollectionClient({
   const [showCreateBinder, setShowCreateBinder] = useState(false)
   const [showRenameBinder, setShowRenameBinder] = useState(false)
   const [showDeleteBinder, setShowDeleteBinder] = useState(false)
+
+  // Selection mode state
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showAddToBinder, setShowAddToBinder] = useState(false)
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
+  const [isBulkActionLoading, setIsBulkActionLoading] = useState(false)
+
+  // Toast state
+  const [toastState, setToastState] = useState<{
+    type: 'success' | 'error' | 'info'
+    message: string
+  } | null>(null)
 
   // Track collection view on initial load
   const hasTrackedView = useRef(false)
@@ -144,10 +161,174 @@ export default function CollectionClient({
   // Display total: filtered cards + all products
   const displayTotalValue = filteredCardsTotalValue + productsTotalValue
 
-  // Binder handlers
+  // --- Selection mode helpers ---
+
+  const exitSelectionMode = useCallback(() => {
+    setIsSelectionMode(false)
+    setSelectedIds(new Set())
+  }, [])
+
+  // The list of currently visible items for select all
+  const currentVisibleItems = useMemo(() => {
+    if (collectionType === 'cards') return filteredCardList
+    return productList
+  }, [collectionType, filteredCardList, productList])
+
+  const isAllSelected = useMemo(() => {
+    if (currentVisibleItems.length === 0) return false
+    return currentVisibleItems.every((item) => selectedIds.has(item.id))
+  }, [currentVisibleItems, selectedIds])
+
+  // --- Selection handlers ---
+
+  const handleToggleSelectionMode = () => {
+    if (isSelectionMode) {
+      exitSelectionMode()
+    } else {
+      setIsSelectionMode(true)
+    }
+  }
+
+  const handleToggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+
+  const handleSelectAll = useCallback(() => {
+    const allIds = new Set(currentVisibleItems.map((item) => item.id))
+    setSelectedIds(allIds)
+  }, [currentVisibleItems])
+
+  const handleDeselectAll = useCallback(() => {
+    setSelectedIds(new Set())
+  }, [])
+
+  // --- Auto-exit selection mode on context changes ---
+
   const handleBinderChange = (binder: Binder) => {
+    exitSelectionMode()
     setActiveBinder(binder)
   }
+
+  const handleCollectionTypeChange = (type: CollectionType) => {
+    exitSelectionMode()
+    setCollectionType(type)
+  }
+
+  // --- Binder action handlers ---
+
+  const handleAddToBinder = async (binderId: string) => {
+    setIsBulkActionLoading(true)
+    try {
+      const cardIds = Array.from(selectedIds)
+      const { data, error } = await addCardsToBinder(binderId, cardIds)
+      if (error) {
+        setToastState({ type: 'error', message: error })
+        return
+      }
+
+      // Update local binderCardList with new entries
+      if (data && data.length > 0) {
+        setBinderCardList((prev) => [...prev, ...data])
+      }
+
+      const binderName = binderList.find((b) => b.id === binderId)?.name ?? 'binder'
+      setToastState({
+        type: 'success',
+        message: `Added ${cardIds.length} ${cardIds.length === 1 ? 'card' : 'cards'} to ${binderName}`
+      })
+      setShowAddToBinder(false)
+      exitSelectionMode()
+    } finally {
+      setIsBulkActionLoading(false)
+    }
+  }
+
+  const handleRemoveFromBinder = async () => {
+    setIsBulkActionLoading(true)
+    try {
+      const cardIds = Array.from(selectedIds)
+      const { error } = await removeCardsFromBinder(activeBinder.id, cardIds)
+      if (error) {
+        setToastState({ type: 'error', message: error })
+        return
+      }
+
+      // Remove from local binderCardList
+      const removedSet = new Set(cardIds)
+      setBinderCardList((prev) =>
+        prev.filter(
+          (bc) =>
+            !(bc.binder_id === activeBinder.id && removedSet.has(bc.collection_card_id))
+        )
+      )
+
+      setToastState({
+        type: 'success',
+        message: `Removed ${cardIds.length} ${cardIds.length === 1 ? 'card' : 'cards'} from ${activeBinder.name}`
+      })
+      exitSelectionMode()
+    } finally {
+      setIsBulkActionLoading(false)
+    }
+  }
+
+  // --- Bulk delete handlers ---
+
+  const handleBulkDelete = async () => {
+    setIsBulkActionLoading(true)
+    try {
+      const ids = Array.from(selectedIds)
+
+      if (collectionType === 'cards') {
+        const { error, deletedCount } = await bulkDeleteCollectionCards(ids)
+        if (error) {
+          setToastState({ type: 'error', message: error })
+          return
+        }
+
+        // Remove from local state
+        const deletedSet = new Set(ids)
+        setCardList((prev) => prev.filter((c) => !deletedSet.has(c.id)))
+
+        // Also remove from binderCardList
+        setBinderCardList((prev) =>
+          prev.filter((bc) => !deletedSet.has(bc.collection_card_id))
+        )
+
+        setToastState({
+          type: 'success',
+          message: `Deleted ${deletedCount} ${deletedCount === 1 ? 'card' : 'cards'} from collection`
+        })
+      } else {
+        const { error, deletedCount } = await bulkDeleteCollectionProducts(ids)
+        if (error) {
+          setToastState({ type: 'error', message: error })
+          return
+        }
+
+        // Remove from local state
+        const deletedSet = new Set(ids)
+        setProductList((prev) => prev.filter((p) => !deletedSet.has(p.id)))
+
+        setToastState({
+          type: 'success',
+          message: `Deleted ${deletedCount} ${deletedCount === 1 ? 'product' : 'products'} from collection`
+        })
+      }
+
+      setShowBulkDeleteConfirm(false)
+      exitSelectionMode()
+    } finally {
+      setIsBulkActionLoading(false)
+    }
+  }
+
+  // --- Binder CRUD handlers ---
 
   const handleCreateBinder = async (name: string) => {
     const { data: newBinder, error } = await createBinder(name)
@@ -197,8 +378,11 @@ export default function CollectionClient({
     setShowDeleteBinder(false)
   }
 
-  // Card handlers
+  // --- Card handlers ---
+
   const handleViewCard = (card: CollectionCard) => {
+    // Block QuickView in selection mode
+    if (isSelectionMode) return
     setSelectedCard(card as CollectionCardWithPokemon)
   }
 
@@ -222,8 +406,11 @@ export default function CollectionClient({
     }
   }
 
-  // Product handlers
+  // --- Product handlers ---
+
   const handleViewProduct = (product: CollectionProductWithPriceChanges) => {
+    // Block QuickView in selection mode
+    if (isSelectionMode) return
     setSelectedProduct(product)
   }
 
@@ -253,6 +440,9 @@ export default function CollectionClient({
     return <EmptyCollectionState />
   }
 
+  const isCustomBinder = !activeBinder.is_default
+  const thClasses = 'px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider'
+
   return (
     <div>
       <CollectionHeader
@@ -260,7 +450,7 @@ export default function CollectionClient({
         productCount={productList.length}
         totalValue={displayTotalValue}
         collectionType={collectionType}
-        onCollectionTypeChange={setCollectionType}
+        onCollectionTypeChange={handleCollectionTypeChange}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         binders={binderList}
@@ -269,11 +459,13 @@ export default function CollectionClient({
         onCreateBinder={() => setShowCreateBinder(true)}
         onRenameBinder={() => setShowRenameBinder(true)}
         onDeleteBinder={() => setShowDeleteBinder(true)}
+        isSelectionMode={isSelectionMode}
+        onToggleSelectionMode={handleToggleSelectionMode}
       />
 
       {/* Cards View */}
       {collectionType === 'cards' && (
-        <>
+        <div className={isSelectionMode ? 'pb-28 md:pb-24' : ''}>
           {/* Empty binder state (only for custom binders with no cards) */}
           {filteredCardList.length === 0 && !activeBinder.is_default ? (
             <div className="text-center py-12">
@@ -291,6 +483,9 @@ export default function CollectionClient({
                   card={card}
                   onViewCard={() => handleViewCard(card)}
                   priority={index < 8}
+                  isSelectionMode={isSelectionMode}
+                  isSelected={selectedIds.has(card.id)}
+                  onToggleSelect={() => handleToggleSelect(card.id)}
                 />
               )}
               emptyStateComponent={<EmptyCollectionState />}
@@ -308,60 +503,20 @@ export default function CollectionClient({
               items={filteredCardList}
               renderHeader={() => (
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Card
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Variant
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Condition
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-center text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Qty
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Grade
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Price
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Total
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Added
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
+                  {isSelectionMode && (
+                    <th scope="col" className="px-4 py-3 w-12" />
+                  )}
+                  <th scope="col" className={thClasses}>Card</th>
+                  <th scope="col" className={thClasses}>Variant</th>
+                  <th scope="col" className={thClasses}>Condition</th>
+                  <th scope="col" className={`${thClasses} text-center`}>Qty</th>
+                  <th scope="col" className={thClasses}>Grade</th>
+                  <th scope="col" className={`${thClasses} text-right`}>Price</th>
+                  <th scope="col" className={`${thClasses} text-right`}>Total</th>
+                  <th scope="col" className={thClasses}>Added</th>
+                  {!isSelectionMode && (
+                    <th scope="col" className={thClasses}>Actions</th>
+                  )}
                 </tr>
               )}
               renderRow={(card) => (
@@ -369,33 +524,57 @@ export default function CollectionClient({
                   key={card.id}
                   card={card}
                   onViewCard={() => handleViewCard(card)}
+                  isSelectionMode={isSelectionMode}
+                  isSelected={selectedIds.has(card.id)}
+                  onToggleSelect={() => handleToggleSelect(card.id)}
                 />
               )}
               emptyStateComponent={<EmptyCollectionState />}
             />
           )}
-        </>
+        </div>
       )}
 
       {/* Sealed Products View */}
       {collectionType === 'sealed' && (
-        <>
+        <div className={isSelectionMode ? 'pb-28 md:pb-24' : ''}>
           {viewMode === 'grid' ? (
             <SealedCollectionGrid
               products={productList}
               onViewProduct={handleViewProduct}
+              isSelectionMode={isSelectionMode}
+              selectedIds={selectedIds}
+              onToggleSelect={handleToggleSelect}
             />
           ) : (
             <SealedCollectionList
               products={productList}
               onViewProduct={handleViewProduct}
+              isSelectionMode={isSelectionMode}
+              selectedIds={selectedIds}
+              onToggleSelect={handleToggleSelect}
             />
           )}
-        </>
+        </div>
       )}
 
-      {/* Card Quickview */}
-      {selectedCard && (
+      {/* Selection Action Bar (floating) */}
+      {isSelectionMode && (
+        <SelectionActionBar
+          selectedCount={selectedIds.size}
+          isCustomBinder={isCustomBinder}
+          collectionType={collectionType}
+          onAddToBinder={() => setShowAddToBinder(true)}
+          onRemoveFromBinder={handleRemoveFromBinder}
+          onDelete={() => setShowBulkDeleteConfirm(true)}
+          onSelectAll={handleSelectAll}
+          onDeselectAll={handleDeselectAll}
+          isAllSelected={isAllSelected}
+        />
+      )}
+
+      {/* Card Quickview — blocked in selection mode */}
+      {selectedCard && !isSelectionMode && (
         <QuickView
           isOpen={!!selectedCard}
           onClose={() => setSelectedCard(null)}
@@ -416,8 +595,8 @@ export default function CollectionClient({
         </QuickView>
       )}
 
-      {/* Product Quickview */}
-      {selectedProduct && (
+      {/* Product Quickview — blocked in selection mode */}
+      {selectedProduct && !isSelectionMode && (
         <QuickView
           isOpen={!!selectedProduct}
           onClose={() => setSelectedProduct(null)}
@@ -438,6 +617,60 @@ export default function CollectionClient({
         </QuickView>
       )}
 
+      {/* Add to Binder Dialog */}
+      <AddToBinderDialog
+        isOpen={showAddToBinder}
+        binders={binderList}
+        currentBinderId={isCustomBinder ? activeBinder.id : undefined}
+        selectedCount={selectedIds.size}
+        onConfirm={handleAddToBinder}
+        onCancel={() => setShowAddToBinder(false)}
+        onCreateBinder={() => {
+          setShowAddToBinder(false)
+          setShowCreateBinder(true)
+        }}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      {showBulkDeleteConfirm && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            onClick={() => setShowBulkDeleteConfirm(false)}
+          />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4">
+            <div className="bg-white rounded-lg shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-grey-900">
+                Delete {selectedIds.size} {collectionType === 'cards' ? (selectedIds.size === 1 ? 'card' : 'cards') : (selectedIds.size === 1 ? 'product' : 'products')}?
+              </h3>
+              <p className="mt-2 text-sm text-grey-600">
+                This will permanently remove {selectedIds.size === 1 ? 'this item' : 'these items'} from your collection.
+                This action cannot be undone.
+              </p>
+
+              <div className="flex gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowBulkDeleteConfirm(false)}
+                  disabled={isBulkActionLoading}
+                  className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkDelete}
+                  disabled={isBulkActionLoading}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isBulkActionLoading ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Binder Dialogs */}
       <CreateBinderDialog
         isOpen={showCreateBinder}
@@ -456,6 +689,15 @@ export default function CollectionClient({
         onConfirm={handleDeleteBinder}
         onCancel={() => setShowDeleteBinder(false)}
       />
+
+      {/* Toast Notification */}
+      {toastState && (
+        <Toast
+          type={toastState.type}
+          message={toastState.message}
+          onClose={() => setToastState(null)}
+        />
+      )}
     </div>
   )
 }
