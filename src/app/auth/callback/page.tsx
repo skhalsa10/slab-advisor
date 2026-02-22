@@ -3,6 +3,7 @@
 import { useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { checkProfileExists } from '@/actions/profile'
 import LoadingScreen from '@/components/ui/LoadingScreen'
 import { trackSignIn, trackSignUp } from '@/lib/posthog/events'
 
@@ -53,14 +54,10 @@ function AuthCallbackContent() {
           // OAuth succeeded - credits are automatically created by database trigger
           // No client-side credit creation needed (and blocked by RLS policies)
 
-          // Check if user has a profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('username')
-            .eq('user_id', data.session.user.id)
-            .single()
+          // Check if user has a profile (server-side query)
+          const hasProfile = await checkProfileExists(data.session.user.id)
 
-          if (!profile) {
+          if (!hasProfile) {
             // New OAuth user needs to set username
             trackSignUp({ method: 'google' })
             router.push('/auth/complete-profile')

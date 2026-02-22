@@ -1,5 +1,4 @@
 import { Suspense } from 'react'
-import AppNavigation from '@/components/layout/AppNavigation'
 import PageHeader from '@/components/explore/PageHeader'
 import PokemonHeroSection from '@/components/explore/PokemonHeroSection'
 import NewestSetsWidget from '@/components/widgets/NewestSetsWidget'
@@ -31,38 +30,36 @@ function WidgetSkeleton() {
 
 export default function ExplorePage() {
   return (
-    <AppNavigation>
-      <div className="space-y-8">
-        <PageHeader
-          title="Explore Trading Cards"
-          description="Browse and discover cards from your favorite TCGs"
-        />
+    <div className="space-y-8">
+      <PageHeader
+        title="Explore Trading Cards"
+        description="Browse and discover cards from your favorite TCGs"
+      />
 
-        {/* Pokemon Hero Section */}
-        <Suspense fallback={<HeroSkeleton />}>
-          <PokemonHeroSection />
-        </Suspense>
+      {/* Pokemon Hero Section */}
+      <Suspense fallback={<HeroSkeleton />}>
+        <PokemonHeroSection />
+      </Suspense>
 
-        {/* Newest Sets Widget */}
-        <Suspense fallback={<WidgetSkeleton />}>
-          <NewestSetsWidget limit={8} />
-        </Suspense>
+      {/* Newest Sets Widget */}
+      <Suspense fallback={<WidgetSkeleton />}>
+        <NewestSetsWidget limit={8} />
+      </Suspense>
 
-        {/* Newly Released Top Cards Widget */}
-        <Suspense fallback={<WidgetSkeleton />}>
-          <NewlyReleasedTopCardsWidget numSets={2} cardsPerSet={5} />
-        </Suspense>
+      {/* Newly Released Top Cards Widget */}
+      <Suspense fallback={<WidgetSkeleton />}>
+        <NewlyReleasedTopCardsWidget numSets={2} cardsPerSet={5} />
+      </Suspense>
 
-        {/* Trending This Week - Top 7-Day Price Movers */}
-        <Suspense fallback={<WidgetSkeleton />}>
-          <TopMoversWidget limit={10} />
-        </Suspense>
+      {/* Trending This Week - Top 7-Day Price Movers */}
+      <Suspense fallback={<WidgetSkeleton />}>
+        <TopMoversWidget limit={10} />
+      </Suspense>
 
-        {/* Future TCG note */}
-        <p className="text-center text-sm text-grey-500">
-          More TCGs coming soon
-        </p>
-      </div>
-    </AppNavigation>
+      {/* Future TCG note */}
+      <p className="text-center text-sm text-grey-500">
+        More TCGs coming soon
+      </p>
+    </div>
   )
 }

@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { getUser } from "@/lib/auth-server";
+import { AuthStateProvider } from "@/contexts/AuthStateContext";
 import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
 import EnvironmentBadge from "@/components/ui/EnvironmentBadge";
 import CookieConsent from "@/components/consent/CookieConsent";
@@ -96,19 +98,23 @@ export const metadata: Metadata = {
  * 
  * Note: This layout applies to ALL pages in the app directory
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getUser();
+
   return (
     <html lang="en">
       <body
         className={`${inter.variable} ${jetBrainsMono.variable} antialiased min-w-[320px]`}
       >
-        <ConditionalQuickAddProvider>
-          {children}
-        </ConditionalQuickAddProvider>
+        <AuthStateProvider initialUser={user}>
+          <ConditionalQuickAddProvider>
+            {children}
+          </ConditionalQuickAddProvider>
+        </AuthStateProvider>
         <EnvironmentBadge />
         <CookieConsent />
         <SpeedInsights />

@@ -1,7 +1,8 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { getCurrentUser, getUserCredits } from '@/lib/auth'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { fetchUserCredits } from '@/actions/credits'
+import { useAuthState } from '@/contexts/AuthStateContext'
 import { supabase } from '@/lib/supabase'
 import type { User, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 
@@ -25,59 +26,65 @@ interface UserCreditsRow {
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined)
 
 export function CreditsProvider({ children }: { children: ReactNode }) {
+  const authState = useAuthState()
+  const contextUser = authState?.user ?? null
+
   const [credits, setCredits] = useState(0)
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(contextUser)
   const [loading, setLoading] = useState(true)
   const [isRealtimeConnected, setIsRealtimeConnected] = useState(false)
 
-  const refreshCredits = async () => {
+  // Sync with auth context changes (login/logout)
+  useEffect(() => {
+    setUser(contextUser)
+    if (!contextUser) {
+      setCredits(0)
+      setLoading(false)
+    }
+  }, [contextUser])
+
+  const refreshCredits = useCallback(async () => {
     try {
-      const currentUser = await getCurrentUser()
-      if (currentUser) {
-        const userCredits = await getUserCredits(currentUser.id)
+      if (user) {
+        const userCredits = await fetchUserCredits(user.id)
         setCredits(userCredits)
-        setUser(currentUser)
       } else {
         setCredits(0)
-        setUser(null)
       }
     } catch {
       setCredits(0)
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
 
+  // Fetch credits when user changes
   useEffect(() => {
-    refreshCredits()
-  }, [])
+    if (user) {
+      refreshCredits()
+    }
+  }, [user, refreshCredits])
 
   // Set up realtime subscription for credit changes
   useEffect(() => {
     if (!user) return
 
-    // Set up realtime subscription for credit changes
-
-    // Create a channel for this user's credits
     const channel = supabase
       .channel(`user-credits-${user.id}`)
       .on<UserCreditsRow>(
         'postgres_changes',
         {
-          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'user_credits',
           filter: `user_id=eq.${user.id}`
         },
         (payload: RealtimePostgresChangesPayload<UserCreditsRow>) => {
           if (payload.eventType === 'UPDATE' && payload.new) {
-            // Update credits when database changes
             setCredits(payload.new.credits_remaining)
           } else if (payload.eventType === 'INSERT' && payload.new) {
-            // Handle new credit record
             setCredits(payload.new.credits_remaining)
           } else if (payload.eventType === 'DELETE') {
-            // Handle credit record deletion (shouldn't happen normally)
             setCredits(0)
           }
         }
@@ -92,7 +99,6 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         }
       })
 
-    // Cleanup subscription on unmount or user change
     return () => {
       setIsRealtimeConnected(false)
       supabase.removeChannel(channel)

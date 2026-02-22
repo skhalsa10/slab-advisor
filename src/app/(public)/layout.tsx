@@ -6,33 +6,24 @@ import Sidebar from '@/components/layout/Sidebar'
 import Navbar from '@/components/layout/Navbar'
 import SidebarPageContainer from '@/components/layout/SidebarPageContainer'
 import NavbarPageContainer from '@/components/layout/NavbarPageContainer'
-import LoadingScreen from '@/components/ui/LoadingScreen'
 import { createLoginHandler, createSignOutHandler } from '@/utils/auth-navigation'
 import { useAuth } from '@/hooks/useAuth'
 
-interface AppNavigationProps {
-  children: React.ReactNode
-}
-
 /**
- * Smart navigation component that renders either:
- * - Navbar (for unauthenticated users)
- * - Sidebar (for authenticated users)
- * 
- * Also provides the appropriate layout wrapper and context providers.
+ * Shared layout for public routes (browse, explore).
+ *
+ * Persists across page transitions within this route group,
+ * eliminating navigation remounts and auth flash.
+ *
+ * Reads auth state from context (instant, no loading state).
+ * Renders Sidebar for authenticated users, Navbar for guests.
  */
-export default function AppNavigation({ children }: AppNavigationProps) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, loading, setUser } = useAuth()
+  const { user, setUser } = useAuth()
   const handleLogin = createLoginHandler(router)
   const handleSignOut = createSignOutHandler(router, setUser)
 
-  if (loading) {
-    return <LoadingScreen />
-  }
-
-  // Authenticated user - show sidebar layout
-  // Note: QuickAddProvider is now handled at the root level
   if (user) {
     return (
       <CreditsProvider>
@@ -46,7 +37,6 @@ export default function AppNavigation({ children }: AppNavigationProps) {
     )
   }
 
-  // Unauthenticated user - show navbar layout
   return (
     <div className="min-h-screen bg-grey-50">
       <Navbar onLogin={handleLogin} />

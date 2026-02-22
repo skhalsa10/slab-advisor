@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/useAuth'
 import {
   validateUsernameFormat,
   suggestUsernameFromEmail,
@@ -14,10 +14,12 @@ import LoadingScreen from '@/components/ui/LoadingScreen'
  *
  * After OAuth signup (Google), new users are redirected here to set their username.
  * This page is required before accessing the app.
+ *
+ * Middleware handles redirect if user already has profile or is unauthenticated.
  */
 export default function CompleteProfile() {
   const router = useRouter()
-  
+  const { user } = useAuth({ redirectOnNoAuth: true, redirectOnNoAuthTo: '/auth' })
 
   const [username, setUsername] = useState('')
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(
@@ -25,53 +27,16 @@ export default function CompleteProfile() {
   )
   const [usernameChecking, setUsernameChecking] = useState(false)
   const [usernameError, setUsernameError] = useState('')
-  const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  // Check if user already has profile, suggest username from email
+  // Suggest username from email when user is available
   useEffect(() => {
-    async function checkProfile() {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-
-        if (!user) {
-          // Not authenticated, redirect to login
-          router.push('/auth')
-          return
-        }
-
-        // Check if user already has profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('user_id', user.id)
-          .single()
-
-        if (profile) {
-          // Already has profile, redirect to dashboard
-          router.push('/dashboard')
-          return
-        }
-
-        // Suggest username from email
-        if (user.email) {
-          const suggested = suggestUsernameFromEmail(user.email)
-          setUsername(suggested)
-        }
-
-        setLoading(false)
-      } catch (err) {
-        console.error('Error checking profile:', err)
-        setError('Failed to load profile')
-        setLoading(false)
-      }
+    if (user?.email) {
+      const suggested = suggestUsernameFromEmail(user.email)
+      setUsername(suggested)
     }
-
-    checkProfile()
-  }, [router])
+  }, [user])
 
   // Debounced username availability check
   useEffect(() => {
@@ -139,7 +104,8 @@ export default function CompleteProfile() {
     }
   }
 
-  if (loading) {
+  // While redirect is happening (no user), show loading
+  if (!user) {
     return <LoadingScreen message="Loading..." />
   }
 
