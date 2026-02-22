@@ -46,7 +46,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   const refreshCredits = useCallback(async () => {
     try {
       if (user) {
-        const userCredits = await fetchUserCredits(user.id)
+        const userCredits = await fetchUserCredits()
         setCredits(userCredits)
       } else {
         setCredits(0)

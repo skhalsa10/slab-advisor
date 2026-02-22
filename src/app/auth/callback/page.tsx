@@ -55,7 +55,7 @@ function AuthCallbackContent() {
           // No client-side credit creation needed (and blocked by RLS policies)
 
           // Check if user has a profile (server-side query)
-          const hasProfile = await checkProfileExists(data.session.user.id)
+          const hasProfile = await checkProfileExists()
 
           if (!hasProfile) {
             // New OAuth user needs to set username
