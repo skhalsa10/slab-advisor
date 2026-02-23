@@ -1,10 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { useAuth } from '@/hooks/useAuth'
 import { CONDITION_OPTIONS } from '@/constants/cards'
 import { getVariantLabel, parseVariantSelection } from '@/utils/variantUtils'
 import { trackCardAdded } from '@/lib/posthog/events'
+import { addCardsToBinder } from '@/actions/binders'
+import BinderMultiSelect from './BinderMultiSelect'
+import type { Binder } from '@/types/database'
 
 interface AddToCollectionFormProps {
   cardId: string
@@ -14,6 +18,7 @@ interface AddToCollectionFormProps {
   onError: (error: string) => void
   onClose?: () => void
   mode?: 'modal' | 'inline' | 'transform'
+  binders?: Binder[]
 }
 
 interface FormData {
@@ -32,10 +37,12 @@ export default function AddToCollectionForm({
   onSuccess,
   onError,
   onClose,
-  mode = 'modal'
+  mode = 'modal',
+  binders
 }: AddToCollectionFormProps) {
   const { user } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedBinderIds, setSelectedBinderIds] = useState<string[]>([])
   const [formData, setFormData] = useState<FormData>({
     variant: availableVariants[0] || '',
     quantity: 1,
@@ -109,10 +116,62 @@ export default function AddToCollectionForm({
       trackCardAdded({
         source: 'manual',
         category: 'pokemon',
-        cardId: cardId
+        cardId: cardId,
+        binderCount: selectedBinderIds.length
       })
-      onSuccess(result.message || 'Card added to collection successfully')
-      
+
+      // Assign to selected binders (if any)
+      const collectionCardId = result.data?.id
+      let binderFailureCount = 0
+
+      if (selectedBinderIds.length > 0 && collectionCardId) {
+        await Sentry.startSpan(
+          { op: 'binder.assign', name: 'Assign card to binders' },
+          async (span) => {
+            span.setAttribute('binder_count', selectedBinderIds.length)
+
+            const binderResults = await Promise.allSettled(
+              selectedBinderIds.map(binderId =>
+                addCardsToBinder(binderId, [collectionCardId])
+              )
+            )
+
+            let successCount = 0
+            for (const binderResult of binderResults) {
+              if (binderResult.status === 'rejected') {
+                binderFailureCount++
+                Sentry.captureException(binderResult.reason, {
+                  tags: { operation: 'binder_assign' }
+                })
+              } else if (binderResult.value.error) {
+                binderFailureCount++
+                Sentry.captureException(new Error(binderResult.value.error), {
+                  tags: { operation: 'binder_assign' }
+                })
+              } else {
+                successCount++
+              }
+            }
+
+            Sentry.metrics.count('binder_cards_assigned', successCount, {
+              attributes: { status: 'success' }
+            })
+            if (binderFailureCount > 0) {
+              Sentry.metrics.count('binder_cards_assigned', binderFailureCount, {
+                attributes: { status: 'failed' }
+              })
+            }
+          }
+        )
+      }
+
+      // Build success message
+      let successMessage = result.message || 'Card added to collection successfully'
+      if (binderFailureCount > 0) {
+        successMessage += `. Note: ${binderFailureCount} binder assignment(s) failed.`
+      }
+      onSuccess(successMessage)
+
       // Reset form
       setFormData({
         variant: availableVariants[0] || '',
@@ -122,6 +181,7 @@ export default function AddToCollectionForm({
         acquisition_date: '',
         notes: ''
       })
+      setSelectedBinderIds([])
 
       // Close modal/dialog if applicable
       if (onClose) {
@@ -260,6 +320,21 @@ export default function AddToCollectionForm({
             placeholder="Optional notes..."
           />
         </div>
+
+        {/* Row 5: Binder Selection (only when authenticated and binders available) */}
+        {user && binders && (
+          <div>
+            <label className="block text-sm font-medium text-grey-700 mb-1">
+              Binders
+            </label>
+            <BinderMultiSelect
+              binders={binders}
+              selectedBinderIds={selectedBinderIds}
+              onSelectionChange={setSelectedBinderIds}
+              disabled={isSubmitting}
+            />
+          </div>
+        )}
       </div>
 
       {/* Form Actions */}

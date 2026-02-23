@@ -1,7 +1,9 @@
 import { getCardWithSetServer } from '@/lib/pokemon-db-server'
 import { getAllCardPrices } from '@/actions/prices'
+import { getUserBinders } from '@/lib/collection-server'
 import CardDetailClient from './CardDetailClient'
 import Link from 'next/link'
+import type { Binder } from '@/types/database'
 
 interface CardDetailsPageProps {
   params: Promise<{
@@ -25,8 +27,17 @@ export default async function CardDetailsPage({ params }: CardDetailsPageProps) 
     // Fetch price data at page level for flexibility (includes all variant patterns)
     const { data: priceData } = await getAllCardPrices(cardId)
 
+    // Fetch user's binders (graceful fallback if not authenticated)
+    let binders: Binder[] = []
+    try {
+      binders = await getUserBinders()
+    } catch {
+      // User not authenticated or fetch failed — empty array is fine
+      binders = []
+    }
+
     return (
-      <CardDetailClient card={card} set={set} setId={setId} priceData={priceData} />
+      <CardDetailClient card={card} set={set} setId={setId} priceData={priceData} binders={binders} />
     )
   } catch (error) {
     console.error('Error fetching card data in server component:', error)

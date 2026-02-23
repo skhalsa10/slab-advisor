@@ -37,6 +37,9 @@ export const EVENTS = {
   CARD_GRADED: 'card_graded',
   CARD_DETAILS_VIEWED: 'card_details_viewed',
 
+  // Binder events
+  BINDER_CREATED: 'binder_created',
+
   // Collection events
   COLLECTION_VIEWED: 'collection_viewed',
 
@@ -76,6 +79,7 @@ interface CardAddedProperties {
   source: 'manual' | 'ai'
   category?: string
   cardId?: string
+  binderCount?: number
 }
 
 interface CardRemovedProperties {
@@ -140,6 +144,10 @@ interface UserDataDeletedProperties {
   gradingsDeleted: number
   productsDeleted: number
   snapshotsDeleted: number
+}
+
+interface BinderCreatedProperties {
+  source: 'collection_page' | 'add_to_collection_modal'
 }
 
 // ============================================
@@ -256,6 +264,13 @@ export function trackMarketMoversPeriodChanged(properties: MarketMoversPeriodCha
  */
 export function trackUserDataDeleted(properties: UserDataDeletedProperties): void {
   posthog.capture(EVENTS.USER_DATA_DELETED, properties)
+}
+
+/**
+ * Track binder created
+ */
+export function trackBinderCreated(properties: BinderCreatedProperties): void {
+  posthog.capture(EVENTS.BINDER_CREATED, properties)
 }
 
 /**

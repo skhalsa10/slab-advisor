@@ -13,15 +13,17 @@ import { buildAvailableVariants } from '@/utils/variantUtils'
 import { PriceWidget, PriceWidgetEmpty, PriceWidgetProvider, VariantSwatch, PriceHeadline } from '@/components/prices'
 import type { CardFull, SetWithCards } from '@/models/pokemon'
 import type { CombinedCardPrices } from '@/types/prices'
+import type { Binder } from '@/types/database'
 
 interface CardDetailClientProps {
   card: CardFull
   set: SetWithCards
   setId: string
   priceData?: CombinedCardPrices | null
+  binders?: Binder[]
 }
 
-export default function CardDetailClient({ card, set, setId, priceData }: CardDetailClientProps) {
+export default function CardDetailClient({ card, set, setId, priceData, binders = [] }: CardDetailClientProps) {
   const { user } = useAuth()
   const { buildHref } = usePreserveFilters()
   const [showCollectionModal, setShowCollectionModal] = useState(false)
@@ -317,6 +319,7 @@ export default function CardDetailClient({ card, set, setId, priceData }: CardDe
         availableVariants={availableVariants}
         onSuccess={handleCollectionSuccess}
         onError={handleCollectionError}
+        binders={binders}
       />
     </div>
   )

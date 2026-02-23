@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import AddToCollectionForm from './AddToCollectionForm'
+import type { Binder } from '@/types/database'
 
 interface AddToCollectionModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface AddToCollectionModalProps {
   availableVariants: string[]
   onSuccess: (message: string) => void
   onError: (error: string) => void
+  binders?: Binder[]
 }
 
 export default function AddToCollectionModal({
@@ -20,7 +22,8 @@ export default function AddToCollectionModal({
   cardName,
   availableVariants,
   onSuccess,
-  onError
+  onError,
+  binders
 }: AddToCollectionModalProps) {
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -72,6 +75,7 @@ export default function AddToCollectionModal({
               onError={onError}
               onClose={onClose}
               mode="modal"
+              binders={binders}
             />
           </div>
         </div>
