@@ -108,94 +108,88 @@ export default function SearchResultCard({
         
 
         {/* Add to Collection Button */}
-        {!showAddForm ? (
-            <button
-              onClick={handleAddClick}
-              disabled={isCurrentlyAdding}
-              className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-grey-400 
-                         text-white text-sm font-medium py-2.5 px-3 rounded-lg
-                         transition-all duration-200 flex items-center justify-center
-                         hover:shadow-md active:scale-95"
-              aria-label={`Add ${card.name} from ${card.set_name} to collection`}
-            >
-              {isCurrentlyAdding ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-                  <span>Adding...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  <span>Add to Collection</span>
-                </>
-              )}
-            </button>
-        ) : (
-          <div className="space-y-2">
-            {/* Variant Selection */}
-            <div>
-              <label className="block text-xs font-medium text-grey-700 mb-1">
-                Variant:
-              </label>
-              <select
-                value={variant}
-                onChange={(e) => setVariant(e.target.value)}
-                className="w-full text-xs border border-grey-300 rounded px-2 py-1 
-                           focus:outline-none focus:ring-1 focus:ring-orange-500"
-              >
-                <option value="normal">Normal</option>
-                <option value="holo">Holo</option>
-                <option value="reverse_holo">Reverse Holo</option>
-                <option value="first_edition">1st Edition</option>
-                <option value="illustration_rare">Illustration Rare</option>
-                <option value="alt_art">Alt Art</option>
-                <option value="full_art">Full Art</option>
-                <option value="secret_rare">Secret Rare</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+        <button
+          onClick={handleAddClick}
+          disabled={isCurrentlyAdding}
+          className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-grey-400
+                     text-white text-sm font-medium py-2.5 px-3 rounded-lg
+                     transition-all duration-200 flex items-center justify-center
+                     hover:shadow-md active:scale-95"
+          aria-label={`Add ${card.name} from ${card.set_name} to collection`}
+        >
+          {isCurrentlyAdding ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+              <span>Adding...</span>
+            </>
+          ) : (
+            <>
+              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>{showAddForm ? 'Cancel' : 'Add to Collection'}</span>
+            </>
+          )}
+        </button>
 
-            {/* Quantity */}
-            <div>
-              <label className="block text-xs font-medium text-grey-700 mb-1">
-                Quantity:
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="999"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full text-xs border border-grey-300 rounded px-2 py-1 
-                           focus:outline-none focus:ring-1 focus:ring-orange-500"
-              />
-            </div>
+        {/* Expandable form section - CSS grid height animation */}
+        <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+          showAddForm ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}>
+          <div className="overflow-hidden">
+            <div className="space-y-2 pt-1">
+              {/* Variant Selection */}
+              <div>
+                <label className="block text-xs font-medium text-grey-700 mb-1">
+                  Variant:
+                </label>
+                <select
+                  value={variant}
+                  onChange={(e) => setVariant(e.target.value)}
+                  className="w-full text-xs border border-grey-300 rounded px-2 py-1
+                             focus:outline-none focus:ring-1 focus:ring-orange-500"
+                >
+                  <option value="normal">Normal</option>
+                  <option value="holo">Holo</option>
+                  <option value="reverse_holo">Reverse Holo</option>
+                  <option value="first_edition">1st Edition</option>
+                  <option value="illustration_rare">Illustration Rare</option>
+                  <option value="alt_art">Alt Art</option>
+                  <option value="full_art">Full Art</option>
+                  <option value="secret_rare">Secret Rare</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex space-x-2">
+              {/* Quantity */}
+              <div>
+                <label className="block text-xs font-medium text-grey-700 mb-1">
+                  Quantity:
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="999"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full text-xs border border-grey-300 rounded px-2 py-1
+                             focus:outline-none focus:ring-1 focus:ring-orange-500"
+                />
+              </div>
+
+              {/* Confirm Button */}
               <button
                 onClick={handleConfirmAdd}
                 disabled={isCurrentlyAdding}
-                className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-grey-400 
-                           text-white text-xs font-medium py-1.5 px-2 rounded 
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-grey-400
+                           text-white text-xs font-medium py-1.5 px-2 rounded
                            transition-colors duration-200"
               >
                 {isCurrentlyAdding ? 'Adding...' : 'Confirm'}
               </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                disabled={isCurrentlyAdding}
-                className="flex-1 bg-grey-500 hover:bg-grey-600 disabled:bg-grey-400 
-                           text-white text-xs font-medium py-1.5 px-2 rounded 
-                           transition-colors duration-200"
-              >
-                Cancel
-              </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

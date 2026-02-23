@@ -176,7 +176,7 @@ export default function QuickAddModal({
           </div>
 
           {/* Content */}
-          <div className="p-4">
+          <div className="p-4 min-h-[200px]">
             {children}
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function QuickAddModal({
           </div>
 
           {/* Content */}
-          <div className="p-4">
+          <div className="p-4 min-h-[250px]">
             {children}
           </div>
         </div>
@@ -259,7 +259,7 @@ export default function QuickAddModal({
         </div>
 
         {/* Content */}
-        <div className="p-4 pb-8">
+        <div className="p-4 pb-8 min-h-[250px] transition-all duration-200 ease-out">
           {children}
         </div>
       </div>

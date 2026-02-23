@@ -103,7 +103,7 @@ export default function QuickAddModal({
             fixed z-50 bottom-0 left-0 right-0
             bg-white rounded-t-2xl shadow-2xl
             flex flex-col
-            max-h-[90vh]
+            h-[85vh]
             transform transition-transform duration-300 ease-out
             ${isOpen ? 'translate-y-0' : 'translate-y-full'}
           `}
@@ -122,7 +122,7 @@ export default function QuickAddModal({
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex-1 overflow-y-auto overscroll-contain transition-all duration-200 ease-out">
             {children}
           </div>
 
@@ -155,9 +155,9 @@ export default function QuickAddModal({
             transform transition-all duration-300 ease-out
             ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
 
-            /* Tablet/Desktop dimensions - auto height that fits content */
+            /* Tablet/Desktop dimensions - fixed height to prevent layout shift */
             w-full max-w-[600px]
-            max-h-[80vh]
+            h-[70vh] max-h-[600px]
           `}
         >
           {/* Fixed Header */}
@@ -171,7 +171,7 @@ export default function QuickAddModal({
           </div>
 
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex-1 overflow-y-auto overscroll-contain transition-all duration-200 ease-out">
             {children}
           </div>
         </div>

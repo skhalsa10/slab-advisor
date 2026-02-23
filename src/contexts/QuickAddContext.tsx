@@ -307,9 +307,11 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
               {/* Choice View - Camera button + Search */}
               {(currentView === 'choice' || currentView === 'search') && (
                 <div className="h-full flex flex-col">
-                  {/* Camera Scan Button - hide when search is focused */}
-                  {!isSearchFocused && (
-                    <>
+                  {/* Camera Scan Button - animated collapse when search is focused */}
+                  <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                    !isSearchFocused ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                  }`}>
+                    <div className="overflow-hidden">
                       <div className="p-4">
                         <button
                           onClick={() => setCurrentView('camera')}
@@ -329,8 +331,8 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
                         <span className="text-sm text-grey-500">or search by name</span>
                         <div className="flex-1 h-px bg-grey-200" />
                       </div>
-                    </>
-                  )}
+                    </div>
+                  </div>
 
                   {/* Search Content */}
                   <div className="flex-1 overflow-hidden">

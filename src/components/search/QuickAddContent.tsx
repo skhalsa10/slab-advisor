@@ -2,6 +2,7 @@
 
 import SearchBar from './SearchBar'
 import SearchResultCard from './SearchResultCard'
+import SearchResultCardSkeleton from './SearchResultCardSkeleton'
 import { useQuickAdd } from '@/hooks/useQuickAdd'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -119,11 +120,17 @@ export default function QuickAddContent({
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading State - skeleton grid matching results layout */}
       {loading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-          <span className="ml-3 text-sm text-grey-600">Searching cards...</span>
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="h-4 w-24 bg-grey-200 rounded animate-pulse" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <SearchResultCardSkeleton key={i} />
+            ))}
+          </div>
         </div>
       )}
 
