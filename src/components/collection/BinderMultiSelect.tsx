@@ -24,7 +24,8 @@ export default function BinderMultiSelect({
   disabled = false
 }: BinderMultiSelectProps) {
   const breakpoints = useBreakpoint()
-  const isMobile = !breakpoints.md // < 768px
+  const isTablet = breakpoints.md && !breakpoints.lg // 768-1023px — full-screen modal
+  const useOverlay = !breakpoints.lg // phone + tablet use overlay instead of popover
 
   // Local copy of binders (initialized from prop, updated on inline creation)
   const [binderList, setBinderList] = useState<Binder[]>(() =>
@@ -45,18 +46,18 @@ export default function BinderMultiSelect({
   // Focus search input when popover/drawer opens
   useEffect(() => {
     if (open) {
-      const ref = isMobile ? mobileSearchInputRef : searchInputRef
+      const ref = useOverlay ? mobileSearchInputRef : searchInputRef
       const timer = setTimeout(() => ref.current?.focus(), 50)
       return () => clearTimeout(timer)
     } else {
       setSearchTerm('')
       setCreateError(null)
     }
-  }, [open, isMobile])
+  }, [open, useOverlay])
 
   // Handle escape key for mobile drawer
   useEffect(() => {
-    if (!open || !isMobile) return
+    if (!open || !useOverlay) return
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(false)
@@ -64,7 +65,7 @@ export default function BinderMultiSelect({
 
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
-  }, [open, isMobile])
+  }, [open, useOverlay])
 
   // Filter binders by search term
   const filteredBinders = useMemo(() => {
@@ -305,8 +306,8 @@ export default function BinderMultiSelect({
     </>
   )
 
-  // --- MOBILE: Drawer layout ---
-  if (isMobile) {
+  // --- PHONE + TABLET: Overlay layout ---
+  if (useOverlay) {
     return (
       <div className="space-y-1.5">
         {/* Trigger */}
@@ -327,7 +328,7 @@ export default function BinderMultiSelect({
           {triggerContent}
         </div>
 
-        {/* Drawer overlay */}
+        {/* Overlay */}
         {open && (
           <>
             {/* Backdrop */}
@@ -337,35 +338,59 @@ export default function BinderMultiSelect({
               aria-label="Close binder selector"
             />
 
-            {/* Drawer */}
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label="Select binders"
-              className="fixed z-[80] bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl flex flex-col h-[60vh] transform transition-transform duration-300 ease-out translate-y-0"
-            >
-              {/* Handle bar */}
-              <div className="flex justify-center pt-3 pb-2">
-                <div className="w-10 h-1 bg-grey-300 rounded-full" />
+            {isTablet ? (
+              /* TABLET: Centered modal */
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Select binders"
+                className="fixed z-[80] inset-0 bg-white flex flex-col"
+              >
+                {/* Header */}
+                <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-grey-100">
+                  <h3 className="text-base font-semibold text-grey-900">Select Binders</h3>
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors px-3 py-1 rounded-md hover:bg-orange-50"
+                  >
+                    Done
+                  </button>
+                </div>
+
+                {/* Binder list content */}
+                {binderListContent(mobileSearchInputRef, 'flex-1 min-h-0 overflow-y-auto')}
               </div>
+            ) : (
+              /* PHONE: Bottom sheet drawer */
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Select binders"
+                className="fixed z-[80] bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl flex flex-col h-[60vh] transform transition-transform duration-300 ease-out translate-y-0"
+              >
+                {/* Handle bar */}
+                <div className="flex justify-center pt-3 pb-2">
+                  <div className="w-10 h-1 bg-grey-300 rounded-full" />
+                </div>
 
-              {/* Header */}
-              <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-grey-100">
-                <h3 className="text-base font-semibold text-grey-900">Select Binders</h3>
-                <button
-                  onClick={() => setOpen(false)}
-                  className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors px-3 py-1 rounded-md hover:bg-orange-50"
-                >
-                  Done
-                </button>
+                {/* Header */}
+                <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-grey-100">
+                  <h3 className="text-base font-semibold text-grey-900">Select Binders</h3>
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors px-3 py-1 rounded-md hover:bg-orange-50"
+                  >
+                    Done
+                  </button>
+                </div>
+
+                {/* Binder list content */}
+                {binderListContent(mobileSearchInputRef, 'flex-1 min-h-0 overflow-y-auto', 'py-3')}
+
+                {/* Safe area padding for devices with home indicator */}
+                <div className="flex-shrink-0 h-safe-area-inset-bottom pb-2" />
               </div>
-
-              {/* Binder list content — search + scrollable list + create */}
-              {binderListContent(mobileSearchInputRef, 'flex-1 min-h-0 overflow-y-auto', 'py-3')}
-
-              {/* Safe area padding for devices with home indicator */}
-              <div className="flex-shrink-0 h-safe-area-inset-bottom pb-2" />
-            </div>
+            )}
           </>
         )}
 

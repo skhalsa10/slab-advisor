@@ -339,7 +339,7 @@ export default function AddToCollectionForm({
 
       {/* Form Actions */}
       <div className={`flex gap-3 ${isTransformMode ? 'pt-2' : 'pt-4'}`}>
-        {onClose && (
+        {onClose && !isTransformMode && (
           <button
             type="button"
             onClick={onClose}

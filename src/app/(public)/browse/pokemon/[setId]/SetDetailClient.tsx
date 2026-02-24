@@ -26,6 +26,7 @@ import {
   type OwnershipFilterValue,
 } from '@/constants/url-filters'
 import type { PokemonSetWithCardsAndProducts } from '@/models/pokemon'
+import type { Binder } from '@/types/database'
 import QuickView from '@/components/ui/QuickView'
 import Toast from '@/components/ui/Toast'
 import CardQuickViewContent from '@/components/browse/CardQuickViewContent'
@@ -49,9 +50,10 @@ import SegmentedControl from '@/components/ui/SegmentedControl'
 interface SetDetailClientProps {
   initialData: PokemonSetWithCardsAndProducts
   setId: string
+  binders?: Binder[]
 }
 
-export default function SetDetailClient({ initialData, setId }: SetDetailClientProps) {
+export default function SetDetailClient({ initialData, setId, binders }: SetDetailClientProps) {
   const { user } = useAuth()
 
   // Fetch owned card IDs for ownership filtering
@@ -549,6 +551,7 @@ export default function SetDetailClient({ initialData, setId }: SetDetailClientP
           <CardQuickViewContent
             cardId={selectedCardId}
             setId={setId}
+            binders={binders}
             onClose={handleQuickViewClose}
             onCollectionUpdate={handleCollectionUpdate}
             onSuccess={showSuccessToast}
