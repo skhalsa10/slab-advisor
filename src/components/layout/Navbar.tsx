@@ -36,10 +36,10 @@ export default function Navbar({ onLogin }: NavbarProps) {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <Image
-                src="/logo.svg"
+                src="/logo_light.png"
                 alt="Slab Advisor Logo"
-                width={200}
-                height={50}
+                width={196}
+                height={84}
                 className="h-10 w-auto"
                 priority
               />

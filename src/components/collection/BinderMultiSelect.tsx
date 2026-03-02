@@ -236,7 +236,7 @@ export default function BinderMultiSelect({
       </div>
 
       {/* Scrollable binder list */}
-      <div className={listClassName}>
+      <div id="binder-multiselect-listbox" role="listbox" aria-label="Binders" className={listClassName}>
         {filteredBinders.length > 0 ? (
           <div className="p-1">
             {filteredBinders.map(binder => {
@@ -316,6 +316,7 @@ export default function BinderMultiSelect({
           tabIndex={disabled ? -1 : 0}
           aria-label="Select binders"
           aria-expanded={open}
+          aria-controls="binder-multiselect-listbox"
           onClick={() => !disabled && setOpen(true)}
           onKeyDown={(e) => {
             if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
@@ -412,6 +413,7 @@ export default function BinderMultiSelect({
             tabIndex={disabled ? -1 : 0}
             aria-label="Select binders"
             aria-expanded={open}
+            aria-controls="binder-multiselect-listbox"
             className={triggerClasses}
           >
             {triggerContent}

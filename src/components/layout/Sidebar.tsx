@@ -62,18 +62,14 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
         <div className="flex flex-col h-full bg-white border-r border-grey-200">
           {/* Logo */}
-          <div className="flex items-center h-16 flex-shrink-0 px-4 border-b border-grey-200">
-            <Image 
-              src="/logo-icon.svg" 
-              alt="Slab Advisor" 
-              className="h-8 w-8"
-              width={32} 
-              height={32} 
+          <div className="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-grey-200">
+            <Image
+              src="/logo_light.png"
+              alt="Slab Advisor"
+              className="h-12 w-auto"
+              width={196}
+              height={84}
             />
-            <h1 className="ml-3 text-xl font-bold">
-              <span className="text-grey-900">Slab</span>
-              <span className="text-orange-500">Advisor</span>
-            </h1>
           </div>
 
           {/* Navigation */}
@@ -128,17 +124,13 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
           <div className="flex items-center justify-between h-16 px-4">
             {/* Logo */}
             <div className="flex items-center">
-              <Image 
-                src="/logo-icon.svg" 
-                alt="Slab Advisor" 
-                className="h-8 w-8"
-                width={32} 
-                height={32} 
+              <Image
+                src="/logo_light.png"
+                alt="Slab Advisor"
+                className="h-10 w-auto"
+                width={196}
+                height={84}
               />
-              <h1 className="ml-2 text-lg font-bold">
-                <span className="text-grey-900">Slab</span>
-                <span className="text-orange-500">Advisor</span>
-              </h1>
             </div>
 
             {/* Mobile menu button */}

@@ -5,7 +5,12 @@
  * including variants, conditions, quantities, and grades.
  */
 
-import DOMPurify from 'isomorphic-dompurify'
+/**
+ * Strip all HTML tags from a string (defense-in-depth for user-provided values)
+ */
+function stripHtmlTags(input: string): string {
+  return input.replace(/<[^>]*>/g, '')
+}
 
 /**
  * Professional grading data structure
@@ -172,7 +177,7 @@ function formatVariantText(variant: string, pattern?: string | null): string {
       ? 'Poké Ball'
       : pattern === 'master_ball'
         ? 'Master Ball'
-        : DOMPurify.sanitize(pattern, { ALLOWED_TAGS: [] }) // Strip all HTML tags
+        : stripHtmlTags(pattern)
     baseText = `${baseText} (${patternLabel})`
   }
 

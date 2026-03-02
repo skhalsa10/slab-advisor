@@ -41,7 +41,7 @@ export default function PortfolioSection({
   }
 
   return (
-    <>
+    <div className="space-y-6">
       <PortfolioKPIRow
         snapshots={snapshots}
         liveData={liveData}
@@ -53,6 +53,6 @@ export default function PortfolioSection({
         timeRange={timeRange}
         onTimeRangeChange={setTimeRange}
       />
-    </>
+    </div>
   );
 }

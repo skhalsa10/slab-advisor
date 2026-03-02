@@ -47,9 +47,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     siteName: "Slab Advisor",
     images: [{
-      url: "/logo-icon.svg",
-      width: 512,
-      height: 512,
+      url: "/icon_light.png",
+      width: 928,
+      height: 1152,
       alt: "Slab Advisor Logo"
     }]
   },
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Slab Advisor - Trading Card Collection & AI Grading",
     description: "Manage your trading card collection and get AI-powered grade estimates before sending to PSA, BGS, or SGC.",
-    images: ["/logo-icon.svg"]
+    images: ["/icon_light.png"]
   },
   
   // App-specific metadata
