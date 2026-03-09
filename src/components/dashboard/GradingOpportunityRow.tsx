@@ -63,7 +63,7 @@ export default function GradingOpportunityRow({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between px-4 py-4 border-b border-grey-50 last:border-b-0 hover:bg-orange-50/50 transition-all duration-200 cursor-pointer group text-left"
+      className="w-full flex items-center justify-between px-4 py-4 border-b border-border last:border-b-0 hover:bg-accent/50 transition-all duration-200 cursor-pointer group text-left"
     >
       {/* Left Side: Thumbnail + Info */}
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -81,10 +81,10 @@ export default function GradingOpportunityRow({
 
         {/* Card Info */}
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-grey-900 text-sm truncate">
+          <p className="font-medium text-foreground text-sm truncate">
             {opportunity.cardName}
           </p>
-          <p className="text-xs text-grey-400">
+          <p className="text-xs text-muted-foreground">
             {opportunity.setName}
             {opportunity.cardNumber ? ` #${opportunity.cardNumber}` : ''} · Raw:{' '}
             {formatPrice(opportunity.currentMarketPrice)}
@@ -95,13 +95,13 @@ export default function GradingOpportunityRow({
       {/* Right Side: Hero Number + Chevron */}
       <div className="flex items-center gap-2 flex-shrink-0">
         {/* PSA 10 Profit (Hero Number) */}
-        <span className="text-sm font-bold text-grey-800">
+        <span className="text-sm font-bold text-foreground">
           {formatProfit(opportunity.profitAtPsa10)}
         </span>
 
         {/* Chevron */}
         <svg
-          className="w-4 h-4 text-grey-300 group-hover:text-orange-500 transition-colors"
+          className="w-4 h-4 text-muted-foreground group-hover:text-orange-500 transition-colors"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

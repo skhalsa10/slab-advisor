@@ -89,8 +89,8 @@ export default function MarketMoversClient({ cards }: MarketMoversClientProps) {
             onClick={() => handlePeriodChange(period.value)}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               selectedPeriod === period.value
-                ? 'bg-gray-800 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
             {period.label}
@@ -112,7 +112,7 @@ export default function MarketMoversClient({ cards }: MarketMoversClientProps) {
               >
                 <Link
                   href={`/collection/cards/${card.collectionCardId}`}
-                  className="group block bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+                  className="group block bg-card text-card-foreground rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
                 >
                   <div className="aspect-[2.5/3.5] relative">
                     <Image
@@ -127,7 +127,7 @@ export default function MarketMoversClient({ cards }: MarketMoversClientProps) {
                     />
                   </div>
                   <div className="p-2">
-                    <h3 className="text-xs font-medium text-grey-900 truncate">
+                    <h3 className="text-xs font-medium text-foreground truncate">
                       {card.cardName}
                     </h3>
                     <p
@@ -135,7 +135,7 @@ export default function MarketMoversClient({ cards }: MarketMoversClientProps) {
                     >
                       {text}
                     </p>
-                    <p className="text-base font-semibold text-gray-900 mt-1">
+                    <p className="text-base font-semibold text-foreground mt-1">
                       $
                       {card.currentPrice.toLocaleString(undefined, {
                         minimumFractionDigits: 2,

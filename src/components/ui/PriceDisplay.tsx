@@ -18,13 +18,13 @@ export default function PriceDisplay({
   return (
     <div className={className}>
       {showMarketLabel && (
-        <p className="text-xs text-gray-500">Market price</p>
+        <p className="text-xs text-muted-foreground">Market price</p>
       )}
-      <p className="text-base font-semibold text-gray-900">
+      <p className="text-base font-semibold text-foreground">
         {price || 'Not available'}
       </p>
       {hasMultipleVariants && (
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-muted-foreground mt-0.5">
           {variantCount} variants
         </p>
       )}

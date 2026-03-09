@@ -61,7 +61,7 @@ export default async function AccountPage() {
 
       <SubscriptionSection settings={userSettings} />
 
-      <PreferencesSection initialShowGradingTips={userSettings.show_grading_tips} initialTheme={userSettings.theme} />
+      <PreferencesSection initialShowGradingTips={userSettings.show_grading_tips} />
 
       <DangerZoneSection />
     </div>

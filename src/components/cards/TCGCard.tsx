@@ -59,7 +59,7 @@ export default function TCGCard({
     <Link
       href={href}
       onClick={handleClick}
-      className={`group relative bg-white rounded-lg overflow-hidden border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
+      className={`group relative bg-card text-card-foreground rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
     >
       <div className="aspect-[2.5/3.5] relative">
         <Image
@@ -80,11 +80,11 @@ export default function TCGCard({
         )}
       </div>
       <div className="p-2">
-        <h3 className="text-xs font-medium text-grey-900 truncate">
+        <h3 className="text-xs font-medium text-foreground truncate">
           {card.name}
         </h3>
         {card.metadata && card.metadata.length > 0 && (
-          <p className="text-xs text-grey-600">
+          <p className="text-xs text-muted-foreground">
             {card.metadata.map((item, index) => (
               <span key={index}>
                 {item.label && `${item.label}: `}{item.value}
@@ -100,7 +100,7 @@ export default function TCGCard({
             className="mt-1"
           />
         ) : card.price != null ? (
-          <p className="text-base font-semibold text-gray-900 mt-1">
+          <p className="text-base font-semibold text-foreground mt-1">
             ${card.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         ) : null}

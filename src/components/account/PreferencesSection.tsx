@@ -1,16 +1,16 @@
 'use client'
 
 import SettingsToggle from '@/components/ui/SettingsToggle'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface PreferencesSectionProps {
   initialShowGradingTips: boolean
-  initialTheme: 'LIGHT' | 'DARK'
 }
 
 export default function PreferencesSection({
   initialShowGradingTips,
-  initialTheme,
 }: PreferencesSectionProps) {
+  const { theme, toggleTheme } = useTheme()
   const handleGradingTipsToggle = async (value: boolean) => {
     const response = await fetch('/api/profile/grading-tips', {
       method: 'PATCH',
@@ -20,19 +20,6 @@ export default function PreferencesSection({
 
     if (!response.ok) {
       throw new Error('Failed to update grading tips preference')
-    }
-  }
-
-  const handleThemeToggle = async (value: boolean) => {
-    const theme = value ? 'DARK' : 'LIGHT'
-    const response = await fetch('/api/profile/theme', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ theme }),
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to update theme preference')
     }
   }
 
@@ -53,8 +40,8 @@ export default function PreferencesSection({
           id="dark-mode"
           label="Dark Mode"
           description="Switch to dark theme"
-          initialValue={initialTheme === 'DARK'}
-          onToggle={handleThemeToggle}
+          initialValue={theme === 'DARK'}
+          onToggle={() => toggleTheme()}
         />
       </div>
     </div>

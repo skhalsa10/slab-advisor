@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getUser } from "@/lib/auth-server";
+import { fetchUserTheme } from "@/actions/settings";
 import { AuthStateProvider } from "@/contexts/AuthStateContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ConditionalQuickAddProvider from "@/components/providers/ConditionalQuickAddProvider";
 import EnvironmentBadge from "@/components/ui/EnvironmentBadge";
 import CookieConsent from "@/components/consent/CookieConsent";
@@ -116,20 +118,23 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getUser();
+  const initialTheme = await fetchUserTheme();
 
   return (
-    <html lang="en">
+    <html lang="en" className={initialTheme === 'DARK' ? 'dark' : ''}>
       <body
         className={`${inter.variable} ${jetBrainsMono.variable} ${playfair.variable} antialiased min-w-[320px]`}
       >
-        <AuthStateProvider initialUser={user}>
-          <ConditionalQuickAddProvider>
-            {children}
-          </ConditionalQuickAddProvider>
-        </AuthStateProvider>
-        <EnvironmentBadge />
-        <CookieConsent />
-        <SpeedInsights />
+        <ThemeProvider initialTheme={initialTheme}>
+          <AuthStateProvider initialUser={user}>
+            <ConditionalQuickAddProvider>
+              {children}
+            </ConditionalQuickAddProvider>
+          </AuthStateProvider>
+          <EnvironmentBadge />
+          <CookieConsent />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );

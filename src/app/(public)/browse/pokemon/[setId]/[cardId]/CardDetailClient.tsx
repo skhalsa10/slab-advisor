@@ -76,7 +76,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
 
   // Content to render (used with or without provider)
   const content = (
-    <div className="space-y-6 bg-white md:bg-transparent min-h-screen md:min-h-0">
+    <div className="space-y-6 bg-background md:bg-transparent min-h-screen md:min-h-0">
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
@@ -92,12 +92,12 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
               className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
               title="Previous card"
             >
-              <svg className="w-5 h-5 text-grey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </Link>
           )}
-          <span className="text-sm text-grey-600">
+          <span className="text-sm text-muted-foreground">
             Card {currentCardIndex + 1} of {set.cards.length}
           </span>
           {nextCard && (
@@ -106,7 +106,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
               className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
               title="Next card"
             >
-              <svg className="w-5 h-5 text-grey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
@@ -138,25 +138,25 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
           <div className="hidden md:block mt-6 border-t border-gray-100 pt-4 max-w-xs">
             <div className="grid grid-cols-2 gap-y-4 gap-x-2">
               <div>
-                <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Card Number</dt>
-                <dd className="text-sm font-medium text-gray-900 leading-tight">#{card.local_id}</dd>
+                <dt className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Card Number</dt>
+                <dd className="text-sm font-medium text-foreground leading-tight">#{card.local_id}</dd>
               </div>
               {card.category && (
                 <div>
-                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Category</dt>
-                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.category}</dd>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Category</dt>
+                  <dd className="text-sm font-medium text-foreground leading-tight">{card.category}</dd>
                 </div>
               )}
               {card.rarity && (
                 <div>
-                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Rarity</dt>
-                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.rarity}</dd>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Rarity</dt>
+                  <dd className="text-sm font-medium text-foreground leading-tight">{card.rarity}</dd>
                 </div>
               )}
               {card.illustrator && (
                 <div>
-                  <dt className="text-[10px] uppercase tracking-wider font-bold text-gray-400">Illustrator</dt>
-                  <dd className="text-sm font-medium text-gray-900 leading-tight">{card.illustrator}</dd>
+                  <dt className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Illustrator</dt>
+                  <dd className="text-sm font-medium text-foreground leading-tight">{card.illustrator}</dd>
                 </div>
               )}
             </div>
@@ -167,39 +167,39 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
         <div className="order-2 md:order-none space-y-5">
           {/* 1. Title (compact) */}
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{card.name}</h1>
-            <p className="text-sm text-gray-500">{set.name}</p>
+            <h1 className="text-2xl font-bold text-foreground">{card.name}</h1>
+            <p className="text-sm text-muted-foreground">{set.name}</p>
           </div>
 
           {/* Mobile-only: Scrollable metadata pills (tablet/desktop show in left column) */}
           <div className="md:hidden relative -mx-6">
             <div className="flex gap-2 overflow-x-auto px-6 pb-2">
-              <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
-                <span className="text-grey-500 mr-1">Number:</span>
+              <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-sm text-foreground whitespace-nowrap">
+                <span className="text-muted-foreground mr-1">Number:</span>
                 <span className="font-medium">#{card.local_id}</span>
               </span>
               {card.rarity && (
-                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
-                  <span className="text-grey-500 mr-1">Rarity:</span>
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-sm text-foreground whitespace-nowrap">
+                  <span className="text-muted-foreground mr-1">Rarity:</span>
                   <span className="font-medium">{card.rarity}</span>
                 </span>
               )}
               {card.category && (
-                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
-                  <span className="text-grey-500 mr-1">Category:</span>
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-sm text-foreground whitespace-nowrap">
+                  <span className="text-muted-foreground mr-1">Category:</span>
                   <span className="font-medium">{card.category}</span>
                 </span>
               )}
               {card.illustrator && (
-                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-grey-100 text-sm text-grey-700 whitespace-nowrap">
-                  <span className="text-grey-500 mr-1">Illustrator:</span>
+                <span className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-full bg-muted text-sm text-foreground whitespace-nowrap">
+                  <span className="text-muted-foreground mr-1">Illustrator:</span>
                   <span className="font-medium">{card.illustrator}</span>
                 </span>
               )}
             </div>
             {/* Right gradient fade indicator */}
             <div
-              className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none"
+              className="absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-background to-transparent pointer-events-none"
               aria-hidden="true"
             />
           </div>
@@ -244,7 +244,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
                   href={`https://www.tcgplayer.com/product/${card.tcgplayer_product_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -256,7 +256,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
                 href={getEbaySearchUrl(`${card.name} ${card.local_id} ${set.name}`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2.5 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -270,9 +270,9 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
       </div>
 
       {/* Mobile Sticky Action Bar - fixed at bottom on mobile only, hidden on tablet+ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 pt-3 pb-10 z-50">
-        {/* Extended white background to cover any gaps below */}
-        <div className="absolute left-0 right-0 top-full h-20 bg-white" />
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border px-4 pt-3 pb-10 z-50">
+        {/* Extended white/background to cover any gaps below */}
+        <div className="absolute left-0 right-0 top-full h-20 bg-background" />
         <div className="flex items-center gap-2 max-w-lg mx-auto">
           <button
             onClick={handleAddToCollectionClick}
@@ -285,10 +285,10 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
               href={`https://www.tcgplayer.com/product/${card.tcgplayer_product_id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+              className="p-3 border border-border rounded-lg bg-background hover:bg-muted transition-colors"
               title="Shop on TCGPlayer"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </a>
@@ -297,10 +297,10 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
             href={getEbaySearchUrl(`${card.name} ${card.local_id} ${set.name}`)}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+            className="p-3 border border-border rounded-lg bg-background hover:bg-muted transition-colors"
             title="Shop on eBay"
           >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
           </a>

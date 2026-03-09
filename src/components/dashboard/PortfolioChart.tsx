@@ -184,8 +184,8 @@ export default function PortfolioChart({
               onClick={() => toggleSeries('total')}
               className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 visibility.total
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {visibility.total && <CheckIcon />}
@@ -195,8 +195,8 @@ export default function PortfolioChart({
               onClick={() => toggleSeries('cards')}
               className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 visibility.cards
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {visibility.cards && <CheckIcon />}
@@ -207,8 +207,8 @@ export default function PortfolioChart({
                 onClick={() => toggleSeries('sealed')}
                 className={`inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                   visibility.sealed
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
                 {visibility.sealed && <CheckIcon />}
@@ -225,8 +225,8 @@ export default function PortfolioChart({
                 onClick={() => onTimeRangeChange(range.value)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                   timeRange === range.value
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
                 {range.label}

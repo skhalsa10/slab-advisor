@@ -32,8 +32,8 @@ export function VariantSwatch({ className = '' }: VariantSwatchProps) {
           onClick={() => setSelectedVariant(v)}
           className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
             selectedVariant.displayName === v.displayName
-              ? 'bg-gray-800 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground hover:bg-muted/80'
           }`}
         >
           {v.displayName}

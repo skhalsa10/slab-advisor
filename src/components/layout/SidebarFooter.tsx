@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { MoreHorizontal, User, LogOut, Sparkles, Sun, Moon } from 'lucide-react'
-import { fetchUserTheme } from '@/actions/settings'
+import { useTheme } from '@/contexts/ThemeContext'
 
 interface SidebarFooterProps {
   email: string
@@ -25,36 +25,7 @@ function getInitials(email: string): string {
 }
 
 export default function SidebarFooter({ email, credits, onSignOut, onNavigate }: SidebarFooterProps) {
-  const [theme, setTheme] = useState<'LIGHT' | 'DARK'>('LIGHT')
-  const [isThemeLoading, setIsThemeLoading] = useState(false)
-
-  useEffect(() => {
-    fetchUserTheme().then(setTheme)
-  }, [])
-
-  const handleThemeToggle = async () => {
-    const newTheme = theme === 'LIGHT' ? 'DARK' : 'LIGHT'
-    const previousTheme = theme
-
-    setTheme(newTheme)
-    setIsThemeLoading(true)
-
-    try {
-      const response = await fetch('/api/profile/theme', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: newTheme }),
-      })
-
-      if (!response.ok) {
-        setTheme(previousTheme)
-      }
-    } catch {
-      setTheme(previousTheme)
-    } finally {
-      setIsThemeLoading(false)
-    }
-  }
+  const { theme, toggleTheme, isThemeLoading } = useTheme()
 
   return (
     <div className="flex-shrink-0 border-t border-grey-800 p-2">
@@ -115,7 +86,7 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
               aria-checked={theme === 'DARK'}
               aria-label="Toggle dark mode"
               disabled={isThemeLoading}
-              onClick={handleThemeToggle}
+              onClick={toggleTheme}
               className={`
                 relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full
                 border-2 border-transparent transition-colors duration-200 ease-in-out

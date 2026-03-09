@@ -247,11 +247,11 @@ export function PriceWidget({
       {/* ZONE 1: HEADER (Control Deck) - hidden when PriceHeadline used */}
       {/* ================================================================= */}
       {!hidePriceHeadline && (
-        <div className="p-5 border-b border-gray-100">
+        <div className="p-5 border-b border-border">
           {/* Top row: Label + Dropdown + Mode Toggle */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Market Value
               </span>
 
@@ -261,7 +261,7 @@ export function PriceWidget({
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
-                    className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                    className="text-sm border border-border rounded-lg px-2 py-1 bg-background focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   >
                     {availableConditions.map((cond) => (
                       <option key={cond} value={cond}>
@@ -270,14 +270,14 @@ export function PriceWidget({
                     ))}
                   </select>
                 ) : (
-                  <span className="text-sm text-gray-600">{condition}</span>
+                  <span className="text-sm text-muted-foreground">{condition}</span>
                 )
               ) : (
                 availableGrades.length > 1 ? (
                   <select
                     value={grade}
                     onChange={(e) => setGrade(e.target.value as PsaGradeKey)}
-                    className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                    className="text-sm border border-border rounded-lg px-2 py-1 bg-background focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
                   >
                     {availableGrades.map((g) => (
                       <option key={g.value} value={g.value}>
@@ -286,7 +286,7 @@ export function PriceWidget({
                     ))}
                   </select>
                 ) : (
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-muted-foreground">
                     {gradeKeyToLabel(grade)}
                   </span>
                 )
@@ -295,13 +295,13 @@ export function PriceWidget({
 
             {/* Mode Toggle (Raw/Graded) */}
             {hasRaw && hasGraded && (
-              <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+              <div className="flex rounded-lg border border-border overflow-hidden">
                 <button
                   onClick={() => setViewMode('Raw')}
                   className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                     viewMode === 'Raw'
                       ? 'bg-orange-500 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   Raw
@@ -311,7 +311,7 @@ export function PriceWidget({
                   className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                     viewMode === 'Graded'
                       ? 'bg-orange-500 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : 'bg-background text-muted-foreground hover:bg-muted'
                   }`}
                 >
                   Graded
@@ -334,8 +334,8 @@ export function PriceWidget({
                     onClick={() => setVariant(displayName)}
                     className={`px-2 py-1 text-xs rounded-md transition-colors ${
                       isSelected
-                        ? 'bg-gray-800 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     }`}
                   >
                     {displayName}
@@ -348,11 +348,11 @@ export function PriceWidget({
           {/* Hero row: Price + Trend Badge */}
           <div className="flex items-baseline gap-3">
             {currentPrice !== null ? (
-              <span className="text-3xl font-bold text-gray-900">
+              <span className="text-3xl font-bold text-foreground">
                 {formatCurrency(currentPrice)}
               </span>
             ) : (
-              <span className="text-xl font-medium text-gray-400">
+              <span className="text-xl font-medium text-muted-foreground">
                 No price available
               </span>
             )}
@@ -363,7 +363,7 @@ export function PriceWidget({
                     ? 'bg-green-100 text-green-700'
                     : changeDisplay.isNegative
                     ? 'bg-red-100 text-red-700'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
                 {changeDisplay.isPositive && (
@@ -435,9 +435,9 @@ export function PriceWidget({
                   if (!active || !payload || !payload.length) return null;
                   const data = payload[0].payload as ChartDataPoint;
                   return (
-                    <div className="bg-gray-900 px-3 py-2 rounded-lg shadow-lg">
-                      <div className="text-white font-bold text-base">{formatCurrency(data.value)}</div>
-                      <div className="text-gray-400 text-xs mt-0.5">
+                    <div className="bg-popover border border-border px-3 py-2 rounded-lg shadow-lg">
+                      <div className="text-popover-foreground font-bold text-base">{formatCurrency(data.value)}</div>
+                      <div className="text-muted-foreground text-xs mt-0.5">
                         {formatTooltipDate(data.date)}
                       </div>
                     </div>
@@ -478,7 +478,7 @@ export function PriceWidget({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
             No history data available for this period
           </div>
         )}
@@ -496,8 +496,8 @@ export function PriceWidget({
               onClick={() => setTimeRange(range.value)}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 timeRange === range.value
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {range.label}
@@ -508,7 +508,7 @@ export function PriceWidget({
         {/* Right side info for Raw mode */}
         {viewMode === 'Raw' && (
           <div className="text-right">
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-muted-foreground">
               {totalVolume} {totalVolume === 1 ? 'sale' : 'sales'} this period
             </div>
           </div>
@@ -528,12 +528,12 @@ export function PriceWidget({
                       : 'bg-red-500'
                   }`}
                 />
-                <span className="text-xs text-gray-500 capitalize">
+                <span className="text-xs text-muted-foreground capitalize">
                   {priceData[grade]?.smartMarketPrice?.confidence} confidence
                 </span>
               </div>
             )}
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-muted-foreground">
               {totalVolume} {totalVolume === 1 ? 'sale' : 'sales'} this period
             </div>
           </div>
