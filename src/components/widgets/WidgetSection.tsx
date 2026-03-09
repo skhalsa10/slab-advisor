@@ -45,7 +45,7 @@ export default function WidgetSection({
         </div>
         <div className="flex items-center gap-3">
           {badgeCount !== undefined && (
-            <span className="px-2.5 py-1 text-xs font-medium text-grey-600 bg-grey-100 rounded-full">
+            <span className="px-2.5 py-1 text-xs font-medium text-grey-700 bg-white border border-grey-200 shadow-sm rounded-full">
               {badgeCount} {badgeLabel}
             </span>
           )}
