@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   DropdownMenu,
@@ -9,7 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, User, LogOut, Sparkles } from 'lucide-react'
+import { MoreHorizontal, User, LogOut, Sparkles, Sun, Moon } from 'lucide-react'
+import { fetchUserTheme } from '@/actions/settings'
 
 interface SidebarFooterProps {
   email: string
@@ -23,6 +25,37 @@ function getInitials(email: string): string {
 }
 
 export default function SidebarFooter({ email, credits, onSignOut, onNavigate }: SidebarFooterProps) {
+  const [theme, setTheme] = useState<'LIGHT' | 'DARK'>('LIGHT')
+  const [isThemeLoading, setIsThemeLoading] = useState(false)
+
+  useEffect(() => {
+    fetchUserTheme().then(setTheme)
+  }, [])
+
+  const handleThemeToggle = async () => {
+    const newTheme = theme === 'LIGHT' ? 'DARK' : 'LIGHT'
+    const previousTheme = theme
+
+    setTheme(newTheme)
+    setIsThemeLoading(true)
+
+    try {
+      const response = await fetch('/api/profile/theme', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: newTheme }),
+      })
+
+      if (!response.ok) {
+        setTheme(previousTheme)
+      }
+    } catch {
+      setTheme(previousTheme)
+    } finally {
+      setIsThemeLoading(false)
+    }
+  }
+
   return (
     <div className="flex-shrink-0 border-t border-grey-800 p-2">
       <DropdownMenu>
@@ -62,6 +95,43 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
             <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs font-bold font-mono">
               {credits}
             </span>
+          </DropdownMenuLabel>
+
+          {/* Theme toggle */}
+          <DropdownMenuLabel className="flex items-center justify-between font-normal py-2">
+            <div className="flex items-center gap-2">
+              {theme === 'DARK' ? (
+                <Moon className="h-4 w-4 text-orange-500" />
+              ) : (
+                <Sun className="h-4 w-4 text-orange-500" />
+              )}
+              <span className="text-sm text-grey-600">
+                {theme === 'DARK' ? 'Dark Mode' : 'Light Mode'}
+              </span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={theme === 'DARK'}
+              aria-label="Toggle dark mode"
+              disabled={isThemeLoading}
+              onClick={handleThemeToggle}
+              className={`
+                relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full
+                border-2 border-transparent transition-colors duration-200 ease-in-out
+                focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+                disabled:opacity-50 disabled:cursor-not-allowed
+                ${theme === 'DARK' ? 'bg-orange-500' : 'bg-grey-200'}
+              `}
+            >
+              <span
+                className={`
+                  pointer-events-none inline-block h-4 w-4 transform rounded-full
+                  bg-white shadow ring-0 transition duration-200 ease-in-out
+                  ${theme === 'DARK' ? 'translate-x-4' : 'translate-x-0'}
+                `}
+              />
+            </button>
           </DropdownMenuLabel>
 
           <DropdownMenuSeparator />
