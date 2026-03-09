@@ -24,10 +24,10 @@ function getInitials(email: string): string {
 
 export default function SidebarFooter({ email, credits, onSignOut, onNavigate }: SidebarFooterProps) {
   return (
-    <div className="flex-shrink-0 border-t border-grey-200 p-2">
+    <div className="flex-shrink-0 border-t border-grey-800 p-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-grey-100 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+          <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-grey-800 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-grey-900">
             {/* Avatar */}
             <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-medium text-orange-700">
@@ -36,12 +36,12 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
             </div>
 
             {/* Email */}
-            <span className="flex-1 text-sm text-grey-700 truncate text-left">
+            <span className="flex-1 text-sm text-grey-300 truncate text-left">
               {email}
             </span>
 
             {/* More icon */}
-            <MoreHorizontal className="h-4 w-4 text-grey-400 flex-shrink-0" />
+            <MoreHorizontal className="h-4 w-4 text-grey-500 flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
 

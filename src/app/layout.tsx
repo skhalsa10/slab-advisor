@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { getUser } from "@/lib/auth-server";
 import { AuthStateProvider } from "@/contexts/AuthStateContext";
@@ -21,6 +21,13 @@ const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-mono", // CSS custom property for use in globals.css
+});
+
+// Playfair Display: Serif font for headings (h1-h3)
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-serif", // CSS custom property for use in globals.css
 });
 
 // Viewport configuration — viewport-fit=cover enables safe area insets on notched devices
@@ -62,6 +69,11 @@ export const metadata: Metadata = {
     images: ["/icon_light.png"]
   },
   
+  // Favicon
+  icons: {
+    icon: "/favicon.png",
+  },
+
   // App-specific metadata
   applicationName: "Slab Advisor",
   referrer: "origin-when-cross-origin",
@@ -108,7 +120,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${jetBrainsMono.variable} antialiased min-w-[320px]`}
+        className={`${inter.variable} ${jetBrainsMono.variable} ${playfair.variable} antialiased min-w-[320px]`}
       >
         <AuthStateProvider initialUser={user}>
           <ConditionalQuickAddProvider>

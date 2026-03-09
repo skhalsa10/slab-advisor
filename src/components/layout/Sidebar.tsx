@@ -60,11 +60,11 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
     <>
       {/* Desktop Sidebar */}
       <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex flex-col h-full bg-white border-r border-grey-200">
+        <div className="flex flex-col h-full bg-grey-900">
           {/* Logo */}
-          <div className="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-grey-200">
+          <div className="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-grey-800">
             <Image
-              src="/logo_light.png"
+              src="/logo_dark.png"
               alt="Slab Advisor"
               className="h-12 w-auto"
               width={196}
@@ -81,7 +81,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     <button
                       key={item.name}
                       onClick={() => handleNavigationClick(item)}
-                      className="w-full border-transparent text-grey-600 hover:bg-grey-50 hover:text-grey-900 group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors"
+                      className="w-full border-transparent text-grey-300 hover:bg-grey-800 hover:text-white group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors"
                     >
                       <span className="mr-3 text-lg">{item.icon}</span>
                       {item.name}
@@ -95,8 +95,8 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     href={item.href}
                     className={`${
                       isActiveLink(item.href)
-                        ? 'bg-orange-50 border-orange-500 text-orange-700'
-                        : 'border-transparent text-grey-600 hover:bg-grey-50 hover:text-grey-900'
+                        ? 'bg-grey-800 border-orange-500 text-orange-400'
+                        : 'border-transparent text-grey-300 hover:bg-grey-800 hover:text-white'
                     } group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors`}
                   >
                     <span className="mr-3 text-lg">{item.icon}</span>
@@ -120,12 +120,12 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
 
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50">
-        <div className="bg-white shadow-sm border-b border-grey-200">
+        <div className="bg-grey-900 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4">
             {/* Logo */}
             <div className="flex items-center">
               <Image
-                src="/logo_light.png"
+                src="/logo_dark.png"
                 alt="Slab Advisor"
                 className="h-10 w-auto"
                 width={196}
@@ -137,7 +137,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
             <div className="flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-grey-600 hover:text-grey-900 hover:bg-grey-100"
+                className="p-2 rounded-md text-grey-300 hover:text-white hover:bg-grey-800"
               >
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {mobileMenuOpen ? (
@@ -152,7 +152,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
 
           {/* Mobile menu dropdown */}
           {mobileMenuOpen && (
-            <div className="border-t border-grey-200">
+            <div className="border-t border-grey-800 bg-grey-900">
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {navigation.map((item) => {
                   if (item.action === 'quickAdd') {
@@ -163,7 +163,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                           handleNavigationClick(item)
                           setMobileMenuOpen(false)
                         }}
-                        className="w-full text-grey-600 hover:bg-grey-50 hover:text-grey-900 flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors"
+                        className="w-full text-grey-300 hover:bg-grey-800 hover:text-white flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors"
                       >
                         <span className="mr-3 text-lg">{item.icon}</span>
                         {item.name}
@@ -177,8 +177,8 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                       href={item.href}
                       className={`${
                         isActiveLink(item.href)
-                          ? 'bg-orange-50 text-orange-700'
-                          : 'text-grey-600 hover:bg-grey-50 hover:text-grey-900'
+                          ? 'bg-grey-800 text-orange-400'
+                          : 'text-grey-300 hover:bg-grey-800 hover:text-white'
                       } flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
