@@ -104,7 +104,7 @@ export default function GradingOpportunityList({
         <button
           onClick={handleViewAll}
           disabled={isLoadingAll}
-          className="w-full -mx-4 -mb-4 border-t border-grey-100 bg-grey-50 p-3 text-center text-xs font-medium text-grey-600 hover:bg-grey-100 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full -mx-4 -mb-4 border-t border-grey-100 bg-white p-3 text-center text-sm font-medium text-orange-600 hover:bg-orange-50/50 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ width: 'calc(100% + 2rem)' }}
         >
           {isLoadingAll ? 'Loading...' : `View all ${displayCount} opportunities`}

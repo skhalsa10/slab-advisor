@@ -548,7 +548,7 @@ export default function GradingAnalysisModal({
       <>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-          <h2 className="text-lg font-semibold text-grey-900">Grading Analysis</h2>
+          <h2 className="text-xl font-bold font-serif text-grey-900">Grading Analysis</h2>
           <button
             onClick={onClose}
             className="text-grey-400 hover:text-grey-600 transition-colors p-1"
@@ -588,10 +588,10 @@ export default function GradingAnalysisModal({
                 <p className="font-semibold text-grey-900">{opportunity.cardName}</p>
                 {/* Strategy Badge - based on PSA 9 profitability */}
                 <span
-                  className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full whitespace-nowrap ${
+                  className={`inline-block px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap border shadow-sm ${
                     (opportunity.profitAtPsa9 ?? 0) > 0
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-orange-100 text-orange-700'
+                      ? 'bg-white border-green-200 text-grey-800'
+                      : 'bg-white border-orange-200 text-orange-700'
                   }`}
                 >
                   {(opportunity.profitAtPsa9 ?? 0) > 0 ? 'Safe Bet' : 'PSA 10 Required'}
@@ -611,10 +611,10 @@ export default function GradingAnalysisModal({
             </p>
 
             {/* PSA 10 breakdown */}
-            <div className="bg-white rounded-md p-3 border border-green-200">
+            <div className="bg-white rounded-md p-4 border border-grey-200 shadow-sm">
               <div className="flex justify-between items-center">
-                <span className="font-medium text-grey-900">PSA 10 Potential</span>
-                <span className="text-lg font-bold text-green-600">
+                <span className="font-semibold text-grey-900">PSA 10 Potential</span>
+                <span className="text-xl font-bold text-grey-800">
                   +{formatPrice(profitPsa10)}
                 </span>
               </div>
@@ -632,9 +632,9 @@ export default function GradingAnalysisModal({
                   <span>-{formatPrice(gradingFee)}</span>
                 </div>
                 {opportunity.roiPsa10 != null && (
-                  <div className="flex justify-between pt-1 border-t border-grey-200 font-medium">
+                  <div className="flex justify-between pt-2 mt-2 border-t border-grey-100 font-medium text-grey-700">
                     <span>ROI</span>
-                    <span className="text-green-600">
+                    <span>
                       {Number(opportunity.roiPsa10).toFixed(0)}%
                     </span>
                   </div>
@@ -836,7 +836,7 @@ export default function GradingAnalysisModal({
 
         {/* Modal */}
         <div
-          className="pointer-events-auto w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col mx-4"
+          className="pointer-events-auto w-full max-w-md bg-[#faebce] rounded-xl shadow-2xl flex flex-col mx-4 border border-grey-200"
           style={{ maxHeight: '90vh' }}
           role="dialog"
           aria-modal="true"

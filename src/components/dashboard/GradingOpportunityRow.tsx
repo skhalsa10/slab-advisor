@@ -63,7 +63,7 @@ export default function GradingOpportunityRow({
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between px-4 py-3 border-b border-grey-50 last:border-b-0 hover:bg-grey-50 transition-colors cursor-pointer group text-left"
+      className="w-full flex items-center justify-between px-4 py-4 border-b border-grey-50 last:border-b-0 hover:bg-orange-50/50 transition-all duration-200 cursor-pointer group text-left"
     >
       {/* Left Side: Thumbnail + Info */}
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -72,9 +72,9 @@ export default function GradingOpportunityRow({
           <Image
             src={imageUrl}
             alt={opportunity.cardName}
-            width={28}
-            height={40}
-            className="h-10 w-auto rounded-md shadow-sm object-cover"
+            width={34}
+            height={48}
+            className="h-12 w-auto rounded-md shadow-sm object-cover"
             unoptimized={imageUrl.includes('ximilar.com')}
           />
         </div>
@@ -95,7 +95,7 @@ export default function GradingOpportunityRow({
       {/* Right Side: Hero Number + Chevron */}
       <div className="flex items-center gap-2 flex-shrink-0">
         {/* PSA 10 Profit (Hero Number) */}
-        <span className="text-sm font-bold text-green-600">
+        <span className="text-sm font-bold text-grey-800">
           {formatProfit(opportunity.profitAtPsa10)}
         </span>
 
