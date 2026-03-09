@@ -79,7 +79,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
           <p className="mt-2 text-center text-sm text-grey-600">
-            {isLogin ? 'Get AI-powered card grading insights' : 'Start with 2 free card analyses'}
+            {isLogin ? 'Unlock the full potential of your collection' : 'Begin building your ultimate card portfolio'}
           </p>
         </div>
         {/* Google Login Button */}
@@ -100,15 +100,10 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
         </div>
 
         {/* Divider */}
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-grey-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 py-1 bg-white text-grey-500 relative z-10">Or continue with email</span>
-            </div>
-          </div>
+        <div className="mt-6 flex items-center">
+          <div className="flex-grow border-t border-grey-300" />
+          <span className="flex-shrink-0 px-2 text-sm text-grey-500">Or continue with email</span>
+          <div className="flex-grow border-t border-grey-300" />
         </div>
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
