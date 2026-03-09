@@ -131,6 +131,7 @@ export async function checkUsernameAvailable(
 export interface UserSettings {
   show_grading_tips: boolean
   subscription_tier: 'free' | 'pro'
+  theme: 'LIGHT' | 'DARK'
 }
 
 /**
@@ -144,22 +145,23 @@ export async function getUserSettings(userId: string): Promise<UserSettings> {
 
   const { data, error } = await supabase
     .from('user_settings')
-    .select('show_grading_tips, subscription_tier')
+    .select('show_grading_tips, subscription_tier, theme')
     .eq('user_id', userId)
     .single()
 
   if (error) {
     // User has no settings yet - return defaults
     if (error.code === 'PGRST116') {
-      return { show_grading_tips: true, subscription_tier: 'free' }
+      return { show_grading_tips: true, subscription_tier: 'free', theme: 'LIGHT' }
     }
     console.error('Error fetching user settings:', error)
-    return { show_grading_tips: true, subscription_tier: 'free' }
+    return { show_grading_tips: true, subscription_tier: 'free', theme: 'LIGHT' }
   }
 
   return {
     show_grading_tips: data?.show_grading_tips ?? true,
     subscription_tier: (data?.subscription_tier as 'free' | 'pro') ?? 'free',
+    theme: (data?.theme as 'LIGHT' | 'DARK') ?? 'LIGHT',
   }
 }
 

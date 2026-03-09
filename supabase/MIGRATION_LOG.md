@@ -76,3 +76,4 @@ Follow the workflow: apply to gamma first, test, then apply to production.
 | 20260215000001 | create_binder_cards_table | 2026-02-15 | 2026-02-15 | Junction table linking binders to collection cards with RLS |
 | 20260215000002 | add_binder_protection_trigger | 2026-02-15 | 2026-02-15 | Slug generation function + default binder protection trigger |
 | 20260215000003 | add_binders_to_signup_and_backfill | 2026-02-15 | 2026-02-15 | Update signup trigger for binders, backfill existing users |
+| 20260308000000 | add_theme_to_user_settings | 2026-03-08 | 2026-03-08 | Add theme column (LIGHT/DARK) to user_settings |

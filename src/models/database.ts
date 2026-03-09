@@ -816,6 +816,7 @@ export type Database = {
           show_grading_tips: boolean
           stripe_customer_id: string | null
           subscription_tier: string
+          theme: string
           updated_at: string | null
           user_id: string
         }
@@ -825,6 +826,7 @@ export type Database = {
           show_grading_tips?: boolean
           stripe_customer_id?: string | null
           subscription_tier?: string
+          theme?: string
           updated_at?: string | null
           user_id: string
         }
@@ -834,6 +836,7 @@ export type Database = {
           show_grading_tips?: boolean
           stripe_customer_id?: string | null
           subscription_tier?: string
+          theme?: string
           updated_at?: string | null
           user_id?: string
         }
