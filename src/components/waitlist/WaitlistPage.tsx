@@ -6,6 +6,8 @@ import { useRef } from 'react'
 import { Sparkles, BookOpen, Shield, TrendingUp } from 'lucide-react'
 import Image from 'next/image'
 import WaitlistNavbar from './WaitlistNavbar'
+import WaitlistFAQ from './WaitlistFAQ'
+import WaitlistFooter from './WaitlistFooter'
 import { getFeaturedCardData, type FeaturedCardData } from '@/actions/waitlist-featured-card'
 
 /**
@@ -203,20 +205,11 @@ export default function WaitlistPage() {
       {/* Feature Grid (Bento Box) */}
       <FeatureGrid />
 
-      {/* Easter Egg Footer - Styled as Pill Badge */}
-      <footer className="bg-[#FDF8F6] py-12 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center"
-        >
-          <span className="inline-flex items-center bg-orange-50 text-orange-800 px-4 py-2 rounded-full text-sm font-medium border border-orange-100">
-            ✨ Founding Members get early store access and an exclusive portfolio badge.
-          </span>
-        </motion.div>
-      </footer>
+      {/* FAQ Section */}
+      <WaitlistFAQ />
+
+      {/* Main Footer */}
+      <WaitlistFooter />
     </div>
   )
 }
