@@ -15,7 +15,7 @@ export default function WaitlistNavbar() {
         <div className="flex justify-center items-center h-16">
           <Link href="/" className="flex items-center">
             <Image
-              src="/logo_light.png"
+              src="/secondary_logo_light.png"
               alt="Slab Advisor Logo"
               width={196}
               height={84}

@@ -65,7 +65,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
           {/* Logo */}
           <div className="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-grey-800">
             <Image
-              src="/logo_dark.png"
+              src="/secondary_logo_dark.png"
               alt="Slab Advisor"
               className="h-12 w-auto"
               width={196}
@@ -126,7 +126,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
             {/* Logo */}
             <div className="flex items-center">
               <Image
-                src="/logo_dark.png"
+                src="/secondary_logo_dark.png"
                 alt="Slab Advisor"
                 className="h-10 w-auto"
                 width={196}

@@ -13,7 +13,7 @@ export default function WaitlistFooter() {
           <div className="md:col-span-2 space-y-4">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo_light.png"
+                src="/secondary_logo_light.png"
                 alt="Slab Advisor Logo"
                 width={196}
                 height={84}
