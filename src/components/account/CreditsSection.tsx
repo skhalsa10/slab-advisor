@@ -16,7 +16,7 @@ export default function CreditsSection({ credits }: CreditsSectionProps) {
       <div className="p-4">
         {/* Total credits display */}
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Sparkles className="h-6 w-6 text-orange-500" />
+          <Sparkles className="h-6 w-6 text-orange-600" />
           <span className="text-3xl font-bold text-grey-900">
             {credits.credits_remaining}
           </span>
@@ -24,7 +24,7 @@ export default function CreditsSection({ credits }: CreditsSectionProps) {
         </div>
 
         {/* Breakdown */}
-        <div className="bg-grey-50 rounded-lg p-3 mb-4">
+        <div className="bg-white/50 rounded-lg p-3 mb-4 border border-grey-100">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between items-center">
               <span className="text-grey-600">Subscription</span>
@@ -51,7 +51,7 @@ export default function CreditsSection({ credits }: CreditsSectionProps) {
         {/* Buy Credits button (placeholder) */}
         <button
           disabled
-          className="w-full px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
+          className="w-full px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
           title="Coming soon"
         >
           Buy Credits

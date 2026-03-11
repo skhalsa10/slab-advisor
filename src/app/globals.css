@@ -82,9 +82,9 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
-/* Serif headings — Playfair Display for premium feel */
+/* Headers should inherit sans-serif font */
 h1, h2, h3 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: inherit;
 }
 
 /* Typography utility classes */

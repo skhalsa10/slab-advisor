@@ -31,8 +31,8 @@ export default function ProfileSection({
       <div className="p-4">
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="h-16 w-16 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-xl font-medium text-orange-700">
+          <div className="h-16 w-16 rounded-full bg-orange-200 flex items-center justify-center flex-shrink-0">
+            <span className="text-xl font-medium text-orange-800">
               {getInitials(email)}
             </span>
           </div>

@@ -20,7 +20,7 @@ export default function SubscriptionSection({
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               isBasic
-                ? 'bg-grey-100 text-grey-800'
+                ? 'bg-grey-200 text-grey-800'
                 : 'bg-orange-100 text-orange-800'
             }`}
           >
@@ -40,7 +40,7 @@ export default function SubscriptionSection({
           <>
             <button
               disabled
-              className="w-full px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
+              className="w-full px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
               title="Coming soon"
             >
               Upgrade to Pro
