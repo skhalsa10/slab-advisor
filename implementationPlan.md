@@ -2,9 +2,9 @@
 
 ## 📊 Overall Progress Summary
 
-**Last Updated:** February 6, 2026
+**Last Updated:** March 14, 2026
 
-### Project Completion: ~92%
+### Project Completion: ~93%
 
 #### ✅ Fully Completed
 - **Phase 1**: Foundation & Authentication (100%)
@@ -12,21 +12,28 @@
 - **Database Schema**: Pokemon cards, collections, pricing infrastructure, portfolio snapshots (100%)
 - **Pricing Pipeline**: Python scripts for daily price updates (100%)
 - **Variant System**: Multi-pattern support (Poké Ball, Master Ball) (100%)
-- **Collection Management**: CRUD operations, grid/list views, products (90%)
+- **Collection Management**: CRUD operations, grid/list views, products, binders, bulk actions (85%)
 - **Browse Experience**: Card browsing, set viewing, filtering (90%)
 - **Explore Page**: Game selection hub + widgets (100%)
 - **Ximilar Card Identification**: Camera scan, image upload, card matching (100%)
 
 #### 🟡 Partially Completed
-- **Phase 3**: Dashboard & Navigation (90%)
-- **Phase 4**: Collection Features (90%)
+- **Phase 3**: Dashboard & Navigation (92%) — Settings page created, dashboard mostly populated, still adding widgets
+- **Phase 4**: Collection Features (92%) — Binders, bulk select/delete done; search/filter/sort still needed
 - **Phase 5**: Add Card Flow (95%)
 - **Pricing Display**: Smart price formatting implemented, historical tracking complete (95%)
 - **Ximilar Integration**: Card ID complete (100%), Grading complete (100%)
 - **Camera Configuration**: Use-case specific camera settings (100%)
 - **Explore/Browse Polish**: UI cleanup, mobile filters, variant display fixes (90%)
+- **App Polish & UX**: Dark mode, visual rebrand, lucide icons, account unification (ongoing)
 
 #### ✅ Recently Completed
+- **Dark Mode & Theme System**: ThemeContext with semantic color tokens, named color primitives, theme toggle in account preferences and sidebar, `theme` column in user_settings ✅ (March 14, 2026)
+- **Visual Rebrand**: Earth-tone color palette, serif typography, dark green sidebar, secondary_logo variants, lucide-react sidebar icons ✅ (March 2026)
+- **Account Page Unification**: Merged settings into unified account page, GDPR-compliant delete all user data feature, user_settings table ✅ (March 2026)
+- **Binder System**: Binder tables, switcher UI with create/rename/delete, binder multi-select in Add to Collection modal, bulk selection mode with binder and delete actions ✅ (February 2026)
+- **Auth Rearchitect**: Eliminated loading flash on auth state and navigation ✅ (February 2026)
+- **Security Hardening**: Derived user identity from session in server actions, explicit card ownership checks, hardened binder server actions ✅ (February 2026)
 - **Market Movers Widget**: Dashboard widget showing collection cards with biggest price movements, 24H/7D/30D period toggle, noise filtering ✅ (February 15, 2026)
 - **Top Gems Widget**: Dashboard trophy-case showing top 3 most valuable collection cards ✅ (February 13, 2026)
 - **Observability Stack**: PostHog analytics with custom events + Sentry error tracking with performance spans, logs, and metrics ✅ (February 8, 2026)
@@ -716,10 +723,10 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 
 ---
 
-#### 7. Dashboard Completion ✅ MOSTLY COMPLETE
-**Status:** 🟡 90% Complete
+#### 7. Dashboard Completion ⚠️ IN PROGRESS
+**Status:** 🟡 92% Complete
 **Priority:** 🟠 High
-**Completed:** January 17, 2026 (core features)
+**Last Updated:** March 14, 2026
 
 **What's Done:**
 - ✅ Dashboard page exists (`src/app/(authenticated)/dashboard/page.tsx`)
@@ -733,10 +740,13 @@ This becomes the "premium intelligence layer" on top of solid foundations.
 - ✅ **Portfolio Value Chart** - Interactive chart with 7D/30D/90D/1Y time ranges
 - ✅ **Live KPIs** - Card count, product count, total estimated value
 - ✅ **Sealed Products in Portfolio** - Products now included in daily snapshot calculations
+- ✅ **Top Gems Widget** - Trophy-case showing top 3 most valuable collection cards
+- ✅ **Market Movers Widget** - Cards with biggest price movements, 24H/7D/30D period toggle
 
 **What's Missing:**
 - ❌ Cards by category breakdown (Pokemon, One Piece, Sports, Other TCG)
 - ❌ Followers/following counts (requires social features)
+- ❌ Additional widgets (TBD)
 
 **Implementation Tasks:**
 1. ~~Create dashboard data API~~ ✅ COMPLETED (via getDashboardStats in collection-server.ts)
@@ -889,6 +899,28 @@ These features ensure production readiness, prevent disasters, and polish the us
   - Removed columns, index, API manual-entry mode, and utility fallback logic
   - Migration: `20260206000000_drop_manual_card_columns.sql`
 
+**Visual & Theming:**
+- ✅ Dark mode with ThemeContext and semantic color tokens (March 2026)
+- ✅ Named color primitives migration for account components (March 2026)
+- ✅ Earth-tone color palette, serif typography, dark green sidebar (March 2026)
+- ✅ Logo/branding update with secondary_logo variants (March 2026)
+- ✅ Lucide-react icons replacing emoji nav icons in sidebar (March 2026)
+- ✅ Theme toggle in account preferences and sidebar popover (March 2026)
+- ✅ Grading analysis modal and top opportunities widget premium brand aesthetics (March 2026)
+- ✅ Account page visual polish and typography refinement (March 2026)
+
+**Account & Settings:**
+- ✅ Unified account page merging settings (March 2026)
+- ✅ GDPR-compliant delete all user data feature (March 2026)
+- ✅ User_settings table for private user data (March 2026)
+- ✅ Sidebar footer refactored with user dropdown menu (March 2026)
+
+**Auth & Security:**
+- ✅ Auth state rearchitect eliminating loading flash (February 2026)
+- ✅ Server action security: derive user identity from session (February 2026)
+- ✅ Explicit card ownership check in addCardsToBinder (February 2026)
+- ✅ Hardened binder server actions and data fetching (February 2026)
+
 **Search & Filtering:**
 - ❌ Collection search by card name
 - ❌ Filter by category, grade, price range
@@ -896,15 +928,16 @@ These features ensure production readiness, prevent disasters, and polish the us
 - ❌ Saved filter presets
 
 **Bulk Operations:**
-- ❌ Select multiple cards
-- ❌ Bulk delete
+- ✅ Select multiple cards (bulk selection mode) (February 2026)
+- ✅ Bulk delete (February 2026)
+- ✅ Bulk add to binder (February 2026)
 - ❌ Bulk privacy toggle
 - ❌ Bulk export
 
 **Mobile Optimization:**
 - ✅ Responsive layouts (mostly done)
 - ❌ Touch-optimized controls
-- ❌ Mobile camera integration
+- ✅ Mobile camera integration (Ximilar camera capture for identification and grading)
 - ❌ Progressive Web App (PWA) features
 - ❌ Offline support
 
@@ -1650,8 +1683,8 @@ CREATE INDEX idx_follows_following ON follows(following_id);
   - ✅ Variant-specific pricing display
   - ✅ Responsive design (2-5 columns)
   - ✅ CRUD operations
-- **Missing:** Search, filtering, sorting, bulk operations
-- **Status:** 🟡 70% complete
+- **Missing:** Search, filtering, sorting
+- **Status:** 🟡 85% complete (binders + bulk select/delete done)
 
 #### Authentication
 - **Methods:** Email/password, Google OAuth
@@ -1660,8 +1693,9 @@ CREATE INDEX idx_follows_following ON follows(following_id);
   - ✅ Protected routes (middleware)
   - ✅ Session management
   - ✅ Auth callbacks
-- **Missing:** Username in signup flow
-- **Status:** ✅ 90% complete
+- ✅ Username system (complete-profile flow, availability check, validation)
+- ✅ Auth state rearchitect (eliminated loading flash)
+- **Status:** ✅ 95% complete
 
 ---
 
@@ -1714,7 +1748,7 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 
 ✅ **Phase 1: Foundation & Authentication** (100%)
 - Next.js app setup with Slab Advisor branding
-- Orange (#f25733) and grey palette
+- ~~Orange (#f25733) and grey palette~~ → Earth-tone palette with dark green sidebar, serif typography (rebranded March 2026)
 - Supabase authentication (email/password + Google OAuth)
 - Protected routes
 - Basic layout structure
@@ -1728,21 +1762,23 @@ CREATE INDEX idx_follows_following ON follows(following_id);
 - Card collection dashboard
 - Individual card details view
 
-🟡 **Phase 3: Core Navigation & Dashboard** (70%)
-- ✅ Sidebar navigation (Dashboard, Collection, Add Card)
+🟡 **Phase 3: Core Navigation & Dashboard** (92%)
+- ✅ Sidebar navigation (Dashboard, Collection, Add Card) with lucide-react icons
 - ✅ Mobile hamburger menu
 - ✅ Credits display in navigation
-- ⚠️ Dashboard shows placeholders ("Coming Soon")
+- ✅ Dashboard populated with real data widgets (Portfolio Chart, Top Gems, Market Movers, Grading Opportunities, Recent Scans)
 - ✅ Explore page implemented (was "Discover") - needs polish (see Tier 3, Item 11)
-- ❌ Settings page not implemented
+- ✅ Settings/Account page created (unified account page with preferences, theme toggle, delete data)
+- ❌ Additional dashboard widgets still planned
 
-🟡 **Phase 4: Enhanced Collection Management** (70%)
+🟡 **Phase 4: Enhanced Collection Management** (85%)
 - ✅ Collection page with header
 - ✅ Grid and list views with excellent UX
 - ✅ Trading card aspect ratio (2.5:3.5)
 - ✅ Responsive grid (2-5 columns)
+- ✅ Binder system (create, rename, delete, multi-select, switcher UI)
+- ✅ Bulk selection mode with binder and delete actions
 - ❌ Search and filtering not implemented
-- ❌ Bulk operations not implemented
 - ❌ Export functionality not implemented
 
 🟡 **Phase 5: Add Card Flow** (85%)
