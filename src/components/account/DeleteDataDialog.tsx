@@ -52,7 +52,7 @@ export default function DeleteDataDialog({
 
       {/* Dialog */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-xl p-6">
+        <div className="bg-card rounded-lg shadow-xl p-6">
           {/* Header */}
           <div className="flex items-start gap-3 mb-4">
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">

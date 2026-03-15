@@ -43,8 +43,8 @@ export default async function AccountPage() {
           <User className="h-5 w-5 text-orange-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-grey-900">Account</h1>
-          <p className="text-grey-600 text-sm">
+          <h1 className="text-2xl font-bold text-foreground">Account</h1>
+          <p className="text-muted-foreground text-sm">
             Manage your account and preferences
           </p>
         </div>
