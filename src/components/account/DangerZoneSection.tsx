@@ -44,7 +44,7 @@ export default function DangerZoneSection() {
 
   return (
     <>
-      <div className="bg-white rounded-lg border border-red-200 mb-6">
+      <div className="bg-card rounded-lg border border-red-200 mb-6">
         <div className="px-4 py-3 border-b border-red-200 bg-red-50">
           <h2 className="text-sm font-semibold text-red-800 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
@@ -54,8 +54,8 @@ export default function DangerZoneSection() {
         <div className="p-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h3 className="text-sm font-medium text-grey-900">Delete All My Data</h3>
-              <p className="text-sm text-grey-600 mt-1">
+              <h3 className="text-sm font-medium text-card-foreground">Delete All My Data</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Permanently delete all your collection data, gradings, and profile information.
                 Your account, username, credits, and settings will be preserved.
               </p>

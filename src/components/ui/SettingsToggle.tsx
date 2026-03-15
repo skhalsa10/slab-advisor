@@ -42,11 +42,11 @@ export default function SettingsToggle({
   return (
     <div className="flex items-center justify-between py-4">
       <div className="flex-1">
-        <label htmlFor={id} className="text-sm font-medium text-grey-900">
+        <label htmlFor={id} className="text-sm font-medium text-foreground">
           {label}
         </label>
         {description && (
-          <p className="text-sm text-grey-500 mt-0.5">{description}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{description}</p>
         )}
       </div>
       <button
@@ -61,7 +61,7 @@ export default function SettingsToggle({
           border-2 border-transparent transition-colors duration-200 ease-in-out
           focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
           disabled:opacity-50 disabled:cursor-not-allowed
-          ${enabled ? 'bg-orange-500' : 'bg-grey-200'}
+          ${enabled ? 'bg-orange-500' : 'bg-muted'}
         `}
       >
         <span

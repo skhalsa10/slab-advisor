@@ -59,13 +59,13 @@ export default function DeleteDataDialog({
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-grey-900">
-                Delete All Your Data?
+              <h3 className="text-lg font-semibold text-foreground">
+                Delete Account Data
               </h3>
-              <p className="mt-2 text-sm text-grey-600">
-                This will permanently delete:
+              <p className="mt-2 text-sm text-muted-foreground">
+                This action cannot be undone. This will permanently delete your account and remove your data from our servers.
               </p>
-              <ul className="mt-1 text-sm text-grey-600 list-disc list-inside">
+              <ul className="mt-1 text-sm text-muted-foreground list-disc list-inside">
                 <li>All your collection cards and their images</li>
                 <li>All card gradings</li>
                 <li>All sealed products</li>
@@ -91,8 +91,8 @@ export default function DeleteDataDialog({
 
           {/* Confirmation input */}
           <div className="mb-4">
-            <label htmlFor="confirmation" className="block text-sm font-medium text-grey-700 mb-1">
-              Type <span className="font-mono bg-grey-100 px-1 rounded">DELETE</span> to confirm
+            <label htmlFor="confirmation" className="block text-sm font-medium text-secondary-foreground mb-1">
+              Type <span className="font-mono bg-muted px-1 rounded">DELETE</span> to confirm
             </label>
             <input
               id="confirmation"
@@ -101,7 +101,7 @@ export default function DeleteDataDialog({
               onChange={(e) => setConfirmationText(e.target.value)}
               placeholder="DELETE"
               disabled={isDeleting}
-              className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:bg-grey-100 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-destructive focus:border-destructive disabled:bg-muted disabled:cursor-not-allowed"
               autoComplete="off"
             />
           </div>
@@ -119,7 +119,7 @@ export default function DeleteDataDialog({
               type="button"
               onClick={handleCancel}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-border text-secondary-foreground text-sm font-medium rounded-md hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>

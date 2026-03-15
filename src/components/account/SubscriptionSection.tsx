@@ -10,9 +10,9 @@ export default function SubscriptionSection({
   const isBasic = settings.subscription_tier === 'free'
 
   return (
-    <div className="bg-white rounded-lg border border-grey-200 mb-6">
-      <div className="px-4 py-3 border-b border-grey-200">
-        <h2 className="text-sm font-semibold text-grey-900">Subscription</h2>
+    <div className="bg-card rounded-lg border border-border mb-6">
+      <div className="px-4 py-3 border-b border-border">
+        <h2 className="text-sm font-semibold text-card-foreground">Subscription</h2>
       </div>
       <div className="p-4">
         {/* Tier badge */}
@@ -20,7 +20,7 @@ export default function SubscriptionSection({
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               isBasic
-                ? 'bg-grey-200 text-grey-800'
+                ? 'bg-secondary text-secondary-foreground'
                 : 'bg-orange-100 text-orange-800'
             }`}
           >
@@ -29,7 +29,7 @@ export default function SubscriptionSection({
         </div>
 
         {/* Description */}
-        <p className="text-sm text-grey-600 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           {isBasic
             ? 'Purchase credits as needed'
             : '10 credits per month included'}
@@ -45,7 +45,7 @@ export default function SubscriptionSection({
             >
               Upgrade to Pro
             </button>
-            <p className="text-xs text-grey-500 text-center mt-2">
+            <p className="text-xs text-muted-foreground text-center mt-2">
               Get 10 credits/month + perks - Coming soon
             </p>
           </>
@@ -55,7 +55,7 @@ export default function SubscriptionSection({
         {!isBasic && (
           <button
             disabled
-            className="w-full px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
+            className="w-full px-4 py-2 border border-border/60 text-muted-foreground text-sm font-medium rounded-md opacity-50 cursor-not-allowed"
             title="Coming soon"
           >
             Manage Subscription

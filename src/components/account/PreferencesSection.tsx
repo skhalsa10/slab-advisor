@@ -24,11 +24,11 @@ export default function PreferencesSection({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-grey-200 mb-6">
-      <div className="px-4 py-3 border-b border-grey-200">
-        <h2 className="text-sm font-semibold text-grey-900">Preferences</h2>
+    <div className="bg-card rounded-lg border border-border mb-6">
+      <div className="px-4 py-3 border-b border-border">
+        <h2 className="text-sm font-semibold text-card-foreground">Preferences</h2>
       </div>
-      <div className="px-4 divide-y divide-grey-100">
+      <div className="px-4 divide-y divide-border/50">
         <SettingsToggle
           id="grading-tips"
           label="Show Grading Tips"

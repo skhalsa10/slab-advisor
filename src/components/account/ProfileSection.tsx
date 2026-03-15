@@ -24,9 +24,9 @@ export default function ProfileSection({
   memberSince,
 }: ProfileSectionProps) {
   return (
-    <div className="bg-white rounded-lg border border-grey-200 mb-6">
-      <div className="px-4 py-3 border-b border-grey-200">
-        <h2 className="text-sm font-semibold text-grey-900">Profile</h2>
+    <div className="bg-card rounded-lg border border-border mb-6">
+      <div className="px-4 py-3 border-b border-border">
+        <h2 className="text-sm font-semibold text-card-foreground">Profile</h2>
       </div>
       <div className="p-4">
         <div className="flex items-start gap-4">
@@ -39,11 +39,11 @@ export default function ProfileSection({
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <p className="text-lg font-semibold text-grey-900">
+            <p className="text-lg font-semibold text-card-foreground">
               @{profile.username}
             </p>
-            <p className="text-sm text-grey-600 truncate">{email}</p>
-            <p className="text-sm text-grey-500 mt-1">
+            <p className="text-sm text-muted-foreground truncate">{email}</p>
+            <p className="text-sm text-muted-foreground mt-1">
               Member since {formatDate(memberSince)}
             </p>
           </div>
