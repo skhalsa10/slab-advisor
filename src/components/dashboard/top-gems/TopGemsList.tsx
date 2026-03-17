@@ -28,13 +28,13 @@ function GemPlaceholder({ position }: { position: 2 | 3 }) {
       className={`
         flex flex-col items-center justify-center rounded-lg border border-dashed
         aspect-[2.5/3.5] p-3
-        ${style.borderColor} bg-white/50
+        ${style.borderColor} bg-card/50
       `}
     >
-      <div className="w-8 h-8 rounded-full bg-grey-100 flex items-center justify-center mb-1.5">
-        <PlusCircle className="w-4 h-4 text-grey-400" />
+      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center mb-1.5">
+        <PlusCircle className="w-4 h-4 text-muted-foreground" />
       </div>
-      <p className="text-xs text-grey-500 text-center">Add cards</p>
+      <p className="text-xs text-muted-foreground text-center">Add cards</p>
       <Link
         href="/collection/add"
         className="mt-1 text-[10px] text-orange-600 hover:text-orange-700 font-medium"

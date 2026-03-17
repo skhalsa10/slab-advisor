@@ -36,16 +36,16 @@ export default function WidgetSection({
   children,
 }: WidgetSectionProps) {
   return (
-    <section className="bg-white rounded-2xl border border-grey-100 shadow-sm overflow-hidden">
+    <section className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-grey-100">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
           {icon && <span className="text-orange-500">{icon}</span>}
-          <h2 className="text-base font-semibold text-grey-900">{title}</h2>
+          <h2 className="text-base font-semibold text-card-foreground">{title}</h2>
         </div>
         <div className="flex items-center gap-3">
           {badgeCount !== undefined && (
-            <span className="px-2.5 py-1 text-xs font-medium text-grey-700 bg-white border border-grey-200 shadow-sm rounded-full">
+            <span className="px-2.5 py-1 text-xs font-medium text-muted-foreground bg-card border border-border shadow-sm rounded-full">
               {badgeCount} {badgeLabel}
             </span>
           )}

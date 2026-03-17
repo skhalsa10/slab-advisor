@@ -21,14 +21,14 @@ function ChartIcon({ className = 'w-8 h-8' }: { className?: string }) {
 
 export default function PortfolioEmptyState() {
   return (
-    <div className="bg-white rounded-2xl border border-grey-100 shadow-sm p-8 text-center">
-      <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-        <ChartIcon className="w-8 h-8 text-gray-400" />
+    <div className="bg-card rounded-2xl border border-border shadow-sm p-8 text-center">
+      <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+        <ChartIcon className="w-8 h-8 text-muted-foreground" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-semibold text-card-foreground mb-2">
         Portfolio Tracking Coming Soon
       </h3>
-      <p className="text-sm text-gray-500 max-w-md mx-auto">
+      <p className="text-sm text-muted-foreground max-w-md mx-auto">
         We&apos;re building your portfolio history. Check back in a few days to
         see how your collection value changes over time.
       </p>

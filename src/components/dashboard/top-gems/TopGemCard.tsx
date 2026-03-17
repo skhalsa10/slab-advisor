@@ -84,18 +84,18 @@ export default function TopGemCard({ gem, priority = false }: TopGemCardProps) {
       {/* Card Info - tight spacing */}
       <div className="flex flex-col p-2 pt-1.5">
         {/* Card Name */}
-        <h3 className="font-medium text-grey-900 text-xs truncate" title={gem.cardName}>
+        <h3 className="font-medium text-card-foreground text-xs truncate" title={gem.cardName}>
           {gem.cardName}
         </h3>
 
         {/* Set + Number - hide on very small screens */}
-        <p className="text-[10px] text-grey-500 truncate hidden sm:block">
+        <p className="text-[10px] text-muted-foreground truncate hidden sm:block">
           {gem.setName}
           {gem.cardNumber && ` #${gem.cardNumber}`}
         </p>
 
         {/* Value */}
-        <p className="mt-0.5 text-sm font-bold text-grey-900">
+        <p className="mt-0.5 text-sm font-bold text-card-foreground">
           {formatCurrency(gem.currentValue)}
         </p>
       </div>

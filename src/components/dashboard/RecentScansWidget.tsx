@@ -42,13 +42,13 @@ function getGradeBadge(grade: number | null): {
   if (roundedGrade >= 10) {
     return { text: 'GEM MINT 10', colorClass: 'text-green-600' }
   } else if (roundedGrade >= 9) {
-    return { text: `MINT ${roundedGrade}`, colorClass: 'text-grey-600' }
+    return { text: `MINT ${roundedGrade}`, colorClass: 'text-muted-foreground' }
   } else if (roundedGrade >= 8) {
-    return { text: `NM-MT ${roundedGrade}`, colorClass: 'text-grey-500' }
+    return { text: `NM-MT ${roundedGrade}`, colorClass: 'text-muted-foreground' }
   } else if (roundedGrade >= 7) {
-    return { text: `NM ${roundedGrade}`, colorClass: 'text-grey-500' }
+    return { text: `NM ${roundedGrade}`, colorClass: 'text-muted-foreground' }
   } else {
-    return { text: `${roundedGrade}`, colorClass: 'text-grey-400' }
+    return { text: `${roundedGrade}`, colorClass: 'text-muted-foreground' }
   }
 }
 
@@ -66,14 +66,14 @@ function MiniSlabCard({ scan }: { scan: RecentScan }) {
           src={scan.imageUrl}
           alt={scan.cardName}
           fill
-          className="rounded-xl object-cover border border-grey-200 shadow-sm"
+          className="rounded-xl object-cover border border-border shadow-sm"
           sizes="(max-width: 640px) 144px, 160px"
         />
         {/* Grade Badge - positioned at bottom center */}
         {badge && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
             <div
-              className={`backdrop-blur-md bg-white/90 shadow-sm border border-grey-200 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${badge.colorClass}`}
+              className={`backdrop-blur-md bg-card/90 shadow-sm border border-border px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${badge.colorClass}`}
             >
               {badge.text}
             </div>
@@ -82,10 +82,10 @@ function MiniSlabCard({ scan }: { scan: RecentScan }) {
       </div>
       {/* Footer: Card Name + Timestamp */}
       <div className="px-1">
-        <p className="text-sm font-medium text-grey-900 truncate">
+        <p className="text-sm font-medium text-card-foreground truncate">
           {scan.cardName}
         </p>
-        <p className="text-xs text-grey-400">{formatRelativeTime(scan.createdAt)}</p>
+        <p className="text-xs text-muted-foreground">{formatRelativeTime(scan.createdAt)}</p>
       </div>
     </div>
   )
@@ -111,8 +111,8 @@ export default async function RecentScansWidget({
   }
 
   return (
-    <section className="bg-white rounded-2xl border border-grey-100 shadow-sm p-6">
-      <h2 className="font-bold text-grey-900 mb-4">Recent Scans</h2>
+    <section className="bg-card rounded-2xl border border-border shadow-sm p-6">
+      <h2 className="font-bold text-card-foreground mb-4">Recent Scans</h2>
 
       {/* Horizontal Scroll Carousel */}
       <div className="flex gap-4 overflow-x-auto pb-2 snap-x scrollbar-hide">

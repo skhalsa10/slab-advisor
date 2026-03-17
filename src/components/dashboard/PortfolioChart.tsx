@@ -174,9 +174,9 @@ export default function PortfolioChart({
   const hasSealedData = chartData.some((d) => d.sealed > 0);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
       {/* Header: Series toggles (left) and Time range pills (right) */}
-      <div className="px-5 py-4 border-b border-gray-100">
+      <div className="px-5 py-4 border-b border-border">
         <div className="flex items-center justify-between flex-wrap gap-3">
           {/* Series toggles */}
           <div className="flex gap-2">
@@ -371,7 +371,7 @@ export default function PortfolioChart({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+          <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
             No portfolio data available for this period
           </div>
         )}

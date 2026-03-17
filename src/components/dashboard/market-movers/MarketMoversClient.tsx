@@ -49,7 +49,7 @@ function formatChange(change: number): {
   } else if (change < 0) {
     return { text, colorClass: 'text-red-700', bgClass: 'bg-red-50' }
   }
-  return { text, colorClass: 'text-grey-500', bgClass: 'bg-grey-50' }
+  return { text, colorClass: 'text-muted-foreground', bgClass: 'bg-muted' }
 }
 
 interface MarketMoversClientProps {
@@ -149,7 +149,7 @@ export default function MarketMoversClient({ cards }: MarketMoversClientProps) {
           })}
         </HorizontalScroll>
       ) : (
-        <p className="text-sm text-grey-500 py-4 text-center">
+        <p className="text-sm text-muted-foreground py-4 text-center">
           No significant market movement detected
         </p>
       )}

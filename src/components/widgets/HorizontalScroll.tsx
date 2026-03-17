@@ -54,12 +54,12 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10
                      hidden md:group-hover:flex
                      w-10 h-10 items-center justify-center
-                     bg-white/90 rounded-full shadow-lg border border-grey-200
-                     hover:bg-white transition-colors"
+                     bg-card/90 rounded-full shadow-lg border border-border
+                     hover:bg-card transition-colors"
           aria-label="Scroll left"
         >
           <svg
-            className="w-5 h-5 text-grey-700"
+            className="w-5 h-5 text-foreground"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -81,7 +81,7 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
         className={`
           flex gap-4 overflow-x-auto pb-2
           snap-x snap-mandatory
-          scrollbar-thin scrollbar-thumb-grey-300 scrollbar-track-transparent
+          scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent
           ${className}
         `}
       >
@@ -95,12 +95,12 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10
                      hidden md:group-hover:flex
                      w-10 h-10 items-center justify-center
-                     bg-white/90 rounded-full shadow-lg border border-grey-200
-                     hover:bg-white transition-colors"
+                     bg-card/90 rounded-full shadow-lg border border-border
+                     hover:bg-card transition-colors"
           aria-label="Scroll right"
         >
           <svg
-            className="w-5 h-5 text-grey-700"
+            className="w-5 h-5 text-foreground"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -119,7 +119,7 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
       {canScrollRight && (
         <div
           className="absolute right-0 top-0 bottom-2 w-12
-                     bg-gradient-to-l from-white to-transparent
+                     bg-gradient-to-l from-card to-transparent
                      pointer-events-none"
         />
       )}

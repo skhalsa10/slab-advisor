@@ -103,7 +103,7 @@ function TrendBadge({ change }: { change: number | null }) {
           ? 'bg-green-100 text-green-700'
           : isNegative
             ? 'bg-red-100 text-red-700'
-            : 'bg-gray-100 text-gray-600'
+            : 'bg-muted text-muted-foreground'
       }`}
     >
       {isPositive && (
@@ -156,22 +156,22 @@ function KPICard({
   change: number | null;
 }) {
   return (
-    <div className="bg-white overflow-hidden shadow-sm rounded-2xl">
+    <div className="bg-card overflow-hidden shadow-sm rounded-2xl">
       <div className="px-5 py-4">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0">
-            <p className="text-sm text-grey-500 font-medium">{label}</p>
+            <p className="text-sm text-muted-foreground font-medium">{label}</p>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-2xl font-semibold text-grey-900">
+              <span className="text-2xl font-semibold text-card-foreground">
                 {value}
               </span>
               <TrendBadge change={change} />
             </div>
             {subText && (
-              <p className="text-xs text-grey-400 mt-1">{subText}</p>
+              <p className="text-xs text-muted-foreground mt-1">{subText}</p>
             )}
           </div>
-          <div className="flex-shrink-0 ml-4 text-grey-400">{icon}</div>
+          <div className="flex-shrink-0 ml-4 text-muted-foreground">{icon}</div>
         </div>
       </div>
     </div>
