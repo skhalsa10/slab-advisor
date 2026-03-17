@@ -8,7 +8,7 @@ import TopMoversWidget from '@/components/widgets/TopMoversWidget'
 // Loading skeletons for widgets
 function HeroSkeleton() {
   return (
-    <div className="animate-pulse rounded-xl border border-grey-200 bg-grey-100 h-48 md:h-56" />
+    <div className="animate-pulse rounded-xl border border-border bg-secondary h-48 md:h-56" />
   )
 }
 
@@ -16,12 +16,12 @@ function WidgetSkeleton() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <div className="h-6 w-32 bg-grey-200 rounded animate-pulse" />
-        <div className="h-4 w-20 bg-grey-200 rounded animate-pulse" />
+        <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+        <div className="h-4 w-20 bg-muted rounded animate-pulse" />
       </div>
       <div className="flex gap-4 overflow-hidden">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="flex-shrink-0 w-36 h-48 bg-grey-200 rounded-lg animate-pulse" />
+          <div key={i} className="flex-shrink-0 w-36 h-48 bg-muted rounded-lg animate-pulse" />
         ))}
       </div>
     </div>
@@ -57,7 +57,7 @@ export default function ExplorePage() {
       </Suspense>
 
       {/* Future TCG note */}
-      <p className="text-center text-sm text-grey-500">
+      <p className="text-center text-sm text-muted-foreground">
         More TCGs coming soon
       </p>
     </div>

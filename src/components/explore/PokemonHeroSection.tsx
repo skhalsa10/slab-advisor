@@ -26,7 +26,7 @@ export default async function PokemonHeroSection() {
   ]
 
   return (
-    <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-grey-900 via-grey-800 to-grey-900">
+    <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-forest-900 via-forest-800 to-forest-900">
       {/* Subtle pattern overlay */}
       <div
         className="absolute inset-0 opacity-10"
@@ -36,10 +36,10 @@ export default async function PokemonHeroSection() {
       />
 
       {/* Gradient overlay for depth - left side for text */}
-      <div className="absolute inset-0 bg-gradient-to-r from-grey-900/90 via-grey-900/70 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-forest-900/90 via-forest-900/70 to-transparent" />
 
       {/* Dark gradient on right side - ensures button visibility against any card colors */}
-      <div className="hidden sm:block absolute inset-y-0 right-0 w-56 bg-gradient-to-l from-grey-900 via-grey-900/80 to-transparent z-[6]" />
+      <div className="hidden sm:block absolute inset-y-0 right-0 w-56 bg-gradient-to-l from-forest-900 via-forest-900/80 to-transparent z-[6]" />
 
       {/* Fanned cards - positioned to overlap right edge */}
       <div className="hidden sm:block">

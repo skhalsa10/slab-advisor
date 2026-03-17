@@ -41,7 +41,7 @@ export default async function NewestSetsWidget({ limit = 8, viewAllHref }: Newes
               href={`/browse/pokemon/${set.id}`}
               className="flex-shrink-0 snap-start w-32 sm:w-36 group"
             >
-              <div className="bg-white border border-grey-200 rounded-lg p-3 hover:border-orange-300 hover:shadow-md transition-all duration-200">
+              <div className="bg-card border border-border rounded-lg p-3 hover:border-orange-300 hover:shadow-md transition-all duration-200">
                 {hasLogo ? (
                   <div className="h-16 sm:h-20 flex items-center justify-center mb-2">
                     <Image
@@ -55,13 +55,13 @@ export default async function NewestSetsWidget({ limit = 8, viewAllHref }: Newes
                     />
                   </div>
                 ) : (
-                  <div className="h-16 sm:h-20 flex items-center justify-center mb-2 bg-grey-50 rounded">
-                    <span className="text-grey-400 text-xs text-center px-2">
+                  <div className="h-16 sm:h-20 flex items-center justify-center mb-2 bg-background rounded">
+                    <span className="text-muted-foreground text-xs text-center px-2">
                       {set.name}
                     </span>
                   </div>
                 )}
-                <p className="text-xs font-medium text-grey-900 text-center truncate">
+                <p className="text-xs font-medium text-foreground text-center truncate">
                   {set.name}
                 </p>
               </div>
