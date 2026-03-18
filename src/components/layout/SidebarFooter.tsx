@@ -27,10 +27,10 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
   const { theme, toggleTheme, isThemeLoading } = useTheme()
 
   return (
-    <div className="flex-shrink-0 border-t border-grey-800 p-2">
+    <div className="flex-shrink-0 border-t border-sidebar-border p-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-grey-800 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-grey-900">
+          <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-sidebar-accent transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-sidebar">
             {/* Avatar */}
             <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
               <span className="text-sm font-medium text-orange-700">
@@ -39,29 +39,29 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
             </div>
 
             {/* Email */}
-            <span className="flex-1 text-sm text-grey-300 truncate text-left">
+            <span className="flex-1 text-sm text-sidebar-foreground truncate text-left">
               {email}
             </span>
 
             {/* More icon */}
-            <MoreHorizontal className="h-4 w-4 text-grey-500 flex-shrink-0" />
+            <MoreHorizontal className="h-4 w-4 text-sidebar-foreground flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
           side="top"
           align="start"
-          className="w-56 bg-white"
+          className="w-56 bg-card"
         >
           {/* Header with email */}
           <DropdownMenuLabel className="font-normal">
-            <p className="text-sm font-medium text-grey-900 truncate">{email}</p>
+            <p className="text-sm font-medium text-foreground truncate">{email}</p>
           </DropdownMenuLabel>
 
           {/* Credits display (non-clickable) */}
           <DropdownMenuLabel className="flex items-center gap-2 font-normal py-2">
             <Sparkles className="h-4 w-4 text-orange-500" />
-            <span className="text-sm text-grey-600">Credits:</span>
+            <span className="text-sm text-muted-foreground">Credits:</span>
             <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs font-bold font-mono">
               {credits}
             </span>
@@ -75,7 +75,7 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
               ) : (
                 <Sun className="h-4 w-4 text-orange-500" />
               )}
-              <span className="text-sm text-grey-600">
+              <span className="text-sm text-muted-foreground">
                 {theme === 'DARK' ? 'Dark Mode' : 'Light Mode'}
               </span>
             </div>
@@ -91,7 +91,7 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
                 border-2 border-transparent transition-colors duration-200 ease-in-out
                 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
                 disabled:opacity-50 disabled:cursor-not-allowed
-                ${theme === 'DARK' ? 'bg-orange-500' : 'bg-grey-200'}
+                ${theme === 'DARK' ? 'bg-orange-500' : 'bg-muted'}
               `}
             >
               <span

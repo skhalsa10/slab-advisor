@@ -285,11 +285,11 @@ h1, h2, h3 {
   --chart-4: #b04f16;
   --chart-5: #d06024;
   
-  --sidebar: #151814;
+  --sidebar: var(--forest-900);
   --sidebar-foreground: var(--cream-100);
   --sidebar-primary: #ed732d;
   --sidebar-primary-foreground: var(--brand-white);
-  --sidebar-accent: var(--brand-white);
+  --sidebar-accent: var(--forest-800);
   --sidebar-accent-foreground: var(--cream-100);
   --sidebar-border: var(--forest-800);
   --sidebar-ring: var(--sage-500);

@@ -29,7 +29,7 @@ export default function Navbar({ onLogin }: NavbarProps) {
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b border-grey-200">
+    <nav className="bg-card shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
@@ -51,7 +51,7 @@ export default function Navbar({ onLogin }: NavbarProps) {
             <div className="ml-10 flex items-baseline space-x-4">
               <Link
                 href="/explore"
-                className="text-grey-600 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-muted-foreground hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
               >
                 Explore
               </Link>
@@ -68,7 +68,7 @@ export default function Navbar({ onLogin }: NavbarProps) {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="bg-grey-100 inline-flex items-center justify-center p-2 rounded-md text-grey-400 hover:text-grey-500 hover:bg-grey-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-inset transition-colors"
+              className="bg-secondary inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-inset transition-colors"
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
@@ -89,11 +89,11 @@ export default function Navbar({ onLogin }: NavbarProps) {
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-grey-200 shadow-lg">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-card border-t border-border shadow-lg">
             <Link
               href="/explore"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-grey-600 hover:text-orange-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+              className="text-muted-foreground hover:text-orange-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
             >
               Explore
             </Link>

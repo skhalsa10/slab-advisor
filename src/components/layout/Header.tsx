@@ -22,14 +22,14 @@ export default function Header({ onSignOut }: HeaderProps) {
   }
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-card shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3 sm:py-4">
           {/* Logo and Title */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             <Image src="/icon_light.png" alt="Slab Advisor" className="h-8 w-auto sm:h-10" width={32} height={40} />
             <h1 className="text-xl sm:text-2xl font-bold">
-              <span className="text-grey-900">Slab</span>
+              <span className="text-foreground">Slab</span>
               <span className="text-orange-500">Advisor</span>
             </h1>
           </div>
@@ -39,12 +39,12 @@ export default function Header({ onSignOut }: HeaderProps) {
             {user && (
               <>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-grey-600">Credits:</span>
+                  <span className="text-sm text-muted-foreground">Credits:</span>
                   <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-sm font-medium">
                     {credits}
                   </span>
                 </div>
-                <span className="text-sm text-grey-600">{user.email}</span>
+                <span className="text-sm text-muted-foreground">{user.email}</span>
                 <button
                   onClick={handleSignOut}
                   className="text-sm text-orange-600 hover:text-orange-500"
@@ -66,7 +66,7 @@ export default function Header({ onSignOut }: HeaderProps) {
               {/* Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-grey-600 hover:text-grey-900 hover:bg-grey-100"
+                className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary"
               >
                 <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {mobileMenuOpen ? (
@@ -82,21 +82,21 @@ export default function Header({ onSignOut }: HeaderProps) {
 
         {/* Mobile Menu Dropdown */}
         {user && mobileMenuOpen && (
-          <div className="sm:hidden py-3 border-t border-grey-200">
+          <div className="sm:hidden py-3 border-t border-border">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-grey-600">Signed in as:</span>
-                <span className="text-sm font-medium text-grey-900 truncate max-w-[200px]">
+                <span className="text-sm text-muted-foreground">Signed in as:</span>
+                <span className="text-sm font-medium text-foreground truncate max-w-[200px]">
                   {user.email}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-grey-600">Credits remaining:</span>
-                <span className="text-sm font-medium text-grey-900">{credits}</span>
+                <span className="text-sm text-muted-foreground">Credits remaining:</span>
+                <span className="text-sm font-medium text-foreground">{credits}</span>
               </div>
               <button
                 onClick={handleSignOut}
-                className="w-full text-left text-sm text-orange-600 hover:text-orange-500 py-2 border-t border-grey-200"
+                className="w-full text-left text-sm text-orange-600 hover:text-orange-500 py-2 border-t border-border"
               >
                 Sign out
               </button>
