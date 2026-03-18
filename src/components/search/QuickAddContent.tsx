@@ -73,7 +73,7 @@ export default function QuickAddContent({
       return (
         <div className="text-center py-12 px-4">
           <div className="text-4xl mb-4">⌨️</div>
-          <p className="text-sm text-grey-600">
+          <p className="text-sm text-muted-foreground">
             Keep typing... (minimum 2 characters unless using # or structured search)
           </p>
         </div>
@@ -84,11 +84,11 @@ export default function QuickAddContent({
       return (
         <div className="text-center py-12 px-4">
           <div className="text-4xl mb-4">😕</div>
-          <h3 className="text-lg font-medium text-grey-900 mb-2">No cards found</h3>
-          <p className="text-sm text-grey-600 mb-4">
+          <h3 className="text-lg font-medium text-foreground mb-2">No cards found</h3>
+          <p className="text-sm text-muted-foreground mb-4">
             Try a different search term or check your spelling
           </p>
-          <div className="text-xs text-grey-500">
+          <div className="text-xs text-muted-foreground">
             <p>Search tips:</p>
             <p>• Use simpler terms (try &quot;pikachu&quot; instead of &quot;pikachu ex&quot;)</p>
             <p>• Check spelling of card names and sets</p>
@@ -124,7 +124,7 @@ export default function QuickAddContent({
       {loading && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <div className="h-4 w-24 bg-grey-200 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-muted rounded animate-pulse" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
@@ -141,7 +141,7 @@ export default function QuickAddContent({
       {!loading && results.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-grey-900">
+            <h3 className="text-sm font-medium text-foreground">
               Found {results.length} card{results.length !== 1 ? 's' : ''}
             </h3>
             {query && (
@@ -168,7 +168,7 @@ export default function QuickAddContent({
           {/* Results Info */}
           {results.length >= 50 && (
             <div className="mt-4 text-center">
-              <p className="text-xs text-grey-500">
+              <p className="text-xs text-muted-foreground">
                 Showing first 50 results. Try a more specific search for better results.
               </p>
             </div>

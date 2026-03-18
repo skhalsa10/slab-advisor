@@ -61,7 +61,7 @@ export default function SearchBar({
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
           <svg 
-            className="h-5 w-5 text-grey-400" 
+            className="h-5 w-5 text-muted-foreground" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -83,8 +83,8 @@ export default function SearchBar({
           onBlur={() => setIsFocused(false)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || defaultPlaceholder}
-          className={`block w-full pl-10 py-3 border border-grey-300 rounded-lg
-                     placeholder-grey-500 focus:outline-none focus:ring-2
+          className={`block w-full pl-10 py-3 border border-border rounded-lg
+                     placeholder-muted-foreground focus:outline-none focus:ring-2
                      focus:ring-orange-500 focus:border-orange-500
                      text-sm transition-colors
                      ${value ? 'pr-10' : showCameraIcon && isFocused ? 'pr-12' : 'pr-3'}`}
@@ -96,7 +96,7 @@ export default function SearchBar({
           {value && (
             <button
               onClick={() => onChange('')}
-              className="text-grey-400 hover:text-grey-600 transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
               type="button"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@ export default function SearchBar({
             <button
               onClick={onCameraClick}
               onMouseDown={(e) => e.preventDefault()} // Prevent blur
-              className="text-grey-400 hover:text-orange-500 transition-colors p-1"
+              className="text-muted-foreground hover:text-orange-500 transition-colors p-1"
               type="button"
               aria-label="Scan with camera"
             >
@@ -125,23 +125,23 @@ export default function SearchBar({
 
       {/* Search Hints - only show when input is focused */}
       {showHints && isFocused && (
-        <div className="mt-2 p-3 bg-grey-50 rounded-lg border border-grey-200">
-          <h4 className="text-xs font-medium text-grey-700 mb-2">Search Tips:</h4>
-          <div className="space-y-1 text-xs text-grey-600">
+        <div className="mt-2 p-3 bg-background rounded-lg border border-border">
+          <h4 className="text-xs font-medium text-foreground mb-2">Search Tips:</h4>
+          <div className="space-y-1 text-xs text-muted-foreground">
             <div className="flex items-center space-x-2">
-              <span className="font-mono bg-white px-1.5 py-0.5 rounded border">pikachu 181</span>
+              <span className="font-mono bg-card px-1.5 py-0.5 rounded border">pikachu 181</span>
               <span>Name and number</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono bg-white px-1.5 py-0.5 rounded border">#025</span>
+              <span className="font-mono bg-card px-1.5 py-0.5 rounded border">#025</span>
               <span>Exact card number</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono bg-white px-1.5 py-0.5 rounded border">stellar crown charizard</span>
+              <span className="font-mono bg-card px-1.5 py-0.5 rounded border">stellar crown charizard</span>
               <span>Set and card name</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-mono bg-white px-1.5 py-0.5 rounded border">name:&quot;pikachu&quot; id:&quot;181&quot; set:&quot;base set&quot;</span>
+              <span className="font-mono bg-card px-1.5 py-0.5 rounded border">name:&quot;pikachu&quot; id:&quot;181&quot; set:&quot;base set&quot;</span>
               <span>Precise search (any combination)</span>
             </div>
           </div>

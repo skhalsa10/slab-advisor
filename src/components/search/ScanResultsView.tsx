@@ -42,7 +42,7 @@ function CarouselCard({
     >
       {/* Card image - large */}
       <div className={`
-        relative aspect-[2.5/3.5] bg-grey-100 rounded-xl overflow-hidden shadow-lg
+        relative aspect-[2.5/3.5] bg-secondary rounded-xl overflow-hidden shadow-lg
         transition-all duration-300
         ${isSelected ? 'ring-4 ring-orange-500 ring-offset-2' : ''}
       `}>
@@ -56,7 +56,7 @@ function CarouselCard({
             priority={isSelected}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-grey-400">
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
             <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
@@ -83,10 +83,10 @@ function CarouselCard({
 
       {/* Card info below image */}
       <div className="mt-3 text-center px-2">
-        <p className="font-semibold text-grey-900 text-sm line-clamp-2">{cardName}</p>
-        <p className="text-xs text-grey-600 mt-1">{setName}</p>
+        <p className="font-semibold text-foreground text-sm line-clamp-2">{cardName}</p>
+        <p className="text-xs text-muted-foreground mt-1">{setName}</p>
         {cardNumber && (
-          <p className="text-xs text-grey-500">#{cardNumber}</p>
+          <p className="text-xs text-muted-foreground">#{cardNumber}</p>
         )}
       </div>
     </div>
@@ -184,8 +184,8 @@ export default function ScanResultsView({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-grey-900 mb-2">Could Not Identify Card</h3>
-        <p className="text-sm text-grey-600 mb-6">
+        <h3 className="text-lg font-medium text-foreground mb-2">Could Not Identify Card</h3>
+        <p className="text-sm text-muted-foreground mb-6">
           {result.error || 'We couldn\'t identify the card in this image. Try taking another photo with better lighting.'}
         </p>
 
@@ -195,7 +195,7 @@ export default function ScanResultsView({
             <img
               src={result.capturedImage}
               alt="Captured card"
-              className="w-full rounded-lg border border-grey-200"
+              className="w-full rounded-lg border border-border"
             />
           </div>
         )}
@@ -203,7 +203,7 @@ export default function ScanResultsView({
         <div className="flex gap-3 justify-center">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-grey-700 hover:bg-grey-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
           >
             Cancel
           </button>
@@ -222,8 +222,8 @@ export default function ScanResultsView({
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="p-4 text-center">
-        <h3 className="text-lg font-medium text-grey-900">Card Identified</h3>
-        <p className="text-sm text-grey-600">
+        <h3 className="text-lg font-medium text-foreground">Card Identified</h3>
+        <p className="text-sm text-muted-foreground">
           {allMatches.length === 1
             ? 'We found a match for your card'
             : `Swipe to view ${allMatches.length} possible matches`
@@ -266,7 +266,7 @@ export default function ScanResultsView({
                   w-2 h-2 rounded-full transition-all
                   ${selectedIndex === index
                     ? 'w-6 bg-orange-500'
-                    : 'bg-grey-300 hover:bg-grey-400'
+                    : 'bg-muted-foreground hover:bg-muted-foreground'
                   }
                 `}
                 aria-label={`Go to match ${index + 1}`}
@@ -278,14 +278,14 @@ export default function ScanResultsView({
 
       {/* Add to collection form - compact */}
       {canAdd && (
-        <div className="px-4 py-3 border-t border-grey-200 bg-grey-50">
+        <div className="px-4 py-3 border-t border-border bg-background">
           <div className="flex items-center gap-4">
             {/* Variant */}
             <div className="flex-1">
               <select
                 value={variant}
                 onChange={(e) => setVariant(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-grey-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="normal">Normal</option>
                 <option value="holo">Holo</option>
@@ -303,14 +303,14 @@ export default function ScanResultsView({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-8 h-8 rounded-lg border border-grey-300 flex items-center justify-center hover:bg-grey-100 text-lg"
+                className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-secondary text-lg"
               >
                 -
               </button>
               <span className="w-6 text-center font-medium">{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-8 h-8 rounded-lg border border-grey-300 flex items-center justify-center hover:bg-grey-100 text-lg"
+                className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-secondary text-lg"
               >
                 +
               </button>
@@ -320,11 +320,11 @@ export default function ScanResultsView({
       )}
 
       {/* Action buttons */}
-      <div className="p-4 border-t border-grey-200 flex gap-3">
+      <div className="p-4 border-t border-border flex gap-3">
         <button
           onClick={onRetry}
           disabled={isAdding}
-          className="flex-1 px-4 py-3 text-grey-700 bg-grey-100 rounded-lg hover:bg-grey-200 transition-colors disabled:opacity-50"
+          className="flex-1 px-4 py-3 text-foreground bg-secondary rounded-lg hover:bg-muted transition-colors disabled:opacity-50"
         >
           Scan Again
         </button>

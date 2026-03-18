@@ -74,7 +74,7 @@ export default function QuickAddModal({
   const CloseButton = () => (
     <button
       onClick={onClose}
-      className="text-grey-400 hover:text-grey-600 transition-colors p-1 rounded-md hover:bg-grey-100"
+      className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-secondary"
       aria-label="Close modal"
     >
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,7 +101,7 @@ export default function QuickAddModal({
           aria-labelledby="quick-add-title"
           className={`
             fixed z-50 bottom-0 left-0 right-0
-            bg-white rounded-t-2xl shadow-2xl
+            bg-card rounded-t-2xl shadow-2xl
             flex flex-col
             h-[85vh]
             transform transition-transform duration-300 ease-out
@@ -110,12 +110,12 @@ export default function QuickAddModal({
         >
           {/* Handle bar */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-grey-300 rounded-full" />
+            <div className="w-10 h-1 bg-muted-foreground rounded-full" />
           </div>
 
           {/* Header */}
-          <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-grey-100">
-            <h2 id="quick-add-title" className="text-lg font-semibold text-grey-900">
+          <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-border">
+            <h2 id="quick-add-title" className="text-lg font-semibold text-foreground">
               {title}
             </h2>
             <CloseButton />
@@ -150,7 +150,7 @@ export default function QuickAddModal({
           aria-modal="true"
           aria-labelledby="quick-add-title"
           className={`
-            bg-white rounded-lg shadow-2xl pointer-events-auto
+            bg-card rounded-lg shadow-2xl pointer-events-auto
             flex flex-col
             transform transition-all duration-300 ease-out
             ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
@@ -161,9 +161,9 @@ export default function QuickAddModal({
           `}
         >
           {/* Fixed Header */}
-          <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 rounded-t-lg">
+          <div className="flex-shrink-0 bg-card border-b border-border px-4 py-3 rounded-t-lg">
             <div className="flex items-center justify-between">
-              <h2 id="quick-add-title" className="text-lg font-semibold text-grey-900 truncate">
+              <h2 id="quick-add-title" className="text-lg font-semibold text-foreground truncate">
                 {title}
               </h2>
               <CloseButton />

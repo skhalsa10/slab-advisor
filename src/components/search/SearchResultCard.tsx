@@ -68,9 +68,9 @@ export default function SearchResultCard({
   const isCurrentlyAdding = isAdding || localAdding
 
   return (
-    <div className="bg-white rounded-lg border border-grey-200 hover:border-grey-300 transition-all duration-200 overflow-hidden">
+    <div className="bg-card rounded-lg border border-border hover:border-border transition-all duration-200 overflow-hidden">
       {/* Card Image */}
-      <div className="aspect-[3/4] relative bg-grey-100">
+      <div className="aspect-[3/4] relative bg-secondary">
         <Image
           src={cardImageUrl}
           alt={card.name}
@@ -83,19 +83,19 @@ export default function SearchResultCard({
       {/* Card Info */}
       <div className="p-3 space-y-2">
         {/* Card Name */}
-        <h3 className="font-semibold text-grey-900 text-sm leading-tight line-clamp-1" title={card.name}>
+        <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-1" title={card.name}>
           {card.name}
         </h3>
         
         {/* Set Name */}
-        <div className="text-xs text-grey-600 truncate" title={card.set_name}>
+        <div className="text-xs text-muted-foreground truncate" title={card.set_name}>
           {card.set_name}
         </div>
         
         {/* Number and Rarity Row */}
         <div className="flex items-center gap-2">
           {card.local_id && (
-            <span className="text-xs font-mono text-grey-600">
+            <span className="text-xs font-mono text-muted-foreground">
               #{card.local_id}
             </span>
           )}
@@ -111,7 +111,7 @@ export default function SearchResultCard({
         <button
           onClick={handleAddClick}
           disabled={isCurrentlyAdding}
-          className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-grey-400
+          className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-muted-foreground
                      text-white text-sm font-medium py-2.5 px-3 rounded-lg
                      transition-all duration-200 flex items-center justify-center
                      hover:shadow-md active:scale-95"
@@ -140,13 +140,13 @@ export default function SearchResultCard({
             <div className="space-y-2 pt-1">
               {/* Variant Selection */}
               <div>
-                <label className="block text-xs font-medium text-grey-700 mb-1">
+                <label className="block text-xs font-medium text-foreground mb-1">
                   Variant:
                 </label>
                 <select
                   value={variant}
                   onChange={(e) => setVariant(e.target.value)}
-                  className="w-full text-xs border border-grey-300 rounded px-2 py-1
+                  className="w-full text-xs border border-border rounded px-2 py-1
                              focus:outline-none focus:ring-1 focus:ring-orange-500"
                 >
                   <option value="normal">Normal</option>
@@ -163,7 +163,7 @@ export default function SearchResultCard({
 
               {/* Quantity */}
               <div>
-                <label className="block text-xs font-medium text-grey-700 mb-1">
+                <label className="block text-xs font-medium text-foreground mb-1">
                   Quantity:
                 </label>
                 <input
@@ -172,7 +172,7 @@ export default function SearchResultCard({
                   max="999"
                   value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-full text-xs border border-grey-300 rounded px-2 py-1
+                  className="w-full text-xs border border-border rounded px-2 py-1
                              focus:outline-none focus:ring-1 focus:ring-orange-500"
                 />
               </div>
@@ -181,7 +181,7 @@ export default function SearchResultCard({
               <button
                 onClick={handleConfirmAdd}
                 disabled={isCurrentlyAdding}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-grey-400
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-muted-foreground
                            text-white text-xs font-medium py-1.5 px-2 rounded
                            transition-colors duration-200"
               >
