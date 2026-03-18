@@ -59,7 +59,7 @@ export default function TCGProduct({
   // Common content for both link and interactive modes
   const content = (
     <>
-      <div className="aspect-[2.5/3.5] relative bg-grey-100">
+      <div className="aspect-[2.5/3.5] relative bg-secondary">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -71,12 +71,12 @@ export default function TCGProduct({
               e.currentTarget.style.display = 'none'
               const parent = e.currentTarget.parentElement
               if (parent) {
-                parent.innerHTML = '<div class="flex items-center justify-center h-full text-grey-400"><svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg></div>'
+                parent.innerHTML = '<div class="flex items-center justify-center h-full text-muted-foreground"><svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg></div>'
               }
             }}
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-grey-400">
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
@@ -90,7 +90,7 @@ export default function TCGProduct({
         )}
       </div>
       <div className="p-3">
-        <h3 className="text-sm font-medium text-grey-900 line-clamp-2">
+        <h3 className="text-sm font-medium text-foreground line-clamp-2">
           {product.name}
         </h3>
         <div className="mt-2">
@@ -102,7 +102,7 @@ export default function TCGProduct({
         {/* Only show shop link text when not using onClick handler */}
         {!onClick && (
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-grey-600">{shopLinkText}</span>
+            <span className="text-xs text-muted-foreground">{shopLinkText}</span>
             <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -117,7 +117,7 @@ export default function TCGProduct({
     return (
       <div
         onClick={handleClick}
-        className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
+        className={`group relative bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
       >
         {content}
       </div>
@@ -130,7 +130,7 @@ export default function TCGProduct({
       href={productHref}
       target={target}
       rel={rel}
-      className={`group relative bg-white rounded-lg overflow-hidden border border-grey-200 hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
+      className={`group relative bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
     >
       {content}
     </a>

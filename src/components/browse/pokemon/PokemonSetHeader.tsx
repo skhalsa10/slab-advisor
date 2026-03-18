@@ -33,14 +33,14 @@ export default function PokemonSetHeader({
       </Link>
 
       {/* White card container */}
-      <div className="bg-white rounded-lg border border-grey-200 p-6 space-y-6">
+      <div className="bg-card rounded-lg border border-border p-6 space-y-6">
         {/* ===== MOBILE LAYOUT ===== */}
         <div className="sm:hidden space-y-4">
           {/* Mobile header with back chevron */}
           <div className="flex items-center space-x-3">
             <Link
               href={backHref}
-              className="flex-shrink-0 -ml-2 p-1 text-grey-600 hover:text-grey-900"
+              className="flex-shrink-0 -ml-2 p-1 text-muted-foreground hover:text-foreground"
               aria-label="Back to Sets"
             >
               <svg
@@ -70,11 +70,11 @@ export default function PokemonSetHeader({
                 }}
               />
             )}
-            <h1 className="text-2xl font-bold text-grey-900">{setData.name}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{setData.name}</h1>
           </div>
 
           {/* Divider */}
-          <hr className="border-grey-200" />
+          <hr className="border-border" />
 
           {/* Mobile stacked content */}
           <SetStatistics
@@ -126,7 +126,7 @@ export default function PokemonSetHeader({
           <div className="flex gap-6">
             {/* Left: Title, Stats, Shop */}
             <div className="flex-1 min-w-0 space-y-4">
-              <h1 className="text-2xl font-bold text-grey-900">{setData.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{setData.name}</h1>
 
               <SetStatistics
                 totalCards={setData.card_count_total || 0}
@@ -178,7 +178,7 @@ export default function PokemonSetHeader({
                   }}
                 />
               )}
-              <h1 className="text-2xl font-bold text-grey-900">{setData.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{setData.name}</h1>
             </div>
 
             {/* Metadata / Statistics */}

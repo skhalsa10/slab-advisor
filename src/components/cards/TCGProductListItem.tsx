@@ -58,7 +58,7 @@ export default function TCGProductListItem({
 
   return (
     <tr
-      className={`hover:bg-grey-50 transition-colors ${onClick ? 'cursor-pointer' : ''}`}
+      className={`hover:bg-accent transition-colors ${onClick ? 'cursor-pointer' : ''}`}
       onClick={onClick ? handleRowClick : undefined}
     >
       {/* Quick Add Column */}
@@ -78,24 +78,24 @@ export default function TCGProductListItem({
                 alt={product.name}
                 width={48}
                 height={48}
-                className="h-12 w-12 object-contain rounded-md border border-grey-200"
+                className="h-12 w-12 object-contain rounded-md border border-border"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
                 }}
               />
             ) : (
-              <div className="h-12 w-12 rounded-md bg-grey-100 flex items-center justify-center">
-                <svg className="h-6 w-6 text-grey-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="h-12 w-12 rounded-md bg-secondary flex items-center justify-center">
+                <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
             )}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-grey-900">
+            <div className="text-sm font-medium text-foreground">
               {product.name}
             </div>
-            <div className="text-sm text-grey-500">
+            <div className="text-sm text-muted-foreground">
               Product #{product.tcgplayer_product_id || 'N/A'}
             </div>
           </div>

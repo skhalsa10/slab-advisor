@@ -25,15 +25,15 @@ export default function ShopTheSet({ tcgPlayerUrl, tcgPlayerGroups, setName, sho
   const shouldUseTCGPlayerGroups = tcgPlayerGroups && tcgPlayerGroups.length > 0
 
   // Primary button styling (main actions)
-  const primaryButtonClass = "flex-1 max-w-56 inline-flex items-center justify-center px-4 py-2.5 bg-white border-2 border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors whitespace-nowrap"
+  const primaryButtonClass = "flex-1 max-w-56 inline-flex items-center justify-center px-4 py-2.5 bg-card border-2 border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors whitespace-nowrap"
 
   // Secondary button styling (supplemental options)
-  const secondaryButtonClass = "flex-1 max-w-56 inline-flex items-center justify-center px-4 py-2.5 bg-white border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors whitespace-nowrap"
+  const secondaryButtonClass = "flex-1 max-w-56 inline-flex items-center justify-center px-4 py-2.5 bg-card border border-orange-600 text-orange-600 text-sm font-medium rounded-md hover:bg-orange-50 transition-colors whitespace-nowrap"
 
   return (
     <div>
       {showTitle && (
-        <h3 className="text-lg font-semibold text-grey-900 mb-4">Shop the set</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Shop the set</h3>
       )}
 
       <div className="flex flex-wrap gap-2">
@@ -98,7 +98,7 @@ export default function ShopTheSet({ tcgPlayerUrl, tcgPlayerGroups, setName, sho
         </a>
       </div>
 
-      <p className="text-xs text-grey-500 mt-3">Shopping links may contain affiliate links</p>
+      <p className="text-xs text-muted-foreground mt-3">Shopping links may contain affiliate links</p>
     </div>
   )
 }

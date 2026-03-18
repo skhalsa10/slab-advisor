@@ -73,15 +73,15 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
     if (variant === 'bar') {
       return (
         <div className="animate-pulse">
-          <div className="h-5 bg-grey-200 rounded w-32 mb-2" />
-          <div className="h-3 bg-grey-200 rounded-full w-full" />
+          <div className="h-5 bg-muted rounded w-32 mb-2" />
+          <div className="h-3 bg-muted rounded-full w-full" />
         </div>
       )
     }
     return (
       <div className="animate-pulse flex flex-col items-center">
-        {showTitle && <div className="h-6 bg-grey-200 rounded w-40 mb-4" />}
-        <div className="w-44 h-44 bg-grey-200 rounded-full" />
+        {showTitle && <div className="h-6 bg-muted rounded w-40 mb-4" />}
+        <div className="w-44 h-44 bg-muted rounded-full" />
       </div>
     )
   }
@@ -98,22 +98,22 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
         <div className="flex items-center justify-between mb-2">
           {showTitle ? (
             <>
-              <h3 className="text-sm font-semibold text-grey-900">
+              <h3 className="text-sm font-semibold text-foreground">
                 {setName} Set
               </h3>
-              <span className="text-sm font-medium text-grey-700">
+              <span className="text-sm font-medium text-foreground">
                 {isComplete ? '100%' : `${percentage.toFixed(0)}%`}
               </span>
             </>
           ) : (
-            <span className="text-sm font-semibold text-grey-900">
+            <span className="text-sm font-semibold text-foreground">
               {isComplete ? '100% complete' : `${percentage.toFixed(0)}% complete`}
             </span>
           )}
         </div>
 
         {/* Progress bar */}
-        <div className="relative h-3 bg-grey-200 rounded-full overflow-hidden">
+        <div className="relative h-3 bg-muted rounded-full overflow-hidden">
           <div
             className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out"
             style={{
@@ -126,11 +126,11 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
 
         {/* Stats row */}
         <div className="flex items-center justify-between mt-1.5">
-          <span className="text-xs text-grey-600">
+          <span className="text-xs text-muted-foreground">
             {ownedCount} / {totalCards} cards
           </span>
           {!isComplete && remaining > 0 && (
-            <span className="text-xs text-grey-500">
+            <span className="text-xs text-muted-foreground">
               {remaining} to go
             </span>
           )}
@@ -143,7 +143,7 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
 
         {/* Encouraging message for empty collection */}
         {ownedCount === 0 && (
-          <p className="text-xs text-grey-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Start your collection!
           </p>
         )}
@@ -162,7 +162,7 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
     <div className="flex flex-col items-center">
       {/* Title - centered */}
       {showTitle && (
-        <h3 className="text-lg font-semibold text-grey-900 mb-4 text-center">
+        <h3 className="text-lg font-semibold text-foreground mb-4 text-center">
           {setName} Set
         </h3>
       )}
@@ -184,7 +184,7 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
-            className="text-grey-200"
+            className="text-muted"
           />
           {/* Progress circle */}
           {percentage > 0 && (
@@ -210,15 +210,15 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
             <>
               <span className="text-xl font-bold text-green-600">Set</span>
               <span className="text-xl font-bold text-green-600">Complete</span>
-              <span className="text-sm font-semibold text-grey-600 mt-1">
+              <span className="text-sm font-semibold text-muted-foreground mt-1">
                 100% complete
               </span>
             </>
           ) : (
             <>
-              <span className="text-4xl font-bold text-grey-900">{remaining}</span>
-              <span className="text-sm text-grey-600">cards to go</span>
-              <span className="text-sm font-semibold text-grey-700 mt-1">
+              <span className="text-4xl font-bold text-foreground">{remaining}</span>
+              <span className="text-sm text-muted-foreground">cards to go</span>
+              <span className="text-sm font-semibold text-foreground mt-1">
                 {percentage.toFixed(0)}% complete
               </span>
             </>
@@ -228,7 +228,7 @@ export default function SetOwnershipSummary({ totalCards, setId, setName, onRefe
 
       {/* Encouraging message for empty collection */}
       {ownedCount === 0 && (
-        <p className="text-sm text-grey-500 text-center mt-3">
+        <p className="text-sm text-muted-foreground text-center mt-3">
           Start your collection!
         </p>
       )}

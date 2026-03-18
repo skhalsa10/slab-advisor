@@ -144,7 +144,7 @@ export default function CardQuickViewContent({
 
   // --- Shared mini-context header for form view ---
   const formContextHeader = (
-    <div className="flex items-center gap-3 px-4 py-3 border-b border-grey-100 bg-white">
+    <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card">
       <button
         onClick={() => setCurrentView('details')}
         className="flex items-center text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors flex-shrink-0"
@@ -154,10 +154,10 @@ export default function CardQuickViewContent({
         </svg>
         Back
       </button>
-      <div className="w-px h-8 bg-grey-200 flex-shrink-0" />
+      <div className="w-px h-8 bg-muted flex-shrink-0" />
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-grey-900 truncate">{cardData.name}</p>
-        <p className="text-xs text-grey-500 truncate">
+        <p className="text-sm font-semibold text-foreground truncate">{cardData.name}</p>
+        <p className="text-xs text-muted-foreground truncate">
           {cardData.set?.name || 'Unknown Set'} • #{cardData.local_id || 'No Number'}
         </p>
       </div>
@@ -217,8 +217,8 @@ export default function CardQuickViewContent({
             </div>
             {/* Title info */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-grey-900">{cardData.name}</h3>
-              <p className="text-sm text-grey-600">
+              <h3 className="text-lg font-semibold text-foreground">{cardData.name}</h3>
+              <p className="text-sm text-muted-foreground">
                 {cardData.set?.name || 'Unknown Set'} • #{cardData.local_id || 'No Number'}
               </p>
               <Link
@@ -241,7 +241,7 @@ export default function CardQuickViewContent({
         </div>
 
         {/* Sticky Footer - Always visible at bottom */}
-        <div className="flex-shrink-0 bg-white border-t border-grey-200 px-4 pt-3 pb-8">
+        <div className="flex-shrink-0 bg-card border-t border-border px-4 pt-3 pb-8">
           {/* Primary Action */}
           <button
             onClick={handleAddToCollectionClick}
@@ -257,7 +257,7 @@ export default function CardQuickViewContent({
                 href={`https://www.tcgplayer.com/product/${cardData.tcgplayer_product_id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center px-3 py-2.5 border border-grey-300 text-grey-600 text-xs font-medium rounded-lg hover:border-grey-400 hover:bg-grey-50 transition-colors"
+                className="inline-flex items-center justify-center px-3 py-2.5 border border-border text-muted-foreground text-xs font-medium rounded-lg hover:border-muted-foreground hover:bg-accent transition-colors"
               >
                 <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -272,7 +272,7 @@ export default function CardQuickViewContent({
               href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center justify-center px-3 py-2.5 border border-grey-300 text-grey-600 text-xs font-medium rounded-lg hover:border-grey-400 hover:bg-grey-50 transition-colors ${!cardData.tcgplayer_product_id ? 'col-span-2' : ''}`}
+              className={`inline-flex items-center justify-center px-3 py-2.5 border border-border text-muted-foreground text-xs font-medium rounded-lg hover:border-muted-foreground hover:bg-accent transition-colors ${!cardData.tcgplayer_product_id ? 'col-span-2' : ''}`}
             >
               <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -286,14 +286,14 @@ export default function CardQuickViewContent({
 
           {/* Navigation Row */}
           {(navigation.prevCard || navigation.nextCard) && (
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-grey-100">
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
               <button
                 onClick={() => navigation.prevCard && navigation.onNavigate(navigation.prevCard.id)}
                 disabled={!navigation.prevCard}
                 className={`flex items-center space-x-1 px-2 py-1.5 text-sm font-medium transition-colors ${
                   navigation.prevCard
                     ? 'text-orange-600 active:bg-orange-50'
-                    : 'text-grey-300'
+                    : 'text-border'
                 }`}
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -308,7 +308,7 @@ export default function CardQuickViewContent({
                 className={`flex items-center space-x-1 px-2 py-1.5 text-sm font-medium transition-colors ${
                   navigation.nextCard
                     ? 'text-orange-600 active:bg-orange-50'
-                    : 'text-grey-300'
+                    : 'text-border'
                 }`}
               >
                 <span>Next</span>
@@ -386,7 +386,7 @@ export default function CardQuickViewContent({
                   href={`https://www.tcgplayer.com/product/${cardData.tcgplayer_product_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-3 py-2 border border-grey-300 text-grey-600 text-xs font-medium rounded-md hover:border-grey-400 hover:text-grey-800 hover:bg-grey-50 transition-colors"
+                  className="inline-flex items-center justify-center px-3 py-2 border border-border text-muted-foreground text-xs font-medium rounded-md hover:border-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                 >
                   {/* Shopping bag icon */}
                   <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ export default function CardQuickViewContent({
                 href={getEbaySearchUrl(`${cardData.name} ${cardData.local_id} ${cardData.set?.name || ''}`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`inline-flex items-center justify-center px-3 py-2 border border-grey-300 text-grey-600 text-xs font-medium rounded-md hover:border-grey-400 hover:text-grey-800 hover:bg-grey-50 transition-colors ${!cardData.tcgplayer_product_id ? 'col-span-2' : ''}`}
+                className={`inline-flex items-center justify-center px-3 py-2 border border-border text-muted-foreground text-xs font-medium rounded-md hover:border-muted-foreground hover:text-foreground hover:bg-accent transition-colors ${!cardData.tcgplayer_product_id ? 'col-span-2' : ''}`}
               >
                 {/* Shopping bag icon */}
                 <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -415,7 +415,7 @@ export default function CardQuickViewContent({
               </a>
             </div>
 
-            <p className="text-xs text-grey-400 text-center">Shopping links may contain affiliate links</p>
+            <p className="text-xs text-muted-foreground text-center">Shopping links may contain affiliate links</p>
           </div>
         </div>
       </div>
@@ -458,8 +458,8 @@ function PokemonDetails({ card, detailsHref, isTwoColumn = false }: { card: Card
   return (
     <div className="space-y-2">
       <div>
-        <h3 className="text-base font-semibold text-grey-900 mb-0.5">{card.name}</h3>
-        <p className="text-sm text-grey-600">
+        <h3 className="text-base font-semibold text-foreground mb-0.5">{card.name}</h3>
+        <p className="text-sm text-muted-foreground">
           {card.set?.name || 'Unknown Set'} • #{card.local_id || 'No Number'}
         </p>
         <Link
@@ -477,29 +477,29 @@ function PokemonDetails({ card, detailsHref, isTwoColumn = false }: { card: Card
       <div className={isTwoColumn ? 'grid grid-cols-2 gap-x-4 gap-y-2 text-sm' : 'space-y-1 text-sm'}>
         {card.category && (
           <div className={isTwoColumn ? '' : 'flex justify-between'}>
-            <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Category</p>
-            <p className="text-grey-900">{card.category}</p>
+            <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Category</p>
+            <p className="text-foreground">{card.category}</p>
           </div>
         )}
 
         {card.rarity && (
           <div className={isTwoColumn ? '' : 'flex justify-between'}>
-            <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Rarity</p>
-            <p className="text-grey-900">{card.rarity}</p>
+            <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Rarity</p>
+            <p className="text-foreground">{card.rarity}</p>
           </div>
         )}
 
         {card.illustrator && (
           <div className={isTwoColumn ? '' : 'flex justify-between'}>
-            <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Illustrator</p>
-            <p className={isTwoColumn ? 'text-grey-900' : 'text-grey-900 truncate max-w-[180px]'}>{card.illustrator}</p>
+            <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Illustrator</p>
+            <p className={isTwoColumn ? 'text-foreground' : 'text-foreground truncate max-w-[180px]'}>{card.illustrator}</p>
           </div>
         )}
 
         {variants.length > 0 && (
           <div className={isTwoColumn ? '' : 'flex justify-between'}>
-            <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Variants</p>
-            <p className="text-grey-900">
+            <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Variants</p>
+            <p className="text-foreground">
               {variants.join(', ')}
             </p>
           </div>
@@ -508,17 +508,17 @@ function PokemonDetails({ card, detailsHref, isTwoColumn = false }: { card: Card
 
       {/* Market Prices Section - Tighter spacing */}
       <div className="border-t pt-2 mt-2">
-        <h4 className="text-sm font-semibold text-grey-900 mb-1.5">Market Prices</h4>
+        <h4 className="text-sm font-semibold text-foreground mb-1.5">Market Prices</h4>
         {availablePrices.length === 0 ? (
-          <p className="text-sm text-grey-500 italic">Price data unavailable</p>
+          <p className="text-sm text-muted-foreground italic">Price data unavailable</p>
         ) : (
           <div className="space-y-1">
             {availablePrices.map(({ label, price }) => (
               <div key={label} className="flex items-baseline text-sm">
-                <span className="text-grey-600">{label}</span>
+                <span className="text-muted-foreground">{label}</span>
                 {/* Dotted leader to guide eye from label to price */}
-                <span className="flex-1 border-b border-dotted border-grey-300 mx-2 mb-1" />
-                <span className="font-semibold text-grey-900">
+                <span className="flex-1 border-b border-dotted border-border mx-2 mb-1" />
+                <span className="font-semibold text-foreground">
                   ${price.toFixed(2)}
                 </span>
               </div>
@@ -542,26 +542,26 @@ function MobileMetadataGrid({ card }: { card: CardFull }) {
     <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-4">
       {card.category && (
         <div>
-          <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Category</p>
-          <p className="text-grey-900 text-sm">{card.category}</p>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Category</p>
+          <p className="text-foreground text-sm">{card.category}</p>
         </div>
       )}
       {card.rarity && (
         <div>
-          <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Rarity</p>
-          <p className="text-grey-900 text-sm">{card.rarity}</p>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Rarity</p>
+          <p className="text-foreground text-sm">{card.rarity}</p>
         </div>
       )}
       {card.illustrator && (
         <div>
-          <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Illustrator</p>
-          <p className="text-grey-900 text-sm truncate">{card.illustrator}</p>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Illustrator</p>
+          <p className="text-foreground text-sm truncate">{card.illustrator}</p>
         </div>
       )}
       {variants.length > 0 && (
         <div>
-          <p className="font-medium text-grey-500 text-xs uppercase tracking-wide">Variants</p>
-          <p className="text-grey-900 text-sm">{variants.join(', ')}</p>
+          <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">Variants</p>
+          <p className="text-foreground text-sm">{variants.join(', ')}</p>
         </div>
       )}
     </div>
@@ -585,17 +585,17 @@ function MobilePriceList({ card }: { card: CardFull }) {
     }) : []
 
   return (
-    <div className="border-t border-grey-200 pt-3">
-      <h4 className="text-sm font-semibold text-grey-900 mb-2">Market Prices</h4>
+    <div className="border-t border-border pt-3">
+      <h4 className="text-sm font-semibold text-foreground mb-2">Market Prices</h4>
       {availablePrices.length === 0 ? (
-        <p className="text-sm text-grey-500 italic">Price data unavailable</p>
+        <p className="text-sm text-muted-foreground italic">Price data unavailable</p>
       ) : (
         <div className="space-y-1.5">
           {availablePrices.map(({ label, price }) => (
             <div key={label} className="flex items-baseline text-sm">
-              <span className="text-grey-600">{label}</span>
-              <span className="flex-1 border-b border-dotted border-grey-300 mx-2 mb-1" />
-              <span className="font-semibold text-grey-900">${price.toFixed(2)}</span>
+              <span className="text-muted-foreground">{label}</span>
+              <span className="flex-1 border-b border-dotted border-border mx-2 mb-1" />
+              <span className="font-semibold text-foreground">${price.toFixed(2)}</span>
             </div>
           ))}
         </div>

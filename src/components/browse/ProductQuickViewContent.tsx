@@ -218,9 +218,9 @@ export default function ProductQuickViewContent({
                 if (!active || !payload?.[0]) return null
                 const data = payload[0].payload
                 return (
-                  <div className="bg-gray-900 px-3 py-2 rounded-lg shadow-lg">
+                  <div className="bg-popover px-3 py-2 rounded-lg shadow-lg">
                     <div className="text-white font-bold">${data.value.toFixed(2)}</div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-muted-foreground text-xs">
                       {new Date(data.date).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -248,7 +248,7 @@ export default function ProductQuickViewContent({
           </AreaChart>
         </ResponsiveContainer>
       ) : (
-        <div className="h-full flex items-center justify-center text-gray-400 text-sm">
+        <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
           No price history available
         </div>
       )}
@@ -262,7 +262,7 @@ export default function ProductQuickViewContent({
         href={getTCGPlayerProductUrl(productData.tcgplayer_product_id)}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-3 py-2.5 border border-grey-300 text-grey-600 text-xs font-medium rounded-lg hover:border-grey-400 hover:bg-grey-50 transition-colors"
+        className="inline-flex items-center justify-center px-3 py-2.5 border border-border text-muted-foreground text-xs font-medium rounded-lg hover:border-muted-foreground hover:bg-accent transition-colors"
       >
         <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -276,7 +276,7 @@ export default function ProductQuickViewContent({
         href={getEbaySearchUrl(productData.name)}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center justify-center px-3 py-2.5 border border-grey-300 text-grey-600 text-xs font-medium rounded-lg hover:border-grey-400 hover:bg-grey-50 transition-colors"
+        className="inline-flex items-center justify-center px-3 py-2.5 border border-border text-muted-foreground text-xs font-medium rounded-lg hover:border-muted-foreground hover:bg-accent transition-colors"
       >
         <svg className="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -305,8 +305,8 @@ export default function ProductQuickViewContent({
     }
 
     return (
-      <div className={`w-full aspect-[2.5/3.5] bg-grey-100 rounded-lg flex items-center justify-center ${className}`}>
-        <svg className="w-12 h-12 text-grey-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`w-full aspect-[2.5/3.5] bg-secondary rounded-lg flex items-center justify-center ${className}`}>
+        <svg className="w-12 h-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
         </svg>
       </div>
@@ -327,11 +327,11 @@ export default function ProductQuickViewContent({
             </div>
             {/* Title info */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-grey-900 line-clamp-2">{productData.name}</h3>
-              <p className="text-sm text-grey-600">{productData.pokemon_sets?.name || 'Unknown Set'}</p>
+              <h3 className="text-lg font-semibold text-foreground line-clamp-2">{productData.name}</h3>
+              <p className="text-sm text-muted-foreground">{productData.pokemon_sets?.name || 'Unknown Set'}</p>
               {currentPrice && (
                 <div className="mt-2">
-                  <span className="text-xl font-bold text-grey-900">${currentPrice.toFixed(2)}</span>
+                  <span className="text-xl font-bold text-foreground">${currentPrice.toFixed(2)}</span>
                   {priceChange !== null && (
                     <span className={`ml-2 text-sm font-medium ${priceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(1)}%
@@ -344,7 +344,7 @@ export default function ProductQuickViewContent({
 
           {/* Price Chart */}
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-grey-900 mb-1">90-Day Price History</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-1">90-Day Price History</h4>
             {renderPriceChart()}
           </div>
 
@@ -365,7 +365,7 @@ export default function ProductQuickViewContent({
 
         {/* Sticky Footer - Always visible at bottom */}
         {!showCollectionForm && (
-          <div className="flex-shrink-0 bg-white border-t border-grey-200 px-4 pt-3 pb-8">
+          <div className="flex-shrink-0 bg-card border-t border-border px-4 pt-3 pb-8">
             {/* Primary Action */}
             <button
               onClick={handleAddToCollectionClick}
@@ -379,14 +379,14 @@ export default function ProductQuickViewContent({
 
             {/* Navigation Row */}
             {(navigation.prevCard || navigation.nextCard) && (
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-grey-100">
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 <button
                   onClick={() => navigation.prevCard && navigation.onNavigate(navigation.prevCard.id)}
                   disabled={!navigation.prevCard}
                   className={`flex items-center space-x-1 px-2 py-1.5 text-sm font-medium transition-colors ${
                     navigation.prevCard
                       ? 'text-orange-600 active:bg-orange-50'
-                      : 'text-grey-300'
+                      : 'text-border'
                   }`}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -401,7 +401,7 @@ export default function ProductQuickViewContent({
                   className={`flex items-center space-x-1 px-2 py-1.5 text-sm font-medium transition-colors ${
                     navigation.nextCard
                       ? 'text-orange-600 active:bg-orange-50'
-                      : 'text-grey-300'
+                      : 'text-border'
                   }`}
                 >
                   <span>Next</span>
@@ -433,16 +433,16 @@ export default function ProductQuickViewContent({
         <div className="flex-1 space-y-3">
           {/* Header */}
           <div>
-            <h3 className="text-base font-semibold text-grey-900 mb-0.5">{productData.name}</h3>
-            <p className="text-sm text-grey-600">{productData.pokemon_sets?.name || 'Unknown Set'}</p>
+            <h3 className="text-base font-semibold text-foreground mb-0.5">{productData.name}</h3>
+            <p className="text-sm text-muted-foreground">{productData.pokemon_sets?.name || 'Unknown Set'}</p>
           </div>
 
           {/* Current Price */}
           <div className="border-t pt-2">
-            <h4 className="text-sm font-semibold text-grey-900 mb-1">Market Price</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-1">Market Price</h4>
             {currentPrice ? (
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-grey-900">${currentPrice.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-foreground">${currentPrice.toFixed(2)}</span>
                 {priceChange !== null && (
                   <span className={`text-sm font-medium ${priceChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(1)}% (90d)
@@ -450,13 +450,13 @@ export default function ProductQuickViewContent({
                 )}
               </div>
             ) : (
-              <p className="text-sm text-grey-500 italic">Price unavailable</p>
+              <p className="text-sm text-muted-foreground italic">Price unavailable</p>
             )}
           </div>
 
           {/* Price Chart */}
           <div>
-            <h4 className="text-xs font-medium text-grey-500 uppercase tracking-wide mb-1">90-Day History</h4>
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">90-Day History</h4>
             {renderPriceChart()}
           </div>
 
@@ -481,7 +481,7 @@ export default function ProductQuickViewContent({
 
               {renderShopLinks()}
 
-              <p className="text-xs text-grey-400 text-center">Shopping links may contain affiliate links</p>
+              <p className="text-xs text-muted-foreground text-center">Shopping links may contain affiliate links</p>
             </div>
           )}
         </div>

@@ -370,7 +370,7 @@ export default function SetDetailClient({ initialData, setId, binders }: SetDeta
   // Empty state for products
   const productsEmptyState = (
     <div className="text-center py-8">
-      <p className="text-grey-600">No products available for this set</p>
+      <p className="text-muted-foreground">No products available for this set</p>
     </div>
   )
 
@@ -453,16 +453,16 @@ export default function SetDetailClient({ initialData, setId, binders }: SetDeta
                     <span className="sr-only">Quick Add</span>
                   </th>
                 )}
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Card
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Number
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Rarity
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Price
                 </th>
                 <th scope="col" className="relative px-6 py-3">
@@ -507,10 +507,10 @@ export default function SetDetailClient({ initialData, setId, binders }: SetDeta
                     <span className="sr-only">Quick Add</span>
                   </th>
                 )}
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Product
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Market Price
                 </th>
                 <th scope="col" className="relative px-6 py-3">
