@@ -10,7 +10,7 @@ import Image from 'next/image'
  */
 export default function WaitlistNavbar() {
   return (
-    <nav className="bg-white shadow-sm border-b border-grey-200">
+    <nav className="bg-card shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center items-center h-16">
           <Link href="/" className="flex items-center">

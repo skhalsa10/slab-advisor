@@ -110,13 +110,13 @@ export default function CompleteProfile() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-grey-50 py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="text-3xl font-extrabold text-grey-900">
+          <h2 className="text-3xl font-extrabold text-foreground">
             Choose Your Username
           </h2>
-          <p className="mt-2 text-sm text-grey-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             Pick a unique username to complete your profile
           </p>
         </div>
@@ -125,7 +125,7 @@ export default function CompleteProfile() {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-grey-700"
+              className="block text-sm font-medium text-foreground"
             >
               Username
             </label>
@@ -137,7 +137,7 @@ export default function CompleteProfile() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-grey-300 placeholder-grey-500 text-grey-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 pr-10 border border-border placeholder-muted-foreground text-foreground rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                 placeholder="your_username"
               />
               {/* Validation indicators */}
@@ -145,7 +145,7 @@ export default function CompleteProfile() {
                 <div className="absolute right-3 top-2">
                   {usernameChecking ? (
                     <svg
-                      className="animate-spin h-5 w-5 text-grey-400"
+                      className="animate-spin h-5 w-5 text-muted-foreground"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -199,11 +199,11 @@ export default function CompleteProfile() {
             )}
             {/* Show lowercase preview if username contains uppercase */}
             {username && username !== username.toLowerCase() && (
-              <p className="mt-1 text-xs text-grey-600">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Will be saved as: <strong>{username.toLowerCase()}</strong>
               </p>
             )}
-            <p className="mt-2 text-xs text-grey-500">
+            <p className="mt-2 text-xs text-muted-foreground">
               3-30 characters, letters, numbers, and underscores only
             </p>
           </div>

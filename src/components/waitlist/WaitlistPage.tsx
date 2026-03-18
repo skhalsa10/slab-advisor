@@ -102,14 +102,14 @@ export default function WaitlistPage() {
                 transition={{ duration: 0.6 }}
                 className="text-center lg:text-left"
               >
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-grey-900 tracking-tight leading-tight">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground tracking-tight leading-tight">
                   The Sanctuary for
                   <span className="text-orange-600 block">Card Collectors</span>
                 </h1>
 
-                <p className="mt-6 text-lg sm:text-xl text-grey-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 leading-relaxed">
                   Manage your portfolio, predict grades with AI, and access sealed product at MSRP.{' '}
-                  <span className="font-medium text-grey-700">The era of the scalper is over.</span>
+                  <span className="font-medium text-foreground">The era of the scalper is over.</span>
                 </p>
 
                 {/* Email Form - Stacked on mobile, fused on larger screens */}
@@ -127,7 +127,7 @@ export default function WaitlistPage() {
                       placeholder="Enter your email"
                       required
                       disabled={status === 'submitting'}
-                      className="h-12 px-4 bg-white border border-gray-200 rounded-full text-grey-900 placeholder-grey-400 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 text-base shadow-sm"
+                      className="h-12 px-4 bg-card border border-gray-200 rounded-full text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 text-base shadow-sm"
                     />
                     <button
                       type="submit"
@@ -139,7 +139,7 @@ export default function WaitlistPage() {
                   </div>
 
                   {/* Fused Command Bar for sm+ screens */}
-                  <div className="hidden sm:flex bg-white p-1.5 rounded-full shadow-lg border border-gray-100 items-center">
+                  <div className="hidden sm:flex bg-card p-1.5 rounded-full shadow-lg border border-gray-100 items-center">
                     <label htmlFor="waitlist-email" className="sr-only">
                       Email address
                     </label>
@@ -151,7 +151,7 @@ export default function WaitlistPage() {
                       placeholder="Enter your email"
                       required
                       disabled={status === 'submitting'}
-                      className="flex-1 h-10 px-4 bg-transparent border-none text-grey-900 placeholder-grey-400 focus:outline-none disabled:opacity-50 text-base"
+                      className="flex-1 h-10 px-4 bg-transparent border-none text-foreground placeholder-muted-foreground focus:outline-none disabled:opacity-50 text-base"
                     />
                     <button
                       type="submit"
@@ -169,7 +169,7 @@ export default function WaitlistPage() {
                   )}
                 </form>
 
-                <p className="mt-4 text-sm text-grey-500">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Join early and be a founding member. No spam, ever.
                 </p>
               </motion.div>
@@ -241,10 +241,10 @@ function SuccessState() {
           />
         </svg>
       </div>
-      <h2 className="text-3xl sm:text-4xl font-bold text-grey-900 mb-4">
+      <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
         You&apos;re on the list!
       </h2>
-      <p className="text-lg text-grey-600 max-w-md mx-auto">
+      <p className="text-lg text-muted-foreground max-w-md mx-auto">
         We&apos;ll notify you when Slab Advisor is ready. Check your inbox for a welcome message.
       </p>
     </motion.div>
@@ -396,7 +396,7 @@ function FeatureGrid() {
   ]
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white" ref={ref}>
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
@@ -437,7 +437,7 @@ function FeatureCard({ icon: Icon, title, description, accent }: FeatureCardProp
         relative rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow h-full
         ${accent
           ? 'bg-orange-50/80 border-2 border-orange-200'
-          : 'bg-white border border-grey-100'
+          : 'bg-card border border-border'
         }
       `}
     >
@@ -454,14 +454,14 @@ function FeatureCard({ icon: Icon, title, description, accent }: FeatureCardProp
       <div
         className={`
           inline-flex items-center justify-center p-3 rounded-xl mb-6
-          ${accent ? 'bg-orange-100 text-orange-600' : 'bg-grey-100 text-grey-700'}
+          ${accent ? 'bg-orange-100 text-orange-600' : 'bg-secondary text-foreground'}
         `}
       >
         <Icon className="w-6 h-6" />
       </div>
 
-      <h3 className="text-xl font-bold text-grey-900 mb-3">{title}</h3>
-      <p className="text-grey-600 leading-relaxed">{description}</p>
+      <h3 className="text-xl font-bold text-foreground mb-3">{title}</h3>
+      <p className="text-muted-foreground leading-relaxed">{description}</p>
     </div>
   )
 }

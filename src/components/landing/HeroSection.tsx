@@ -14,12 +14,12 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
   return (
     <section className="bg-gradient-to-br from-orange-50 to-orange-100 py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-grey-900 mb-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
           AI-Powered Card Grading &
           <span className="text-orange-600 block">Collection Management</span>
         </h1>
         
-        <p className="text-xl sm:text-2xl text-grey-600 mb-8 max-w-3xl mx-auto">
+        <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
           Get professional-grade card analysis, accurate pricing, and comprehensive collection tracking 
           for your TCG and sports cards—all powered by advanced AI.
         </p>
@@ -33,25 +33,25 @@ export default function HeroSection({ onGetStarted }: HeroSectionProps) {
           </button>
         </div>
         
-        <p className="text-grey-500 text-sm mb-12">
+        <p className="text-muted-foreground text-sm mb-12">
           Start with 2 free card analyses • No credit card required
         </p>
         
-        <div className="bg-white rounded-xl shadow-2xl p-8 max-w-4xl mx-auto">
+        <div className="bg-card rounded-xl shadow-2xl p-8 max-w-4xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold text-orange-600 mb-2">AI Analysis</div>
-              <p className="text-grey-600">Instant card identification and condition assessment</p>
+              <p className="text-muted-foreground">Instant card identification and condition assessment</p>
             </div>
             
             <div>
               <div className="text-3xl font-bold text-orange-600 mb-2">Real Pricing</div>
-              <p className="text-grey-600">Up-to-date market values and price trends</p>
+              <p className="text-muted-foreground">Up-to-date market values and price trends</p>
             </div>
             
             <div>
               <div className="text-3xl font-bold text-orange-600 mb-2">Collection</div>
-              <p className="text-grey-600">Track your entire collection&apos;s value and growth</p>
+              <p className="text-muted-foreground">Track your entire collection&apos;s value and growth</p>
             </div>
           </div>
         </div>

@@ -26,7 +26,7 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
           <button
             onClick={onGetStarted}
-            className="bg-white hover:bg-grey-50 text-orange-600 font-semibold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
+            className="bg-card hover:bg-accent text-orange-600 font-semibold py-4 px-8 rounded-lg text-lg transition-colors shadow-lg hover:shadow-xl"
           >
             Start Your Free Analysis
           </button>

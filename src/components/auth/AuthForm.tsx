@@ -72,13 +72,13 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-grey-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-grey-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
-          <p className="mt-2 text-center text-sm text-grey-600">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             {isLogin ? 'Unlock the full potential of your collection' : 'Begin building your ultimate card portfolio'}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
           <button
             onClick={() => handleSocialLogin('google')}
             disabled={loading}
-            className="w-full flex justify-center items-center px-4 py-2 border border-grey-300 rounded-md shadow-sm bg-white text-sm font-medium text-grey-500 hover:bg-grey-50 disabled:opacity-50"
+            className="w-full flex justify-center items-center px-4 py-2 border border-border rounded-md shadow-sm bg-card text-sm font-medium text-muted-foreground hover:bg-accent disabled:opacity-50"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -101,9 +101,9 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
 
         {/* Divider */}
         <div className="mt-6 flex items-center">
-          <div className="flex-grow border-t border-grey-300" />
-          <span className="flex-shrink-0 px-2 text-sm text-grey-500">Or continue with email</span>
-          <div className="flex-grow border-t border-grey-300" />
+          <div className="flex-grow border-t border-border" />
+          <span className="flex-shrink-0 px-2 text-sm text-muted-foreground">Or continue with email</span>
+          <div className="flex-grow border-t border-border" />
         </div>
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
@@ -116,7 +116,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full px-3 py-2 border border-grey-300 placeholder-grey-500 text-grey-900 rounded-t-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                className="relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground rounded-t-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
             </div>
@@ -128,7 +128,7 @@ export default function AuthForm({ onSuccess, initialError }: AuthFormProps) {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="relative block w-full px-3 py-2 border border-grey-300 placeholder-grey-500 text-grey-900 rounded-b-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                className="relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
             </div>

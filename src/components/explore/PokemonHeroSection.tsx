@@ -78,10 +78,10 @@ export default async function PokemonHeroSection() {
       <div className="relative px-6 py-10 sm:px-8 sm:py-12 md:py-14 z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         {/* Left: Text - shrinks on medium screens to make room for button */}
         <div className="flex-shrink min-w-0 lg:max-w-[50%]">
-          <h2 className="text-2xl font-bold text-white sm:text-3xl tracking-tight uppercase">
+          <h2 className="text-2xl font-bold text-cream-50 sm:text-3xl tracking-tight uppercase">
             Pokemon Trading Cards
           </h2>
-          <p className="mt-2 text-white/90 sm:text-lg" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)' }}>
+          <p className="mt-2 text-cream-50/90 sm:text-lg" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 2px 8px rgba(0,0,0,0.8)' }}>
             Explore all series, sets, and prices
           </p>
         </div>
@@ -89,7 +89,7 @@ export default async function PokemonHeroSection() {
         {/* CTA Button - stacks on mobile/tablet, inline on large screens */}
         <Link
           href="/browse/pokemon"
-          className="flex-shrink-0 self-start lg:self-center inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-lg hover:bg-orange-600 transition-colors"
+          className="flex-shrink-0 self-start lg:self-center inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-semibold text-cream-50 shadow-lg hover:bg-orange-600 transition-colors"
         >
           Browse Sets
           <svg

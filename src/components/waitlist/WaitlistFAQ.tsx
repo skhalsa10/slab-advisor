@@ -28,8 +28,8 @@ export default function WaitlistFAQ() {
     <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#FDF8F6]">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-grey-900 mb-4">Frequently Asked Questions</h2>
-          <p className="text-lg text-grey-600">Everything you need to know about Slab Advisor.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-muted-foreground">Everything you need to know about Slab Advisor.</p>
         </div>
         
         <div className="space-y-4">
@@ -46,14 +46,14 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="bg-white border border-grey-200 rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden hover:border-orange-200 transition-colors">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
       >
-        <span className="text-lg font-semibold text-grey-900 pr-8">{question}</span>
+        <span className="text-lg font-semibold text-foreground pr-8">{question}</span>
         <ChevronDown 
-          className={`w-5 h-5 text-grey-500 transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-muted-foreground transition-transform duration-300 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
       
@@ -65,7 +65,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
-            <div className="px-6 pb-6 text-grey-600 leading-relaxed">
+            <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
               {answer}
             </div>
           </motion.div>

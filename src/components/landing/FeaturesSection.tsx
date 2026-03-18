@@ -41,13 +41,13 @@ export default function FeaturesSection() {
   ]
 
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-card">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-grey-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
             Everything You Need for Card Collecting
           </h2>
-          <p className="text-xl text-grey-600 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             From AI-powered analysis to comprehensive collection management, 
             Slab Advisor gives you professional tools at your fingertips.
           </p>
@@ -57,13 +57,13 @@ export default function FeaturesSection() {
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-grey-50 rounded-xl p-6 hover:bg-grey-100 transition-colors"
+              className="bg-background rounded-xl p-6 hover:bg-secondary transition-colors"
             >
               <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-grey-900 mb-3">
+              <h3 className="text-xl font-semibold text-foreground mb-3">
                 {feature.title}
               </h3>
-              <p className="text-grey-600 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
             </div>
