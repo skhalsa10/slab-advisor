@@ -127,7 +127,7 @@ export default function WaitlistPage() {
                       placeholder="Enter your email"
                       required
                       disabled={status === 'submitting'}
-                      className="h-12 px-4 bg-card border border-gray-200 rounded-full text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 text-base shadow-sm"
+                      className="h-12 px-4 bg-card border border-border rounded-full text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 text-base shadow-sm"
                     />
                     <button
                       type="submit"
@@ -139,7 +139,7 @@ export default function WaitlistPage() {
                   </div>
 
                   {/* Fused Command Bar for sm+ screens */}
-                  <div className="hidden sm:flex bg-card p-1.5 rounded-full shadow-lg border border-gray-100 items-center">
+                  <div className="hidden sm:flex bg-card p-1.5 rounded-full shadow-lg border border-border items-center">
                     <label htmlFor="waitlist-email" className="sr-only">
                       Email address
                     </label>
@@ -275,7 +275,7 @@ function DashboardMockup({ cardData }: DashboardMockupProps) {
         className="relative"
       >
         {/* Dashboard frame - Dark mode with studio lighting */}
-        <div className="bg-gray-900 rounded-3xl p-6 shadow-[0_20px_50px_-12px_rgba(249,115,22,0.3)] border border-white/10 border-t-white/20">
+        <div className="bg-forest-900 rounded-3xl p-6 shadow-[0_20px_50px_-12px_rgba(249,115,22,0.3)] border border-white/10 border-t-white/20">
           {/* Card display area */}
           <div className="relative aspect-[3/4] max-w-[280px] mx-auto">
             <Image
@@ -297,20 +297,20 @@ function DashboardMockup({ cardData }: DashboardMockupProps) {
           {/* Stats bar with real pricing data */}
           <div className="mt-8 flex justify-between text-center">
             <div>
-              <div className="text-xs text-gray-400">PSA 10 Value</div>
+              <div className="text-xs text-cream-200">PSA 10 Value</div>
               <div className="text-lg font-semibold text-white">
                 ${cardData.psa10Price.toLocaleString()}
               </div>
             </div>
             <div>
-              <div className="text-xs text-gray-400">Raw → Graded</div>
+              <div className="text-xs text-cream-200">Raw → Graded</div>
               <div className="text-lg font-semibold text-green-400 flex items-center justify-center gap-1">
                 <TrendingUp className="w-4 h-4" />
                 +{cardData.gainPercent}%
               </div>
             </div>
             <div>
-              <div className="text-xs text-gray-400">Rarity</div>
+              <div className="text-xs text-cream-200">Rarity</div>
               <div className="text-lg font-semibold text-orange-400">SIR</div>
             </div>
           </div>
@@ -335,7 +335,7 @@ interface MobileCardPreviewProps {
 function MobileCardPreview({ cardData }: MobileCardPreviewProps) {
   return (
     <div className="relative">
-      <div className="bg-gray-900 rounded-2xl p-4 shadow-[0_15px_40px_-10px_rgba(249,115,22,0.25)] border border-white/10 border-t-white/20">
+      <div className="bg-forest-900 rounded-2xl p-4 shadow-[0_15px_40px_-10px_rgba(249,115,22,0.25)] border border-white/10 border-t-white/20">
         <div className="relative aspect-[3/4] max-w-[200px] mx-auto">
           <Image
             src={FEATURED_CARD_IMAGE}
@@ -349,13 +349,13 @@ function MobileCardPreview({ cardData }: MobileCardPreviewProps) {
         {/* Grade Badge with gain */}
         <div className="mt-4 flex items-center justify-center gap-3">
           <div className="text-center">
-            <span className="text-xs text-gray-400 block">PSA 10</span>
+            <span className="text-xs text-cream-200 block">PSA 10</span>
             <span className="bg-orange-600 text-white font-bold px-3 py-1 rounded-full text-sm">
               ${cardData.psa10Price.toLocaleString()}
             </span>
           </div>
           <div className="text-center">
-            <span className="text-xs text-gray-400 block">Gain</span>
+            <span className="text-xs text-cream-200 block">Gain</span>
             <span className="text-green-400 font-bold text-sm flex items-center gap-0.5">
               <TrendingUp className="w-3 h-3" />
               +{cardData.gainPercent}%

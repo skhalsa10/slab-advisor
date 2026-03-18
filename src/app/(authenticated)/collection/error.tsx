@@ -27,9 +27,9 @@ export default function CollectionError({ error, reset }: CollectionErrorProps) 
         </svg>
       </div>
       
-      <h3 className="text-lg font-medium text-grey-900 mb-2">Error Loading Collection</h3>
+      <h3 className="text-lg font-medium text-foreground mb-2">Error Loading Collection</h3>
       
-      <p className="text-sm text-grey-600 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         {error.message === 'User not authenticated' 
           ? 'Please sign in to view your collection.'
           : 'Unable to load your collection. Please try again.'

@@ -32,9 +32,9 @@ export const RANK_STYLES: Record<1 | 2 | 3, RankStyle> = {
   },
   2: {
     // Silver
-    bgGradient: 'bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100',
+    bgGradient: 'bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100',
     borderColor: 'border-slate-300',
-    rankBadgeBg: 'bg-gradient-to-r from-slate-400 to-gray-500',
+    rankBadgeBg: 'bg-gradient-to-r from-slate-400 to-slate-500',
     rankBadgeText: 'text-white',
   },
   3: {
