@@ -493,11 +493,11 @@ export default function GradingAnalysisModal({
   } else if (captureStep === 'error') {
     content = (
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-          <h2 className="text-lg font-semibold text-grey-900">Error</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+          <h2 className="text-lg font-semibold text-foreground">Error</h2>
           <button
             onClick={handleClose}
-            className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+            className="text-muted-foreground hover:text-muted-foreground transition-colors p-1"
             aria-label="Close"
           >
             <svg
@@ -529,10 +529,10 @@ export default function GradingAnalysisModal({
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <p className="text-grey-900 font-medium text-center mb-2">
+          <p className="text-foreground font-medium text-center mb-2">
             Something went wrong
           </p>
-          <p className="text-grey-600 text-sm text-center mb-6">{error}</p>
+          <p className="text-muted-foreground text-sm text-center mb-6">{error}</p>
           <button
             onClick={handleRetry}
             className="px-6 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
@@ -547,11 +547,11 @@ export default function GradingAnalysisModal({
     content = (
       <>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-          <h2 className="text-xl font-bold font-serif text-grey-900">Grading Analysis</h2>
+        <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+          <h2 className="text-xl font-bold font-serif text-foreground">Grading Analysis</h2>
           <button
             onClick={onClose}
-            className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+            className="text-muted-foreground hover:text-muted-foreground transition-colors p-1"
             aria-label="Close"
           >
             <svg
@@ -585,19 +585,19 @@ export default function GradingAnalysisModal({
             <div className="min-w-0">
               {/* Card name + badge inline */}
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-grey-900">{opportunity.cardName}</p>
+                <p className="font-semibold text-foreground">{opportunity.cardName}</p>
                 {/* Strategy Badge - based on PSA 9 profitability */}
                 <span
                   className={`inline-block px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap border shadow-sm ${
                     (opportunity.profitAtPsa9 ?? 0) > 0
-                      ? 'bg-white border-green-200 text-grey-800'
-                      : 'bg-white border-orange-200 text-orange-700'
+                      ? 'bg-card border-green-200 text-foreground'
+                      : 'bg-card border-orange-200 text-orange-700'
                   }`}
                 >
                   {(opportunity.profitAtPsa9 ?? 0) > 0 ? 'Safe Bet' : 'PSA 10 Required'}
                 </span>
               </div>
-              <p className="text-sm text-grey-500">
+              <p className="text-sm text-muted-foreground">
                 {opportunity.setName}
                 {opportunity.cardNumber ? ` #${opportunity.cardNumber}` : ''}
               </p>
@@ -605,20 +605,20 @@ export default function GradingAnalysisModal({
           </div>
 
           {/* Math breakdown card */}
-          <div className="bg-grey-50 rounded-lg p-4 space-y-3">
-            <p className="text-xs text-grey-500 font-medium uppercase tracking-wide">
+          <div className="bg-background rounded-lg p-4 space-y-3">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
               Profit Analysis
             </p>
 
             {/* PSA 10 breakdown */}
-            <div className="bg-white rounded-md p-4 border border-grey-200 shadow-sm">
+            <div className="bg-card rounded-md p-4 border border-border shadow-sm">
               <div className="flex justify-between items-center">
-                <span className="font-semibold text-grey-900">PSA 10 Potential</span>
-                <span className="text-xl font-bold text-grey-800">
+                <span className="font-semibold text-foreground">PSA 10 Potential</span>
+                <span className="text-xl font-bold text-foreground">
                   +{formatPrice(profitPsa10)}
                 </span>
               </div>
-              <div className="mt-2 text-xs text-grey-500 space-y-1">
+              <div className="mt-2 text-xs text-muted-foreground space-y-1">
                 <div className="flex justify-between">
                   <span>Graded Value (PSA 10)</span>
                   <span>{formatPrice(psa10Value)}</span>
@@ -632,7 +632,7 @@ export default function GradingAnalysisModal({
                   <span>-{formatPrice(gradingFee)}</span>
                 </div>
                 {opportunity.roiPsa10 != null && (
-                  <div className="flex justify-between pt-2 mt-2 border-t border-grey-100 font-medium text-grey-700">
+                  <div className="flex justify-between pt-2 mt-2 border-t border-border font-medium text-foreground">
                     <span>ROI</span>
                     <span>
                       {Number(opportunity.roiPsa10).toFixed(0)}%
@@ -646,15 +646,15 @@ export default function GradingAnalysisModal({
             {opportunity.profitAtPsa9 != null && (
               <div
                 className={`${
-                  (opportunity.profitAtPsa9 ?? 0) < 0 ? 'bg-red-50' : 'bg-grey-100'
+                  (opportunity.profitAtPsa9 ?? 0) < 0 ? 'bg-red-50' : 'bg-secondary'
                 } rounded-md p-3`}
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-grey-600">PSA 9 Safety Net</span>
+                  <span className="text-sm text-muted-foreground">PSA 9 Safety Net</span>
                   <span
                     className={`font-medium ${
                       Number(opportunity.profitAtPsa9) >= 0
-                        ? 'text-grey-700'
+                        ? 'text-foreground'
                         : 'text-red-600'
                     }`}
                   >
@@ -662,7 +662,7 @@ export default function GradingAnalysisModal({
                     {formatPrice(Number(opportunity.profitAtPsa9))}
                   </span>
                 </div>
-                <p className="text-xs text-grey-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   If graded PSA 9 instead of 10
                 </p>
               </div>
@@ -683,7 +683,7 @@ export default function GradingAnalysisModal({
         </div>
 
         {/* Footer with CTA */}
-        <div className="p-4 border-t border-grey-200 flex-shrink-0 space-y-3">
+        <div className="p-4 border-t border-border flex-shrink-0 space-y-3">
           <button
             onClick={handleStartPreGrade}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
@@ -705,7 +705,7 @@ export default function GradingAnalysisModal({
             Start AI Pre-Grade
           </button>
           {opportunity.cardNumber && (
-            <p className="text-xs text-grey-500 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Make sure you have Card #{opportunity.cardNumber} ready.
             </p>
           )}
@@ -718,8 +718,8 @@ export default function GradingAnalysisModal({
                 disabled={!canGoPrevious}
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   canGoPrevious
-                    ? 'text-grey-700 hover:bg-grey-100'
-                    : 'text-grey-300 cursor-not-allowed'
+                    ? 'text-foreground hover:bg-secondary'
+                    : 'text-border cursor-not-allowed'
                 }`}
               >
                 <svg
@@ -738,7 +738,7 @@ export default function GradingAnalysisModal({
                 Prev
               </button>
 
-              <span className="text-sm text-grey-500">
+              <span className="text-sm text-muted-foreground">
                 {currentIndex + 1} of {totalCount}
               </span>
 
@@ -747,8 +747,8 @@ export default function GradingAnalysisModal({
                 disabled={!canGoNext}
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   canGoNext
-                    ? 'text-grey-700 hover:bg-grey-100'
-                    : 'text-grey-300 cursor-not-allowed'
+                    ? 'text-foreground hover:bg-secondary'
+                    : 'text-border cursor-not-allowed'
                 }`}
               >
                 Next
@@ -783,7 +783,7 @@ export default function GradingAnalysisModal({
           aria-hidden="true"
         />
         <div
-          className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl flex flex-col"
+          className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl flex flex-col"
           style={{ maxHeight: '90vh' }}
           role="dialog"
           aria-modal="true"
@@ -811,10 +811,10 @@ export default function GradingAnalysisModal({
           <button
             onClick={handlePrevious}
             disabled={!canGoPrevious}
-            className={`pointer-events-auto mr-4 p-3 rounded-full bg-white shadow-lg transition-all flex-shrink-0 ${
+            className={`pointer-events-auto mr-4 p-3 rounded-full bg-card shadow-lg transition-all flex-shrink-0 ${
               canGoPrevious
-                ? 'hover:bg-grey-100 text-grey-700 cursor-pointer'
-                : 'text-grey-300 cursor-not-allowed'
+                ? 'hover:bg-secondary text-foreground cursor-pointer'
+                : 'text-border cursor-not-allowed'
             }`}
             aria-label="Previous card"
           >
@@ -836,7 +836,7 @@ export default function GradingAnalysisModal({
 
         {/* Modal */}
         <div
-          className="pointer-events-auto w-full max-w-md bg-[#faebce] rounded-xl shadow-2xl flex flex-col mx-4 border border-grey-200"
+          className="pointer-events-auto w-full max-w-md bg-[#faebce] rounded-xl shadow-2xl flex flex-col mx-4 border border-border"
           style={{ maxHeight: '90vh' }}
           role="dialog"
           aria-modal="true"
@@ -850,10 +850,10 @@ export default function GradingAnalysisModal({
           <button
             onClick={handleNext}
             disabled={!canGoNext}
-            className={`pointer-events-auto ml-4 p-3 rounded-full bg-white shadow-lg transition-all flex-shrink-0 ${
+            className={`pointer-events-auto ml-4 p-3 rounded-full bg-card shadow-lg transition-all flex-shrink-0 ${
               canGoNext
-                ? 'hover:bg-grey-100 text-grey-700 cursor-pointer'
-                : 'text-grey-300 cursor-not-allowed'
+                ? 'hover:bg-secondary text-foreground cursor-pointer'
+                : 'text-border cursor-not-allowed'
             }`}
             aria-label="Next card"
           >

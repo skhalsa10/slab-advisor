@@ -43,11 +43,11 @@ export default function GradingConfirmation({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-        <h2 className="text-lg font-semibold text-grey-900">Review Images</h2>
+      <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+        <h2 className="text-lg font-semibold text-foreground">Review Images</h2>
         <button
           onClick={onCancel}
-          className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+          className="text-muted-foreground hover:text-muted-foreground transition-colors p-1"
           aria-label="Cancel"
         >
           <svg
@@ -77,8 +77,8 @@ export default function GradingConfirmation({
             className="w-12 h-16 rounded-md object-cover"
           />
           <div>
-            <p className="font-semibold text-grey-900">{opportunity.cardName}</p>
-            <p className="text-sm text-grey-500">{opportunity.setName}</p>
+            <p className="font-semibold text-foreground">{opportunity.cardName}</p>
+            <p className="text-sm text-muted-foreground">{opportunity.setName}</p>
             <span
               className={`inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-full ${
                 opportunity.gradingSafetyTier === 'SAFE_BET'
@@ -95,8 +95,8 @@ export default function GradingConfirmation({
         <div className="grid grid-cols-2 gap-3">
           {/* Front image */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-grey-700 text-center">Front</p>
-            <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-grey-100 border border-grey-200">
+            <p className="text-sm font-medium text-foreground text-center">Front</p>
+            <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-secondary border border-border">
               {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
               <img
                 src={frontImage}
@@ -114,8 +114,8 @@ export default function GradingConfirmation({
 
           {/* Back image */}
           <div className="space-y-2">
-            <p className="text-sm font-medium text-grey-700 text-center">Back</p>
-            <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-grey-100 border border-grey-200">
+            <p className="text-sm font-medium text-foreground text-center">Back</p>
+            <div className="relative aspect-[2.5/3.5] rounded-lg overflow-hidden bg-secondary border border-border">
               {/* eslint-disable-next-line @next/next/no-img-element -- TODO: Refactor to blob URLs */}
               <img
                 src={backImage}
@@ -154,7 +154,7 @@ export default function GradingConfirmation({
       </div>
 
       {/* Footer with buttons */}
-      <div className="p-4 border-t border-grey-200 flex-shrink-0 space-y-2">
+      <div className="p-4 border-t border-border flex-shrink-0 space-y-2">
         <button
           onClick={onStartGrading}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
@@ -178,7 +178,7 @@ export default function GradingConfirmation({
 
         <button
           onClick={onCancel}
-          className="w-full px-4 py-2 text-grey-600 font-medium hover:text-grey-800 transition-colors"
+          className="w-full px-4 py-2 text-muted-foreground font-medium hover:text-foreground transition-colors"
         >
           Cancel
         </button>

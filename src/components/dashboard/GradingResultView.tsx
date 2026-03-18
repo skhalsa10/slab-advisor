@@ -52,11 +52,11 @@ export default function GradingResultView({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-        <h2 className="text-lg font-semibold text-grey-900">Grading Results</h2>
+      <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+        <h2 className="text-lg font-semibold text-foreground">Grading Results</h2>
         <button
           onClick={onClose}
-          className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+          className="text-muted-foreground hover:text-muted-foreground transition-colors p-1"
           aria-label="Close"
         >
           <svg
@@ -78,26 +78,26 @@ export default function GradingResultView({
       {/* Body */}
       <div className="p-4 space-y-4 overflow-y-auto flex-1">
         {/* Card name */}
-        <p className="text-center text-grey-600 font-medium">{cardName}</p>
+        <p className="text-center text-muted-foreground font-medium">{cardName}</p>
 
         {/* Final grade - prominent display */}
         <div className="text-center py-6">
           <div className="inline-flex flex-col items-center">
-            <span className="text-sm text-grey-500 uppercase tracking-wide mb-1">
+            <span className="text-sm text-muted-foreground uppercase tracking-wide mb-1">
               Estimated Grade
             </span>
             <span className={`text-6xl font-bold ${getGradeColor(grade_final)}`}>
               {formatGrade(grade_final)}
             </span>
-            <span className="mt-2 px-3 py-1 bg-grey-100 text-grey-700 text-sm font-medium rounded-full">
+            <span className="mt-2 px-3 py-1 bg-secondary text-foreground text-sm font-medium rounded-full">
               {condition}
             </span>
           </div>
         </div>
 
         {/* Grade breakdown */}
-        <div className="bg-grey-50 rounded-lg p-4 space-y-3">
-          <p className="text-xs text-grey-500 font-medium uppercase tracking-wide">
+        <div className="bg-background rounded-lg p-4 space-y-3">
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Grade Breakdown
           </p>
 
@@ -111,30 +111,30 @@ export default function GradingResultView({
         </div>
 
         {/* Centering details */}
-        <div className="bg-grey-50 rounded-lg p-4 space-y-3">
-          <p className="text-xs text-grey-500 font-medium uppercase tracking-wide">
+        <div className="bg-background rounded-lg p-4 space-y-3">
+          <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
             Centering Details
           </p>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Front centering */}
             <div className="space-y-1">
-              <p className="text-sm font-medium text-grey-700">Front</p>
-              <p className="text-xs text-grey-500">
+              <p className="text-sm font-medium text-foreground">Front</p>
+              <p className="text-xs text-muted-foreground">
                 L/R: {gradingResult.front_centering_lr || 'N/A'}
               </p>
-              <p className="text-xs text-grey-500">
+              <p className="text-xs text-muted-foreground">
                 T/B: {gradingResult.front_centering_tb || 'N/A'}
               </p>
             </div>
 
             {/* Back centering */}
             <div className="space-y-1">
-              <p className="text-sm font-medium text-grey-700">Back</p>
-              <p className="text-xs text-grey-500">
+              <p className="text-sm font-medium text-foreground">Back</p>
+              <p className="text-xs text-muted-foreground">
                 L/R: {gradingResult.back_centering_lr || 'N/A'}
               </p>
-              <p className="text-xs text-grey-500">
+              <p className="text-xs text-muted-foreground">
                 T/B: {gradingResult.back_centering_tb || 'N/A'}
               </p>
             </div>
@@ -142,13 +142,13 @@ export default function GradingResultView({
         </div>
 
         {/* Disclaimer */}
-        <p className="text-xs text-grey-400 text-center">
+        <p className="text-xs text-muted-foreground text-center">
           This is an AI-estimated grade and may differ from actual PSA grading results.
         </p>
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-grey-200 flex-shrink-0">
+      <div className="p-4 border-t border-border flex-shrink-0">
         <button
           onClick={onClose}
           className="w-full px-4 py-3 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition-colors"
@@ -179,8 +179,8 @@ function GradeRow({ label, grade }: { label: string; grade: number }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-grey-600 w-20">{label}</span>
-      <div className="flex-1 h-2 bg-grey-200 rounded-full overflow-hidden">
+      <span className="text-sm text-muted-foreground w-20">{label}</span>
+      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${
             grade >= 9 ? 'bg-green-500' : grade >= 7 ? 'bg-yellow-500' : 'bg-orange-500'

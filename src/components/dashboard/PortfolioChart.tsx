@@ -73,12 +73,12 @@ function CustomTooltip({
   const data = payload[0].payload;
 
   return (
-    <div className="bg-gray-900 px-3 py-2 rounded-lg shadow-lg">
-      <div className="text-gray-400 text-xs mb-1">
+    <div className="bg-forest-900 px-3 py-2 rounded-lg shadow-lg">
+      <div className="text-cream-200 text-xs mb-1">
         {formatTooltipDate(data.date)}
       </div>
       {visibility.total && (
-        <div className="text-white font-bold text-base">
+        <div className="text-cream-50 font-bold text-base">
           Total: {formatCurrency(data.total)}
         </div>
       )}

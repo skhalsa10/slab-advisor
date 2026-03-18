@@ -20,11 +20,11 @@ function PlaceholderCard({
   return (
     <div className="relative">
       <div
-        className={`bg-grey-200 rounded-lg aspect-[2.5/3.5] flex items-center justify-center p-2 ${
+        className={`bg-muted rounded-lg aspect-[2.5/3.5] flex items-center justify-center p-2 ${
           isGood ? 'ring-2 ring-green-500' : 'ring-2 ring-red-500'
         }`}
       >
-        <span className="text-xs text-grey-600 text-center leading-tight">
+        <span className="text-xs text-muted-foreground text-center leading-tight">
           {label}
         </span>
       </div>
@@ -81,11 +81,11 @@ function SmallPlaceholderCard({
   return (
     <div className="relative">
       <div
-        className={`bg-grey-200 rounded-md aspect-square flex items-center justify-center p-1 ${
+        className={`bg-muted rounded-md aspect-square flex items-center justify-center p-1 ${
           isGood ? 'ring-2 ring-green-500' : 'ring-2 ring-red-500'
         }`}
       >
-        <span className="text-[10px] text-grey-600 text-center leading-tight">
+        <span className="text-[10px] text-muted-foreground text-center leading-tight">
           {label}
         </span>
       </div>
@@ -152,11 +152,11 @@ function WelcomeSlide() {
         </svg>
       </div>
 
-      <h3 className="text-xl font-bold text-grey-900 mb-3">
+      <h3 className="text-xl font-bold text-foreground mb-3">
         Welcome & Important Instructions
       </h3>
 
-      <p className="text-grey-600">
+      <p className="text-muted-foreground">
         Please read every slide carefully. Skipping even one may affect your
         grading accuracy.
       </p>
@@ -170,25 +170,25 @@ function WelcomeSlide() {
 function BackgroundSlide() {
   return (
     <div className="flex flex-col items-center text-center px-4">
-      <h3 className="text-xl font-bold text-grey-900 mb-4">Solid Background</h3>
+      <h3 className="text-xl font-bold text-foreground mb-4">Solid Background</h3>
 
       {/* 3 placeholders in a row */}
       <div className="grid grid-cols-3 gap-4 mb-4 w-full max-w-xs">
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Multi-color Background" isGood={false} />
-          <span className="text-xs text-grey-500">Multi-color</span>
+          <span className="text-xs text-muted-foreground">Multi-color</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Plain White Background" isGood={true} />
-          <span className="text-xs text-grey-500">Plain White</span>
+          <span className="text-xs text-muted-foreground">Plain White</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Plain Black Background" isGood={true} />
-          <span className="text-xs text-grey-500">Plain Black</span>
+          <span className="text-xs text-muted-foreground">Plain Black</span>
         </div>
       </div>
 
-      <p className="text-grey-600 text-sm">
+      <p className="text-muted-foreground text-sm">
         Use a plain, solid background for your card. Avoid patterned or textured
         surfaces.
       </p>
@@ -202,7 +202,7 @@ function BackgroundSlide() {
 function NoSleevesSlide() {
   return (
     <div className="flex flex-col items-center text-center px-4">
-      <h3 className="text-xl font-bold text-grey-900 mb-4">
+      <h3 className="text-xl font-bold text-foreground mb-4">
         No Sleeves or Protectors
       </h3>
 
@@ -210,19 +210,19 @@ function NoSleevesSlide() {
       <div className="grid grid-cols-3 gap-4 mb-4 w-full max-w-xs">
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Card in Graded Slab" isGood={false} />
-          <span className="text-xs text-grey-500">Slab</span>
+          <span className="text-xs text-muted-foreground">Slab</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Card in Sleeve" isGood={false} />
-          <span className="text-xs text-grey-500">Sleeved</span>
+          <span className="text-xs text-muted-foreground">Sleeved</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Bare Card (No Protection)" isGood={true} />
-          <span className="text-xs text-grey-500">Bare</span>
+          <span className="text-xs text-muted-foreground">Bare</span>
         </div>
       </div>
 
-      <p className="text-grey-600 text-sm">
+      <p className="text-muted-foreground text-sm">
         Your card must be bare—remove any slabs, sleeves, or protectors before
         taking your photo.
       </p>
@@ -236,7 +236,7 @@ function NoSleevesSlide() {
 function FramingSlide() {
   return (
     <div className="flex flex-col items-center text-center px-4">
-      <h3 className="text-xl font-bold text-grey-900 mb-4">
+      <h3 className="text-xl font-bold text-foreground mb-4">
         Proper Framing & Distance
       </h3>
 
@@ -244,19 +244,19 @@ function FramingSlide() {
       <div className="grid grid-cols-3 gap-4 mb-4 w-full max-w-xs">
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Card Fills Frame Properly" isGood={true} />
-          <span className="text-xs text-grey-500">Ideal</span>
+          <span className="text-xs text-muted-foreground">Ideal</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Card Too Small / Far Away" isGood={false} />
-          <span className="text-xs text-grey-500">Too Far</span>
+          <span className="text-xs text-muted-foreground">Too Far</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <PlaceholderCard label="Edges Cropped Off" isGood={false} />
-          <span className="text-xs text-grey-500">Too Close</span>
+          <span className="text-xs text-muted-foreground">Too Close</span>
         </div>
       </div>
 
-      <p className="text-grey-600 text-sm">
+      <p className="text-muted-foreground text-sm">
         Hold your camera so the card is properly framed. Not too far, not too
         close.
       </p>
@@ -276,29 +276,29 @@ function LevelSlide({
 }) {
   return (
     <div className="flex flex-col items-center text-center px-4">
-      <h3 className="text-xl font-bold text-grey-900 mb-4">Take It Level</h3>
+      <h3 className="text-xl font-bold text-foreground mb-4">Take It Level</h3>
 
       {/* 4 placeholders in a 2x2 grid */}
       <div className="grid grid-cols-4 gap-3 mb-4 w-full max-w-xs">
         <div className="flex flex-col items-center gap-1">
           <SmallPlaceholderCard label="Crooked" isGood={false} />
-          <span className="text-[10px] text-grey-500">Crooked</span>
+          <span className="text-[10px] text-muted-foreground">Crooked</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <SmallPlaceholderCard label="Tilted" isGood={false} />
-          <span className="text-[10px] text-grey-500">Tilted</span>
+          <span className="text-[10px] text-muted-foreground">Tilted</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <SmallPlaceholderCard label="Horizontal" isGood={false} />
-          <span className="text-[10px] text-grey-500">Horizontal</span>
+          <span className="text-[10px] text-muted-foreground">Horizontal</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <SmallPlaceholderCard label="Straight & Level" isGood={true} />
-          <span className="text-[10px] text-grey-500">Level</span>
+          <span className="text-[10px] text-muted-foreground">Level</span>
         </div>
       </div>
 
-      <p className="text-grey-600 text-sm mb-4">
+      <p className="text-muted-foreground text-sm mb-4">
         Keep your card straight and level. Avoid tilting, rotating, or shooting
         at an angle.
       </p>
@@ -309,9 +309,9 @@ function LevelSlide({
           type="checkbox"
           checked={dontShowAgain}
           onChange={(e) => setDontShowAgain(e.target.checked)}
-          className="w-4 h-4 rounded border-grey-300 text-orange-600 focus:ring-orange-500"
+          className="w-4 h-4 rounded border-border text-orange-600 focus:ring-orange-500"
         />
-        <span className="text-sm text-grey-600">
+        <span className="text-sm text-muted-foreground">
           Don&apos;t show these tips again
         </span>
       </label>
@@ -335,7 +335,7 @@ function ProgressDots({
         <div
           key={i}
           className={`w-2 h-2 rounded-full transition-colors ${
-            i === current ? 'bg-orange-500' : 'bg-grey-300'
+            i === current ? 'bg-orange-500' : 'bg-muted-foreground'
           }`}
         />
       ))}
@@ -402,13 +402,13 @@ export default function GradingTutorialCarousel({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-        <h2 className="text-lg font-semibold text-grey-900">
+      <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+        <h2 className="text-lg font-semibold text-foreground">
           Photo Tips ({currentSlide + 1}/{totalSlides})
         </h2>
         <button
           onClick={onBack}
-          className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+          className="text-muted-foreground hover:text-muted-foreground transition-colors p-1"
           aria-label="Close"
         >
           <svg
@@ -433,7 +433,7 @@ export default function GradingTutorialCarousel({
       </div>
 
       {/* Footer - Progress & Navigation */}
-      <div className="p-4 border-t border-grey-200 flex-shrink-0 space-y-4">
+      <div className="p-4 border-t border-border flex-shrink-0 space-y-4">
         {/* Progress Dots */}
         <ProgressDots total={totalSlides} current={currentSlide} />
 
@@ -442,7 +442,7 @@ export default function GradingTutorialCarousel({
           {/* Back Button */}
           <button
             onClick={handlePrevious}
-            className="flex-1 px-4 py-3 border border-grey-300 text-grey-700 font-medium rounded-lg hover:bg-grey-50 transition-colors"
+            className="flex-1 px-4 py-3 border border-border text-foreground font-medium rounded-lg hover:bg-accent transition-colors"
           >
             {isFirstSlide ? 'Cancel' : 'Back'}
           </button>

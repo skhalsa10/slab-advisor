@@ -72,11 +72,11 @@ export default function AIAnalysisVisualization({
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-grey-200 flex-shrink-0">
-        <h2 className="text-lg font-semibold text-grey-900">Analyzing Card...</h2>
+      <div className="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+        <h2 className="text-lg font-semibold text-foreground">Analyzing Card...</h2>
         <button
           disabled
-          className="px-3 py-1.5 text-sm text-grey-400 bg-grey-100 rounded-lg cursor-not-allowed"
+          className="px-3 py-1.5 text-sm text-muted-foreground bg-secondary rounded-lg cursor-not-allowed"
         >
           Cancel
         </button>
@@ -153,7 +153,7 @@ export default function AIAnalysisVisualization({
                     <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
                   ) : (
                     // Empty circle
-                    <div className="w-5 h-5 border-2 border-grey-300 rounded-full" />
+                    <div className="w-5 h-5 border-2 border-border rounded-full" />
                   )}
                 </div>
 
@@ -164,7 +164,7 @@ export default function AIAnalysisVisualization({
                       ? 'text-green-600'
                       : isActive
                         ? 'text-blue-600'
-                        : 'text-grey-400'
+                        : 'text-muted-foreground'
                   }`}
                 >
                   {isComplete ? step.completedLabel : step.activeLabel}
@@ -175,7 +175,7 @@ export default function AIAnalysisVisualization({
         </div>
 
         {/* Subtle hint text */}
-        <p className="mt-6 text-xs text-grey-400 text-center">
+        <p className="mt-6 text-xs text-muted-foreground text-center">
           Our AI is analyzing your card&apos;s condition...
         </p>
       </div>
