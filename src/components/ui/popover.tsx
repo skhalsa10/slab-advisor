@@ -38,7 +38,7 @@ function PopoverContent({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          "bg-white text-grey-900 z-[60] w-(--radix-popover-trigger-width) max-h-(--radix-popover-content-available-height) rounded-md border border-grey-200 p-0 shadow-md outline-hidden",
+          "bg-card text-foreground z-[60] w-(--radix-popover-trigger-width) max-h-(--radix-popover-content-available-height) rounded-md border border-border p-0 shadow-md outline-hidden",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
           "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",

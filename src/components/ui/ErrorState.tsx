@@ -18,8 +18,8 @@ export default function ErrorState({
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
-      <h3 className="text-lg font-medium text-grey-900 mb-2">{title}</h3>
-      <p className="text-sm text-grey-600 mb-4">{message}</p>
+      <h3 className="text-lg font-medium text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground mb-4">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}

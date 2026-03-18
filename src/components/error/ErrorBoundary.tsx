@@ -56,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Default error UI
       return (
-        <div className="min-h-64 flex items-center justify-center bg-grey-50 rounded-lg border border-grey-200">
+        <div className="min-h-64 flex items-center justify-center bg-background rounded-lg border border-border">
           <div className="text-center p-8">
             <div className="mx-auto h-12 w-12 text-red-400 mb-4">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,10 +68,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-grey-900 mb-2">
+            <h3 className="text-lg font-medium text-foreground mb-2">
               Something went wrong
             </h3>
-            <p className="text-grey-600 mb-4">
+            <p className="text-muted-foreground mb-4">
               We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <button

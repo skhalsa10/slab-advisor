@@ -19,8 +19,8 @@ export default function LoadingScreen({
   background = 'grey' 
 }: LoadingScreenProps) {
   const backgroundClasses = {
-    grey: 'bg-grey-50',
-    white: 'bg-white',
+    grey: 'bg-background',
+    white: 'bg-card',
     transparent: 'bg-transparent'
   }
 
@@ -31,7 +31,7 @@ export default function LoadingScreen({
       <div className="text-center">
         <LoadingSpinner className="mx-auto" />
         {message && (
-          <p className="mt-4 text-grey-600">{message}</p>
+          <p className="mt-4 text-muted-foreground">{message}</p>
         )}
       </div>
     </div>

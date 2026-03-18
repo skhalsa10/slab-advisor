@@ -150,7 +150,7 @@ export default function DesktopUploadZone({
   }, [dashboardUrl])
 
   return (
-    <div className="fixed inset-0 z-50 bg-grey-900 flex flex-col">
+    <div className="fixed inset-0 z-50 bg-foreground flex flex-col">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -161,10 +161,10 @@ export default function DesktopUploadZone({
       />
 
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-grey-700">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <button
           onClick={onClose}
-          className="p-2 text-grey-400 hover:text-white hover:bg-grey-700 rounded-full transition-colors"
+          className="p-2 text-muted-foreground hover:text-white hover:bg-muted-foreground rounded-full transition-colors"
           aria-label="Close"
         >
           <svg
@@ -220,7 +220,7 @@ export default function DesktopUploadZone({
               ? 'border-orange-500 bg-orange-500/10 cursor-wait'
               : isDragging
               ? 'border-orange-500 bg-orange-500/10 cursor-pointer'
-              : 'border-grey-500 hover:border-orange-500 hover:bg-grey-800/50 cursor-pointer'
+              : 'border-muted-foreground hover:border-orange-500 hover:bg-foreground/50 cursor-pointer'
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -231,10 +231,10 @@ export default function DesktopUploadZone({
             /* Compressing State */
             <>
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4" />
-              <p className="text-grey-300 text-lg mb-2">
+              <p className="text-border text-lg mb-2">
                 Preparing image...
               </p>
-              <p className="text-grey-500 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Optimizing for upload
               </p>
             </>
@@ -243,7 +243,7 @@ export default function DesktopUploadZone({
             <>
               {/* Cloud Upload Icon */}
               <svg
-                className="w-16 h-16 mx-auto mb-4 text-grey-400"
+                className="w-16 h-16 mx-auto mb-4 text-muted-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -256,10 +256,10 @@ export default function DesktopUploadZone({
                 />
               </svg>
 
-              <p className="text-grey-300 text-lg mb-2">
+              <p className="text-border text-lg mb-2">
                 Drag & drop your card scan here
               </p>
-              <p className="text-grey-500 text-sm mb-4">or</p>
+              <p className="text-muted-foreground text-sm mb-4">or</p>
 
               <button
                 type="button"
@@ -272,7 +272,7 @@ export default function DesktopUploadZone({
                 Browse Files
               </button>
 
-              <p className="text-grey-500 text-xs mt-4">
+              <p className="text-muted-foreground text-xs mt-4">
                 Supports: {SUPPORTED_FORMATS}
               </p>
             </>
@@ -287,15 +287,15 @@ export default function DesktopUploadZone({
         )}
 
         {/* Instruction Text */}
-        <p className="text-grey-400 text-sm mt-4 text-center max-w-md">
+        <p className="text-muted-foreground text-sm mt-4 text-center max-w-md">
           {instructionText}
         </p>
 
         {/* QR Code Section */}
-        <div className="mt-8 p-4 bg-grey-800 rounded-lg border border-grey-700 max-w-xs w-full">
+        <div className="mt-8 p-4 bg-foreground rounded-lg border border-border max-w-xs w-full">
           <div className="flex items-center gap-2 mb-3 justify-center">
             <svg
-              className="w-5 h-5 text-grey-400"
+              className="w-5 h-5 text-muted-foreground"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -307,7 +307,7 @@ export default function DesktopUploadZone({
                 d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
               />
             </svg>
-            <p className="text-grey-400 text-sm font-medium">
+            <p className="text-muted-foreground text-sm font-medium">
               Switch to Mobile
             </p>
           </div>
@@ -321,14 +321,14 @@ export default function DesktopUploadZone({
             />
           </div>
 
-          <p className="text-grey-500 text-xs text-center mt-3">
+          <p className="text-muted-foreground text-xs text-center mt-3">
             Scan with your phone to continue there
           </p>
 
           {/* Copy Link Button */}
           <button
             onClick={handleCopyLink}
-            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 text-grey-400 hover:text-white hover:bg-grey-700 rounded-lg transition-colors text-sm"
+            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2 text-muted-foreground hover:text-white hover:bg-muted-foreground rounded-lg transition-colors text-sm"
           >
             {copied ? (
               <>

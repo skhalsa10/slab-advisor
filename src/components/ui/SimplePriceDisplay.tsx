@@ -20,8 +20,8 @@ export default function SimplePriceDisplay({
 
   return (
     <div className={className}>
-      {showMarketLabel && <p className="text-xs text-grey-500">Market price</p>}
-      <p className="text-base font-semibold text-grey-900">
+      {showMarketLabel && <p className="text-xs text-muted-foreground">Market price</p>}
+      <p className="text-base font-semibold text-foreground">
         {formattedPrice || 'Not available'}
       </p>
     </div>

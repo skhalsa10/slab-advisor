@@ -15,7 +15,7 @@ function CardErrorFallback({
   message = "There was an issue processing your card. This might be due to image quality or connectivity issues."
 }: CardErrorFallbackProps) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-red-200">
+    <div className="bg-card rounded-lg shadow-md p-6 border border-red-200">
       <div className="text-center">
         <div className="mx-auto h-12 w-12 text-red-400 mb-4">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -27,10 +27,10 @@ function CardErrorFallback({
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-grey-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           {title}
         </h3>
-        <p className="text-grey-600 mb-4">
+        <p className="text-muted-foreground mb-4">
           {message}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
