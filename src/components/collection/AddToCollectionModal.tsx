@@ -69,7 +69,7 @@ export default function AddToCollectionModal({
   const CloseButton = () => (
     <button
       onClick={onClose}
-      className="text-grey-400 hover:text-grey-600 transition-colors p-1 rounded-md hover:bg-grey-100"
+      className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-secondary"
       aria-label="Close modal"
     >
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -109,7 +109,7 @@ export default function AddToCollectionModal({
           aria-labelledby="add-to-collection-title"
           className={`
             fixed z-50 bottom-0 left-0 right-0
-            bg-white rounded-t-2xl shadow-2xl
+            bg-card rounded-t-2xl shadow-2xl
             flex flex-col
             h-[85vh]
             transform transition-transform duration-300 ease-out
@@ -118,16 +118,16 @@ export default function AddToCollectionModal({
         >
           {/* Handle bar */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-grey-300 rounded-full" />
+            <div className="w-10 h-1 bg-muted-foreground rounded-full" />
           </div>
 
           {/* Header */}
-          <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-grey-100">
+          <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-border">
             <div>
-              <h2 id="add-to-collection-title" className="text-lg font-semibold text-grey-900">
+              <h2 id="add-to-collection-title" className="text-lg font-semibold text-foreground">
                 Add to Collection
               </h2>
-              <p className="text-sm text-grey-600">
+              <p className="text-sm text-muted-foreground">
                 Adding &ldquo;{cardName}&rdquo;
               </p>
             </div>
@@ -163,7 +163,7 @@ export default function AddToCollectionModal({
           aria-modal="true"
           aria-labelledby="add-to-collection-title"
           className={`
-            bg-white rounded-lg shadow-2xl pointer-events-auto
+            bg-card rounded-lg shadow-2xl pointer-events-auto
             flex flex-col
             w-full max-w-md max-h-[90vh]
             transform transition-all duration-300 ease-out
@@ -171,13 +171,13 @@ export default function AddToCollectionModal({
           `}
         >
           {/* Header */}
-          <div className="flex-shrink-0 bg-white border-b border-grey-200 px-6 py-4 rounded-t-lg">
+          <div className="flex-shrink-0 bg-card border-b border-border px-6 py-4 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div>
-                <h2 id="add-to-collection-title" className="text-xl font-semibold text-grey-900">
+                <h2 id="add-to-collection-title" className="text-xl font-semibold text-foreground">
                   Add to Collection
                 </h2>
-                <p className="text-sm text-grey-600">
+                <p className="text-sm text-muted-foreground">
                   Adding &ldquo;{cardName}&rdquo; to your collection
                 </p>
               </div>

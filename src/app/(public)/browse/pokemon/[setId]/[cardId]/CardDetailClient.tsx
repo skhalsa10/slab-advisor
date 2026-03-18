@@ -89,7 +89,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
           {previousCard && (
             <Link
               href={buildHref(`/browse/pokemon/${setId}/${previousCard.id}`)}
-              className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
               title="Previous card"
             >
               <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
           {nextCard && (
             <Link
               href={buildHref(`/browse/pokemon/${setId}/${nextCard.id}`)}
-              className="p-2 rounded-lg hover:bg-grey-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
               title="Next card"
             >
               <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ export default function CardDetailClient({ card, set, setId, priceData, binders 
           />
 
           {/* Card Specs - Tablet/Desktop: Technical Spec Sheet Grid */}
-          <div className="hidden md:block mt-6 border-t border-gray-100 pt-4 max-w-xs">
+          <div className="hidden md:block mt-6 border-t border-border pt-4 max-w-xs">
             <div className="grid grid-cols-2 gap-y-4 gap-x-2">
               <div>
                 <dt className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Card Number</dt>

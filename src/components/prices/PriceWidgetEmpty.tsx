@@ -10,11 +10,11 @@ export function PriceWidgetEmpty({
 }: PriceWidgetEmptyProps) {
   return (
     <div
-      className={`bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center ${className}`}
+      className={`bg-card rounded-2xl border border-border shadow-sm p-8 text-center ${className}`}
     >
       {/* Chart icon - muted */}
       <svg
-        className="w-12 h-12 text-gray-300 mx-auto mb-3"
+        className="w-12 h-12 text-muted-foreground mx-auto mb-3"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -28,8 +28,8 @@ export function PriceWidgetEmpty({
         />
       </svg>
 
-      <h3 className="text-gray-700 font-medium mb-1">{message}</h3>
-      <p className="text-gray-500 text-sm">
+      <h3 className="text-foreground font-medium mb-1">{message}</h3>
+      <p className="text-muted-foreground text-sm">
         We don&apos;t have pricing information for this card yet.
       </p>
     </div>

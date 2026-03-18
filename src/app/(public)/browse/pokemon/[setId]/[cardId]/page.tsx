@@ -52,8 +52,8 @@ export default async function CardDetailsPage({ params }: CardDetailsPageProps) 
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-grey-900 mb-2">Error Loading Card</h3>
-        <p className="text-sm text-grey-600 mb-4">Card not found or failed to load</p>
+        <h3 className="text-lg font-medium text-foreground mb-2">Error Loading Card</h3>
+        <p className="text-sm text-muted-foreground mb-4">Card not found or failed to load</p>
         <Link
           href={`/browse/pokemon/${setId}`}
           className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
