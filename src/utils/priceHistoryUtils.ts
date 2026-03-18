@@ -194,7 +194,7 @@ export function formatPriceChange(change: number | null): {
   if (change === null || change === undefined) {
     return {
       text: '—',
-      colorClass: 'text-gray-400',
+      colorClass: 'text-muted-foreground',
       isPositive: false,
       isNegative: false,
     };
@@ -205,7 +205,7 @@ export function formatPriceChange(change: number | null): {
   const sign = isPositive ? '+' : '';
   const text = `${sign}${change.toFixed(1)}%`;
 
-  let colorClass = 'text-gray-500';
+  let colorClass = 'text-muted-foreground';
   if (isPositive) colorClass = 'text-green-600';
   if (isNegative) colorClass = 'text-red-600';
 

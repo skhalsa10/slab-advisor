@@ -27,7 +27,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   if (user) {
     return (
       <CreditsProvider>
-        <div className="h-screen bg-grey-50">
+        <div className="h-screen bg-background">
           <Sidebar onSignOut={handleSignOut} />
           <SidebarPageContainer>
             {children}
@@ -38,7 +38,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <div className="min-h-screen bg-grey-50">
+    <div className="min-h-screen bg-background">
       <Navbar onLogin={handleLogin} />
       <NavbarPageContainer>
         {children}

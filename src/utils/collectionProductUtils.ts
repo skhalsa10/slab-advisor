@@ -145,7 +145,7 @@ export function getConditionBadgeColor(condition: string | null): string {
     case 'damaged':
       return 'bg-red-100 text-red-800'
     default:
-      return 'bg-grey-100 text-grey-800'
+      return 'bg-secondary text-foreground'
   }
 }
 
@@ -231,6 +231,6 @@ export function formatGainLoss(
  * @returns Tailwind color class for positive (green), negative (red), or neutral (grey)
  */
 export function getGainLossColor(value: number | null): string {
-  if (value === null) return 'text-grey-400'
+  if (value === null) return 'text-muted-foreground'
   return value >= 0 ? 'text-green-600' : 'text-red-600'
 }

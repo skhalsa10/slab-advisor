@@ -28,7 +28,7 @@ export default function DashboardLayout({
   return (
     <ErrorBoundary>
       <CreditsProvider>
-        <div className="h-screen bg-grey-50 overflow-hidden">
+        <div className="h-screen bg-background overflow-hidden">
           <Sidebar onSignOut={handleSignOut} />
           <SidebarPageContainer>
             {children}

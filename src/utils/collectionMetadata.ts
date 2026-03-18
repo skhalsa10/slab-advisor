@@ -28,10 +28,10 @@ export const VARIANT_CONFIG = {
   normal: {
     text: 'Normal',
     abbreviation: 'Normal',
-    colorClass: 'bg-grey-500/70',
-    listColorClass: 'bg-grey-100 border-grey-300',
+    colorClass: 'bg-muted-foreground/70',
+    listColorClass: 'bg-secondary border-border',
     textColor: 'text-white',
-    listTextColor: 'text-grey-800'
+    listTextColor: 'text-foreground'
   },
   holo: {
     text: 'Holo',
@@ -95,10 +95,10 @@ export const VARIANT_CONFIG = {
  * Default styling for unknown/custom variants
  */
 const DEFAULT_VARIANT_STYLE = {
-  colorClass: 'bg-grey-600/70',
-  listColorClass: 'bg-grey-100 border-grey-300',
+  colorClass: 'bg-muted-foreground/70',
+  listColorClass: 'bg-secondary border-border',
   textColor: 'text-white',
-  listTextColor: 'text-grey-800'
+  listTextColor: 'text-foreground'
 }
 
 /**
@@ -348,5 +348,5 @@ export function getBadgeBaseClasses() {
  * Get list badge classes (larger, more readable)
  */
 export function getListBadgeClasses() {
-  return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border border-gray-200 shadow-sm'
+  return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border border-border shadow-sm'
 }

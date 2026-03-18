@@ -327,9 +327,9 @@ export function QuickAddProvider({ children }: QuickAddProviderProps) {
 
                       {/* Divider */}
                       <div className="flex items-center gap-4 px-4 py-2">
-                        <div className="flex-1 h-px bg-grey-200" />
-                        <span className="text-sm text-grey-500">or search by name</span>
-                        <div className="flex-1 h-px bg-grey-200" />
+                        <div className="flex-1 h-px bg-muted" />
+                        <span className="text-sm text-muted-foreground">or search by name</span>
+                        <div className="flex-1 h-px bg-muted" />
                       </div>
                     </div>
                   </div>
