@@ -16,7 +16,7 @@ export default function ViewToggle({ viewMode, onViewModeChange, className = '' 
   return (
     <button
       onClick={toggleView}
-      className={`p-2 rounded-lg bg-grey-100 text-grey-600 hover:text-grey-900 hover:bg-grey-200 transition-colors ${className}`}
+      className={`p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground hover:bg-muted transition-colors ${className}`}
       aria-label={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
       title={viewMode === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
     >

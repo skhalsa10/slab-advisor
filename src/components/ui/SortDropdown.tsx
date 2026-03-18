@@ -67,7 +67,7 @@ export default function SortDropdown({ options, value, onChange, className = '',
     <div className={`relative ${className}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg bg-grey-100 text-grey-600 hover:text-grey-900 hover:bg-grey-200 transition-colors"
+        className="p-2 rounded-lg bg-secondary text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
         aria-label={`${title}: ${selectedOption?.label || 'Select'}`}
         title={`${title}: ${selectedOption?.label || 'Select'}`}
         aria-expanded={isOpen}
@@ -99,7 +99,7 @@ export default function SortDropdown({ options, value, onChange, className = '',
       {/* Desktop/Tablet: Dropdown menu */}
       {isOpen && (
         <div
-          className="hidden sm:block absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-grey-200 py-1 z-50"
+          className="hidden sm:block absolute right-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border py-1 z-50"
           role="listbox"
           aria-label="Sort options"
         >
@@ -109,8 +109,8 @@ export default function SortDropdown({ options, value, onChange, className = '',
               onClick={() => handleSelect(option.value)}
               className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                 option.value === value
-                  ? 'bg-orange-50 text-orange-600 font-medium'
-                  : 'text-grey-700 hover:bg-grey-50'
+                  ? 'bg-accent text-orange-600 font-medium'
+                  : 'text-foreground hover:bg-accent'
               }`}
               role="option"
               aria-selected={option.value === value}
@@ -133,18 +133,18 @@ export default function SortDropdown({ options, value, onChange, className = '',
 
           {/* Bottom sheet */}
           <div
-            className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-xl animate-slide-up"
+            className="sm:hidden fixed inset-x-0 bottom-0 z-50 bg-card rounded-t-2xl shadow-xl animate-slide-up"
             role="listbox"
             aria-label="Sort options"
           >
             {/* Handle bar */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-grey-300 rounded-full" />
+              <div className="w-10 h-1 bg-muted-foreground rounded-full" />
             </div>
 
             {/* Title */}
-            <div className="px-4 pb-2 border-b border-grey-100">
-              <h3 className="text-lg font-semibold text-grey-900">{title}</h3>
+            <div className="px-4 pb-2 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
             </div>
 
             {/* Options */}
@@ -155,8 +155,8 @@ export default function SortDropdown({ options, value, onChange, className = '',
                   onClick={() => handleSelect(option.value)}
                   className={`w-full text-left px-4 py-3 text-base transition-colors flex items-center justify-between ${
                     option.value === value
-                      ? 'bg-orange-50 text-orange-600'
-                      : 'text-grey-700 active:bg-grey-50'
+                      ? 'bg-accent text-orange-600'
+                      : 'text-foreground active:bg-accent'
                   }`}
                   role="option"
                   aria-selected={option.value === value}

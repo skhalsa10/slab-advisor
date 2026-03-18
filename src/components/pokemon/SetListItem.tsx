@@ -19,7 +19,7 @@ export default function SetListItem({ set, series }: SetListItemProps) {
   const { buildHref } = usePreserveFilters()
 
   return (
-    <tr className="hover:bg-grey-50 transition-colors">
+    <tr className="hover:bg-accent transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <Link href={buildHref(`/browse/pokemon/${set.id}`)} className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10">
@@ -35,31 +35,31 @@ export default function SetListItem({ set, series }: SetListItemProps) {
                 }}
               />
             ) : (
-              <div className="h-10 w-10 rounded-md bg-grey-100 flex items-center justify-center">
-                <svg className="h-6 w-6 text-grey-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="h-10 w-10 rounded-md bg-secondary flex items-center justify-center">
+                <svg className="h-6 w-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                 </svg>
               </div>
             )}
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-grey-900">
+            <div className="text-sm font-medium text-foreground">
               {set.name}
             </div>
-            <div className="text-sm text-grey-500">
+            <div className="text-sm text-muted-foreground">
               {set.id}
             </div>
           </div>
         </Link>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-grey-900">{series?.name || 'Unknown'}</div>
+        <div className="text-sm text-foreground">{series?.name || 'Unknown'}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-grey-900">{set.card_count_total || 0}</div>
+        <div className="text-sm text-foreground">{set.card_count_total || 0}</div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-grey-900">
+        <div className="text-sm text-foreground">
           {set.release_date ? new Date(set.release_date).toLocaleDateString() : 'Unknown'}
         </div>
       </td>

@@ -26,7 +26,7 @@ export default function NoResultsMessage({
 
   return (
     <div className="text-center py-8">
-      <p className="text-grey-600">{getMessage()}</p>
+      <p className="text-muted-foreground">{getMessage()}</p>
     </div>
   )
 }
