@@ -82,7 +82,7 @@ export default function EditCollectionForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Quantity */}
       <div>
-        <label htmlFor="quantity" className="block text-sm font-medium text-grey-700 mb-1">
+        <label htmlFor="quantity" className="block text-sm font-medium text-foreground mb-1">
           Quantity
         </label>
         <input
@@ -92,7 +92,7 @@ export default function EditCollectionForm({
           value={formData.quantity}
           onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
           className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-            errors.quantity ? 'border-red-500' : 'border-grey-300'
+            errors.quantity ? 'border-red-500' : 'border-border'
           }`}
           disabled={isSubmitting}
         />
@@ -103,14 +103,14 @@ export default function EditCollectionForm({
 
       {/* Condition */}
       <div>
-        <label htmlFor="condition" className="block text-sm font-medium text-grey-700 mb-1">
+        <label htmlFor="condition" className="block text-sm font-medium text-foreground mb-1">
           Condition
         </label>
         <select
           id="condition"
           value={formData.condition}
           onChange={(e) => handleInputChange('condition', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           disabled={isSubmitting}
         >
           {CONDITION_OPTIONS.map(option => (
@@ -123,11 +123,11 @@ export default function EditCollectionForm({
 
       {/* Acquisition Price */}
       <div>
-        <label htmlFor="acquisition_price" className="block text-sm font-medium text-grey-700 mb-1">
+        <label htmlFor="acquisition_price" className="block text-sm font-medium text-foreground mb-1">
           Purchase Price
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-grey-500">$</span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
           <input
             type="text"
             id="acquisition_price"
@@ -135,7 +135,7 @@ export default function EditCollectionForm({
             value={formData.acquisition_price}
             onChange={(e) => handleInputChange('acquisition_price', e.target.value)}
             className={`w-full pl-8 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-              errors.acquisition_price ? 'border-red-500' : 'border-grey-300'
+              errors.acquisition_price ? 'border-red-500' : 'border-border'
             }`}
             disabled={isSubmitting}
           />
@@ -147,7 +147,7 @@ export default function EditCollectionForm({
 
       {/* Acquisition Date */}
       <div>
-        <label htmlFor="acquisition_date" className="block text-sm font-medium text-grey-700 mb-1">
+        <label htmlFor="acquisition_date" className="block text-sm font-medium text-foreground mb-1">
           Purchase Date
         </label>
         <input
@@ -155,14 +155,14 @@ export default function EditCollectionForm({
           id="acquisition_date"
           value={formData.acquisition_date}
           onChange={(e) => handleInputChange('acquisition_date', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           disabled={isSubmitting}
         />
       </div>
 
       {/* Notes */}
       <div>
-        <label htmlFor="notes" className="block text-sm font-medium text-grey-700 mb-1">
+        <label htmlFor="notes" className="block text-sm font-medium text-foreground mb-1">
           Notes
         </label>
         <textarea
@@ -171,7 +171,7 @@ export default function EditCollectionForm({
           placeholder="Add any notes about this card..."
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
           disabled={isSubmitting}
         />
       </div>
@@ -182,7 +182,7 @@ export default function EditCollectionForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

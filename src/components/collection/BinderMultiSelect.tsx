@@ -167,7 +167,7 @@ export default function BinderMultiSelect({
       {/* Chips area — single line, overflow hidden for measurement */}
       <div ref={chipsContainerRef} className="flex items-center gap-1.5 min-w-0 overflow-hidden flex-1">
         {/* Locked "All Cards" chip */}
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-grey-100 text-grey-500 text-xs font-medium flex-shrink-0">
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-muted-foreground text-xs font-medium flex-shrink-0">
           <Lock className="w-3 h-3" />
           All Cards
         </span>
@@ -194,32 +194,32 @@ export default function BinderMultiSelect({
 
       {/* "+N more" badge when chips overflow */}
       {overflowCount > 0 && (
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-grey-200 text-grey-600 text-xs font-medium flex-shrink-0">
+        <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-medium flex-shrink-0">
           +{overflowCount}
         </span>
       )}
 
       {/* Placeholder when nothing selected */}
       {selectedBinders.length === 0 && (
-        <span className="text-grey-400">Select binders...</span>
+        <span className="text-muted-foreground">Select binders...</span>
       )}
 
-      <ChevronDown className={`w-4 h-4 text-grey-400 flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
+      <ChevronDown className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
     </>
   )
 
-  const triggerClasses = `w-full h-[38px] px-3 py-1.5 text-left border border-grey-300 rounded-md text-sm
+  const triggerClasses = `w-full h-[38px] px-3 py-1.5 text-left border border-border rounded-md text-sm
     focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500
     transition-colors flex items-center gap-1.5
-    ${disabled ? 'opacity-50 cursor-not-allowed bg-grey-50' : 'bg-white hover:border-grey-400 cursor-pointer'}`
+    ${disabled ? 'opacity-50 cursor-not-allowed bg-background' : 'bg-card hover:border-muted-foreground cursor-pointer'}`
 
   // --- Shared binder list content (search + list + create) ---
   const binderListContent = (inputRef: React.RefObject<HTMLInputElement | null>, listClassName: string, rowPadding = 'py-1.5') => (
     <>
       {/* Search input — pinned top */}
-      <div className="flex-shrink-0 border-b border-grey-100 p-2">
+      <div className="flex-shrink-0 border-b border-border p-2">
         <div className="relative">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-grey-400" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             ref={inputRef}
             type="text"
@@ -230,7 +230,7 @@ export default function BinderMultiSelect({
             }}
             placeholder="Search binders..."
             aria-label="Search binders"
-            className="w-full pl-8 pr-3 py-1.5 text-sm border border-grey-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full pl-8 pr-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           />
         </div>
       </div>
@@ -249,13 +249,13 @@ export default function BinderMultiSelect({
                   className={`w-full flex items-center gap-2 px-2 ${rowPadding} rounded-md text-sm text-left cursor-pointer transition-colors ${
                     isSelected
                       ? 'bg-orange-50 text-orange-900'
-                      : 'text-grey-700 hover:bg-grey-50'
+                      : 'text-foreground hover:bg-accent'
                   }`}
                 >
                   <span className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center ${
                     isSelected
                       ? 'bg-orange-600 border-orange-600'
-                      : 'border-grey-300'
+                      : 'border-border'
                   }`}>
                     {isSelected && <Check className="w-3 h-3 text-white" />}
                   </span>
@@ -265,11 +265,11 @@ export default function BinderMultiSelect({
             })}
           </div>
         ) : searchTerm.trim() ? (
-          <div className="p-3 text-center text-sm text-grey-500">
+          <div className="p-3 text-center text-sm text-muted-foreground">
             No binders match &ldquo;{searchTerm}&rdquo;
           </div>
         ) : (
-          <div className="p-3 text-center text-sm text-grey-500">
+          <div className="p-3 text-center text-sm text-muted-foreground">
             No binders yet. Create one below.
           </div>
         )}
@@ -277,7 +277,7 @@ export default function BinderMultiSelect({
 
       {/* Create new binder button — pinned bottom */}
       {!exactMatchExists && searchTerm.trim() && (
-        <div className="flex-shrink-0 border-t border-grey-100 p-1">
+        <div className="flex-shrink-0 border-t border-border p-1">
           <button
             type="button"
             onClick={handleCreate}
@@ -299,8 +299,8 @@ export default function BinderMultiSelect({
 
       {/* Create prompt when no binders exist and no search */}
       {binderList.length === 0 && !searchTerm.trim() && (
-        <div className="flex-shrink-0 border-t border-grey-100 p-2">
-          <p className="text-xs text-grey-500 mb-1.5">Type a name above to create your first binder.</p>
+        <div className="flex-shrink-0 border-t border-border p-2">
+          <p className="text-xs text-muted-foreground mb-1.5">Type a name above to create your first binder.</p>
         </div>
       )}
     </>
@@ -345,11 +345,11 @@ export default function BinderMultiSelect({
                 role="dialog"
                 aria-modal="true"
                 aria-label="Select binders"
-                className="fixed z-[80] inset-0 bg-white flex flex-col"
+                className="fixed z-[80] inset-0 bg-card flex flex-col"
               >
                 {/* Header */}
-                <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-grey-100">
-                  <h3 className="text-base font-semibold text-grey-900">Select Binders</h3>
+                <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b border-border">
+                  <h3 className="text-base font-semibold text-foreground">Select Binders</h3>
                   <button
                     onClick={() => setOpen(false)}
                     className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors px-3 py-1 rounded-md hover:bg-orange-50"
@@ -367,16 +367,16 @@ export default function BinderMultiSelect({
                 role="dialog"
                 aria-modal="true"
                 aria-label="Select binders"
-                className="fixed z-[80] bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl flex flex-col h-[60vh] transform transition-transform duration-300 ease-out translate-y-0"
+                className="fixed z-[80] bottom-0 left-0 right-0 bg-card rounded-t-2xl shadow-2xl flex flex-col h-[60vh] transform transition-transform duration-300 ease-out translate-y-0"
               >
                 {/* Handle bar */}
                 <div className="flex justify-center pt-3 pb-2">
-                  <div className="w-10 h-1 bg-grey-300 rounded-full" />
+                  <div className="w-10 h-1 bg-muted-foreground rounded-full" />
                 </div>
 
                 {/* Header */}
-                <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-grey-100">
-                  <h3 className="text-base font-semibold text-grey-900">Select Binders</h3>
+                <div className="flex-shrink-0 flex items-center justify-between px-4 py-2 border-b border-border">
+                  <h3 className="text-base font-semibold text-foreground">Select Binders</h3>
                   <button
                     onClick={() => setOpen(false)}
                     className="text-sm font-semibold text-orange-600 hover:text-orange-700 transition-colors px-3 py-1 rounded-md hover:bg-orange-50"
@@ -396,7 +396,7 @@ export default function BinderMultiSelect({
         )}
 
         {/* Static "All Cards" info */}
-        <p className="text-xs text-grey-400">
+        <p className="text-xs text-muted-foreground">
           Cards are automatically added to All Cards.
         </p>
       </div>
@@ -426,7 +426,7 @@ export default function BinderMultiSelect({
       </Popover>
 
       {/* Static "All Cards" info */}
-      <p className="text-xs text-grey-400">
+      <p className="text-xs text-muted-foreground">
         Cards are automatically added to All Cards.
       </p>
     </div>

@@ -95,7 +95,7 @@ export default function EditProductForm({
       <div>
         <label
           htmlFor="quantity"
-          className="block text-sm font-medium text-grey-700 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Quantity
         </label>
@@ -108,7 +108,7 @@ export default function EditProductForm({
             handleInputChange('quantity', parseInt(e.target.value) || 1)
           }
           className={`w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-            errors.quantity ? 'border-red-500' : 'border-grey-300'
+            errors.quantity ? 'border-red-500' : 'border-border'
           }`}
           disabled={isSubmitting}
         />
@@ -121,7 +121,7 @@ export default function EditProductForm({
       <div>
         <label
           htmlFor="condition"
-          className="block text-sm font-medium text-grey-700 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Condition
         </label>
@@ -129,7 +129,7 @@ export default function EditProductForm({
           id="condition"
           value={formData.condition}
           onChange={(e) => handleInputChange('condition', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           disabled={isSubmitting}
         >
           {PRODUCT_CONDITION_OPTIONS.map((option) => (
@@ -144,12 +144,12 @@ export default function EditProductForm({
       <div>
         <label
           htmlFor="purchase_price"
-          className="block text-sm font-medium text-grey-700 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Purchase Price
         </label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-grey-500">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
             $
           </span>
           <input
@@ -161,7 +161,7 @@ export default function EditProductForm({
               handleInputChange('purchase_price', e.target.value)
             }
             className={`w-full pl-8 pr-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 ${
-              errors.purchase_price ? 'border-red-500' : 'border-grey-300'
+              errors.purchase_price ? 'border-red-500' : 'border-border'
             }`}
             disabled={isSubmitting}
           />
@@ -175,7 +175,7 @@ export default function EditProductForm({
       <div>
         <label
           htmlFor="purchased_at"
-          className="block text-sm font-medium text-grey-700 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Purchase Date
         </label>
@@ -184,7 +184,7 @@ export default function EditProductForm({
           id="purchased_at"
           value={formData.purchased_at}
           onChange={(e) => handleInputChange('purchased_at', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
           disabled={isSubmitting}
         />
       </div>
@@ -193,7 +193,7 @@ export default function EditProductForm({
       <div>
         <label
           htmlFor="notes"
-          className="block text-sm font-medium text-grey-700 mb-1"
+          className="block text-sm font-medium text-foreground mb-1"
         >
           Notes
         </label>
@@ -203,7 +203,7 @@ export default function EditProductForm({
           placeholder="Add any notes about this product..."
           value={formData.notes}
           onChange={(e) => handleInputChange('notes', e.target.value)}
-          className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+          className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
           disabled={isSubmitting}
         />
       </div>
@@ -214,7 +214,7 @@ export default function EditProductForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

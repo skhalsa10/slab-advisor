@@ -204,10 +204,10 @@ export default function AddToCollectionForm({
     <form onSubmit={handleSubmit} className={containerClasses}>
       {!isTransformMode && (
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-grey-900 mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Add to Collection
           </h3>
-          <p className="text-sm text-grey-600">
+          <p className="text-sm text-muted-foreground">
             Adding &ldquo;{cardName}&rdquo; to your collection
           </p>
         </div>
@@ -217,14 +217,14 @@ export default function AddToCollectionForm({
         {/* Row 1: Variant | Condition */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="variant" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="variant" className="block text-sm font-medium text-foreground mb-1">
               Variant *
             </label>
             <select
               id="variant"
               value={formData.variant}
               onChange={(e) => handleInputChange('variant', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               required
             >
               <option value="">Select</option>
@@ -237,14 +237,14 @@ export default function AddToCollectionForm({
           </div>
 
           <div>
-            <label htmlFor="condition" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="condition" className="block text-sm font-medium text-foreground mb-1">
               Condition
             </label>
             <select
               id="condition"
               value={formData.condition}
               onChange={(e) => handleInputChange('condition', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
               {CONDITION_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -258,11 +258,11 @@ export default function AddToCollectionForm({
         {/* Row 2: Price Paid | Quantity */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="acquisition_price" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="acquisition_price" className="block text-sm font-medium text-foreground mb-1">
               Price Paid
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2 text-grey-500 text-sm">$</span>
+              <span className="absolute left-3 top-2 text-muted-foreground text-sm">$</span>
               <input
                 type="number"
                 id="acquisition_price"
@@ -270,14 +270,14 @@ export default function AddToCollectionForm({
                 min="0"
                 value={formData.acquisition_price}
                 onChange={(e) => handleInputChange('acquisition_price', e.target.value)}
-                className="w-full pl-7 pr-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full pl-7 pr-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="0.00"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="quantity" className="block text-sm font-medium text-foreground mb-1">
               Quantity *
             </label>
             <input
@@ -286,7 +286,7 @@ export default function AddToCollectionForm({
               min="1"
               value={formData.quantity}
               onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               required
             />
           </div>
@@ -294,7 +294,7 @@ export default function AddToCollectionForm({
 
         {/* Row 3: Purchase Date (full width for now, graded toggle can be added later) */}
         <div>
-          <label htmlFor="acquisition_date" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="acquisition_date" className="block text-sm font-medium text-foreground mb-1">
             Purchase Date
           </label>
           <input
@@ -302,13 +302,13 @@ export default function AddToCollectionForm({
             id="acquisition_date"
             value={formData.acquisition_date}
             onChange={(e) => handleInputChange('acquisition_date', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           />
         </div>
 
         {/* Row 4: Notes (Full Width) */}
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="notes" className="block text-sm font-medium text-foreground mb-1">
             Notes
           </label>
           <textarea
@@ -316,7 +316,7 @@ export default function AddToCollectionForm({
             rows={2}
             value={formData.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             placeholder="Optional notes..."
           />
         </div>
@@ -324,7 +324,7 @@ export default function AddToCollectionForm({
         {/* Row 5: Binder Selection (only when authenticated and binders available) */}
         {user && binders && (
           <div>
-            <label className="block text-sm font-medium text-grey-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Binders
             </label>
             <BinderMultiSelect
@@ -343,7 +343,7 @@ export default function AddToCollectionForm({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 rounded-md hover:bg-grey-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-md hover:bg-accent transition-colors"
             disabled={isSubmitting}
           >
             Cancel

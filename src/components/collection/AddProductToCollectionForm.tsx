@@ -119,10 +119,10 @@ export default function AddProductToCollectionForm({
     <form onSubmit={handleSubmit} className={containerClasses}>
       {!isInlineMode && (
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-grey-900 mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             Add to Collection
           </h3>
-          <p className="text-sm text-grey-600 line-clamp-2">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             Adding &ldquo;{productName}&rdquo; to your collection
           </p>
         </div>
@@ -132,14 +132,14 @@ export default function AddProductToCollectionForm({
         {/* Row 1: Condition | Quantity */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="condition" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="condition" className="block text-sm font-medium text-foreground mb-1">
               Condition
             </label>
             <select
               id="condition"
               value={formData.condition}
               onChange={(e) => handleInputChange('condition', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
               {PRODUCT_CONDITION_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -150,7 +150,7 @@ export default function AddProductToCollectionForm({
           </div>
 
           <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="quantity" className="block text-sm font-medium text-foreground mb-1">
               Quantity *
             </label>
             <input
@@ -159,7 +159,7 @@ export default function AddProductToCollectionForm({
               min="1"
               value={formData.quantity}
               onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               required
             />
           </div>
@@ -168,11 +168,11 @@ export default function AddProductToCollectionForm({
         {/* Row 2: Price Paid | Purchase Date */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="purchase_price" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="purchase_price" className="block text-sm font-medium text-foreground mb-1">
               Price Paid
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-2 text-grey-500 text-sm">$</span>
+              <span className="absolute left-3 top-2 text-muted-foreground text-sm">$</span>
               <input
                 type="number"
                 id="purchase_price"
@@ -180,14 +180,14 @@ export default function AddProductToCollectionForm({
                 min="0"
                 value={formData.purchase_price}
                 onChange={(e) => handleInputChange('purchase_price', e.target.value)}
-                className="w-full pl-7 pr-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full pl-7 pr-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 placeholder="0.00"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="purchased_at" className="block text-sm font-medium text-grey-700 mb-1">
+            <label htmlFor="purchased_at" className="block text-sm font-medium text-foreground mb-1">
               Purchase Date
             </label>
             <input
@@ -195,14 +195,14 @@ export default function AddProductToCollectionForm({
               id="purchased_at"
               value={formData.purchased_at}
               onChange={(e) => handleInputChange('purchased_at', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             />
           </div>
         </div>
 
         {/* Row 3: Notes (Full Width) */}
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="notes" className="block text-sm font-medium text-foreground mb-1">
             Notes
           </label>
           <textarea
@@ -210,7 +210,7 @@ export default function AddProductToCollectionForm({
             rows={2}
             value={formData.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             placeholder="Optional notes..."
           />
         </div>
@@ -222,7 +222,7 @@ export default function AddProductToCollectionForm({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 rounded-md hover:bg-grey-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-border text-foreground rounded-md hover:bg-accent transition-colors"
             disabled={isSubmitting}
           >
             Cancel

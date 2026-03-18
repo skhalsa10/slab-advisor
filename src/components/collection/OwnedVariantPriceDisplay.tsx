@@ -49,7 +49,7 @@ export function OwnedVariantPriceDisplay({
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-xs font-semibold text-grey-600 uppercase tracking-wide mb-1">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
               Current Market Value
             </p>
             <p
@@ -59,15 +59,15 @@ export function OwnedVariantPriceDisplay({
               {formatPrice(price)}
             </p>
             {hasMultiple && (
-              <p className="text-sm text-grey-700 mt-2 font-medium">
+              <p className="text-sm text-foreground mt-2 font-medium">
                 {formatPrice(price)} × {quantity} = {formatPrice(totalValue)}
               </p>
             )}
           </div>
 
           <div className="text-right ml-4">
-            <p className="text-xs font-medium text-grey-500 mb-1">Variant</p>
-            <p className="text-sm font-semibold text-grey-900">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Variant</p>
+            <p className="text-sm font-semibold text-foreground">
               {variantDisplay}
             </p>
           </div>
@@ -76,7 +76,7 @@ export function OwnedVariantPriceDisplay({
         {hasMultiple && (
           <div className="mt-3 pt-3 border-t border-green-200">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-medium text-grey-600">
+              <span className="text-xs font-medium text-muted-foreground">
                 Collection Total
               </span>
               <span className="text-lg font-bold text-green-700">

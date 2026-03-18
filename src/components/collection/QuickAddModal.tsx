@@ -137,7 +137,7 @@ export default function QuickAddModal({
   const CloseButton = () => (
     <button
       onClick={onClose}
-      className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+      className="text-muted-foreground hover:text-foreground transition-colors p-1"
       aria-label="Close"
     >
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -161,15 +161,15 @@ export default function QuickAddModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="quick-add-title"
-          className="fixed z-50 w-80 bg-white rounded-lg shadow-2xl border border-grey-200 overflow-hidden"
+          className="fixed z-50 w-80 bg-card rounded-lg shadow-2xl border border-border overflow-hidden"
           style={{
             top: popoverPosition.top,
             left: popoverPosition.left,
           }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-grey-200 bg-grey-50">
-            <h2 id="quick-add-title" className="text-sm font-semibold text-grey-900">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
+            <h2 id="quick-add-title" className="text-sm font-semibold text-foreground">
               {title}
             </h2>
             <CloseButton />
@@ -202,14 +202,14 @@ export default function QuickAddModal({
           className={`
             fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
             w-full max-w-sm mx-4
-            bg-white rounded-lg shadow-2xl overflow-hidden
+            bg-card rounded-lg shadow-2xl overflow-hidden
             transform transition-all duration-200 ease-out
             ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
           `}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-grey-200 bg-grey-50">
-            <h2 id="quick-add-title" className="text-sm font-semibold text-grey-900">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
+            <h2 id="quick-add-title" className="text-sm font-semibold text-foreground">
               {title}
             </h2>
             <CloseButton />
@@ -240,19 +240,19 @@ export default function QuickAddModal({
         aria-labelledby="quick-add-title"
         className={`
           fixed z-50 bottom-0 left-0 right-0
-          bg-white rounded-t-2xl shadow-2xl overflow-hidden
+          bg-card rounded-t-2xl shadow-2xl overflow-hidden
           transform transition-transform duration-300 ease-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}
       >
         {/* Handle bar */}
         <div className="flex justify-center pt-2 pb-1">
-          <div className="w-10 h-1 bg-grey-300 rounded-full"></div>
+          <div className="w-10 h-1 bg-muted-foreground rounded-full"></div>
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-2 border-b border-grey-200">
-          <h2 id="quick-add-title" className="text-base font-semibold text-grey-900">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+          <h2 id="quick-add-title" className="text-base font-semibold text-foreground">
             {title}
           </h2>
           <CloseButton />

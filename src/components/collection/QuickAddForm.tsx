@@ -116,9 +116,9 @@ export default function QuickAddForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Card Preview */}
-      <div className="flex items-center gap-3 pb-3 border-b border-grey-200">
+      <div className="flex items-center gap-3 pb-3 border-b border-border">
         {cardImage && (
-          <div className="relative w-12 h-16 flex-shrink-0 rounded overflow-hidden bg-grey-100">
+          <div className="relative w-12 h-16 flex-shrink-0 rounded overflow-hidden bg-secondary">
             <Image
               src={cardImage}
               alt={cardName}
@@ -129,8 +129,8 @@ export default function QuickAddForm({
           </div>
         )}
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold text-grey-900 truncate">{cardName}</h3>
-          <p className="text-xs text-grey-500">Add to your collection</p>
+          <h3 className="text-sm font-semibold text-foreground truncate">{cardName}</h3>
+          <p className="text-xs text-muted-foreground">Add to your collection</p>
         </div>
       </div>
 
@@ -138,14 +138,14 @@ export default function QuickAddForm({
       <div className="space-y-3">
         {/* Variant Selection */}
         <div>
-          <label htmlFor="quick-variant" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="quick-variant" className="block text-sm font-medium text-foreground mb-1">
             Variant
           </label>
           <select
             id="quick-variant"
             value={formData.variant}
             onChange={(e) => handleInputChange('variant', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             required
           >
             {availableVariants.map((variant) => (
@@ -158,17 +158,17 @@ export default function QuickAddForm({
 
         {/* Quantity */}
         <div>
-          <label htmlFor="quick-quantity" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="quick-quantity" className="block text-sm font-medium text-foreground mb-1">
             Quantity
           </label>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => handleInputChange('quantity', Math.max(1, formData.quantity - 1))}
-              className="w-8 h-8 flex items-center justify-center border border-grey-300 rounded-md hover:bg-grey-50 transition-colors"
+              className="w-8 h-8 flex items-center justify-center border border-border rounded-md hover:bg-accent transition-colors"
               disabled={formData.quantity <= 1}
             >
-              <svg className="w-4 h-4 text-grey-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
               </svg>
             </button>
@@ -178,15 +178,15 @@ export default function QuickAddForm({
               min="1"
               value={formData.quantity}
               onChange={(e) => handleInputChange('quantity', parseInt(e.target.value) || 1)}
-              className="w-16 px-3 py-2 text-sm text-center border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-16 px-3 py-2 text-sm text-center border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               required
             />
             <button
               type="button"
               onClick={() => handleInputChange('quantity', formData.quantity + 1)}
-              className="w-8 h-8 flex items-center justify-center border border-grey-300 rounded-md hover:bg-grey-50 transition-colors"
+              className="w-8 h-8 flex items-center justify-center border border-border rounded-md hover:bg-accent transition-colors"
             >
-              <svg className="w-4 h-4 text-grey-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </button>
@@ -195,14 +195,14 @@ export default function QuickAddForm({
 
         {/* Condition */}
         <div>
-          <label htmlFor="quick-condition" className="block text-sm font-medium text-grey-700 mb-1">
+          <label htmlFor="quick-condition" className="block text-sm font-medium text-foreground mb-1">
             Condition
           </label>
           <select
             id="quick-condition"
             value={formData.condition}
             onChange={(e) => handleInputChange('condition', e.target.value)}
-            className="w-full px-3 py-2 text-sm border border-grey-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="w-full px-3 py-2 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
           >
             {conditionOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -218,7 +218,7 @@ export default function QuickAddForm({
         <button
           type="button"
           onClick={onClose}
-          className="flex-1 px-3 py-2 text-sm border border-grey-300 text-grey-700 rounded-md hover:bg-grey-50 transition-colors"
+          className="flex-1 px-3 py-2 text-sm border border-border text-foreground rounded-md hover:bg-accent transition-colors"
           disabled={isSubmitting}
         >
           Cancel

@@ -4,7 +4,7 @@ export default function EmptySealedState() {
   return (
     <div className="text-center py-12">
       <svg
-        className="mx-auto h-12 w-12 text-grey-400"
+        className="mx-auto h-12 w-12 text-muted-foreground"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -17,10 +17,10 @@ export default function EmptySealedState() {
         />
       </svg>
 
-      <h3 className="mt-2 text-sm font-medium text-grey-900">
+      <h3 className="mt-2 text-sm font-medium text-foreground">
         No sealed products yet
       </h3>
-      <p className="mt-1 text-sm text-grey-500">
+      <p className="mt-1 text-sm text-muted-foreground">
         Sealed products will appear here once added. Browse sets to add products
         to your collection.
       </p>
