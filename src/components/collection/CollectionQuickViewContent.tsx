@@ -105,15 +105,15 @@ export default function CollectionQuickViewContent({
             
             {/* Collection-specific Details */}
             <div className="border-t pt-3">
-              <h4 className="text-sm font-semibold text-grey-900 mb-2">Your Collection</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-2">Your Collection</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-grey-600">Quantity</span>
+                  <span className="text-muted-foreground">Quantity</span>
                   <span className="font-medium">{card.quantity || 1}</span>
                 </div>
                 {card.variant && (
                   <div className="flex justify-between">
-                    <span className="text-grey-600">Variant</span>
+                    <span className="text-muted-foreground">Variant</span>
                     <span className="font-medium capitalize">
                       {(() => {
                         const baseVariant = card.variant.replace('_', ' ')
@@ -134,13 +134,13 @@ export default function CollectionQuickViewContent({
                 )}
                 {card.condition && (
                   <div className="flex justify-between">
-                    <span className="text-grey-600">Condition</span>
+                    <span className="text-muted-foreground">Condition</span>
                     <span className="font-medium">{card.condition}</span>
                   </div>
                 )}
                 {card.acquisition_price !== null && (
                   <div className="flex justify-between">
-                    <span className="text-grey-600">Purchase Price</span>
+                    <span className="text-muted-foreground">Purchase Price</span>
                     <span className="font-medium text-green-600">
                       ${card.acquisition_price.toFixed(2)}
                     </span>
@@ -148,7 +148,7 @@ export default function CollectionQuickViewContent({
                 )}
                 {card.acquisition_date && (
                   <div className="flex justify-between">
-                    <span className="text-grey-600">Purchase Date</span>
+                    <span className="text-muted-foreground">Purchase Date</span>
                     <span className="font-medium">
                       {new Date(card.acquisition_date).toLocaleDateString()}
                     </span>
@@ -156,7 +156,7 @@ export default function CollectionQuickViewContent({
                 )}
                 {card.created_at && (
                   <div className="flex justify-between">
-                    <span className="text-grey-600">Added to Collection</span>
+                    <span className="text-muted-foreground">Added to Collection</span>
                     <span className="font-medium">
                       {new Date(card.created_at).toLocaleDateString()}
                     </span>
@@ -164,8 +164,8 @@ export default function CollectionQuickViewContent({
                 )}
                 {card.notes && (
                   <div>
-                    <span className="text-grey-600">Notes</span>
-                    <p className="mt-1 text-grey-900">{card.notes}</p>
+                    <span className="text-muted-foreground">Notes</span>
+                    <p className="mt-1 text-foreground">{card.notes}</p>
                   </div>
                 )}
               </div>
@@ -269,8 +269,8 @@ function PokemonDetailsCollection({
   return (
     <div className="space-y-3">
       <div>
-        <h3 className="text-base font-semibold text-grey-900 mb-1">{card.name}</h3>
-        <p className="text-sm text-grey-600">
+        <h3 className="text-base font-semibold text-foreground mb-1">{card.name}</h3>
+        <p className="text-sm text-muted-foreground">
           {card.set?.name || 'Unknown Set'} • #{card.local_id || 'No Number'}
         </p>
       </div>
@@ -279,22 +279,22 @@ function PokemonDetailsCollection({
       <div className="grid grid-cols-2 gap-3 text-sm lg:space-y-2 lg:block">
         {card.category && (
           <div className="lg:flex lg:justify-between">
-            <p className="font-medium text-grey-500">Category</p>
-            <p className="text-grey-900">{card.category}</p>
+            <p className="font-medium text-muted-foreground">Category</p>
+            <p className="text-foreground">{card.category}</p>
           </div>
         )}
 
         {card.rarity && (
           <div className="lg:flex lg:justify-between">
-            <p className="font-medium text-grey-500">Rarity</p>
-            <p className="text-grey-900">{card.rarity}</p>
+            <p className="font-medium text-muted-foreground">Rarity</p>
+            <p className="text-foreground">{card.rarity}</p>
           </div>
         )}
 
         {card.illustrator && (
           <div className="col-span-2 lg:flex lg:justify-between">
-            <p className="font-medium text-grey-500">Illustrator</p>
-            <p className="text-grey-900 lg:truncate lg:ml-2">{card.illustrator}</p>
+            <p className="font-medium text-muted-foreground">Illustrator</p>
+            <p className="text-foreground lg:truncate lg:ml-2">{card.illustrator}</p>
           </div>
         )}
       </div>
@@ -311,7 +311,7 @@ function PokemonDetailsCollection({
 
       {variantPrice === null && (
         <div className="border-t pt-4 mt-4">
-          <p className="text-sm text-grey-500 italic text-center">
+          <p className="text-sm text-muted-foreground italic text-center">
             Price data unavailable for this variant
           </p>
         </div>

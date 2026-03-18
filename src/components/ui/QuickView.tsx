@@ -191,7 +191,7 @@ export default function QuickView({
     if (!adjacentCards.prevCard && !adjacentCards.nextCard) return null
 
     return (
-      <div className="flex-shrink-0 bg-white border-t border-grey-200 px-4 py-3">
+      <div className="flex-shrink-0 bg-card border-t border-border px-4 py-3">
         <div className="flex items-center justify-between">
           <button
             onClick={() => adjacentCards.prevCard && handleNavigateToCard(adjacentCards.prevCard.id)}
@@ -199,7 +199,7 @@ export default function QuickView({
             className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               adjacentCards.prevCard
                 ? 'text-orange-600 hover:bg-orange-50'
-                : 'text-grey-300 cursor-not-allowed'
+                : 'text-muted-foreground/50 cursor-not-allowed'
             }`}
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -214,7 +214,7 @@ export default function QuickView({
             className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               adjacentCards.nextCard
                 ? 'text-orange-600 hover:bg-orange-50'
-                : 'text-grey-300 cursor-not-allowed'
+                : 'text-muted-foreground/50 cursor-not-allowed'
             }`}
           >
             <span>Next</span>
@@ -253,13 +253,13 @@ export default function QuickView({
 
         {/* Side Sheet */}
         <div
-          className="fixed top-0 right-0 h-screen w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col"
+          className="fixed top-0 right-0 h-screen w-96 bg-card shadow-2xl z-50 transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col"
           style={{ boxShadow: '-4px 0 24px rgba(0, 0, 0, 0.15)' }}
         >
           {/* Header - Close button only, or with title */}
-          <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
+          <div className="flex-shrink-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
             {showTitle && title ? (
-              <h2 className="text-lg font-semibold text-grey-900 truncate">
+              <h2 className="text-lg font-semibold text-foreground truncate">
                 {title}
               </h2>
             ) : (
@@ -267,7 +267,7 @@ export default function QuickView({
             )}
             <button
               onClick={onClose}
-              className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+              className="text-muted-foreground hover:text-accent-foreground transition-colors p-1"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -306,15 +306,15 @@ export default function QuickView({
         {/* Center Modal */}
         <div className={`fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
           w-full max-w-xl rounded-lg max-h-[90vh]
-          bg-white shadow-2xl overflow-hidden flex flex-col
+          bg-card shadow-2xl overflow-hidden flex flex-col
           transform transition-all duration-300 ease-out ${
           isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}>
 
           {/* Header - Close button only, or with title */}
-          <div className="flex-shrink-0 bg-white border-b border-grey-200 px-4 py-3 flex items-center justify-between">
+          <div className="flex-shrink-0 bg-card border-b border-border px-4 py-3 flex items-center justify-between">
             {showTitle && title ? (
-              <h2 className="text-lg font-semibold text-grey-900 truncate">
+              <h2 className="text-lg font-semibold text-foreground truncate">
                 {title}
               </h2>
             ) : (
@@ -322,7 +322,7 @@ export default function QuickView({
             )}
             <button
               onClick={onClose}
-              className="text-grey-400 hover:text-grey-600 transition-colors p-1"
+              className="text-muted-foreground hover:text-accent-foreground transition-colors p-1"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -357,7 +357,7 @@ export default function QuickView({
       {/* Bottom Sheet Container */}
       <div className={`fixed z-50 bottom-0 left-0 right-0
         rounded-t-2xl max-h-[92vh]
-        bg-white shadow-2xl flex flex-col
+        bg-card shadow-2xl flex flex-col
         transform transition-transform duration-300 ease-out ${
         isOpen ? 'translate-y-0' : 'translate-y-full'
       }`}>
@@ -366,12 +366,12 @@ export default function QuickView({
         <div className="flex-shrink-0 relative">
           {/* Centered handle */}
           <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-grey-300 rounded-full"></div>
+            <div className="w-10 h-1 bg-muted-foreground/50 rounded-full"></div>
           </div>
           {/* Close button - absolute positioned top right */}
           <button
             onClick={onClose}
-            className="absolute top-2 right-3 text-grey-400 hover:text-grey-600 transition-colors p-1"
+            className="absolute top-2 right-3 text-muted-foreground hover:text-accent-foreground transition-colors p-1"
             aria-label="Close"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

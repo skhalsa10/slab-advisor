@@ -62,14 +62,14 @@ export default function SealedProductGridItem({
 
   return (
     <div
-      className={`group relative bg-white rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
+      className={`group relative bg-card rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
         isSelected
           ? 'border-orange-500 ring-2 ring-orange-500 ring-offset-1'
-          : 'border-grey-200 hover:border-orange-300 hover:shadow-lg'
+          : 'border-border hover:border-orange-300 hover:shadow-lg'
       }`}
       onClick={handleClick}
     >
-      <div className="aspect-[2.5/3.5] relative bg-grey-100">
+      <div className="aspect-[2.5/3.5] relative bg-muted">
         <Image
           src={getProductImageUrl(product)}
           alt={getProductDisplayName(product)}
@@ -97,7 +97,7 @@ export default function SealedProductGridItem({
         {/* Top-left: Quantity badge (only if > 1) — shifts right when checkbox visible */}
         {quantity > 1 && (
           <div className={`absolute top-2 ${isSelectionMode ? 'left-10' : 'left-2'} transition-all`}>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-900 text-white shadow-sm">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-foreground text-background shadow-sm">
               x{quantity}
             </span>
           </div>
@@ -116,7 +116,7 @@ export default function SealedProductGridItem({
       </div>
 
       <div className="p-2">
-        <h3 className="text-xs font-medium text-grey-900 truncate">
+        <h3 className="text-xs font-medium text-card-foreground truncate">
           {getProductDisplayName(product)}
         </h3>
         <p className="text-xs font-semibold text-green-600 mt-1">
@@ -124,7 +124,7 @@ export default function SealedProductGridItem({
         </p>
         {/* Unit price shown when quantity > 1 */}
         {quantity > 1 && marketPrice !== null && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             (${marketPrice.toFixed(2)} / ea)
           </p>
         )}

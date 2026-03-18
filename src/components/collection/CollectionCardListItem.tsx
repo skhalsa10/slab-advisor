@@ -63,8 +63,8 @@ export default function CollectionCardListItem({
     <tr
       className={`cursor-pointer transition-colors ${
         isSelected
-          ? 'bg-orange-50 hover:bg-orange-100'
-          : 'hover:bg-grey-50'
+          ? 'bg-orange-500/10 hover:bg-orange-500/15'
+          : 'hover:bg-accent'
       }`}
       onClick={handleClick}
     >
@@ -75,7 +75,7 @@ export default function CollectionCardListItem({
             className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
               isSelected
                 ? 'bg-orange-500 border-2 border-orange-500'
-                : 'border-2 border-grey-300 bg-white'
+                : 'border-2 border-border bg-card'
             }`}
           >
             {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -96,10 +96,10 @@ export default function CollectionCardListItem({
             />
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-grey-900">
+            <div className="text-sm font-medium text-foreground">
               {getCardDisplayName(card)}
             </div>
-            <div className="text-sm text-grey-500">
+            <div className="text-sm text-muted-foreground">
               Added {formatDate(card.created_at)}
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function CollectionCardListItem({
             {variant.text}
           </span>
         ) : (
-          <span className="text-sm text-grey-500">-</span>
+          <span className="text-sm text-muted-foreground">-</span>
         )}
       </td>
 
@@ -124,14 +124,14 @@ export default function CollectionCardListItem({
             {condition.text}
           </span>
         ) : (
-          <span className="text-sm text-grey-500">-</span>
+          <span className="text-sm text-muted-foreground">-</span>
         )}
       </td>
 
       {/* Quantity column */}
       <td className="px-6 py-4 whitespace-nowrap text-center">
         {quantity.text === '1' ? (
-          <span className="text-sm text-grey-500">1</span>
+          <span className="text-sm text-muted-foreground">1</span>
         ) : (
           <span className={`${badgeClasses} bg-blue-100 text-blue-800 font-semibold`}>
             {quantity.text}
@@ -154,7 +154,7 @@ export default function CollectionCardListItem({
       </td>
 
       {/* Added column */}
-      <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
         {formatDate(card.created_at)}
       </td>
 

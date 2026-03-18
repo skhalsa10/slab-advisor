@@ -57,7 +57,7 @@ export default function CollectionCardActions({
   if (isEditing) {
     return (
       <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-grey-900">Edit Card Details</h4>
+        <h4 className="text-sm font-semibold text-foreground">Edit Card Details</h4>
         <EditCollectionForm
           card={card}
           onSave={handleSave}

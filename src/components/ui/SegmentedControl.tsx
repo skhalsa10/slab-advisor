@@ -64,7 +64,7 @@ export default function SegmentedControl<T extends string>({
 
   return (
     <div
-      className={`${widthClasses} bg-grey-100 rounded-lg ${containerPadding[size]} ${className}`}
+      className={`${widthClasses} bg-muted rounded-lg ${containerPadding[size]} ${className}`}
       role="radiogroup"
       aria-label={ariaLabel}
     >
@@ -80,8 +80,8 @@ export default function SegmentedControl<T extends string>({
               ${fullWidthMobile ? 'flex-1 text-center' : ''}
               rounded-md font-medium transition-all duration-150
               ${isActive
-                ? 'bg-white text-grey-900 shadow-sm'
-                : 'text-grey-500 hover:text-grey-700'
+                ? 'bg-card text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
               }
             `}
             role="radio"

@@ -125,7 +125,7 @@ export default function CollectionProductQuickViewContent({
                 alt={getProductDisplayName(product)}
                 width={240}
                 height={336}
-                className="w-full h-auto rounded-lg shadow-md object-contain bg-grey-100"
+                className="w-full h-auto rounded-lg shadow-md object-contain bg-muted"
                 priority
               />
             </div>
@@ -136,26 +136,26 @@ export default function CollectionProductQuickViewContent({
             {/* Product Information */}
             <div className="space-y-3">
               <div>
-                <h3 className="text-base font-semibold text-grey-900 mb-1">
+                <h3 className="text-base font-semibold text-foreground mb-1">
                   {getProductDisplayName(product)}
                 </h3>
-                <p className="text-sm text-grey-600">
+                <p className="text-sm text-muted-foreground">
                   {getProductSetName(product)}
                 </p>
               </div>
 
               {/* Price Info */}
               {marketPrice !== null && (
-                <div className="bg-grey-50 rounded-lg p-3">
+                <div className="bg-muted/50 rounded-lg p-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-grey-600">Market Price</span>
-                    <span className="text-sm font-medium text-grey-900">
+                    <span className="text-sm text-muted-foreground">Market Price</span>
+                    <span className="text-sm font-medium text-foreground">
                       ${marketPrice.toFixed(2)}
                     </span>
                   </div>
                   {quantity > 1 && totalValue !== null && (
-                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-grey-200">
-                      <span className="text-sm text-grey-600">
+                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-border">
+                      <span className="text-sm text-muted-foreground">
                         Total Value ({quantity}x)
                       </span>
                       <span className="text-sm font-semibold text-green-600">
@@ -179,17 +179,17 @@ export default function CollectionProductQuickViewContent({
               <>
                 {/* Collection-specific Details */}
                 <div className="border-t pt-3">
-                  <h4 className="text-sm font-semibold text-grey-900 mb-2">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">
                     Your Collection
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-grey-600">Quantity</span>
+                      <span className="text-muted-foreground">Quantity</span>
                       <span className="font-medium">{quantity}</span>
                     </div>
                     {product.condition && (
                       <div className="flex justify-between">
-                        <span className="text-grey-600">Condition</span>
+                        <span className="text-muted-foreground">Condition</span>
                         <span className="font-medium">
                           {formatProductCondition(product.condition)}
                         </span>
@@ -197,7 +197,7 @@ export default function CollectionProductQuickViewContent({
                     )}
                     {product.purchase_price !== null && (
                       <div className="flex justify-between">
-                        <span className="text-grey-600">Purchase Price</span>
+                        <span className="text-muted-foreground">Purchase Price</span>
                         <span className="font-medium text-green-600">
                           ${product.purchase_price.toFixed(2)}
                         </span>
@@ -205,7 +205,7 @@ export default function CollectionProductQuickViewContent({
                     )}
                     {product.purchased_at && (
                       <div className="flex justify-between">
-                        <span className="text-grey-600">Purchase Date</span>
+                        <span className="text-muted-foreground">Purchase Date</span>
                         <span className="font-medium">
                           {new Date(product.purchased_at).toLocaleDateString()}
                         </span>
@@ -213,7 +213,7 @@ export default function CollectionProductQuickViewContent({
                     )}
                     {product.created_at && (
                       <div className="flex justify-between">
-                        <span className="text-grey-600">Added to Collection</span>
+                        <span className="text-muted-foreground">Added to Collection</span>
                         <span className="font-medium">
                           {new Date(product.created_at).toLocaleDateString()}
                         </span>
@@ -221,8 +221,8 @@ export default function CollectionProductQuickViewContent({
                     )}
                     {product.notes && (
                       <div>
-                        <span className="text-grey-600">Notes</span>
-                        <p className="mt-1 text-grey-900">{product.notes}</p>
+                        <span className="text-muted-foreground">Notes</span>
+                        <p className="mt-1 text-foreground">{product.notes}</p>
                       </div>
                     )}
                   </div>

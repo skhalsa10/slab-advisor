@@ -38,14 +38,14 @@ export default function DeleteBinderDialog({
 
       {/* Dialog */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4">
-        <div className="bg-white rounded-lg shadow-xl p-6">
-          <h3 className="text-lg font-semibold text-grey-900">
+        <div className="bg-card rounded-lg shadow-xl p-6">
+          <h3 className="text-lg font-semibold text-foreground">
             Delete Binder?
           </h3>
-          <p className="mt-2 text-sm text-grey-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             Are you sure you want to delete <span className="font-medium">{binderName}</span>?
           </p>
-          <p className="mt-1 text-sm text-grey-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Cards in this binder will not be deleted from your collection.
           </p>
 
@@ -54,7 +54,7 @@ export default function DeleteBinderDialog({
               type="button"
               onClick={onCancel}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>

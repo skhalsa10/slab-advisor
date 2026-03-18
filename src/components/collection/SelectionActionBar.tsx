@@ -41,16 +41,16 @@ export default function SelectionActionBar({
       {/* Mobile: stacked two-row layout / Desktop: single-row pill */}
       <div
         className={[
-          'bg-white shadow-xl',
+          'bg-card shadow-xl',
           // Mobile: dock shape
-          'border-t border-grey-200 rounded-t-xl px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)]',
+          'border-t border-border rounded-t-xl px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)]',
           // Desktop: pill shape, single row
           'md:flex md:items-center md:border md:rounded-full md:px-5 md:py-3 md:pb-3 md:gap-3'
         ].join(' ')}
       >
         {/* Row 1 on mobile: count + select all */}
         <div className="flex items-center justify-between mb-3 md:mb-0 md:gap-2 md:flex-shrink-0">
-          <span className="text-sm font-semibold text-grey-900 whitespace-nowrap">
+          <span className="text-sm font-semibold text-foreground whitespace-nowrap">
             {selectedCount} selected
           </span>
           <button
@@ -62,7 +62,7 @@ export default function SelectionActionBar({
         </div>
 
         {/* Divider — desktop only */}
-        <div className="hidden md:block w-px h-6 bg-grey-200 flex-shrink-0" />
+        <div className="hidden md:block w-px h-6 bg-border flex-shrink-0" />
 
         {/* Row 2 on mobile: action buttons / Desktop: inline buttons */}
         <div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export default function SelectionActionBar({
           {collectionType === 'cards' && isCustomBinder && (
             <button
               onClick={onRemoveFromBinder}
-              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 text-sm font-medium text-grey-700 border border-grey-300 hover:bg-grey-50 rounded-full transition-colors whitespace-nowrap"
+              className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 text-sm font-medium text-foreground border border-border hover:bg-accent rounded-full transition-colors whitespace-nowrap"
             >
               <FolderMinus className="w-4 h-4 flex-shrink-0" />
               <span className="hidden sm:inline">Remove</span>
@@ -92,7 +92,7 @@ export default function SelectionActionBar({
           {/* Delete */}
           <button
             onClick={onDelete}
-            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 text-sm font-medium text-red-600 border border-grey-300 hover:bg-red-50 hover:border-red-300 rounded-full transition-colors whitespace-nowrap"
+            className="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 md:py-1.5 text-sm font-medium text-red-600 border border-border hover:bg-red-50 hover:border-red-300 rounded-full transition-colors whitespace-nowrap"
           >
             <Trash2 className="w-4 h-4 flex-shrink-0" />
             Delete

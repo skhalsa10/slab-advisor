@@ -48,15 +48,15 @@ export default function BinderSwitcher({
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'flex items-center gap-1.5 text-2xl font-bold text-grey-900',
-              'hover:bg-grey-100 rounded-lg px-2 py-1 -ml-2',
+              'flex items-center gap-1.5 text-2xl font-bold text-foreground',
+              'hover:bg-accent rounded-lg px-2 py-1 -ml-2',
               'transition-colors duration-150',
               'focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2'
             )}
             aria-label="Switch binder"
           >
             {activeBinder.name}
-            <ChevronDown className="h-5 w-5 text-grey-400" />
+            <ChevronDown className="h-5 w-5 text-muted-foreground" />
           </button>
         </DropdownMenuTrigger>
 
@@ -109,7 +109,7 @@ export default function BinderSwitcher({
         <DropdownMenu open={settingsOpen} onOpenChange={setSettingsOpen}>
           <DropdownMenuTrigger asChild>
             <button
-              className="p-1.5 text-grey-400 hover:text-grey-600 hover:bg-grey-100 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+              className="p-1.5 text-muted-foreground hover:text-accent-foreground hover:bg-accent rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
               aria-label={`Settings for ${activeBinder.name}`}
             >
               <svg

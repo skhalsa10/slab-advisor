@@ -53,7 +53,7 @@ export default function CollectionHeader({
   ]
 
   return (
-    <div className="sticky top-0 z-20 bg-grey-50 pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
+    <div className="sticky top-0 z-20 bg-background pt-4 pb-6 mb-6 -mx-4 px-4 md:-mx-8 md:px-8">
       {/* Header with binder switcher and count */}
       <div className="mb-4">
         <BinderSwitcher
@@ -64,7 +64,7 @@ export default function CollectionHeader({
           onRenameBinder={onRenameBinder}
           onDeleteBinder={onDeleteBinder}
         />
-        <p className="mt-1 text-sm text-grey-600">
+        <p className="mt-1 text-sm text-muted-foreground">
           {cardCount} {cardCount === 1 ? 'card' : 'cards'}
           {productCount > 0 && (
             <span>
@@ -103,8 +103,8 @@ export default function CollectionHeader({
             onClick={onToggleSelectionMode}
             className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               isSelectionMode
-                ? 'text-grey-700 border border-grey-300 hover:bg-grey-50'
-                : 'text-grey-700 border border-grey-300 hover:bg-grey-50'
+                ? 'text-foreground border border-border hover:bg-accent'
+                : 'text-foreground border border-border hover:bg-accent'
             }`}
           >
             {isSelectionMode ? (

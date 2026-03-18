@@ -76,8 +76,8 @@ export default function RenameBinderDialog({
 
       {/* Dialog */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4">
-        <div className="bg-white rounded-lg shadow-xl p-6">
-          <h3 className="text-lg font-semibold text-grey-900 mb-4">
+        <div className="bg-card rounded-lg shadow-xl p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             Rename Binder
           </h3>
 
@@ -85,7 +85,7 @@ export default function RenameBinderDialog({
             <div className="mb-4">
               <label
                 htmlFor="binder-rename"
-                className="block text-sm font-medium text-grey-700 mb-1"
+                className="block text-sm font-medium text-foreground mb-1"
               >
                 Binder Name
               </label>
@@ -100,7 +100,7 @@ export default function RenameBinderDialog({
                 }}
                 maxLength={100}
                 disabled={isRenaming}
-                className="w-full px-3 py-2 border border-grey-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
             </div>
@@ -110,7 +110,7 @@ export default function RenameBinderDialog({
                 type="button"
                 onClick={onCancel}
                 disabled={isRenaming}
-                className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>

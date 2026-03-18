@@ -29,12 +29,12 @@ export default function ItemList<T>({
   }
 
   return (
-    <div className={`bg-white shadow-md rounded-lg overflow-x-auto ${className}`}>
-      <table className="min-w-full divide-y divide-grey-200">
-        <thead className="bg-grey-50 sticky top-0">
+    <div className={`bg-card shadow-md rounded-lg overflow-x-auto ${className}`}>
+      <table className="min-w-full divide-y divide-border">
+        <thead className="bg-muted/50 sticky top-0">
           {renderHeader()}
         </thead>
-        <tbody className="bg-white divide-y divide-grey-200">
+        <tbody className="bg-card divide-y divide-border">
           {items.map((item, index) => renderRow(item, index))}
         </tbody>
       </table>

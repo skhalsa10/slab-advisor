@@ -441,7 +441,7 @@ export default function CollectionClient({
   }
 
   const isCustomBinder = !activeBinder.is_default
-  const thClasses = 'px-6 py-3 text-left text-xs font-medium text-grey-500 uppercase tracking-wider'
+  const thClasses = 'px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'
 
   return (
     <div>
@@ -469,8 +469,8 @@ export default function CollectionClient({
           {/* Empty binder state (only for custom binders with no cards) */}
           {filteredCardList.length === 0 && !activeBinder.is_default ? (
             <div className="text-center py-12">
-              <p className="text-grey-500 text-lg">This binder is empty</p>
-              <p className="text-grey-400 text-sm mt-1">
+              <p className="text-muted-foreground text-lg">This binder is empty</p>
+              <p className="text-muted-foreground text-sm mt-1">
                 Add cards to this binder from your collection
               </p>
             </div>
@@ -639,11 +639,11 @@ export default function CollectionClient({
             onClick={() => setShowBulkDeleteConfirm(false)}
           />
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4">
-            <div className="bg-white rounded-lg shadow-xl p-6">
-              <h3 className="text-lg font-semibold text-grey-900">
+            <div className="bg-card rounded-lg shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-foreground">
                 Delete {selectedIds.size} {collectionType === 'cards' ? (selectedIds.size === 1 ? 'card' : 'cards') : (selectedIds.size === 1 ? 'product' : 'products')}?
               </h3>
-              <p className="mt-2 text-sm text-grey-600">
+              <p className="mt-2 text-sm text-muted-foreground">
                 This will permanently remove {selectedIds.size === 1 ? 'this item' : 'these items'} from your collection.
                 This action cannot be undone.
               </p>
@@ -653,7 +653,7 @@ export default function CollectionClient({
                   type="button"
                   onClick={() => setShowBulkDeleteConfirm(false)}
                   disabled={isBulkActionLoading}
-                  className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>

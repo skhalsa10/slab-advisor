@@ -78,8 +78,8 @@ export default function SealedProductListItem({
     <tr
       className={`cursor-pointer transition-colors ${
         isSelected
-          ? 'bg-orange-50 hover:bg-orange-100'
-          : 'hover:bg-grey-50'
+          ? 'bg-orange-500/10 hover:bg-orange-500/15'
+          : 'hover:bg-accent'
       }`}
       onClick={handleClick}
     >
@@ -90,7 +90,7 @@ export default function SealedProductListItem({
             className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
               isSelected
                 ? 'bg-orange-500 border-2 border-orange-500'
-                : 'border-2 border-grey-300 bg-white'
+                : 'border-2 border-border bg-card'
             }`}
           >
             {isSelected && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -111,10 +111,10 @@ export default function SealedProductListItem({
             />
           </div>
           <div className="ml-4">
-            <div className="text-sm font-medium text-grey-900">
+            <div className="text-sm font-medium text-foreground">
               {getProductDisplayName(product)}
             </div>
-            <div className="text-sm text-grey-500">
+            <div className="text-sm text-muted-foreground">
               {getProductSetName(product)}
             </div>
           </div>
@@ -133,10 +133,10 @@ export default function SealedProductListItem({
       {/* Quantity column */}
       <td className="px-6 py-4 whitespace-nowrap text-center">
         {quantity === 1 ? (
-          <span className="text-sm text-grey-500">1</span>
+          <span className="text-sm text-muted-foreground">1</span>
         ) : (
           <span
-            className={`${badgeClasses} bg-gray-900 text-white font-semibold`}
+            className={`${badgeClasses} bg-foreground text-background font-semibold`}
           >
             x{quantity}
           </span>
@@ -146,7 +146,7 @@ export default function SealedProductListItem({
       {/* Cost Basis column */}
       <td className="px-6 py-4 whitespace-nowrap text-right">
         {hasCostBasis ? (
-          <span className="text-sm text-grey-700">
+          <span className="text-sm text-foreground">
             {formatCurrency(purchasePrice)}
           </span>
         ) : (
@@ -155,7 +155,7 @@ export default function SealedProductListItem({
               e.stopPropagation()
               onViewProduct()
             }}
-            className="px-2 py-0.5 bg-grey-100 text-grey-600 text-xs rounded-full hover:bg-grey-200 transition-colors"
+            className="px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full hover:bg-accent transition-colors"
           >
             Add Cost
           </button>
@@ -164,7 +164,7 @@ export default function SealedProductListItem({
 
       {/* Market Price column */}
       <td className="px-6 py-4 whitespace-nowrap text-right">
-        <span className="text-sm text-grey-700">
+        <span className="text-sm text-foreground">
           {formatCurrency(marketPrice)}
         </span>
       </td>
@@ -195,7 +195,7 @@ export default function SealedProductListItem({
               e.stopPropagation()
               onViewProduct()
             }}
-            className="px-2 py-0.5 bg-grey-100 text-grey-600 text-xs rounded-full hover:bg-grey-200 transition-colors"
+            className="px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full hover:bg-accent transition-colors"
           >
             Add Cost
           </button>

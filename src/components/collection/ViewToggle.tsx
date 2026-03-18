@@ -9,13 +9,13 @@ interface ViewToggleProps {
 
 export default function ViewToggle({ viewMode, onViewModeChange }: ViewToggleProps) {
   return (
-    <div className="flex items-center bg-grey-100 rounded-lg p-1">
+    <div className="flex items-center bg-muted rounded-lg p-1">
       <button
         onClick={() => onViewModeChange('grid')}
         className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           viewMode === 'grid'
-            ? 'bg-white text-grey-900 shadow-sm'
-            : 'text-grey-600 hover:text-grey-900'
+            ? 'bg-card text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
         aria-label="Grid view"
       >
@@ -34,8 +34,8 @@ export default function ViewToggle({ viewMode, onViewModeChange }: ViewTogglePro
         onClick={() => onViewModeChange('list')}
         className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
           viewMode === 'list'
-            ? 'bg-white text-grey-900 shadow-sm'
-            : 'text-grey-600 hover:text-grey-900'
+            ? 'bg-card text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
         }`}
         aria-label="List view"
       >

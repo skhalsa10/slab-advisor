@@ -59,10 +59,10 @@ export default function CollectionCardGridItem({
 
   return (
     <div
-      className={`group relative bg-white rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
+      className={`group relative bg-card rounded-lg overflow-hidden border transition-all duration-200 cursor-pointer ${
         isSelected
           ? 'border-orange-500 ring-2 ring-orange-500 ring-offset-1'
-          : 'border-grey-200 hover:border-orange-300 hover:shadow-lg'
+          : 'border-border hover:border-orange-300 hover:shadow-lg'
       }`}
       onClick={handleClick}
     >
@@ -122,7 +122,7 @@ export default function CollectionCardGridItem({
       </div>
 
       <div className="p-2">
-        <h3 className="text-xs font-medium text-grey-900 truncate">
+        <h3 className="text-xs font-medium text-card-foreground truncate">
           {getCardDisplayName(card)}
         </h3>
         <p className="text-xs font-semibold text-green-600 mt-1">

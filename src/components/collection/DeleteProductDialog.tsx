@@ -48,7 +48,7 @@ export default function DeleteProductDialog({
 
       {/* Dialog */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-xl p-6">
+        <div className="bg-card rounded-lg shadow-xl p-6">
           {/* Header */}
           <div className="flex items-start gap-4 mb-4">
             {productImage && productImage !== '/product-placeholder.svg' && (
@@ -63,10 +63,10 @@ export default function DeleteProductDialog({
               </div>
             )}
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-grey-900">
+              <h3 className="text-lg font-semibold text-foreground">
                 Remove from Collection?
               </h3>
-              <p className="mt-2 text-sm text-grey-600">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Are you sure you want to remove{' '}
                 <span className="font-medium">{productName}</span>
                 {quantity > 1 && ` (${quantity} units)`} from your collection?
@@ -83,7 +83,7 @@ export default function DeleteProductDialog({
               type="button"
               onClick={onCancel}
               disabled={isDeleting}
-              className="flex-1 px-4 py-2 border border-grey-300 text-grey-700 text-sm font-medium rounded-md hover:bg-grey-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
