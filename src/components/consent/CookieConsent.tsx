@@ -68,16 +68,16 @@ export default function CookieConsent() {
       }`}
     >
       <div className="mx-auto max-w-4xl p-4">
-        <div className="rounded-lg border border-neutral-200 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+        <div className="rounded-lg border border-border bg-card p-4 shadow-lg">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Message */}
             <div className="flex-1">
-              <p className="text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="text-sm text-muted-foreground">
                 We use analytics to understand how you use Slab Advisor and improve your experience.
                 {' '}
                 <a
                   href="/privacy"
-                  className="text-blue-600 underline hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                  className="font-medium text-foreground underline hover:opacity-80"
                 >
                   Privacy Policy
                 </a>
@@ -88,13 +88,13 @@ export default function CookieConsent() {
             <div className="flex gap-2 sm:flex-shrink-0">
               <button
                 onClick={handleDecline}
-                className="rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
               >
                 Decline
               </button>
               <button
                 onClick={handleAccept}
-                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
                 Accept
               </button>
