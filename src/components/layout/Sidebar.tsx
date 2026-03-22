@@ -82,9 +82,9 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     <button
                       key={item.name}
                       onClick={() => handleNavigationClick(item)}
-                      className="w-full border-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-white group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors"
+                      className="w-full border-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors"
                     >
-                      <span className="mr-3 text-sidebar-foreground group-hover:text-white transition-colors">{item.icon}</span>
+                      <span className="mr-3 text-sidebar-foreground group-hover:text-sidebar-accent-foreground transition-colors">{item.icon}</span>
                       {item.name}
                     </button>
                   )
@@ -97,7 +97,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                     className={`${
                       isActiveLink(item.href)
                         ? 'bg-sidebar-accent border-orange-500 text-orange-400'
-                        : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-white'
+                        : 'border-transparent text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                     } group flex items-center px-3 py-2 text-sm font-medium border-l-4 transition-colors`}
                   >
                     <span className="mr-3">{item.icon}</span>
@@ -138,7 +138,7 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
             <div className="flex items-center">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-md text-sidebar-foreground hover:text-white hover:bg-sidebar-accent transition-colors focus:outline-none"
+                className="p-2 rounded-md text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors focus:outline-none"
               >
                 {mobileMenuOpen ? (
                   <X className="h-6 w-6" aria-hidden="true" />
@@ -162,9 +162,9 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                           handleNavigationClick(item)
                           setMobileMenuOpen(false)
                         }}
-                        className="w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-white flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors"
+                        className="w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors"
                       >
-                        <span className="mr-3 text-sidebar-foreground group-hover:text-white transition-colors">{item.icon}</span>
+                        <span className="mr-3 text-sidebar-foreground group-hover:text-sidebar-accent-foreground transition-colors">{item.icon}</span>
                         {item.name}
                       </button>
                     )
@@ -177,12 +177,12 @@ export default function Sidebar({ onSignOut }: SidebarProps) {
                       className={`${
                         isActiveLink(item.href)
                           ? 'bg-sidebar-accent text-orange-400'
-                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-white'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                       } flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className={`mr-3 transition-colors ${
-                        isActiveLink(item.href) ? 'text-orange-400' : 'text-sidebar-foreground group-hover:text-white'
+                        isActiveLink(item.href) ? 'text-orange-400' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
                       }`}>
                         {item.icon}
                       </span>
