@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 15.3.4 application using TypeScript, React 19, and Tailwind CSS v4. The project was bootstrapped with create-next-app and uses the App Router architecture.
+This is a Next.js 16.2.1 application using TypeScript, React 19, and Tailwind CSS v4. The project was bootstrapped with create-next-app and uses the App Router architecture.
 
 The name of this application is Slab Advisor. The goal of the app is to provide a way for customers and users to manage their TCG card collection or sports card collection as well as pregrade and price the cards. when a user signs up/login they will be greated with their dashboards showing an overview of how many cards they have in their collection the estimated value of their collection. and how many followers they have or how many people they are following. there should be an add card to collection page which allows them to add a card to the colelction manually, analyze/identify card and price to automatically identify and price it, grade the card or do both automatically identify/price and grade card. there should be a collection page to view their current collection in a list view(like an excel preadsheet) or a card view by just seeing the image of a card and the name. there will be a card details page that contains all information of the card. there will also be a store page where members and non memer can go to buy card products. there will also be an account page where users can manage their account and buy more credits or change their subscription if applicable.
 
@@ -49,7 +49,7 @@ npm run test:coverage # Run tests with coverage report
 
 ### Key Technologies
 
-- **Next.js 15.3.4** with App Router
+- **Next.js 16.2.1** with App Router
 - **React 19** with Server Components
 - **TypeScript** with strict mode enabled
 - **Tailwind CSS v4** with PostCSS
@@ -64,7 +64,7 @@ npm run test:coverage # Run tests with coverage report
 
 ## Framework Documentation
 
-- **Next.js 15**: https://nextjs.org/docs
+- **Next.js 16**: https://nextjs.org/docs/app/getting-started
 - **React 19**: https://react.dev/reference/react
 - **TypeScript**: https://www.typescriptlang.org/docs/
 - **Tailwind CSS v4**: https://tailwindcss.com/docs
