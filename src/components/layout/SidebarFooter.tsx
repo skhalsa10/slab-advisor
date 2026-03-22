@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   DropdownMenu,
@@ -25,10 +26,11 @@ function getInitials(email: string): string {
 
 export default function SidebarFooter({ email, credits, onSignOut, onNavigate }: SidebarFooterProps) {
   const { theme, toggleTheme, isThemeLoading } = useTheme()
+  const [open, setOpen] = useState(false)
 
   return (
     <div className="flex-shrink-0 border-t border-sidebar-border p-2">
-      <DropdownMenu>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-sidebar-accent transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-sidebar">
             {/* Avatar */}
@@ -85,7 +87,7 @@ export default function SidebarFooter({ email, credits, onSignOut, onNavigate }:
               aria-checked={theme === 'DARK'}
               aria-label="Toggle dark mode"
               disabled={isThemeLoading}
-              onClick={toggleTheme}
+              onClick={() => { toggleTheme(); setOpen(false) }}
               className={`
                 relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full
                 border-2 border-transparent transition-colors duration-200 ease-in-out
