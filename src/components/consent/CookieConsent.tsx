@@ -63,12 +63,12 @@ export default function CookieConsent() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 transform transition-transform duration-300 ease-out ${
+      className={`fixed bottom-0 left-0 right-0 z-50 pointer-events-none transform transition-transform duration-300 ease-out ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
       <div className="mx-auto max-w-4xl p-4">
-        <div className="rounded-lg border border-border bg-card p-4 shadow-lg">
+        <div className="pointer-events-auto rounded-lg border border-border bg-card p-4 shadow-lg">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Message */}
             <div className="flex-1">
