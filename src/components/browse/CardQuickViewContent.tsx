@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getCardImageUrl } from '@/lib/pokemon-db'
-import { extractMarketPrices } from '@/utils/priceUtils'
 import { getEbaySearchUrl } from '@/utils/external-links'
 import { useAuth } from '@/hooks/useAuth'
 import { usePreserveFilters } from '@/hooks/useURLFilters'
@@ -423,6 +422,55 @@ export default function CardQuickViewContent({
   )
 }
 
+type RawPriceHistory = Record<string, Record<string, Array<{ market: number | null }>>>
+
+type RawPriceRecord = {
+  raw_price_history: RawPriceHistory | null
+  raw_history_variants_tracked: string[] | null
+  variant_pattern: string | null
+}
+
+/**
+ * Builds a sorted list of { label, price } from raw_price_history.
+ * One entry per variant (e.g. "Normal", "Reverse Holofoil"), using the
+ * most recent Near Mint price from the full price history.
+ */
+function buildAvailablePrices(card: CardFull): { label: string; price: number }[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const records = (card as any).pokemon_card_prices as RawPriceRecord[] | undefined
+  if (!records || records.length === 0) return []
+
+  const result: { label: string; price: number }[] = []
+
+  for (const record of records) {
+    const history = record.raw_price_history
+    const trackedVariants = record.raw_history_variants_tracked
+    if (!history || !trackedVariants) continue
+
+    for (const variantLabel of trackedVariants) {
+      const conditionHistory = history[variantLabel]
+      if (!conditionHistory) continue
+
+      // Prefer Near Mint, fall back to first available condition
+      const conditionEntries = conditionHistory['Near Mint'] ?? Object.values(conditionHistory)[0]
+      if (!conditionEntries || conditionEntries.length === 0) continue
+
+      // Most recent price is the last entry
+      const latestPrice = conditionEntries[conditionEntries.length - 1].market
+      if (latestPrice && latestPrice > 0) {
+        result.push({ label: variantLabel, price: latestPrice })
+      }
+    }
+  }
+
+  return result.sort((a, b) => {
+    const aOrder = VARIANT_SORT_ORDER[a.label] ?? 99
+    const bOrder = VARIANT_SORT_ORDER[b.label] ?? 99
+    if (aOrder !== bOrder) return aOrder - bOrder
+    return a.label.localeCompare(b.label)
+  })
+}
+
 // Price variant sort order: Normal first, then Holo, then Reverse, then others
 const VARIANT_SORT_ORDER: Record<string, number> = {
   'Normal': 1,
@@ -440,20 +488,7 @@ function PokemonDetails({ card, detailsHref, isTwoColumn = false }: { card: Card
   if (card.variant_reverse) variants.push('Reverse')
   if (card.variant_first_edition) variants.push('1st Edition')
 
-  const prices = extractMarketPrices(card.price_data)
-  // Sort prices: Normal first, then Holo, then Reverse, then alphabetically for others
-  const availablePrices = prices ? Object.entries(prices)
-    .filter(([, price]) => price > 0)
-    .map(([variant, price]) => ({
-      label: variant,
-      price: price as number
-    }))
-    .sort((a, b) => {
-      const aOrder = VARIANT_SORT_ORDER[a.label] ?? 99
-      const bOrder = VARIANT_SORT_ORDER[b.label] ?? 99
-      if (aOrder !== bOrder) return aOrder - bOrder
-      return a.label.localeCompare(b.label)
-    }) : []
+  const availablePrices = buildAvailablePrices(card)
 
   return (
     <div className="space-y-2">
@@ -570,19 +605,7 @@ function MobileMetadataGrid({ card }: { card: CardFull }) {
 
 // Mobile-specific price list with dotted leaders
 function MobilePriceList({ card }: { card: CardFull }) {
-  const prices = extractMarketPrices(card.price_data)
-  const availablePrices = prices ? Object.entries(prices)
-    .filter(([, price]) => price > 0)
-    .map(([variant, price]) => ({
-      label: variant,
-      price: price as number
-    }))
-    .sort((a, b) => {
-      const aOrder = VARIANT_SORT_ORDER[a.label] ?? 99
-      const bOrder = VARIANT_SORT_ORDER[b.label] ?? 99
-      if (aOrder !== bOrder) return aOrder - bOrder
-      return a.label.localeCompare(b.label)
-    }) : []
+  const availablePrices = buildAvailablePrices(card)
 
   return (
     <div className="border-t border-border pt-3">

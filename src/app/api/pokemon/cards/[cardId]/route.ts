@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/nextjs'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ cardId: string }> }
 ) {
   try {
@@ -42,10 +42,10 @@ export async function GET(
       )
     }
 
-    // Fetch prices from pokemon_card_prices table
+    // Fetch raw price records — no transformation, keep all fields for the component to use
     const { data: prices, error: pricesError } = await supabase
       .from('pokemon_card_prices')
-      .select('current_market_price, current_market_price_condition, variant_pattern')
+      .select('current_market_price, current_market_price_variant, current_market_price_condition, variant_pattern, raw_price_history, raw_history_variants_tracked')
       .eq('pokemon_card_id', cardId)
 
     if (pricesError) {
@@ -53,34 +53,9 @@ export async function GET(
       // Don't fail - continue without prices
     }
 
-    // Transform prices to legacy price_data format
-    let priceData: Array<{ subTypeName: string; marketPrice: number; variant_pattern?: string }> | null = null
-    if (prices && prices.length > 0) {
-      priceData = []
-      for (const price of prices) {
-        if (price.current_market_price && price.current_market_price > 0) {
-          let subTypeName = price.current_market_price_condition || 'Near Mint'
-          if (price.variant_pattern === 'poke_ball') {
-            subTypeName = `${subTypeName} (Poké Ball)`
-          } else if (price.variant_pattern === 'master_ball') {
-            subTypeName = `${subTypeName} (Master Ball)`
-          }
-
-          priceData.push({
-            subTypeName,
-            marketPrice: price.current_market_price,
-            variant_pattern: price.variant_pattern || undefined
-          })
-        }
-      }
-      if (priceData.length === 0) {
-        priceData = null
-      }
-    }
-
     return NextResponse.json({
       ...card,
-      price_data: priceData
+      pokemon_card_prices: prices || []
     })
   } catch (error) {
     Sentry.captureException(error, {

@@ -8,8 +8,17 @@ import { OwnedVariantPriceDisplay } from '@/components/collection/OwnedVariantPr
 import type { CardFull } from '@/models/pokemon'
 import type { CollectionCardWithPokemon } from '@/utils/collectionCardUtils'
 import { getCardDisplayName, getCardImageUrl } from '@/utils/collectionCardUtils'
-import { extractMarketPrices } from '@/utils/priceUtils'
+import { getCollectionCardPrice } from '@/utils/collectionPriceUtils'
 import { trackCardRemoved } from '@/lib/posthog/events'
+
+const CONDITION_DISPLAY: Record<string, string> = {
+  mint: 'Near Mint',
+  near_mint: 'Near Mint',
+  lightly_played: 'Lightly Played',
+  moderately_played: 'Moderately Played',
+  heavily_played: 'Heavily Played',
+  damaged: 'Damaged',
+}
 
 interface CollectionQuickViewContentProps {
   card: CollectionCardWithPokemon
@@ -67,6 +76,8 @@ export default function CollectionQuickViewContent({
   }
 
   const pokemonCard = card.pokemon_card as CardFull | null
+  const variantPrice = getCollectionCardPrice(card)
+  const priceCondition = CONDITION_DISPLAY[card.condition ?? ''] ?? 'Near Mint'
 
   return (
     <>
@@ -100,6 +111,8 @@ export default function CollectionQuickViewContent({
                 variant={card.variant}
                 variantPattern={card.variant_pattern}
                 quantity={card.quantity || 1}
+                price={variantPrice}
+                priceCondition={priceCondition}
               />
             )}
             
@@ -135,7 +148,9 @@ export default function CollectionQuickViewContent({
                 {card.condition && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Condition</span>
-                    <span className="font-medium">{card.condition}</span>
+                    <span className="font-medium">
+                      {card.condition.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                    </span>
                   </div>
                 )}
                 {card.acquisition_price !== null && (
@@ -211,61 +226,16 @@ function PokemonDetailsCollection({
   variant,
   variantPattern,
   quantity,
+  price,
+  priceCondition,
 }: {
   card: CardFull
   variant: string
   variantPattern?: string | null
   quantity: number
+  price: number | null
+  priceCondition: string
 }) {
-  // Get the price for the specific variant the user owns
-  const getVariantPrice = (): number | null => {
-    if (!card.price_data) return null
-
-    const prices = extractMarketPrices(card.price_data)
-    if (!prices) return null
-
-    // Map collection variant to price variant names
-    const variantMap: Record<string, string[]> = {
-      'normal': ['Normal'],
-      'holo': ['Holofoil', 'Holo'],
-      'reverse_holo': ['Reverse Holofoil', 'Reverse'],
-      'first_edition': ['1st Edition Normal', '1st Edition Holofoil', '1st Edition']
-    }
-
-    const targetPattern = variantPattern || 'base'
-    const priceVariantNames = variantMap[variant] || []
-
-    // Try to find price with pattern suffix first
-    for (const variantName of priceVariantNames) {
-      if (targetPattern !== 'base') {
-        const patternMap: Record<string, string> = {
-          'poke_ball': '(Poké Ball)',
-          'master_ball': '(Master Ball)',
-          'great_ball': '(Great Ball)',
-          'ultra_ball': '(Ultra Ball)',
-        }
-        const patternSuffix = patternMap[targetPattern]
-        if (patternSuffix) {
-          const keyWithPattern = `${variantName} ${patternSuffix}`
-          if (prices[keyWithPattern] && prices[keyWithPattern] > 0) {
-            return prices[keyWithPattern]
-          }
-        }
-      }
-
-      // Try base variant name (without pattern)
-      if (prices[variantName] && prices[variantName] > 0) {
-        return prices[variantName]
-      }
-    }
-
-    // Fallback to lowest available price
-    const allPrices = Object.values(prices).filter(price => price > 0)
-    return allPrices.length > 0 ? Math.min(...allPrices) : null
-  }
-
-  const variantPrice = getVariantPrice()
-
   return (
     <div className="space-y-3">
       <div>
@@ -300,16 +270,15 @@ function PokemonDetailsCollection({
       </div>
 
       {/* Owned Variant Price Display */}
-      {variantPrice !== null && (
+      {price !== null ? (
         <OwnedVariantPriceDisplay
-          price={variantPrice}
+          price={price}
+          condition={priceCondition}
           variant={variant}
           variantPattern={variantPattern}
           quantity={quantity}
         />
-      )}
-
-      {variantPrice === null && (
+      ) : (
         <div className="border-t pt-4 mt-4">
           <p className="text-sm text-muted-foreground italic text-center">
             Price data unavailable for this variant

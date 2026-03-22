@@ -2,6 +2,7 @@ import { formatPrice } from '@/utils/collectionPriceUtils'
 
 interface OwnedVariantPriceDisplayProps {
   price: number
+  condition: string
   variant: string
   variantPattern?: string | null
   quantity: number
@@ -13,6 +14,7 @@ interface OwnedVariantPriceDisplayProps {
  */
 export function OwnedVariantPriceDisplay({
   price,
+  condition,
   variant,
   variantPattern,
   quantity,
@@ -85,6 +87,10 @@ export function OwnedVariantPriceDisplay({
             </div>
           </div>
         )}
+
+        <p className="text-xs text-muted-foreground mt-3">
+          Based on {condition} condition market price
+        </p>
       </div>
     </div>
   )
