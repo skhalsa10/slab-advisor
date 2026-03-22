@@ -20,7 +20,7 @@ import {
   BYPASS_COOKIE_MAX_AGE,
 } from '@/lib/waitlist'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // ========== WAITLIST GATING (runs before Supabase auth for performance) ==========

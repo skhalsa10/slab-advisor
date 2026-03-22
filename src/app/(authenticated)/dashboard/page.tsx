@@ -7,8 +7,6 @@ import TopGemsWidget from '@/components/dashboard/top-gems'
 import MarketMoversWidget, { MarketMoversWidgetSkeleton } from '@/components/dashboard/market-movers'
 import { getPortfolioSnapshots, getLivePortfolioData } from '@/lib/portfolio-server'
 
-export const dynamic = 'force-dynamic'
-
 export default async function DashboardPage() {
   try {
     // Fetch data in parallel for better performance

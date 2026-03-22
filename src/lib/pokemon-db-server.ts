@@ -33,6 +33,7 @@ import type { Match, DatabaseCardMatch } from '@/types/ximilar'
  * ```
  */
 export async function getPokemonBrowseDataServer(): Promise<PokemonBrowseData> {
+  'use cache'
   try {
     const supabase = getServerSupabaseClient()
     
@@ -274,6 +275,7 @@ export async function getSetWithCardsAndProductsServer(setId: string): Promise<P
  * ```
  */
 export async function getNewestSetsServer(limit = 8): Promise<PokemonSetWithSeries[]> {
+  'use cache'
   try {
     const supabase = getServerSupabaseClient()
 
@@ -328,6 +330,7 @@ export async function getTopCardsFromNewestSetsServer(
   numSets = 2,
   cardsPerSet = 5
 ): Promise<Array<PokemonCard & { set: PokemonSetWithSeries }>> {
+  'use cache'
   try {
     const supabase = getServerSupabaseClient()
 

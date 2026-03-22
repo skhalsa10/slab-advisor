@@ -37,6 +37,7 @@ export interface TopMoverCard extends PokemonCard {
  * ```
  */
 export async function getTopMoversServer(limit = 10): Promise<TopMoverCard[]> {
+  'use cache'
   try {
     const supabase = getServerSupabaseClient()
 

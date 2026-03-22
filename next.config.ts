@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   // Prevents trailing slash redirects that break PostHog API calls
   skipTrailingSlashRedirect: true,
 
+  // Enable Cache Components: routes are dynamic by default, use "use cache" to opt-in to caching
+  cacheComponents: true,
+
   // Exclude scripts folder from file watching (contains large archives and data files)
   // Note: Turbopack automatically ignores non-src folders, webpack config is for production builds
   webpack: (config) => {
