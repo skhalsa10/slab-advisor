@@ -55,14 +55,13 @@ export default function CardListItem({
           onClick={(e) => onClick(e, card.id)}
           className="flex items-center text-left hover:text-orange-600 transition-colors"
         >
-          <div className="flex-shrink-0 h-12 w-9">
+          <div className="flex-shrink-0 h-12 w-9 relative">
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={card.name}
-                width={36}
-                height={48}
-                className="h-12 w-9 object-cover rounded"
+                fill
+                className="object-cover rounded"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none'
                 }}

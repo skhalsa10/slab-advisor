@@ -117,7 +117,7 @@ export default function TCGProduct({
     return (
       <div
         onClick={handleClick}
-        className={`group relative bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
+        className={`group relative flex flex-col h-full bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 cursor-pointer ${className}`}
       >
         {content}
       </div>
@@ -130,7 +130,7 @@ export default function TCGProduct({
       href={productHref}
       target={target}
       rel={rel}
-      className={`group relative bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
+      className={`group relative flex flex-col h-full bg-card rounded-lg overflow-hidden border border-border hover:border-orange-300 hover:shadow-lg transition-all duration-200 ${className}`}
     >
       {content}
     </a>
